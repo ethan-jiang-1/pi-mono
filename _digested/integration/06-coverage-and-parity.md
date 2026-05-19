@@ -1,0 +1,99 @@
+# 06 Coverage And Parity：哪些能接，哪些不是 TUI API
+
+## 这张表解决什么问题
+
+外部集成最容易掉进两个坑：
+
+- 看到 pi-mono 有 TUI，就以为能遥控所有 TUI 行为。
+- 看到 TUI 有各种快捷键和面板，就以为它们都有 SDK/RPC 等价物。
+
+更准确的说法是：pi-mono 的核心 runtime 能力可以通过 SDK（进程内）或 RPC（JSONL 子进程）接入，但 TUI 的产品外壳要由宿主自己实现。
+
+## Runtime 能力覆盖
+
+| 能力 | 当前外部接入 | 主要锚点 |
+|---|---|---|
+| 创建/管理 session | SDK：`createAgentSession()` / RPC：`new_session` | [`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts)、[`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
+| 发送 prompt | SDK：`session.prompt()` / RPC：`{"type":"prompt"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
+| steer（方向调整） | SDK：`session.steer()` / RPC：`{"type":"steer"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| follow-up（后续对话） | SDK：`session.followUp()` / RPC：`{"type":"follow_up"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| abort | SDK：`session.abort()` / RPC：`{"type":"abort"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 事件流 | SDK：`session.on("event", ...)` / RPC：stdout JSONL | [`types.ts`](../../packages/agent/src/types.ts)、[`agent-harness.ts`](../../packages/agent/src/harness/agent-harness.ts) |
+| compaction | SDK：`session.compact()` / RPC：`{"type":"compact"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| session fork / clone | SDK：`session.fork()` / RPC：`{"type":"fork"}`、`{"type":"clone"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| session 切换 | SDK：`session.switchSession()` / RPC：`{"type":"switch_session"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 模型切换 | SDK：`session.setModel()` / RPC：`{"type":"set_model"}`、`{"type":"cycle_model"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 思考深度控制 | SDK + RPC：`set_thinking_level`、`cycle_thinking_level` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| bash 直接执行 | SDK：`session.bash()` / RPC：`{"type":"bash"}` | [`bash-executor.ts`](../../packages/coding-agent/src/core/bash-executor.ts) |
+| session 统计 | SDK：`session.getSessionStats()` / RPC：`{"type":"get_session_stats"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 消息列表 | SDK：`session.getMessages()` / RPC：`{"type":"get_messages"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| HTML 导出 | SDK：`session.exportHtml()` / RPC：`{"type":"export_html"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 重试控制 | RPC：`set_auto_retry`、`abort_retry` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
+| 队列模式 | RPC：`set_steering_mode`、`set_follow_up_mode` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
+| 自定义工具 | SDK：`customTools` 参数 | [`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
+| 扩展系统 | SDK：通过 `AgentSession` 内部的 `ExtensionRunner` | [`runner.ts`](../../packages/coding-agent/src/core/extensions/runner.ts) |
+
+## TUI parity 不覆盖
+
+这些能力属于 TUI 客户端体验，不应假设 SDK/RPC 已有等价接口：
+
+| TUI 能力 | 外部 harness 应怎么处理 |
+|---|---|
+| 快捷键（Ctrl+P 切模型、Ctrl+T 切换思考等） | 宿主 UI 自己定义 |
+| dialog / picker | 宿主 UI 自己实现 |
+| toast / status bar / sidebar | 从事件和 agent state 投影 |
+| prompt draft / local stash | 宿主自存 |
+| theme / layout / selection | 宿主自存 |
+| timeline 视觉结构 | 用事件流中的 message + parts 自己渲染 |
+| 权限确认弹窗 | 自己实现阻断交互（hook-based，没有内置弹窗 API） |
+| extension UI（TUI 内的自定义界面） | 可选实现 `ExtensionUIContext`，第一版不必要 |
+| 交互式 bash（TUI 中的实时 stdin） | SDK/RPC 的 `bash` 命令只支持一次性执行 |
+| Markdown 渲染 | 宿主自渲染（事件中是原始文本） |
+
+TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages/coding-agent/src/modes/interactive/)，使用 React Ink 渲染。它不是 SDK 的 UI 层——它是 SDK 的一个 consumer，外部 UI 是另一个 consumer。
+
+## 部分覆盖或需要谨慎的能力
+
+| 能力 | 当前判断 |
+|---|---|
+| 多项目/多 workspace | AgentSession 绑定一个 cwd。多项目需要多个 session 实例 |
+| 远程 workspace | 不是内置能力。文件操作在本地文件系统 |
+| 多用户服务 | 没有认证、隔离、审计。需要宿主自己实现多用户管理层 |
+| 权限自动批准 | hook 层面可以总是返回 approve，但产品上要非常保守 |
+| 长会话恢复 | session 持久化到 JSONL 文件，重启后可恢复。RPC 进程崩溃后需重新 spawn |
+| web-ui 的纯前端方案 | Agent 在浏览器运行，调 LLM provider 直连。工具受限于浏览器沙箱 |
+| 扩展系统 | 通过 SDK 加载，jiti 运行时编译 TypeScript。外部集成通常不需要直接操作 |
+| 文件变更追踪 | `edit` 和 `write` 工具使用队列+去重机制，但不提供显式 diff API（需从 tool result 提取） |
+
+## 判断新能力时的规则
+
+看到一个 pi-mono 能力时，先问四个问题：
+
+1. 它是 runtime 状态，还是 TUI 客户端状态？
+2. 它是否有 SDK method、RPC command 或 type 暴露？
+3. 它是否需要 human-in-the-loop？
+4. 它是否涉及文件、shell、provider credential 或远程 workspace 风险？
+
+如果答案偏向 runtime，并且有 SDK/RPC 边界，就可以纳入 integration harness。否则先写成"宿主自实现 / CLI 绕路 / 未来设计建议"。
+
+## 和 OpenCode 的能力缺口
+
+| 能力 | OpenCode | pi-mono |
+|---|---|---|
+| HTTP server | `opencode serve` (端口 + mDNS) | 无 |
+| SSE 事件流 | 内置 `/event` | 无（RPC JSONL 等价，但不是 HTTP） |
+| 交互式权限 API | `/permission/:id/reply` | hook-based，无独立 API |
+| 交互式问题 API | `/question/:id/reply` | 无等价物 |
+| GitHub Action/Agent | 预置集成 | 无预置集成 |
+| Slack bot | 预置集成 | 无预置集成 |
+| MCP server 能力 | 有 CLI 管理工具 | 无 |
+| ACP 编辑器协议 | 支持 | 无 |
+| SDK 跨语言方案 | `@opencode-ai/sdk` (JS/TS) | RPC JSONL（任意语言可实现） |
+| CI JSON stream | `opencode run --format json` | RPC stdout JSONL |
+| in-process 嵌入 | SDK v2（实际 spawn 子进程） | SDK 真 in-process（同一事件循环） |
+
+## 当前推荐口径
+
+对外介绍 pi-mono integration harness 时，可以这样说：
+
+> pi-mono 可以作为本地 headless agent runtime 被其他产品嵌入。JS/TS 宿主优先用 SDK（`createAgentSession`，同进程调用），非 JS 宿主用 RPC 子进程方案（JSONL over stdin/stdout）。没有 HTTP server——这是 library-first 设计。TUI 只是一个参考实现（React Ink），不是必须复刻的 API surface。

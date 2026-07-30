@@ -1,5 +1,9 @@
 # _digested
 
+> **当前源码基线**：本文档集以 pi-mono `v0.75.3`（upstream tag，commit `76705633`）为准。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)；正文中的机制结论描述当前 release。
+>
+> ⚠️ **upstream 当前已到 v0.83.0**（989 commits ahead）。大部分文档的行号和部分 API 描述可能已过时。参见 [`_change_log/0002-v0.75.3-to-v0.83.0.md`](./_change_log/0002-v0.75.3-to-v0.83.0.md)。
+
 ## 这是什么
 
 `_digested/` 是 pi-mono 的"消化层"：它不替代源码、README 或正式 docs，而是把源码里分散的入口、协议、事件、Agent loop 和集成边界重新整理成更容易进入的心智模型。
@@ -97,9 +101,18 @@ pi-mono 里需要严格区分两种 harness：
 - 工具系统：`packages/coding-agent/src/core/tools/index.ts`、`tool-definition-wrapper.ts`
 - RPC 模式：`packages/coding-agent/src/modes/rpc/`
 
+## 子目录
+
+| 目录 | 聚焦 | 一句话 |
+|------|------|--------|
+| `agent/` | Agent 内核解剖 | 静态结构、运行时、内存管理、harness 机制 |
+| `integration/` | 外部集成 | SDK/RPC 两种接入路径、事件模型、recipes |
+| `_change_log/` | 上游同步记录 | 每次 upstream 版本同步的变更摘要和影响评估 |
+
 ## 用法
 
 - **分析产物**：所有 markdown 分析文档放入对应子目录。
 - **事实标记**：新增导览尽量区分"硬事实 / 解释 / 推测"，避免把未来方向写成已经发生。
 - **新增专题**：如果需要新的分析维度，创建新的子目录即可。
+- **版本追踪**：upstream 发布新版本后，在 `_change_log/` 中写 sync record，然后按影响评估更新受影响的专题文档。
 - **严禁**：不要编辑 `_digested/` 之外的任何文件，除非任务明确要求。

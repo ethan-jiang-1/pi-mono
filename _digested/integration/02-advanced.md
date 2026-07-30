@@ -111,7 +111,7 @@ JSONL 成帧逻辑在 [`packages/coding-agent/src/modes/rpc/jsonl.ts`](../../pac
 
 ```json
 {"type":"response","id":"req-1","payload":{"status":"running","...AgentState...}}
-{"type":"event","event":{"type":"message.updated","...AgentEvent...}}
+{"type":"event","event":{"type":"message.updated","...AgentSessionEvent...}}
 {"type":"ended","id":"...","payload":{"messageId":"..."}}
 ```
 

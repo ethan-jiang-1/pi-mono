@@ -1,28 +1,27 @@
 # pi-mono Agent 架构手册
 
+> **⚠️ v0.83.0 注意**：本文档集基于 v0.75.3 源码编写。v0.75.3→v0.83.0 有重大 API 变更：`AgentEvent`→`AgentSessionEvent`、`ExecutionEnv`→`Models`、AgentHarness 新增泛型 `TContext`、`AgentHarnessTool` 新增 context 参数、新增 `agent/src/harness/tools/` 目录。行号和部分 API 描述可能已过时。参见 [`../_change_log/`](../_change_log/README.md)。
+
 本目录聚焦 pi-mono 的 Agent 内核：`packages/agent`（纯运行时）和 `packages/coding-agent`（应用层扩展）共同构成的 agent 系统。
 
 ## 阅读路径
 
 1. 先读 [01-Anatomy](./01-Anatomy/README.md) — 静态结构
-2. 然后回到本文件查看"按问题读"定位具体问题
-3. 深入源码时以每篇文章的"源码锚点"为入口
-
-相比 OpenCode 的四层体系（01-Anatomy / 02-Runtime / 03-Memory / 04-Harness），pi-mono 的 agent 层更紧凑。核心原因是：
-
-- **pi-mono 的 Agent 内核设计极度干净。** `packages/agent` 只有 ~700 行的 agent-loop，没有任何内置的工具实现、权限引擎或内存管理策略——这些全部通过 `AgentLoopConfig` 的回调点暴露给上层（coding-agent 或外部宿主）自己决定。
-- **扩展系统是应用层的事。** 不像 OpenCode 把插件/ACP/MCP 作为内核的一部分，pi-mono 的扩展系统全在 `packages/coding-agent` 里，agent 内核甚至不知道扩展的存在。
-- **内存管理在会话层。** 压缩、截断、上下文预算等都由 `packages/coding-agent/src/core/compaction/` 处理，不是 agent 内核的职责。
-
-因此本目录当前只有一层：**01-Anatomy**。它覆盖了理解 agent 系统所需的所有静态结构。
+2. 再读 [02-Runtime](./02-Runtime/README.md) — 运行时循环和 pipeline
+3. 然后读 [03-Memory](./03-Memory/README.md) — 内存管理和 compaction
+4. 最后读 [04-Harness](./04-Harness/README.md) — 工具执行和 harness 基础设施
+5. 深入源码时以每篇文章的"源码锚点"为入口
 
 ## 章节导航
 
 - [01-Anatomy](./01-Anatomy/README.md): 静态结构、消息模型、工具注册、扩展系统
   - [1.1_Agent_Info.md](./01-Anatomy/1.1_Agent_Info.md): Agent 身份、配置与生命周期
   - [1.2_Message_Graph.md](./01-Anatomy/1.2_Message_Graph.md): 消息类型系统与 LLM 转换桥
-  - [1.3_Tool_Registry.md](./01-Anatomy/1.3_Tool_Registry.md): 双层工具系统与执行模式
+  - [1.3_Tool_Registry.md](./01-Anatomy/1.3_Tool_Registry.md): 三层工具系统与执行模式
   - [1.4_Extension_System.md](./01-Anatomy/1.4_Extension_System.md): 扩展生命周期、事件扇出与能力注入
+- [02-Runtime](./02-Runtime/README.md): Agent 运行时循环、pipeline、queue、cancellation
+- [03-Memory](./03-Memory/README.md): Compaction、token 估算、session tree
+- [04-Harness](./04-Harness/README.md): AgentHarness、Skills、System Prompt、Extension Runner、Bash/Edit/Write Tools
 
 ## 按问题读
 
@@ -31,6 +30,9 @@
 - 想看"工具为什么有三层类型系统、怎么注册、怎么控制执行顺序": 读 [1.3_Tool_Registry.md](./01-Anatomy/1.3_Tool_Registry.md)
 - 想看"扩展怎么加载、事件怎么扇出、runtime provider 怎么注册": 读 [1.4_Extension_System.md](./01-Anatomy/1.4_Extension_System.md)
 - 想看"Agent 一次回答为什么会分多轮继续跑、steering 和 follow-up 有什么区别": 读 [1.1_Agent_Info.md](./01-Anatomy/1.1_Agent_Info.md) 的 QueueMode 部分 + `packages/agent/src/agent-loop.ts` 的 `runLoop()`
+- 想看"Agent 的双层 loop 和 stream/execute pipeline": 读 [02-Runtime/](./02-Runtime/README.md)
+- 想看"compaction、token 估算和 session tree": 读 [03-Memory/](./03-Memory/README.md)
+- 想看"AgentHarness、skills、bash/edit/write 工具怎么执行": 读 [04-Harness/](./04-Harness/README.md)
 
 ## 写作定调（统一标准）
 
@@ -55,8 +57,28 @@
 - `核心矛盾` 必须明确至少两条会互相拉扯的目标；如果只剩术语罗列（例如仅列模块名），应并入上游章节的"实现思想"小节。
 - 单篇若无法给出可验证的最小例子（看不到可观察信号），优先合并，不勉强保留。
 
+## 已知缺口（v0.83.0 新结构未覆盖）
+
+以下 v0.83.0 新增目录在 `_digested/` 中尚无专题分析：
+
+| 目录 | 文件数 | 一句话 | 优先级 |
+|------|--------|--------|--------|
+| `packages/ai/src/api/` | 31 | wire-protocol streaming 层，lazy loading 架构 | 高 |
+| `packages/ai/src/auth/` | 16 | 一阶 auth 子系统（credential store + OAuth 7 providers） | 高 |
+| `packages/agent/src/harness/tools/` | 10 | factory 模式工具架构（bash/read/write/edit） | 中 |
+| `packages/coding-agent/src/extensions/` | 6 | built-in extensions 层 + llama.cpp 参考实现 | 中 |
+| `packages/ai/src/compat/` | 1 | legacy extension OAuth type shim | 低 |
+
+参见 [`_change_log/_scout-v0.83.0.md`](../_change_log/_scout-v0.83.0.md) 了解每个目录的详细分析。
+
 ## 收敛说明
 
-- 当前为初始版本，覆盖了理解 pi-mono agent 系统的最小必要范围。
+- 当前已从初始版本（只有 01-Anatomy）扩展到完整的 4 个 section（01-Anatomy / 02-Runtime / 03-Memory / 04-Harness），共 21 篇。
+- 基于 v0.75.3 源码编写。行号在 v0.83.0 中已全部漂移。
+- v0.83.0 的重要变化（影响 agent/ 文档）：
+  - `AgentEvent` → `AgentSessionEvent`，事件类型从 `agent/src/types.ts` 移入 `agent/src/harness/types.ts`
+  - AgentHarness 新增泛型 `TContext`；`ExecutionEnv` 被 `Models` 替代
+  - 新增 `agent/src/harness/tools/` 目录（factory 模式工具架构）
+  - `ThinkingLevel` 新增 `"max"`；Compaction 支持 retry 和 `retainedTail`
+  - `ModelSelectEvent`/`ThinkingLevelSelectEvent` 改名为 `ModelUpdateEvent`/`ThinkingLevelUpdateEvent`
 - 未来如果 `packages/agent` 和 `packages/coding-agent` 的职责边界有变化，需要更新本目录的映射。
-- 与 OpenCode 的主要区别：pi-mono 没有内置的 Agent 角色（build/plan/explore），没有权限引擎（permission ask/deny），工具数量少得多（7 个 vs 20+），但扩展系统和 SDK 集成路径更加清晰。

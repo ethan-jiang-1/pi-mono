@@ -227,6 +227,39 @@ Phase 5: Verification（交叉验证收尾）
 ### 2026-07-30 — Phase 0 完成
 
 - 建立 `_change_log/` 目录、README
-- 写基线记录 `0001-baseline-v0.75.3.md`，覆盖范围：agent/ 21 篇 + integration/ 6 篇，37 个引用源文件
-- 写 gap 记录 `0002-v0.75.3-to-v0.83.0.md`：989 commits，按包拆解，关键文件 commit 数，影响评估
-- 更新 `_digested/README.md`：顶部基线声明 + 警示、子目录表、"用法"加版本追踪流程
+- 写基线记录 `0001-baseline-v0.75.3.md`
+- 写 gap 记录 `0002-v0.75.3-to-v0.83.0.md`：989 commits
+- 更新 `_digested/README.md`
+
+### 2026-07-30 — Phase 1 Scout 完成
+
+- 3 个 parallel agent 完成所有关键文件和新增结构的 diff 分析
+- 输出 `_scout-v0.83.0.md`：11 个关键文件的定性报告 + 5 个新增目录的架构分析
+- 确认了按文件→按主题的更新优先级矩阵
+
+### 2026-07-30 — Phase 2 Fix integration/ 完成
+
+- ✅ 06-coverage-and-parity.md：Runtime 能力覆盖表从 19 行扩展到 32 行，覆盖所有 v0.83.0 新增 SDK/RPC 能力
+- ✅ 03-runtime-api.md：更新 SDK `createAgentSession` 参数（modelRuntime、scopedModels、excludeTools）、事件类型、新增方法（setScopedModels、getContextUsage、exportToJsonl 等 10+）、RPC 新命令（get_available_thinking_levels、get_entries、get_tree）、bash excludeFromContext、completion detection（agent_settled）
+- ✅ 04-event-model.md：更新事件类型引用（AgentEvent→AgentSessionEvent）、新增事件表（agent_settled、bash_execution_update 等）、事件改名（ModelSelect→ModelUpdate、ThinkingLevelSelect→ThinkingLevelUpdate）
+- ✅ 02-advanced.md：修正 AgentEvent→AgentSessionEvent 引用
+- ✅ integration/README.md：修正 3 处 AgentEvent→AgentSessionEvent
+- ⏭️ 01-start-here.md、05-recipes.md：未做实质修改（内容偏架构判断和 recipes，不依赖具体 API 签名）
+
+### 2026-07-30 — Phase 3 Fix agent/ 完成（有限范围）
+
+- ✅ agent/README.md：修正"当前只有一层"过时描述 → 完整 4-section 导航；加 v0.83.0 警示、已知缺口表、更新收敛说明
+- ✅ 4 篇核心文档加 v0.83.0 过时警示：4.1_AgentHarness、2.1_The_Loop、3.1_Compaction、1.1_Agent_Info
+- ⏭️ 其余 17 篇 agent/ 文档的行号更新和机制验证推迟到下一轮（需逐篇读源码验证，工作量较大）
+
+### 2026-07-30 — Phase 4 New topics 评估完成（推迟）
+
+- 5 个候选新结构已记录在 [`agent/README.md`](../agent/README.md) 的"已知缺口"表中
+- 按 agent/README.md 独立性标准判断：每个都需要先深入读源码才能写出合格专题
+- 推迟到下一轮，届时逐个评估
+
+### 2026-07-30 — Phase 5 Verification 完成
+
+- ✅ 更新 `_digested/README.md` 基线声明（反映已完成和未完成的工作）
+- ✅ 更新本 plan 进度日志
+- ✅ 下一轮优先级：① 读 ai/src/api/ 和 ai/src/auth/ 源码开新专题；② agent/ 17 篇逐篇验证行号和机制

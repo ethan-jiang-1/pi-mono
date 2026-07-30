@@ -22,14 +22,21 @@ import { createAgentSession } from "pi-mono/coding-agent"
 const session = await createAgentSession({
   cwd: "/path/to/project",        // 项目目录
   model: myModel,                  // pi-ai Model 实例
-  thinkingLevel: "medium",         // "off" | "low" | "medium" | "high"
+  thinkingLevel: "medium",         // "off" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max"
+  scopedModels: [                  // 可选：Ctrl+P 模型轮换范围
+    { model: opusModel, thinkingLevel: "xhigh" },
+    { model: haikuModel },
+  ],
   tools: ["read", "bash", "edit", "write"],  // 可选：工具白名单
-  noTools: undefined,              // 可选："all" | "builtin"
+  excludeTools: ["bash"],          // 可选：工具黑名单（在 tools 之后应用）
+  noTools: undefined,              // 可选："all" | "builtin"（默认工具抑制模式）
   customTools: [],                 // 可选：自定义 ToolDefinition[]
+  modelRuntime: myRuntime,         // 可选：统一的 model/auth runtime（替代旧 authStorage + modelRegistry）
+  sessionStartEvent: myMetadata,   // 可选：session 启动时传给 extension 的元数据
 })
 ```
 
-`CreateAgentSessionOptions` 定义在 [`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts)，包含了 cwd、model、auth、tools、extension 等所有初始化参数。
+`CreateAgentSessionOptions` 定义在 [`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts)。v0.75.3→v0.83.0 的重要变化：**`modelRuntime` 替代了旧的 `authStorage` + `modelRegistry`**；新增 `scopedModels`、`excludeTools`、`sessionStartEvent`。
 
 ### 发送 prompt
 
@@ -52,7 +59,8 @@ await session.abort()
 ### 订阅事件
 
 ```ts
-session.on("event", (event: AgentEvent) => {
+session.on("event", (event: AgentSessionEvent) => {
+  // 注：v0.83.0 中事件类型从 AgentEvent 改为 AgentSessionEvent
   switch (event.type) {
     case "message.updated":
       // 消息元信息更新
@@ -72,12 +80,21 @@ session.on("event", (event: AgentEvent) => {
     case "tool.ended":
       // 工具执行完成
       break
+    case "agent_settled":
+      // agent run 完全结束（替代旧的 agent_end）
+      // 用于 idle 检测：无 pending retries/compactions/continuations
+      break
+    case "bash_execution_update":
+      // bash 执行过程中的流式输出更新（v0.83.0 新增）
+      break
     case "session.status":
       // 状态变化：running / idle / busy
       break
     case "session.error":
       // 错误事件
       break
+  }
+})
   }
 })
 ```
@@ -88,22 +105,40 @@ session.on("event", (event: AgentEvent) => {
 // Compaction
 await session.compact()
 await session.setAutoCompaction(true)
+await session.abortBranchSummary()     // 取消 branch summary
 
 // Session 树
 await session.fork(entryId)
 await session.cloneSession()
 await session.switchSession(sessionPath)
+session.setSessionName("auth-fix")     // 命名 session
 
 // 查询
 const stats = await session.getSessionStats()     // tokens, 消息数
 const msgs = await session.getMessages()           // 消息列表
 const text = await session.getLastAssistantText()  // 最后 assistant 文本
+const usage = session.getContextUsage()            // context 窗口使用情况（v0.83.0 新增）
+const forkMsgs = session.getUserMessagesForForking() // fork 候选消息（v0.83.0 新增）
 
 // 导出
 await session.exportHtml({ outputPath: "/tmp/session.html" })
+await session.exportToJsonl("/tmp/session.jsonl")  // JSONL 导出（v0.83.0 新增）
 
 // Bash 直接执行
 const bashResult = await session.bash("npm test")
+
+// 工具管理
+const allTools = session.getAllTools()            // 所有已注册工具
+const active = session.getActiveToolNames()       // 当前激活的工具名列表
+session.setActiveToolsByName(["read", "write"])   // 动态切换工具（v0.83.0 新增）
+
+// 模型管理
+session.setScopedModels([                         // 设置模型轮换范围（v0.83.0 新增）
+  { model: opusModel, thinkingLevel: "xhigh" },
+])
+
+// 扩展
+session.hasExtensionHandlers("project_trust")     // 检查扩展是否处理某事件（v0.83.0 新增）
 ```
 
 ## 2. RPC 路线：subprocess
@@ -177,6 +212,8 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 → {"type":"cycle_model"}
 → {"type":"set_thinking_level","level":"high"}
 → {"type":"cycle_thinking_level"}
+→ {"type":"get_available_thinking_levels"}     // v0.83.0 新增
+← {"type":"response","payload":{"levels":["off","minimal","low","medium","high","xhigh","max"]}}
 ```
 
 ### compaction
@@ -200,12 +237,25 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 → {"type":"export_html","outputPath":"/tmp/session.html"}
 → {"type":"get_messages"}
 → {"type":"get_last_assistant_text"}
+→ {"type":"get_fork_messages"}         // v0.83.0 新增
 ```
+
+### session entries 浏览（v0.83.0 新增）
+
+```
+→ {"type":"get_entries","since":"entry_abc123"}  // since 可选
+← {"type":"response","payload":{"entries":[...],"leafId":"..."}}
+
+→ {"type":"get_tree"}
+← {"type":"response","payload":{"tree":[...],"leafId":"..."}}
+```
+
+这两个命令让外部 harness 可以浏览 session 的 entries 树结构。
 
 ### bash 直接执行
 
 ```
-→ {"type":"bash","command":"npm test"}
+→ {"type":"bash","command":"npm test","excludeFromContext":false}  // excludeFromContext v0.83.0 新增
 ← {"type":"event","event":{"type":"bash.output","stdout":"...","stderr":"..."}}
 ← {"type":"response","id":null,"payload":{"exitCode":0,"...}}
 → {"type":"abort_bash"}
@@ -231,8 +281,8 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 
 最稳的完成信号：
 
-- SDK：`session.status` 变为 `"idle"`，或 prompt/steer/followUp 返回的 Promise resolve。
-- RPC：收到 `{"type":"ended",...}` 消息。
+- SDK：`session.waitForIdle()` Promise resolve，或监听 `agent_settled` 事件（v0.83.0 中 `agent_settled` 替代了旧的 `agent_end`）。
+- RPC：收到 `{"type":"ended",...}` 消息，或监听 `agent_settled` 事件。
 
 ## 最小状态机
 

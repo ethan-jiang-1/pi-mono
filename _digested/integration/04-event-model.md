@@ -9,11 +9,11 @@ pi-mono 的事件通道：
 - **SDK**：`session.on("event", callback)` — EventEmitter 风格。
 - **RPC**：stdout 的 `{"type":"event",...}` JSONL 行。
 
-事件类型定义在 [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts) 的 `AgentEvent` union type。
+事件类型定义在 [`packages/agent/src/harness/types.ts`](../../packages/agent/src/harness/types.ts) 的 `AgentSessionEvent` union type（v0.83.0：从 `AgentEvent` 改名，并移入 harness types）。
 
 ## 事件的基本形态
 
-Agent 运行时会产生一系列 `AgentEvent`。每个事件有 `type` 字段区分类别，payload 可包含 message、part、tool、turn 等不同数据。
+Agent 运行时会产生一系列 `AgentSessionEvent`。每个事件有 `type` 字段区分类别，payload 可包含 message、part、tool、turn 等不同数据。
 
 事件是**推模型**——Agent 主动产生，宿主被动接收。
 
@@ -26,9 +26,13 @@ Agent 运行时会产生一系列 `AgentEvent`。每个事件有 `type` 字段�
 | **消息** | `message.updated` | user/assistant message 元信息变化 |
 | **Part** | `message.part.updated` | text、tool、reasoning 等 part 增量更新 |
 | **Turn** | `turn.started`、`turn.ended` | 标记一轮 prompt-response 的开始和结束 |
-| **Tool** | `tool.started`、`tool.ended`、`tool.*` | 工具执行的生命周期 |
+| **Tool** | `tool.started`、`tool.ended` | 工具执行的生命周期 |
 | **Session** | `session.status`、`session.error` | 判断 running/idle/busy、展示错误 |
-| **Compaction** | compaction 相关事件 | 上下文压缩开始和完成 |
+| **Agent settled** | `agent_settled` | **v0.83.0 新增**：agent run 完全结束（替代旧的 `agent_end`），用于 idle 检测 |
+| **Bash 更新** | `bash_execution_update` | **v0.83.0 新增**：bash 执行过程中的流式输出更新 |
+| **模型/思考变更** | `model_update`、`thinking_level_update` | **v0.83.0 改名**：从 `model_select`/`thinking_level_select` 改名 |
+| **Compaction** | compaction 事件 + `summarization_retry_*` | 上下文压缩及重试事件（v0.83.0 新增 retry 系列） |
+| **Entry** | `entry_appended` | **v0.83.0 新增**：session entry 追加 |
 
 ## `message.part.updated` 怎么渲染
 
@@ -99,7 +103,7 @@ RPC 模式下，事件被序列化为 JSONL 行：
 
 宿主需要在 JSONL 解析中区分三种顶级消息类型：
 
-- `{"type":"event", ...}` → AgentEvent
+- `{"type":"event", ...}` → AgentSessionEvent（v0.83.0：从 AgentEvent 改名）
 - `{"type":"response", "id":"...", ...}` → 对带 id 命令的直接响应
 - `{"type":"ended", ...}` → prompt/steer/follow_up 完成
 

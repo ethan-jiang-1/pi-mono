@@ -38,7 +38,7 @@ flowchart LR
   AgentSession --> Loop["runLoop<br/>双层状态机"]
   RpcClient --> Loop
   
-  Loop --> Event["AgentEvent stream<br/>事件驱动 UI 更新"]
+  Loop --> Event["AgentSessionEvent stream<br/>事件驱动 UI 更新"]
   Event --> Host
 
   TUI["原终端 TUI<br/>React Ink / interactive mode"] -->|同一套 SDK| AgentSession
@@ -97,7 +97,7 @@ node dist/cli.js --mode rpc
 ## 研究时要坚持的边界
 
 - **先按宿主场景思考。** 不是"源码有什么我就写什么"，而是"Web UI、后台任务、CI、编辑器分别需要什么 harness"。
-- **先讲能不能，再讲 endpoint。** 新人先要判断路线，不该一开始就被 RPC command type、AgentEvent payload 淹没。
+- **先讲能不能，再讲 endpoint。** 新人先要判断路线，不该一开始就被 RPC command type、AgentSessionEvent payload 淹没。
 - **核心能力和 TUI 产品外壳分开。** SDK/RPC 能接核心 agent loop，但不能直接遥控完整 TUI（快捷键、picker、布局）。
 - **内部 harness 和外部 harness 分开。** `agent/04-Harness` 讲扩展、Skill、工具、系统提示词如何进入 Agent；本目录讲宿主系统怎么接 pi-mono。
 - **当前事实和未来设计分开。** 没有 HTTP server 就写没有；未来可以设计，但不能写成现状。
@@ -108,7 +108,7 @@ node dist/cli.js --mode rpc
 - [`01-start-here.md`](01-start-here.md)：入门版，判断路线、SDK vs RPC、最小闭环。
 - [`02-advanced.md`](02-advanced.md)：进阶版，三层架构、为什么 library-first、RPC 协议设计、web-ui 特殊性。
 - [`03-runtime-api.md`](03-runtime-api.md)：真正开始写代码时读，RPC 命令全集、SDK API 调用顺序。
-- [`04-event-model.md`](04-event-model.md)：做自己的 UI 时读，AgentEvent 分类、渲染策略、重连恢复。
+- [`04-event-model.md`](04-event-model.md)：做自己的 UI 时读，AgentSessionEvent 分类、渲染策略、重连恢复。
 - [`05-recipes.md`](05-recipes.md)：按产品形态选方案，Web/Tauri、本地后台、CI、IDE 插件。
 - [`06-coverage-and-parity.md`](06-coverage-and-parity.md)：更细的能力边界表，保留给需要核对 parity 的读者。
 

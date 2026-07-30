@@ -2,7 +2,9 @@
 
 > **当前源码基线**：本文档集以 pi-mono `v0.75.3`（upstream tag，commit `76705633`）为准。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)；正文中的机制结论描述当前 release。
 >
-> ⚠️ **upstream 当前已到 v0.83.0**（989 commits ahead）。大部分文档的行号和部分 API 描述可能已过时。参见 [`_change_log/0002-v0.75.3-to-v0.83.0.md`](./_change_log/0002-v0.75.3-to-v0.83.0.md)。
+> ⚠️ **upstream 当前已到 v0.83.0**（989 commits ahead，2026-07-30 更新）。**2026-07-30 已做第一轮更新**：integration/（06/03/04/02/README）已更新 API 描述和事件类型；agent/README 和 4 篇核心文档已加 v0.83.0 过时警示。**以下尚未更新**：agent/ 内其余 16 篇文档的行号和机制细节；5 个新增源码结构（`ai/api/`、`ai/auth/`、`agent/harness/tools/` 等）尚无专题分析。
+>
+> 参见 [`_change_log/_plan-1-v0.83.0.md`](./_change_log/_plan-1-v0.83.0.md) 了解完整计划和进度。
 
 ## 这是什么
 

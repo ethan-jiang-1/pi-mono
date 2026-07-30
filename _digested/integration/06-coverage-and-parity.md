@@ -19,19 +19,33 @@
 | follow-up（后续对话） | SDK：`session.followUp()` / RPC：`{"type":"follow_up"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | abort | SDK：`session.abort()` / RPC：`{"type":"abort"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 事件流 | SDK：`session.on("event", ...)` / RPC：stdout JSONL | [`types.ts`](../../packages/agent/src/types.ts)、[`agent-harness.ts`](../../packages/agent/src/harness/agent-harness.ts) |
+| 等待 idle（agent settled） | SDK：`session.waitForIdle()` / RPC：监听 `agent_settled` 事件 | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | compaction | SDK：`session.compact()` / RPC：`{"type":"compact"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| branch summary abort | SDK：`session.abortBranchSummary()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | session fork / clone | SDK：`session.fork()` / RPC：`{"type":"fork"}`、`{"type":"clone"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | session 切换 | SDK：`session.switchSession()` / RPC：`{"type":"switch_session"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 模型切换 | SDK：`session.setModel()` / RPC：`{"type":"set_model"}`、`{"type":"cycle_model"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| 思考深度控制 | SDK + RPC：`set_thinking_level`、`cycle_thinking_level` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| bash 直接执行 | SDK：`session.bash()` / RPC：`{"type":"bash"}` | [`bash-executor.ts`](../../packages/coding-agent/src/core/bash-executor.ts) |
+| 模型轮换范围（scoped models） | SDK：`session.setScopedModels()` / `CreateAgentSessionOptions.scopedModels` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
+| 思考深度控制 | SDK + RPC：`set_thinking_level`、`cycle_thinking_level`、`get_available_thinking_levels` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| bash 直接执行 | SDK：`session.bash()` / RPC：`{"type":"bash"}`（支持 `excludeFromContext`） | [`bash-executor.ts`](../../packages/coding-agent/src/core/bash-executor.ts) |
+| bash 中断 | SDK：`session.abortBash()` / RPC：`{"type":"abort_bash"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | session 统计 | SDK：`session.getSessionStats()` / RPC：`{"type":"get_session_stats"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| context 使用追踪 | SDK：`session.getContextUsage()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 消息列表 | SDK：`session.getMessages()` / RPC：`{"type":"get_messages"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | HTML 导出 | SDK：`session.exportHtml()` / RPC：`{"type":"export_html"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| JSONL 导出 | SDK：`session.exportToJsonl()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| fork 消息获取 | SDK：`session.getUserMessagesForForking()` / RPC：`{"type":"get_fork_messages"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| session 命名 | SDK：`session.setSessionName()` / RPC：`{"type":"set_session_name"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| session entries 浏览 | RPC：`get_entries`、`get_tree` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | 重试控制 | RPC：`set_auto_retry`、`abort_retry` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | 队列模式 | RPC：`set_steering_mode`、`set_follow_up_mode` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
+| 工具管理 | SDK：`getActiveToolNames()`、`getAllTools()`、`getToolDefinition()`、`setActiveToolsByName()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 工具排除（excludeTools） | SDK：`CreateAgentSessionOptions.excludeTools`、`noTools` | [`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | 自定义工具 | SDK：`customTools` 参数 | [`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | 扩展系统 | SDK：通过 `AgentSession` 内部的 `ExtensionRunner` | [`runner.ts`](../../packages/coding-agent/src/core/extensions/runner.ts) |
+| 扩展事件查询 | SDK：`session.hasExtensionHandlers(eventType)` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| session context 替换 | SDK：`session.createReplacedSessionContext()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| auth/runtime（ModelRuntime） | SDK：`CreateAgentSessionOptions.modelRuntime`（替代旧 `authStorage` + `modelRegistry`） | [`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 
 ## TUI parity 不覆盖
 

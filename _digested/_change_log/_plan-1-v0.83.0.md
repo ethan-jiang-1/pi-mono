@@ -252,14 +252,16 @@ Phase 5: Verification（交叉验证收尾）
 - ✅ 4 篇核心文档加 v0.83.0 过时警示：4.1_AgentHarness、2.1_The_Loop、3.1_Compaction、1.1_Agent_Info
 - ⏭️ 其余 17 篇 agent/ 文档的行号更新和机制验证推迟到下一轮（需逐篇读源码验证，工作量较大）
 
-### 2026-07-30 — Phase 4 New topics 评估完成（推迟）
+### 2026-07-30 — Phase 3 补充完成
 
-- 5 个候选新结构已记录在 [`agent/README.md`](../agent/README.md) 的"已知缺口"表中
-- 按 agent/README.md 独立性标准判断：每个都需要先深入读源码才能写出合格专题
-- 推迟到下一轮，届时逐个评估
+- ✅ 剩余 17 篇 agent/ 文档全部加 v0.83.0 过时警示（涵盖 API 改名、机制变化、行号失效）
+- ✅ agent/ 全部 21 篇 + 4 个 section README 均有版本警示
 
-### 2026-07-30 — Phase 5 Verification 完成
+### 2026-07-30 — Phase 4 New topics 完成
 
-- ✅ 更新 `_digested/README.md` 基线声明（反映已完成和未完成的工作）
-- ✅ 更新本 plan 进度日志
-- ✅ 下一轮优先级：① 读 ai/src/api/ 和 ai/src/auth/ 源码开新专题；② agent/ 17 篇逐篇验证行号和机制
+- ✅ 新建 `agent/05-Infra/` section：README + 2 篇专题
+  - `5.1_AI_API_Layer.md`：api/ 三层架构、lazyApi/lazyStream 模式、stream 函数合约、cross-provider 共享模块
+  - `5.2_AI_Auth_Subsystem.md`：credential 类型层级、resolveProviderAuth 管道、CredentialStore 并发模型、OAuth 架构（PKCE + device-code + 4 个 provider 实现）
+- ✅ 新建 `agent/04-Harness/4.7_Harness_Tools.md`：factory 模式、ExecutionEnv 抽象、file mutation queue 设计
+- ✅ 更新 `agent/README.md`：新增 05-Infra 和 4.7 导航；已知缺口表标记 3 项已完成
+- ⏭️ 剩余缺口：`coding-agent/src/extensions/`（llama.cpp）和 `ai/src/compat/`（低优先级）

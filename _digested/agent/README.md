@@ -22,6 +22,11 @@
 - [02-Runtime](./02-Runtime/README.md): Agent 运行时循环、pipeline、queue、cancellation
 - [03-Memory](./03-Memory/README.md): Compaction、token 估算、session tree
 - [04-Harness](./04-Harness/README.md): AgentHarness、Skills、System Prompt、Extension Runner、Bash/Edit/Write Tools
+  - ... (6 篇)
+  - [4.7_Harness_Tools.md](./04-Harness/4.7_Harness_Tools.md): **v0.83.0 新增** — factory 模式工具架构
+- [05-Infra](./05-Infra/README.md): **v0.83.0 新增** — AI 基础设施层（API adapter、auth 子系统）
+  - [5.1_AI_API_Layer.md](./05-Infra/5.1_AI_API_Layer.md): wire-protocol streaming 与 lazy loading
+  - [5.2_AI_Auth_Subsystem.md](./05-Infra/5.2_AI_Auth_Subsystem.md): credential 生命周期与 OAuth 流程
 
 ## 按问题读
 
@@ -63,9 +68,9 @@
 
 | 目录 | 文件数 | 一句话 | 优先级 |
 |------|--------|--------|--------|
-| `packages/ai/src/api/` | 31 | wire-protocol streaming 层，lazy loading 架构 | 高 |
-| `packages/ai/src/auth/` | 16 | 一阶 auth 子系统（credential store + OAuth 7 providers） | 高 |
-| `packages/agent/src/harness/tools/` | 10 | factory 模式工具架构（bash/read/write/edit） | 中 |
+| `packages/ai/src/api/` | 31 | ✅ 已写 [5.1_AI_API_Layer.md](./05-Infra/5.1_AI_API_Layer.md) | — |
+| `packages/ai/src/auth/` | 16 | ✅ 已写 [5.2_AI_Auth_Subsystem.md](./05-Infra/5.2_AI_Auth_Subsystem.md) | — |
+| `packages/agent/src/harness/tools/` | 10 | ✅ 已写 [4.7_Harness_Tools.md](./04-Harness/4.7_Harness_Tools.md) | — |
 | `packages/coding-agent/src/extensions/` | 6 | built-in extensions 层 + llama.cpp 参考实现 | 中 |
 | `packages/ai/src/compat/` | 1 | legacy extension OAuth type shim | 低 |
 

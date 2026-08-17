@@ -1,5 +1,7 @@
 # pi-mono Agent 架构手册
 
+> **⚠️ v0.84.2 基线（2026-08-17）**：本仓库代码已同步到 v0.84.2+8（merge `1c91e97a5`），源码锚点对应工作树。v0.84.0 重点变化：① **session v4**——agent 包 session 模型整体重写（lane-based，旧 JSONL/in-memory repo API 删除），新专题 [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md)；② **`AgentHarness` 去泛型化重设计为 `AgentLane` 骨架**（多数操作 `HarnessNotImplemented`），4.1 大半失效；③ `FileSystem.renameFile()` 变必需；④ `message_update` wire 事件改纯 delta；⑤ auth 一批 breaking（见 5.2 警示）。
+>
 > **⚠️ v0.83.0 注意**：本文档集基于 v0.75.3 源码编写。v0.75.3→v0.83.0 有重大 API 变更：`AgentEvent`→`AgentSessionEvent`、`ExecutionEnv`→`Models`、AgentHarness 新增泛型 `TContext`、`AgentHarnessTool` 新增 context 参数、新增 `agent/src/harness/tools/` 目录。行号和部分 API 描述可能已过时。参见 [`../_change_log/`](../_change_log/README.md)。
 
 本目录聚焦 pi-mono 的 Agent 内核：`packages/agent`（纯运行时）和 `packages/coding-agent`（应用层扩展）共同构成的 agent 系统。
@@ -21,6 +23,7 @@
   - [1.4_Extension_System.md](./01-Anatomy/1.4_Extension_System.md): 扩展生命周期、事件扇出与能力注入
 - [02-Runtime](./02-Runtime/README.md): Agent 运行时循环、pipeline、queue、cancellation
 - [03-Memory](./03-Memory/README.md): Compaction、token 估算、session tree
+  - [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md): **v0.84.0 新增** — lane-based 会话存储（Entry/LaneRecord/facts、durable operations、JSONL 原子发布）
 - [04-Harness](./04-Harness/README.md): AgentHarness、Skills、System Prompt、Extension Runner、Bash/Edit/Write Tools
   - ... (6 篇)
   - [4.7_Harness_Tools.md](./04-Harness/4.7_Harness_Tools.md): **v0.83.0 新增** — factory 模式工具架构
@@ -62,28 +65,32 @@
 - `核心矛盾` 必须明确至少两条会互相拉扯的目标；如果只剩术语罗列（例如仅列模块名），应并入上游章节的"实现思想"小节。
 - 单篇若无法给出可验证的最小例子（看不到可观察信号），优先合并，不勉强保留。
 
-## 已知缺口（v0.83.0 新结构未覆盖）
+## 已知缺口（v0.84.2 新结构未覆盖）
 
-以下 v0.83.0 新增目录在 `_digested/` 中尚无专题分析：
-
-| 目录 | 文件数 | 一句话 | 优先级 |
-|------|--------|--------|--------|
-| `packages/ai/src/api/` | 31 | ✅ 已写 [5.1_AI_API_Layer.md](./05-Infra/5.1_AI_API_Layer.md) | — |
-| `packages/ai/src/auth/` | 16 | ✅ 已写 [5.2_AI_Auth_Subsystem.md](./05-Infra/5.2_AI_Auth_Subsystem.md) | — |
-| `packages/agent/src/harness/tools/` | 10 | ✅ 已写 [4.7_Harness_Tools.md](./04-Harness/4.7_Harness_Tools.md) | — |
-| `packages/coding-agent/src/extensions/` | 6 | built-in extensions 层 + llama.cpp 参考实现 | 中 |
-| `packages/ai/src/compat/` | 1 | legacy extension OAuth type shim | 低 |
+| 目录/包 | 一句话 | 优先级 |
+|---------|--------|--------|
+| `packages/agent/src/harness/session/`（v4） | ✅ 已写 [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md) | — |
+| `packages/ai/src/api/` | ✅ 已写 [5.1_AI_API_Layer.md](./05-Infra/5.1_AI_API_Layer.md)（v0.84 警示已加） | — |
+| `packages/ai/src/auth/` | ✅ 已写 [5.2_AI_Auth_Subsystem.md](./05-Infra/5.2_AI_Auth_Subsystem.md)（v0.84 警示已加） | — |
+| `packages/agent/src/harness/tools/` | ✅ 已写 [4.7_Harness_Tools.md](./04-Harness/4.7_Harness_Tools.md)（v0.84 警示已加） | — |
+| `packages/agent/src/search/` | 通用搜索模块（`scanning.ts`），v0.84 新增 | 中 |
+| `packages/protocol` / `client` / `server` | client/server 协议栈（experimental），见 integration/06 的路径介绍 | 中（属 integration 域） |
+| `packages/telemetry` | vendor-neutral typed telemetry，从 agent 包 re-export | 低 |
+| `packages/session-backends/sqlite-node` | SQLite session 后端（从 `storage/` 迁入） | 低 |
+| `packages/coding-agent/src/extensions/` | built-in extensions 层 + llama.cpp 参考实现（v0.83 遗留） | 中 |
+| `packages/ai/src/compat/` | legacy extension OAuth type shim（v0.83 遗留） | 低 |
 
 参见 [`_change_log/_scout-v0.83.0.md`](../_change_log/_scout-v0.83.0.md) 了解每个目录的详细分析。
 
 ## 收敛说明
 
-- 当前已从初始版本（只有 01-Anatomy）扩展到完整的 4 个 section（01-Anatomy / 02-Runtime / 03-Memory / 04-Harness），共 21 篇。
-- 基于 v0.75.3 源码编写。行号在 v0.83.0 中已全部漂移。
+- 当前 5 个 section（01-Anatomy / 02-Runtime / 03-Memory / 04-Harness / 05-Infra），共 23 篇。
+- 正文基于 v0.75.3 编写，v0.83.0 / v0.84.2 两轮以警示标注演进；本仓库代码已同步到 v0.84.2+8，行号锚点对应工作树。
 - v0.83.0 的重要变化（影响 agent/ 文档）：
-  - `AgentEvent` → `AgentSessionEvent`，事件类型从 `agent/src/types.ts` 移入 `agent/src/harness/types.ts`
-  - AgentHarness 新增泛型 `TContext`；`ExecutionEnv` 被 `Models` 替代
+  - `AgentEvent` → `AgentSessionEvent`（更正旧说法：`AgentEvent` 定义仍在 `agent/src/types.ts:428`，`AgentSessionEvent` 在 `coding-agent/src/core/agent-session.ts:141`，两者都不在 harness/types.ts）
+  - AgentHarness 新增泛型 `TContext`（**v0.84.0 又全部移除**，见顶部警示）；`ExecutionEnv` 被 `Models` 替代
   - 新增 `agent/src/harness/tools/` 目录（factory 模式工具架构）
   - `ThinkingLevel` 新增 `"max"`；Compaction 支持 retry 和 `retainedTail`
   - `ModelSelectEvent`/`ThinkingLevelSelectEvent` 改名为 `ModelUpdateEvent`/`ThinkingLevelUpdateEvent`
+- v0.84.0 的重要变化见顶部警示和 [`../_change_log/0003-v0.83.0-to-v0.84.2.md`](../_change_log/0003-v0.83.0-to-v0.84.2.md)。
 - 未来如果 `packages/agent` 和 `packages/coding-agent` 的职责边界有变化，需要更新本目录的映射。

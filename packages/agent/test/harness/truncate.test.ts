@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { truncateHead, truncateTail } from "../../src/harness/utils/truncate.js";
+import { truncateHead, truncateTail } from "../../src/harness/utils/truncate.ts";
 
 const encoder = new TextEncoder();
 
@@ -72,6 +72,15 @@ describe("truncate utilities", () => {
 		expect(result.totalBytes).toBe(9);
 	});
 
+	it("does not count a trailing newline as an extra line", () => {
+		const content = `${Array.from({ length: 3 }, () => "line").join("\n")}\n`;
+		const head = truncateHead(content, { maxBytes: 100, maxLines: 3 });
+		const tail = truncateTail(content, { maxBytes: 100, maxLines: 3 });
+
+		expect(head).toMatchObject({ truncated: false, totalLines: 3, outputLines: 3 });
+		expect(tail).toMatchObject({ truncated: false, totalLines: 3, outputLines: 3 });
+	});
+
 	it("truncates head on UTF-8 byte limits without partial lines", () => {
 		const content = "éé\nabc";
 		const result = truncateHead(content, { maxBytes: 4, maxLines: 10 });
@@ -100,6 +109,17 @@ describe("truncate utilities", () => {
 		expect(result.truncatedBy).toBe("bytes");
 		expect(result.lastLinePartial).toBe(true);
 		expect(result.outputBytes).toBe(5);
+	});
+
+	it("truncates an oversized single line with a trailing newline", () => {
+		const input = `${"X".repeat(300_000)}\n`;
+		const result = truncateTail(input, { maxBytes: 1024, maxLines: 100 });
+
+		expect(result.content).toBe("X".repeat(1024));
+		expect(result.outputBytes).toBe(1024);
+		expect(result.outputLines).toBe(1);
+		expect(result.lastLinePartial).toBe(true);
+		expect(result.truncatedBy).toBe("bytes");
 	});
 
 	it("drops an oversized trailing character when it cannot fit in tail byte limit", () => {

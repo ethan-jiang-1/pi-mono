@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { getModel } from "../src/models.js";
-import { complete } from "../src/stream.js";
-import type { Context } from "../src/types.js";
-import { resolveApiKey } from "./oauth.js";
+import { complete, getModel } from "../src/compat.ts";
+import type { Context } from "../src/types.ts";
+import { resolveApiKey } from "./oauth.ts";
 
 const codexToken = await resolveApiKey("openai-codex");
 

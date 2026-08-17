@@ -1,10 +1,10 @@
 # _digested
 
-> **当前源码基线**：本文档集以 pi-mono `v0.75.3`（upstream tag，commit `76705633`）为准。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)；正文中的机制结论描述当前 release。
+> **当前源码基线**：正文当前对应 pi-mono `v0.83.0`（commit `71efc6f0`）。2026-07-30 从 v0.75.3 更新而来，但只完成了一半：integration/ 已更新 API 描述和事件类型；agent/ 21 篇仅有版本警示、行号和机制细节未逐篇修订；5 个新增源码结构（`ai/api/`、`ai/auth/`、`agent/harness/tools/` 等）已有专题分析。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)。
 >
-> ⚠️ **upstream 当前已到 v0.83.0**（989 commits ahead，2026-07-30 更新）。**2026-07-30 已做第一轮更新**：integration/（06/03/04/02/README）已更新 API 描述和事件类型；agent/README 和 4 篇核心文档已加 v0.83.0 过时警示。**以下尚未更新**：agent/ 内其余 16 篇文档的行号和机制细节；5 个新增源码结构（`ai/api/`、`ai/auth/`、`agent/harness/tools/` 等）尚无专题分析。
+> ⚠️ **upstream 当前已到 v0.84.2+8**（`d3ab2af9`，515 commits ahead，2026-08-17 发现）。v0.84.0 是架构换代版本，直接推翻本目录多处结论：harness session 模型重写为 v4（旧 JSONL/in-memory repo API 已删除）、`message_update` 事件改纯增量、client/server/protocol 三件套（experimental）成型、fullscreen TUI、auth 一批 breaking。详见 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](./_change_log/0003-v0.83.0-to-v0.84.2.md)。
 >
-> 参见 [`_change_log/_plan-1-v0.83.0.md`](./_change_log/_plan-1-v0.83.0.md) 了解完整计划和进度。
+> 上一轮的执行计划与进度见 [`_change_log/_plan-1-v0.83.0.md`](./_change_log/_plan-1-v0.83.0.md)（Phase 5 收尾未完成）。
 
 ## 这是什么
 
@@ -20,7 +20,7 @@ Agent 内核入口：[`agent/`](agent/)
 
 pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不仅是一个可以在终端使用的 coding agent，更是一个可以被其他产品嵌入的 agent 引擎。
 
-它由 7 个包组成一个 monorepo：
+基线 v0.83.0 时它由 7 个包组成一个 monorepo（v0.75.3 时代的 `web-ui`/`mom`/`pods` 已在上游移除）：
 
 | 包 | 职责 | 层级 |
 |---|---|---|
@@ -28,9 +28,11 @@ pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不
 | `packages/agent` | 纯 Agent 运行时：消息管理、工具执行、事件系统、Agent loop | Agent 内核 |
 | `packages/coding-agent` | 完整应用层：CLI/TUI/RPC/SDK、扩展系统、会话管理、内置工具 | 应用外壳 |
 | `packages/tui` | 终端 UI 库：组件系统、渲染引擎、输入处理 | UI 框架 |
-| `packages/web-ui` | Web 组件：前端 UI 组件库 | UI 框架 |
-| `packages/mom` | 内部工具包 | 辅助 |
-| `packages/pods` | 内部工具包 | 辅助 |
+| `packages/evals` | eval harness | 辅助 |
+| `packages/server` | PiServer session server（experimental） | 集成 |
+| `packages/storage` | session 存储（sqlite-node） | 基础设施 |
+
+v0.84.x 又新增 4 个包（`protocol`、`client`、`telemetry`、`session-backends`），见顶部警示和 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](./_change_log/0003-v0.83.0-to-v0.84.2.md)。
 
 ## 核心思想
 

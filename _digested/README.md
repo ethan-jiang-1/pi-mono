@@ -1,10 +1,8 @@
 # _digested
 
-> **当前源码基线**：正文当前对应 pi-mono `v0.83.0`（commit `71efc6f0`）。2026-07-30 从 v0.75.3 更新而来，但只完成了一半：integration/ 已更新 API 描述和事件类型；agent/ 21 篇仅有版本警示、行号和机制细节未逐篇修订；5 个新增源码结构（`ai/api/`、`ai/auth/`、`agent/harness/tools/` 等）已有专题分析。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)。
+> **当前源码基线**：pi-mono `v0.84.2+8`（upstream commit `d3ab2af9`，**已 merge 进本仓库**——merge `1c91e97a5`，源码锚点对应工作树）。2026-08-17 完成第二轮 catch-up：integration/ 事件模型与能力表已更新到 v0.84 实测行为；agent/ 23 篇全部带 v0.84.2 警示，session v4 新专题已写（3.5）。行号复核仍不完全——agent/ 各篇的"行号未复核"提示以警示为准。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)。
 >
-> ⚠️ **upstream 当前已到 v0.84.2+8**（`d3ab2af9`，515 commits ahead，2026-08-17 发现）。v0.84.0 是架构换代版本，直接推翻本目录多处结论：harness session 模型重写为 v4（旧 JSONL/in-memory repo API 已删除）、`message_update` 事件改纯增量、client/server/protocol 三件套（experimental）成型、fullscreen TUI、auth 一批 breaking。详见 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](./_change_log/0003-v0.83.0-to-v0.84.2.md)。
->
-> 上一轮的执行计划与进度见 [`_change_log/_plan-1-v0.83.0.md`](./_change_log/_plan-1-v0.83.0.md)（Phase 5 收尾未完成）。
+> 上一轮（v0.75.3→v0.83.0）记录见 [`_change_log/0002-v0.75.3-to-v0.83.0.md`](./_change_log/0002-v0.75.3-to-v0.83.0.md) 与 [`_change_log/_plan-1-v0.83.0.md`](./_change_log/_plan-1-v0.83.0.md)；本轮见 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](./_change_log/0003-v0.83.0-to-v0.84.2.md) 与 [`_change_log/_plan-2-v0.84.2.md`](./_change_log/_plan-2-v0.84.2.md)。
 
 ## 这是什么
 
@@ -20,19 +18,20 @@ Agent 内核入口：[`agent/`](agent/)
 
 pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不仅是一个可以在终端使用的 coding agent，更是一个可以被其他产品嵌入的 agent 引擎。
 
-基线 v0.83.0 时它由 7 个包组成一个 monorepo（v0.75.3 时代的 `web-ui`/`mom`/`pods` 已在上游移除）：
+当前基线（v0.84.2）它由 10 个包组成一个 monorepo（v0.75.3 时代的 `web-ui`/`mom`/`pods` 已在上游移除；`storage` 于 v0.84 并入 `session-backends`）：
 
 | 包 | 职责 | 层级 |
 |---|---|---|
 | `packages/ai` | LLM 抽象层：模型定义、多 provider 适配、流式协议、消息类型 | 基础设施 |
-| `packages/agent` | 纯 Agent 运行时：消息管理、工具执行、事件系统、Agent loop | Agent 内核 |
+| `packages/agent` | 纯 Agent 运行时：消息管理、工具执行、事件系统、Agent loop、session v4 | Agent 内核 |
 | `packages/coding-agent` | 完整应用层：CLI/TUI/RPC/SDK、扩展系统、会话管理、内置工具 | 应用外壳 |
-| `packages/tui` | 终端 UI 库：组件系统、渲染引擎、输入处理 | UI 框架 |
-| `packages/evals` | eval harness | 辅助 |
+| `packages/tui` | 终端 UI 库：组件系统、渲染引擎、输入处理、fullscreen 模式 | UI 框架 |
+| `packages/protocol` | CBOR 二进制协议 + framing（experimental） | 集成 |
+| `packages/client` | 传输无关的远程 session 客户端（experimental） | 集成 |
 | `packages/server` | PiServer session server（experimental） | 集成 |
-| `packages/storage` | session 存储（sqlite-node） | 基础设施 |
-
-v0.84.x 又新增 4 个包（`protocol`、`client`、`telemetry`、`session-backends`），见顶部警示和 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](./_change_log/0003-v0.83.0-to-v0.84.2.md)。
+| `packages/session-backends` | session 存储后端（sqlite-node） | 基础设施 |
+| `packages/telemetry` | vendor-neutral typed telemetry | 辅助 |
+| `packages/evals` | eval harness | 辅助 |
 
 ## 核心思想
 

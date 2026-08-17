@@ -90,7 +90,7 @@ bash 工具的流式输出是双重路径——`tool_execution_update`（结构�
 
 1. 发送 prompt 后记录当前状态为 `running`。
 2. 事件流中持续更新 UI。
-3. 收到 `turn.ended` 或 `session.status` 为 `idle` 后解除输入锁。
+3. 收到 `agent_settled`（SDK）或 `ended`（RPC）后解除输入锁。
 4. 期间出现错误时展示错误状态，允许用户重试或修改 prompt。
 
 ## 权限和阻断：hook 模型

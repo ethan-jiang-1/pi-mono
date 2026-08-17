@@ -9,67 +9,82 @@ pi-mono 的事件通道：
 - **SDK**：`session.on("event", callback)` — EventEmitter 风格。
 - **RPC**：stdout 的 `{"type":"event",...}` JSONL 行。
 
-事件类型定义在 [`packages/agent/src/harness/types.ts`](../../packages/agent/src/harness/types.ts) 的 `AgentSessionEvent` union type（v0.83.0：从 `AgentEvent` 改名，并移入 harness types）。
+事件类型定义在两处（v0.84.2 验证）：
+
+- [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts) `AgentEvent`（types.ts:428）——Agent 内核级事件：消息、turn、工具执行
+- [`packages/coding-agent/src/core/agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) `AgentSessionEvent`（agent-session.ts:141）= `AgentEvent`（重定义了带 `willRetry` 的 `agent_end`）+ session 级扩展事件（compaction、retry、queue 等）
+
+SDK 事件监听拿到的就是 `AgentSessionEvent`；JSON/RPC 输出经 `toJsonEvent()`（[`modes/json-event.ts`](../../packages/coding-agent/src/modes/json-event.ts)）做了一次 wire 级裁剪（见下文 `message_update`）。
 
 ## 事件的基本形态
 
-Agent 运行时会产生一系列 `AgentSessionEvent`。每个事件有 `type` 字段区分类别，payload 可包含 message、part、tool、turn 等不同数据。
+Agent 运行时会产生一系列 `AgentSessionEvent`。每个事件有 `type` 字段区分类别，payload 可包含 message、delta、tool、turn 等不同数据。
 
 事件是**推模型**——Agent 主动产生，宿主被动接收。
 
 ## 最重要的事件类别
 
-外部 UI 第一版至少关心这些事件：
+外部 UI 第一版至少关心这些事件（事件名均为 snake_case，v0.84.2 实测，不存在 `message.part.updated` 之类点分事件名）：
 
 | 事件类别 | 关键 type 值 | 作用 |
 |---|---|---|
-| **消息** | `message.updated` | user/assistant message 元信息变化 |
-| **Part** | `message.part.updated` | text、tool、reasoning 等 part 增量更新 |
-| **Turn** | `turn.started`、`turn.ended` | 标记一轮 prompt-response 的开始和结束 |
-| **Tool** | `tool.started`、`tool.ended` | 工具执行的生命周期 |
-| **Session** | `session.status`、`session.error` | 判断 running/idle/busy、展示错误 |
-| **Agent settled** | `agent_settled` | **v0.83.0 新增**：agent run 完全结束（替代旧的 `agent_end`），用于 idle 检测 |
-| **Bash 更新** | `bash_execution_update` | **v0.83.0 新增**：bash 执行过程中的流式输出更新 |
-| **模型/思考变更** | `model_update`、`thinking_level_update` | **v0.83.0 改名**：从 `model_select`/`thinking_level_select` 改名 |
-| **Compaction** | compaction 事件 + `summarization_retry_*` | 上下文压缩及重试事件（v0.83.0 新增 retry 系列） |
-| **Entry** | `entry_appended` | **v0.83.0 新增**：session entry 追加 |
+| **消息** | `message_start` / `message_update` / `message_end` | 一条 `AgentMessage` 的生命周期。`message_update` **只对 assistant 流式输出触发**，且 wire 上只带 delta |
+| **Turn** | `turn_start` / `turn_end` | 一轮 assistant 响应 + 工具调用；`turn_end` 带完整 `message` 和 `toolResults` |
+| **工具** | `tool_execution_start` / `tool_execution_update` / `tool_execution_end` | 工具执行生命周期；`update` 带流式 `partialResult` |
+| **Agent 级** | `agent_start` / `agent_end` / `agent_settled` | run 边界；`agent_end` 带 `willRetry`；`agent_settled`（v0.83.0 新增）表示 agent 完全安静下来，**idle 检测用它** |
+| **队列** | `queue_update` | steering / followUp 排队消息变化 |
+| **Compaction** | `compaction_start` / `compaction_end` + `summarization_retry_*` | 上下文压缩及 summarization 重试（v0.83.0 新增 retry 系列） |
+| **自动重试** | `auto_retry_start` / `auto_retry_end` | provider 错误后的自动重试 |
+| **Bash 更新** | `bash_execution_update` | bash 执行期间的流式 stdout/stderr delta |
+| **杂项** | `entry_appended`、`session_info_changed`、`thinking_level_changed` | session entry 追加、session 改名、thinking level 变化 |
 
-## `message.part.updated` 怎么渲染
+## `message_update` 怎么渲染：delta 拼装模型
 
-`message.part.updated` 是 UI 最应该认真处理的事件。它代表一条 message 中某个 part 的增量更新。part 类型包括：
+`message_update` 是 UI 最应该认真处理的事件，也是 **v0.84.0 的 breaking change**：JSON 和 RPC wire 上的 `message_update` **只带 delta，不再带累积 message 快照**（旧版本的 `message` 和 `assistantMessageEvent.partial` 字段导致输出随长度平方增长，已移除）。
 
-- **`text`**：assistant 文本输出，应渲染为文本气泡。
-- **`reasoning`**：模型的思考过程（thinking），应渲染为可折叠的推理区。
-- **`tool`**：工具调用（状态 `pending`、`running`、`completed`、`error`），应渲染为工具卡片。
+拼装规则（[`modes/json-event.ts:23-28`](../../packages/coding-agent/src/modes/json-event.ts) 的权威注释）：
 
-做图形 UI 时，把 part 投影成自己的组件：
+1. `message_start` → 初始 `AgentMessage`
+2. `message_update` → 只带 `{ type, usage, assistantMessageEvent }`，其中 `assistantMessageEvent` 是单个 delta 事件（`partial` 字段已被剥掉）
+3. `message_end` → **最终的权威 message**
 
-- text bubble — 普通文本气泡
-- reasoning collapsible — 可折叠的思考区
-- bash / read / edit / write / find / grep / ls tool card — 工具执行卡片
-- error card — 错误和重试状态
-- turn divider — turn 之间的分隔线
+`assistantMessageEvent` 的 delta 类型（定义在 [`packages/ai/src/types.ts`](../../packages/ai/src/types.ts) `AssistantMessageEvent`，ai/types.ts:523）：
+
+- 文本：`text_start` / `text_delta` / `text_end`（带 `contentIndex` 和 `delta: string`）
+- 思考：`thinking_start` / `thinking_delta` / `thinking_end`
+- 工具调用：`toolcall_start` / `toolcall_delta` / `toolcall_end`
+- 终止：`done`（stop/length/toolUse/deferred）、`error`（aborted/error）
+
+累积 `usage` 保留在每条 `message_update` 里——它大小恒定，不构成平方增长。
+
+做图形 UI 时，把 content 投影成自己的组件：
+
+- text bubble — 按 `contentIndex` 维护文本缓冲，`text_delta` 追加
+- reasoning collapsible — `thinking_delta` 追加，`thinking_end` 定稿
+- tool card — `toolcall_start` 开卡（args 由 `toolcall_delta` 流式拼 JSON），配合 `tool_execution_*` 事件更新状态
+- error card — `assistantMessageEvent.type === "error"` 或 `auto_retry_*` 事件
+- turn divider — `turn_start` / `turn_end`
 
 ## `turn` 事件
 
-- `turn.started`：新一轮开始。外部 UI 应该在 timeline 上开始一个新的会话轮次。
-- `turn.ended`：当前轮次结束。可以折叠该轮次，展示摘要。
+- `turn_start`：新一轮开始。外部 UI 应该在 timeline 上开始一个新的会话轮次。
+- `turn_end`：当前轮次结束，带完整 `message` 和 `toolResults`——懒加载的 UI 可以只在 turn 边界用 `turn_end` 的权威 payload 渲染，忽略中间 delta。
 
-## `tool.*` 事件
+## `tool_execution_*` 事件
 
 工具事件提供工具执行的完整生命周期：
 
-- `tool.started`：工具开始执行（显示 loading 状态）。
-- `tool.updated`（如果存在）：长运行工具的中间输出（如 bash 流式输出）。
-- `tool.ended`：工具执行完成（显示结果或错误）。
+- `tool_execution_start`：工具开始执行（带 `toolCallId`、`toolName`、`args`，显示 loading 状态）。
+- `tool_execution_update`：长运行工具的中间输出（带 `partialResult`）。
+- `tool_execution_end`：工具执行完成（带 `result` 和 `isError`）。
 
-bash 工具的流式输出是一个特例——它在执行期间持续更新，外部 UI 应该实时展示 stdout/stderr。
+bash 工具的流式输出是双重路径——`tool_execution_update`（结构化 partial）之外还有独立的 `bash_execution_update` 事件（纯文本 delta），外部 UI 应该实时展示 stdout/stderr。
 
 ## completion 不等于 prompt() 返回
 
 - SDK 的 `session.prompt()` 返回代表 prompt **被接受并提交**，不代表 Agent 已完成。
 - RPC 的 `prompt` 命令被处理后，事件会持续到达，直到 `{"type":"ended",...}`。
-- 最终完成判断靠 `session.status` 变为 `idle`。
+- 最终完成判断：SDK 监听 `agent_settled`（v0.83.0 起，agent run 完全结束后触发）；RPC 用 `ended` 顶级消息。`agent_end` 带 `willRetry`，不能直接当"结束"用——`willRetry: true` 时后面还有 `auto_retry_*`。
 
 第一版 UI harness 可以简单做：
 
@@ -94,16 +109,18 @@ pi-mono 用 hook 函数做权限控制，不是交互式弹窗：
 
 ## 事件在 RPC 中的表示
 
-RPC 模式下，事件被序列化为 JSONL 行：
+RPC 模式下，事件被序列化为 JSONL 行（事件名与 SDK 完全一致，但 `message_update` 经过了 delta 裁剪）：
 
 ```json
-{"type":"event","event":{"type":"message.part.updated","messageId":"...","part":{"type":"text","text":"I'll fix the auth tests."}}}
-{"type":"event","event":{"type":"tool.ended","toolName":"read","result":"...","durationMs":120}}
+{"type":"event","event":{"type":"message_start","message":{...}}}
+{"type":"event","event":{"type":"message_update","usage":{...},"assistantMessageEvent":{"type":"text_delta","contentIndex":0,"delta":"I'll fix the auth tests."}}}
+{"type":"event","event":{"type":"tool_execution_end","toolCallId":"...","toolName":"read","result":"...","isError":false}}
+{"type":"event","event":{"type":"agent_settled"}}
 ```
 
 宿主需要在 JSONL 解析中区分三种顶级消息类型：
 
-- `{"type":"event", ...}` → AgentSessionEvent（v0.83.0：从 AgentEvent 改名）
+- `{"type":"event", ...}` → `AgentSessionEvent`（wire 形态 = `JsonAgentSessionEvent`）
 - `{"type":"response", "id":"...", ...}` → 对带 id 命令的直接响应
 - `{"type":"ended", ...}` → prompt/steer/follow_up 完成
 

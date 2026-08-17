@@ -46,7 +46,7 @@ const session = await createAgentSession({
 
 // 2. 订阅事件
 session.on("event", (event) => {
-  // message.updated, tool.*, turn.*, session.*
+  // message_start/message_update/message_end, tool_execution_*, turn_start/turn_end, ...
 })
 
 // 3. 发送 prompt
@@ -76,7 +76,7 @@ node dist/cli.js --mode rpc
 
 ```json
 {"type":"response","id":"...","payload":{"status":"ok"}}
-{"type":"event","event":{"type":"message.updated",...}}
+{"type":"event","event":{"type":"message_update","usage":{...},"assistantMessageEvent":{"type":"text_delta",...}}}}
 {"type":"response","id":"...","payload":{"type":"idle"}}
 ```
 
@@ -87,8 +87,8 @@ node dist/cli.js --mode rpc
 1. 创建 session（SDK：`createAgentSession`；RPC：`new_session`）。
 2. 订阅事件（SDK：`session.on("event", ...)`；RPC：开始读取 stdout 事件行）。
 3. 发送 prompt（SDK：`session.prompt()`；RPC：`{"type":"prompt",...}`）。
-4. 处理事件（`message.updated`、`message.part.updated`、`tool.*`、`turn.*`）。
-5. 等到 session idle（`session.status` → `idle`）。
+4. 处理事件（`message_start`/`message_update`/`message_end`、`tool_execution_*`、`turn_start`/`turn_end`）。
+5. 等到 session idle（SDK：`agent_settled` 事件；RPC：`{"type":"ended",...}`）。
 
 ## 什么时候用 SDK，什么时候用 RPC
 

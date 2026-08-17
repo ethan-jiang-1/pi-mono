@@ -61,24 +61,31 @@ await session.abort()
 ```ts
 session.on("event", (event: AgentSessionEvent) => {
   // 注：v0.83.0 中事件类型从 AgentEvent 改为 AgentSessionEvent
+  // 注：SDK 事件的 message_update 带累积 message；JSON/RPC wire 上会被裁成纯 delta
   switch (event.type) {
-    case "message.updated":
-      // 消息元信息更新
+    case "message_start":
+      // 一条消息开始（user/assistant/toolResult 都有）
       break
-    case "message.part.updated":
-      // text, tool, reasoning 等 part 流式更新
+    case "message_update":
+      // assistant 流式更新：event.assistantMessageEvent 是单个 delta
       break
-    case "turn.started":
+    case "message_end":
+      // 消息定稿（权威版本）
+      break
+    case "turn_start":
       // 新 turn 开始
       break
-    case "turn.ended":
-      // turn 结束
+    case "turn_end":
+      // turn 结束（带 message + toolResults）
       break
-    case "tool.started":
+    case "tool_execution_start":
       // 工具开始执行
       break
-    case "tool.ended":
-      // 工具执行完成
+    case "tool_execution_update":
+      // 长运行工具的中间输出（partialResult）
+      break
+    case "tool_execution_end":
+      // 工具执行完成（result + isError）
       break
     case "agent_settled":
       // agent run 完全结束（替代旧的 agent_end）
@@ -87,14 +94,13 @@ session.on("event", (event: AgentSessionEvent) => {
     case "bash_execution_update":
       // bash 执行过程中的流式输出更新（v0.83.0 新增）
       break
-    case "session.status":
-      // 状态变化：running / idle / busy
+    case "queue_update":
+      // steering / followUp 队列变化
       break
-    case "session.error":
-      // 错误事件
+    case "auto_retry_start":
+    case "auto_retry_end":
+      // provider 错误自动重试（v0.84 常见，注意 agent_end 的 willRetry）
       break
-  }
-})
   }
 })
 ```
@@ -157,17 +163,20 @@ RPC 客户端封装在 [`packages/coding-agent/src/modes/rpc/rpc-client.ts`](../
 
 ```
 → {"type":"prompt","message":"fix the failing tests in src/auth.ts"}
-← {"type":"event","event":{"type":"turn.started",...}}
-← {"type":"event","event":{"type":"message.updated",...}}
-← {"type":"event","event":{"type":"message.part.updated","part":{"type":"text","text":"I'll start by reading the test file..."}}}
-← {"type":"event","event":{"type":"tool.started","toolName":"read",...}}
-← {"type":"event","event":{"type":"tool.ended","toolName":"read",...}}
-← {"type":"event","event":{"type":"message.part.updated","part":{"type":"text","text":"Now I'll edit the file..."}}}
-← {"type":"event","event":{"type":"tool.started","toolName":"edit",...}}
-← {"type":"event","event":{"type":"tool.ended","toolName":"edit",...}}
-← {"type":"event","event":{"type":"turn.ended",...}}
+← {"type":"event","event":{"type":"turn_start",...}}
+← {"type":"event","event":{"type":"message_start","message":{...}}}
+← {"type":"event","event":{"type":"message_update","usage":{...},"assistantMessageEvent":{"type":"text_delta","contentIndex":0,"delta":"I'll start by reading the test file..."}}}
+← {"type":"event","event":{"type":"tool_execution_start","toolCallId":"...","toolName":"read",...}}
+← {"type":"event","event":{"type":"tool_execution_end","toolCallId":"...","toolName":"read",...}}
+← {"type":"event","event":{"type":"message_update","usage":{...},"assistantMessageEvent":{"type":"text_delta","contentIndex":0,"delta":"Now I'll edit the file..."}}}
+← {"type":"event","event":{"type":"tool_execution_start","toolCallId":"...","toolName":"edit",...}}
+← {"type":"event","event":{"type":"tool_execution_end","toolCallId":"...","toolName":"edit",...}}
+← {"type":"event","event":{"type":"turn_end",...}}
+← {"type":"event","event":{"type":"agent_settled"}}
 ← {"type":"ended","id":null,"payload":{"messageId":"..."}}
 ```
+
+注意 `message_update` 的 wire 形态：**v0.84.0 起只带 delta**（`usage` + `assistantMessageEvent`），没有累积 `message` 字段。需要 partial 消息的宿主必须在 `message_start` 和 `message_end` 之间自己拼 delta——详见 [04 Event Model](./04-event-model.md)。
 
 ### 调整方向（steer）
 
@@ -256,7 +265,7 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 
 ```
 → {"type":"bash","command":"npm test","excludeFromContext":false}  // excludeFromContext v0.83.0 新增
-← {"type":"event","event":{"type":"bash.output","stdout":"...","stderr":"..."}}
+← {"type":"event","event":{"type":"bash_execution_update","delta":"..."}}
 ← {"type":"response","id":null,"payload":{"exitCode":0,"...}}
 → {"type":"abort_bash"}
 ```

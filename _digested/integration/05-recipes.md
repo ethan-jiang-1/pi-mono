@@ -99,8 +99,8 @@ const client = new RpcClient({
 })
 
 client.on("event", (event) => {
-  if (event.type === "message.part.updated" && event.part.type === "text") {
-    process.stdout.write(event.part.text)
+  if (event.type === "message_update" && event.assistantMessageEvent.type === "text_delta") {
+    process.stdout.write(event.assistantMessageEvent.delta)
   }
 })
 
@@ -115,7 +115,7 @@ client.close()
 
 - **超时**：设置合理的超时时间，避免 CI job 卡死。
 - **非交互**：agent 模式下权限应该设为宽松（允许所有工具）或用 hook 自动拒绝高风险操作。
-- **输出格式**：如果需要机器可读输出，用 `get_last_assistant_text` 或解析事件流中的 `message.part.updated` 事件，自己构建 JSON 输出。
+- **输出格式**：如果需要机器可读输出，用 `get_last_assistant_text` 或解析事件流中的 `message_update` delta 事件，自己构建 JSON 输出。
 - **exit code**：基于 agent 是否成功完成任务来决定 exit 0 还是 1。
 
 ## Recipe 3：本地后台任务 / Supervisor
@@ -203,10 +203,10 @@ export function activate(context: vscode.ExtensionContext) {
 
   // 事件 → VS Code UI
   agent.on("event", (event) => {
-    if (event.type === "message.part.updated") {
-      chatPanel.appendPart(event.part)
+    if (event.type === "message_update") {
+      chatPanel.applyDelta(event.assistantMessageEvent)
     }
-    if (event.type === "tool.ended" && event.toolName === "edit") {
+    if (event.type === "tool_execution_end" && event.toolName === "edit") {
       // 触发 diff 预览
       diffPanel.showDiff(event.result)
     }
@@ -303,7 +303,7 @@ class PiAgent:
 
 ## 常见陷阱
 
-1. **promise 不等于完成**：`session.prompt()` 返回后 agent 可能还在运行工具。等事件流中的 `turn.ended` 或 `session.status` idle。
+1. **promise 不等于完成**：`session.prompt()` 返回后 agent 可能还在运行工具。等 `agent_settled` 事件（SDK）或 `ended` 消息（RPC）。
 2. **多次同时 prompt**：Agent 有队列模式控制，默认 steering 串行化。如果需要同时处理多个 prompt，用多个 AgentSession 实例。
 3. **cwd 不一致**：Agent 的 cwd 决定了它能看到哪些文件。确保 cwd 和宿主预期的项目根目录一致。
 4. **进程不清理**：RPC 子进程在宿主退出时必须 kill。用 `process.on("exit", ...)` 注册清理。

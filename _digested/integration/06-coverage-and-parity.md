@@ -18,21 +18,21 @@
 | steer（方向调整） | SDK：`session.steer()` / RPC：`{"type":"steer"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | follow-up（后续对话） | SDK：`session.followUp()` / RPC：`{"type":"follow_up"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | abort | SDK：`session.abort()` / RPC：`{"type":"abort"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| 事件流 | SDK：`session.on("event", ...)` / RPC：stdout JSONL | [`types.ts`](../../packages/agent/src/types.ts)、[`agent-harness.ts`](../../packages/agent/src/harness/agent-harness.ts) |
+| 事件流 | SDK：`session.subscribe(listener)` / RPC：stdout JSONL | [`types.ts`](../../packages/agent/src/types.ts)、[`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 等待 idle（agent settled） | SDK：`session.waitForIdle()` / RPC：监听 `agent_settled` 事件 | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | compaction | SDK：`session.compact()` / RPC：`{"type":"compact"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | branch summary abort | SDK：`session.abortBranchSummary()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| session fork / clone | SDK：`session.fork()` / RPC：`{"type":"fork"}`、`{"type":"clone"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| session 切换 | SDK：`session.switchSession()` / RPC：`{"type":"switch_session"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| session fork / clone | SDK：`session.sessionManager.fork()`（AgentSession 无 fork 方法）/ RPC：`{"type":"fork"}`、`{"type":"clone"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts)、[`rpc-mode.ts`](../../packages/coding-agent/src/modes/rpc/rpc-mode.ts) |
+| session 切换 | SDK：`session.sessionManager.switchSession()` / RPC：`{"type":"switch_session"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts) |
 | 模型切换 | SDK：`session.setModel()` / RPC：`{"type":"set_model"}`、`{"type":"cycle_model"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 模型轮换范围（scoped models） | SDK：`session.setScopedModels()` / `CreateAgentSessionOptions.scopedModels` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | 思考深度控制 | SDK + RPC：`set_thinking_level`、`cycle_thinking_level`、`get_available_thinking_levels` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| bash 直接执行 | SDK：`session.bash()` / RPC：`{"type":"bash"}`（支持 `excludeFromContext`） | [`bash-executor.ts`](../../packages/coding-agent/src/core/bash-executor.ts) |
+| bash 直接执行 | SDK：`session.executeBash()`（实际方法名）/ RPC：`{"type":"bash"}`（支持 `excludeFromContext`） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`bash-executor.ts`](../../packages/coding-agent/src/core/bash-executor.ts) |
 | bash 中断 | SDK：`session.abortBash()` / RPC：`{"type":"abort_bash"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | session 统计 | SDK：`session.getSessionStats()` / RPC：`{"type":"get_session_stats"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | context 使用追踪 | SDK：`session.getContextUsage()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| 消息列表 | SDK：`session.getMessages()` / RPC：`{"type":"get_messages"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| HTML 导出 | SDK：`session.exportHtml()` / RPC：`{"type":"export_html"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 消息列表 | SDK：`session.messages`（getter）/ RPC：`{"type":"get_messages"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| HTML 导出 | SDK：`session.exportToHtml()` / RPC：`{"type":"export_html"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | JSONL 导出 | SDK：`session.exportToJsonl()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | fork 消息获取 | SDK：`session.getUserMessagesForForking()` / RPC：`{"type":"get_fork_messages"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | session 命名 | SDK：`session.setSessionName()` / RPC：`{"type":"set_session_name"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |

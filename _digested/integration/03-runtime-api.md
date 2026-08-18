@@ -5,7 +5,7 @@
 一个无 TUI harness 的最小闭环是：
 
 1. 创建 Session（SDK `createAgentSession` 或 RPC `new_session`）。
-2. 订阅事件（SDK `session.on("event", ...)` 或 RPC stdout 事件流）。
+2. 订阅事件（SDK `session.subscribe(listener)` 或 RPC stdout 事件流）。
 3. 发送 prompt（SDK `session.prompt()` 或 RPC `{"type":"prompt",...}`）。
 4. 处理事件、权限和 compaction。
 5. 等到 session idle。
@@ -17,9 +17,9 @@
 ### 创建 session
 
 ```ts
-import { createAgentSession } from "pi-mono/coding-agent"
+import { createAgentSession } from "@earendil-works/pi-coding-agent"
 
-const session = await createAgentSession({
+const { session } = await createAgentSession({  // 返回 { session, extensionsResult, modelFallbackMessage? }，需解构
   cwd: "/path/to/project",        // 项目目录
   model: myModel,                  // pi-ai Model 实例
   thinkingLevel: "medium",         // "off" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max"
@@ -36,13 +36,13 @@ const session = await createAgentSession({
 })
 ```
 
-`CreateAgentSessionOptions` 定义在 [`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts)。v0.75.3→v0.83.0 的重要变化：**`modelRuntime` 替代了旧的 `authStorage` + `modelRegistry`**；新增 `scopedModels`、`excludeTools`、`sessionStartEvent`。
+`CreateAgentSessionOptions` 定义在 [`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts)（sdk.ts:38）。返回 `{ session, extensionsResult, modelFallbackMessage? }`（sdk.ts:90-97），要解构出 `session`。v0.75.3→v0.83.0 的重要变化：**`modelRuntime` 替代了旧的 `authStorage` + `modelRegistry`**（`ModelRegistry` 仍在，但已降级为暴露给 extension 的同步 facade，见 5.2）；新增 `scopedModels`、`excludeTools`、`sessionStartEvent`。
 
 ### 发送 prompt
 
 ```ts
 // 初始 prompt
-const result = await session.prompt("fix the failing tests in src/auth.ts")
+await session.prompt("fix the failing tests in src/auth.ts")  // prompt() 返回 void
 
 // 在当前 turn 中调整方向
 await session.steer("use vitest, not jest")
@@ -54,14 +54,15 @@ await session.followUp("also add tests for the edge case we discussed")
 await session.abort()
 ```
 
-每个 prompt 调用返回的结果包含 `messageId`、`turnId` 等元信息。
+（旧版文档说 prompt 返回含 `messageId`/`turnId` 的结果——v0.84.2 的 `AgentSession.prompt()` 签名是 `Promise<void>`（agent-session.ts:1116），不返回这些；消息 id 从 `message_start`/`message_end` 事件里拿。）
 
 ### 订阅事件
 
 ```ts
-session.on("event", (event: AgentSessionEvent) => {
-  // 注：v0.83.0 中事件类型从 AgentEvent 改为 AgentSessionEvent
-  // 注：SDK 事件的 message_update 带累积 message；JSON/RPC wire 上会被裁成纯 delta
+// 订阅：AgentSession.subscribe(listener)（agent-session.ts:815），返回取消函数；
+// 注意没有 EventEmitter 风格的 .on("event", ...)。SDK 订阅拿到的是完整 AgentSessionEvent
+// （message_update 带累积 message）；JSON/RPC wire 上会被 toJsonEvent() 裁成纯 delta。
+session.subscribe((event: AgentSessionEvent) => {
   switch (event.type) {
     case "message_start":
       // 一条消息开始（user/assistant/toolResult 都有）
@@ -107,28 +108,31 @@ session.on("event", (event: AgentSessionEvent) => {
 
 ### session 管理操作
 
+> 方法名已对照 v0.84.2 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:2775`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork 在 `session.sessionManager` 上（RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:617-627）。
+
 ```ts
 // Compaction
-await session.compact()
-await session.setAutoCompaction(true)
-await session.abortBranchSummary()     // 取消 branch summary
+await session.compact()                      // agent-session.ts:1790
+await session.setAutoCompactionEnabled(true) // 注意：不是 setAutoCompaction
+await session.abortBranchSummary()           // 取消 branch summary（agent-session.ts:1946）
 
 // Session 树
-await session.fork(entryId)
-await session.cloneSession()
-await session.switchSession(sessionPath)
-session.setSessionName("auth-fix")     // 命名 session
+await session.sessionManager.fork(entryId)   // SDK 层 fork 在 SessionManager 上
+await session.sessionManager.fork(session.sessionManager.getLeafId(), { position: "at" }) // 等价 RPC clone
+await session.sessionManager.switchSession(sessionPath)   // 等价 RPC switch_session
+session.setSessionName("auth-fix")          // 命名 session（agent-session.ts:2883）
 
 // 查询
-const stats = await session.getSessionStats()     // tokens, 消息数
-const msgs = await session.getMessages()           // 消息列表
-const text = await session.getLastAssistantText()  // 最后 assistant 文本
-const usage = session.getContextUsage()            // context 窗口使用情况（v0.83.0 新增）
-const forkMsgs = session.getUserMessagesForForking() // fork 候选消息（v0.83.0 新增）
+const stats = await session.getSessionStats()     // tokens, 消息数（agent-session.ts:3122）
+const msgs = session.messages                     // getter：消息列表（agent-session.ts:955），无 getMessages()
+const text = session.getLastAssistantText()       // 最后 assistant 文本（agent-session.ts:3293）
+const usage = session.getContextUsage()            // context 窗口使用情况（agent-session.ts:3174）
+const forkMsgs = session.getUserMessagesForForking() // fork 候选消息（agent-session.ts:3100）
+void session.prompt(text, { images, streamingBehavior: "steer" })  // PromptOptions（agent-session.ts:240）
 
 // 导出
-await session.exportHtml({ outputPath: "/tmp/session.html" })
-await session.exportToJsonl("/tmp/session.jsonl")  // JSONL 导出（v0.83.0 新增）
+await session.exportToHtml({ outputPath: "/tmp/session.html" }) // 实际方法名 exportToHtml
+await session.exportToJsonl("/tmp/session.jsonl")  // 返回 string（agent-session.ts:3251）
 
 // Bash 直接执行
 const bashResult = await session.bash("npm test")
@@ -145,7 +149,12 @@ session.setScopedModels([                         // 设置模型轮换范围（
 
 // 扩展
 session.hasExtensionHandlers("project_trust")     // 检查扩展是否处理某事件（v0.83.0 新增）
+
+// 收尾
+session.dispose()                                  // 取消所有运行 + 断开 agent + 清空 listeners（agent-session.ts:839）
 ```
+
+（再核对一次：SDK 侧事件用 `session.subscribe()`；模型读取用 `session.state`/`session.model`/`session.thinkingLevel` getter；所有"方法级"列举以上面注释的行号为准。）
 
 ## 2. RPC 路线：subprocess
 
@@ -172,9 +181,10 @@ RPC 客户端封装在 [`packages/coding-agent/src/modes/rpc/rpc-client.ts`](../
 ← {"type":"event","event":{"type":"tool_execution_start","toolCallId":"...","toolName":"edit",...}}
 ← {"type":"event","event":{"type":"tool_execution_end","toolCallId":"...","toolName":"edit",...}}
 ← {"type":"event","event":{"type":"turn_end",...}}
-← {"type":"event","event":{"type":"agent_settled"}}
-← {"type":"ended","id":null,"payload":{"messageId":"..."}}
+← {"type":"event","event":{"type":"agent_settled"}}   // 一轮 prompt 的完成信号
 ```
+
+> 注意：**没有 `{"type":"ended",...}` 顶级消息**（旧文档有，v0.84.2 源码无）；完成信号就是 `agent_settled` 事件。
 
 注意 `message_update` 的 wire 形态：**v0.84.0 起只带 delta**（`usage` + `assistantMessageEvent`），没有累积 `message` 字段。需要 partial 消息的宿主必须在 `message_start` 和 `message_end` 之间自己拼 delta——详见 [04 Event Model](./04-event-model.md)。
 
@@ -208,21 +218,21 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 
 ```
 → {"id":"req-1","type":"get_state"}
-← {"type":"response","id":"req-1","payload":{"status":"running","sessionId":"...","...}}
+← {"type":"response","id":"req-1","command":"get_state","success":true,"data":{"model":{...},"thinkingLevel":"medium","isStreaming":true,"isCompacting":false,"steeringMode":"all","followUpMode":"all","sessionId":"...","messageCount":12,"pendingMessageCount":0,...}}  // 完整字段见 RpcSessionState（rpc-types.ts:95）
 ```
 
 ### 模型管理
 
 ```
 → {"type":"get_available_models"}
-← {"type":"response","payload":[{"provider":"anthropic","id":"claude-sonnet-4-6","contextWindow":200000,"reasoning":true},...]}
+← {"type":"response","command":"get_available_models","success":true,"data":{"models":[{"provider":"anthropic","id":"claude-sonnet-4-6","contextWindow":200000,"reasoning":true},...]}}  // 实际包在 data.models（rpc-mode.ts:488）
 
 → {"type":"set_model","provider":"openai","modelId":"gpt-5"}
 → {"type":"cycle_model"}
 → {"type":"set_thinking_level","level":"high"}
 → {"type":"cycle_thinking_level"}
 → {"type":"get_available_thinking_levels"}     // v0.83.0 新增
-← {"type":"response","payload":{"levels":["off","minimal","low","medium","high","xhigh","max"]}}
+← {"type":"response","command":"get_available_thinking_levels","success":true,"data":{"levels":["off","minimal","low","medium","high","xhigh","max"]}}
 ```
 
 ### compaction
@@ -241,22 +251,24 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 → {"type":"switch_session","sessionPath":"path/to/other"}
 → {"type":"set_session_name","name":"auth-fix"}
 → {"type":"get_session_stats"}
-← {"type":"response","payload":{"tokenCount":45000,"messageCount":23,...}}
+← {"type":"response","command":"get_session_stats","success":true,"data":{"tokenCount":45000,"messageCount":23,...}}
 
 → {"type":"export_html","outputPath":"/tmp/session.html"}
-→ {"type":"get_messages"}
-→ {"type":"get_last_assistant_text"}
-→ {"type":"get_fork_messages"}         // v0.83.0 新增
+→ {"type":"get_messages"}             // 返回 { messages: AgentMessage[] }
+→ {"type":"get_last_assistant_text"}  // 返回 { text: string | null }
+→ {"type":"get_fork_messages"}        // v0.83.0 新增，返回 { messages: [{ entryId, text }] }
 ```
+
+（注意：RPC 没有 `export_to_jsonl` 命令——JSONL 导出只在 SDK 侧，`session.exportToJsonl()`。）
 
 ### session entries 浏览（v0.83.0 新增）
 
 ```
 → {"type":"get_entries","since":"entry_abc123"}  // since 可选
-← {"type":"response","payload":{"entries":[...],"leafId":"..."}}
+← {"type":"response","command":"get_entries","success":true,"data":{"entries":[...],"leafId":"..."}}
 
 → {"type":"get_tree"}
-← {"type":"response","payload":{"tree":[...],"leafId":"..."}}
+← {"type":"response","command":"get_tree","success":true,"data":{"tree":[...],"leafId":"..."}}
 ```
 
 这两个命令让外部 harness 可以浏览 session 的 entries 树结构。
@@ -266,7 +278,7 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 ```
 → {"type":"bash","command":"npm test","excludeFromContext":false}  // excludeFromContext v0.83.0 新增
 ← {"type":"event","event":{"type":"bash_execution_update","delta":"..."}}
-← {"type":"response","id":null,"payload":{"exitCode":0,"...}}
+← {"type":"response","command":"bash","success":true,"data":{"exitCode":0,"output":"...","cancelled":false,...}}  // BashResult 在 data 字段（rpc-mode.ts:579）
 → {"type":"abort_bash"}
 ```
 
@@ -291,7 +303,7 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 最稳的完成信号：
 
 - SDK：`session.waitForIdle()` Promise resolve，或监听 `agent_settled` 事件（v0.83.0 中 `agent_settled` 替代了旧的 `agent_end`）。
-- RPC：收到 `{"type":"ended",...}` 消息，或监听 `agent_settled` 事件。
+- RPC：监听 `{"type":"event","event":{"type":"agent_settled"}}` 事件（没有 `ended` 消息）。
 
 ## 最小状态机
 

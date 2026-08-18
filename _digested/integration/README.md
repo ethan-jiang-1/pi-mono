@@ -18,10 +18,10 @@
 |---|---|---|
 | 集成范式 | **server-first**（HTTP/SSE） | **library-first**（SDK in-process，RPC 子进程） |
 | 主要嵌入方式 | `opencode serve` + SDK v2 sidecar | `createAgentSession()` 直接嵌入，或 `RpcClient` 子进程 |
-| 跨语言方案 | HTTP + SSE | JSONL over stdin/stdout（22 个 RPC 命令） |
-| web-ui 架构 | 连接本地 server 的前端 | 纯前端，Agent 直接在浏览器运行（调 LLM provider） |
+| 跨语言方案 | HTTP + SSE | JSONL over stdin/stdout（32 个 RPC 命令） |
+| web-ui 架构 | 连接本地 server 的前端 | 曾有纯前端 web-ui（浏览器直接调 LLM provider）；包已移除 |
 | 权限模型 | 事件驱动交互式弹窗（`/permission` reply） | hook-based（`beforeToolCall` 可与外部阻断逻辑集成） |
-| 事件通道 | SSE stream（`/event`） | EventEmitter in-process 或 RPC response/event JSONL |
+| 事件通道 | SSE stream（`/event`） | `session.subscribe()` in-process 或 RPC response/event JSONL |
 | session 持久化 | Server 端 JSONL 文件 | 本地 JSONL 文件（`SessionManager`） |
 | TUI | Solid.js 终端客户端 | React Ink 终端客户端（interactive mode） |
 
@@ -67,10 +67,10 @@ flowchart LR
 如果宿主是 JS/TS（Node/Bun），最推荐的集成方式是直接用 SDK：
 
 ```ts
-import { createAgentSession } from "pi-mono/coding-agent"
+import { createAgentSession } from "@earendil-works/pi-coding-agent"
 
-const session = await createAgentSession({ cwd: "/path/to/project" })
-const result = await session.prompt("fix the failing tests")
+const { session } = await createAgentSession({ cwd: "/path/to/project" })
+await session.prompt("fix the failing tests")
 ```
 
 如果宿主不是 JS/TS，或者需要进程隔离，用 RPC 子进程方案：
@@ -106,7 +106,7 @@ node dist/cli.js --mode rpc
 ## 文档分工
 
 - [`01-start-here.md`](01-start-here.md)：入门版，判断路线、SDK vs RPC、最小闭环。
-- [`02-advanced.md`](02-advanced.md)：进阶版，三层架构、为什么 library-first、RPC 协议设计、web-ui 特殊性。
+- [`02-advanced.md`](02-advanced.md)：进阶版，三层架构、为什么 library-first、RPC 协议设计、web-ui 架构史、protocol/client/server 三件套。
 - [`03-runtime-api.md`](03-runtime-api.md)：真正开始写代码时读，RPC 命令全集、SDK API 调用顺序。
 - [`04-event-model.md`](04-event-model.md)：做自己的 UI 时读，AgentSessionEvent 分类、渲染策略、重连恢复。
 - [`05-recipes.md`](05-recipes.md)：按产品形态选方案，Web/Tauri、本地后台、CI、IDE 插件。
@@ -121,7 +121,7 @@ node dist/cli.js --mode rpc
 | 能不能复用核心 agent 能力？ | 能，包括 session、event、工具、compaction、diff、revert |
 | 有没有 HTTP server？ | 没有。pi-mono 是 library-first |
 | 能不能把它当云端多租户 API 裸用？ | 不建议，也不是当前默认定位 |
-| web-ui 是什么架构？ | 纯前端，Agent 在浏览器直接调 LLM provider；不是 server-client 架构 |
+| web-ui 是什么架构？ | 曾有纯前端 web-ui（浏览器直接调 LLM provider），包已移除；不是 server-client 架构 |
 
 ## 源码锚点
 
@@ -134,4 +134,4 @@ node dist/cli.js --mode rpc
 - Agent 类型：[`../../packages/agent/src/types.ts`](../../packages/agent/src/types.ts)
 - Session 管理：[`../../packages/coding-agent/src/core/session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts)
 - Bash 执行器：[`../../packages/coding-agent/src/core/bash-executor.ts`](../../packages/coding-agent/src/core/bash-executor.ts)
-- web-ui 入口：[`../../apps/web-ui/`](../../apps/web-ui/)
+- ~~web-ui 入口~~：[`../../apps/web-ui/`](../../apps/web-ui/)（**包已移除**，v0.83.0 前即删除；仅保留历史锚点）

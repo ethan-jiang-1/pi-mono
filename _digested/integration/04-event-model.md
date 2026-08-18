@@ -6,7 +6,7 @@
 
 pi-mono 的事件通道：
 
-- **SDK**：`session.on("event", callback)` — EventEmitter 风格。
+- **SDK**：`session.subscribe(listener)` — 返回取消函数（`agent-session.ts:815`），不是 EventEmitter 风格。
 - **RPC**：stdout 的 `{"type":"event",...}` JSONL 行。
 
 事件类型定义在两处（v0.84.2 验证）：
@@ -83,14 +83,14 @@ bash 工具的流式输出是双重路径——`tool_execution_update`（结构�
 ## completion 不等于 prompt() 返回
 
 - SDK 的 `session.prompt()` 返回代表 prompt **被接受并提交**，不代表 Agent 已完成。
-- RPC 的 `prompt` 命令被处理后，事件会持续到达，直到 `{"type":"ended",...}`。
-- 最终完成判断：SDK 监听 `agent_settled`（v0.83.0 起，agent run 完全结束后触发）；RPC 用 `ended` 顶级消息。`agent_end` 带 `willRetry`，不能直接当"结束"用——`willRetry: true` 时后面还有 `auto_retry_*`。
+- RPC 的 `prompt` 命令被处理后，事件会持续到达，直到 `agent_settled` 事件（**没有 `ended` 顶级消息**）。
+- 最终完成判断：SDK 监听 `agent_settled`（v0.83.0 起，agent run 完全结束后触发）；RPC 监听 `{"type":"event","event":{"type":"agent_settled"}}`。`agent_end` 带 `willRetry`，不能直接当"结束"用——`willRetry: true` 时后面还有 `auto_retry_*`。
 
 第一版 UI harness 可以简单做：
 
 1. 发送 prompt 后记录当前状态为 `running`。
 2. 事件流中持续更新 UI。
-3. 收到 `agent_settled`（SDK）或 `ended`（RPC）后解除输入锁。
+3. 收到 `agent_settled`（SDK）或 RPC 的 `{"type":"event","event":{"type":"agent_settled"}}` 后解除输入锁。
 4. 期间出现错误时展示错误状态，允许用户重试或修改 prompt。
 
 ## 权限和阻断：hook 模型
@@ -122,7 +122,7 @@ RPC 模式下，事件被序列化为 JSONL 行（事件名与 SDK 完全一致�
 
 - `{"type":"event", ...}` → `AgentSessionEvent`（wire 形态 = `JsonAgentSessionEvent`）
 - `{"type":"response", "id":"...", ...}` → 对带 id 命令的直接响应
-- `{"type":"ended", ...}` → prompt/steer/follow_up 完成
+- ~~`{"type":"ended", ...}`~~ — v0.84.2 **没有** `ended` 顶级消息；prompt/steer/follow_up 的完成信号就是 `agent_settled` 事件
 
 ## 重连恢复
 
@@ -131,8 +131,8 @@ RPC 子进程如果崩溃或断连，宿主不能假设自己拿到了所有事�
 建议恢复策略：
 
 1. 重新 spawn RPC 子进程，或重新创建 AgentSession。
-2. 调 `get_state`（RPC）或 `session.getState()`（SDK）重建运行状态。
-3. 调 `get_messages`（RPC）或 `session.getMessages()`（SDK）重建消息历史。
+2. 调 `get_state`（RPC）重建运行状态；SDK 用只读 getter `session.state`（`AgentState`，`agent-session.ts:863`）——没有 `getState()` 方法。
+3. 调 `get_messages`（RPC）或 SDK `session.messages`（getter，`agent-session.ts:955`）重建消息历史——没有 `getMessages()` 方法。
 4. 如果有未完成的 prompt，用 `get_state` 检查状态再决定是重试还是继续。
 
 pi-mono 的 session 持久化在本地 JSONL 文件（`SessionManager`），重启后可以恢复。这跟 OpenCode 的 SSE 重连 + REST 恢复策略思路一致，但实现上更轻量——直接读文件，不需要调多个 REST endpoint。

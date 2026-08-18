@@ -91,6 +91,6 @@
   - AgentHarness 新增泛型 `TContext`（**v0.84.0 又全部移除**，见顶部警示）；`ExecutionEnv` 被 `Models` 替代
   - 新增 `agent/src/harness/tools/` 目录（factory 模式工具架构）
   - `ThinkingLevel` 新增 `"max"`；Compaction 支持 retry 和 `retainedTail`
-  - `ModelSelectEvent`/`ThinkingLevelSelectEvent` 改名为 `ModelUpdateEvent`/`ThinkingLevelUpdateEvent`
+  - ~~`ModelSelectEvent`/`ThinkingLevelSelectEvent` 改名~~（2026-08-17 复核：v0.84.2 源码中现名仍是 `ModelSelectEvent`/`ThinkingLevelSelectEvent`，`extensions/types.ts:794-806`；改名未发生，旧记载有误）
 - v0.84.0 的重要变化见顶部警示和 [`../_change_log/0003-v0.83.0-to-v0.84.2.md`](../_change_log/0003-v0.83.0-to-v0.84.2.md)。
 - 未来如果 `packages/agent` 和 `packages/coding-agent` 的职责边界有变化，需要更新本目录的映射。

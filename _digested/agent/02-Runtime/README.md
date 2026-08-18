@@ -1,6 +1,6 @@
 # 02-Runtime: Agent 运行时
 
-本节拆解 pi-mono `@earendil-works/pi-agent` 包中 Agent 的一次完整 prompt→response→tool→response 回合是如何被驱动、流转与约束的。七篇文档分别聚焦一个横切关注点，按问题驱动的阅读路径组织。
+本节拆解 pi-mono `@earendil-works/pi-agent-core` 包中 Agent 的一次完整 prompt→response→tool→response 回合是如何被驱动、流转与约束的。七篇文档分别聚焦一个横切关注点，按问题驱动的阅读路径组织。
 
 ## 问题驱动阅读路径
 
@@ -24,7 +24,7 @@ pi-mono 在两层都有重试机制：pi-ai 层在 `StreamOptions` 中携带 `ma
 
 ### "Session 的状态模型和事件模型如何支撑 Runtime？"
 
-Session 是一个 append-only 树形结构，每个节点是 `SessionTreeEntry` 的 union。`buildSessionContext()` 从当前 leaf 走到 root，在 compaction 边界处做截断，注入 compaction summary 后拼接出 LLM 可消费的消息列表。这个模型同时支撑了分支/导航/分支摘要/重放等功能，而这些功能都依赖于 Runtime 层的 turn 边界、消息生命周期事件。
+Session 是一个 append-only 树形结构。**注意模型归属**：coding-agent 的 `SessionManager` 用 `SessionEntry` union（本目录 2.5 与 03-Memory/3.4 描述的就是它）；agent 包 `harness/session/` 已是 v4 lane-based（`Entry` 7 种，见 03-Memory/3.5），旧的 `SessionTreeEntry` 已删除。两边的 `buildSessionContext()` 都从当前 leaf 走到 root，在 compaction 边界处截断，注入 compaction summary 后拼接出 LLM 可消费的消息列表。这个模型同时支撑了分支/导航/分支摘要/重放等功能，而这些功能都依赖于 Runtime 层的 turn 边界、消息生命周期事件。
 
 **阅读顺序：** 2.5（Session 树形模型与上下文构建）→ 2.6（队列如何与 runtime 的 turn 边界协作）
 

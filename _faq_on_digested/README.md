@@ -34,6 +34,7 @@ _faq_on_digested/
 
 - [`01_model_switching/`](01_model_switching/question.md) — pi-mono TUI 里怎么换模型？Ctrl+P 背后发生了什么？
 - [`02_tui_keybindings/`](02_tui_keybindings/question.md) — pi-mono TUI 有哪些快捷键？分别干什么？
+- [`03_third_party_provider_baseurl/`](03_third_party_provider_baseurl/question.md) — 第三方中转模型怎么挂才不和官方 DeepSeek 冲突？（模型身份、同名 upsert、deepseek.com 魔法探测失效）
 
 ## 引用规范
 

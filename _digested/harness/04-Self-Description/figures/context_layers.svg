@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">上下文分层：harness / 项目 / 领域知识，三份信息分开注入</text>
+
+  <!-- three layers stacked -->
+  <rect x="30" y="56" width="440" height="62" rx="10" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.6"/>
+  <text x="44" y="80" font-size="12" font-weight="700" fill="#115e59">① harness 自述（system prompt）</text>
+  <text x="44" y="98" font-size="10.5" fill="#134e4a">你是谁、在 pi 里、有这些工具、文档地图 —— 随版本走（随包 docs）</text>
+
+  <rect x="30" y="124" width="440" height="62" rx="10" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.6"/>
+  <text x="44" y="148" font-size="12" font-weight="700" fill="#115e59">② 项目约定（&lt;project_context&gt;）</text>
+  <text x="44" y="166" font-size="10.5" fill="#134e4a">AGENTS.md / CLAUDE.md —— 随仓库走，向上遍历继承</text>
+
+  <rect x="30" y="192" width="440" height="62" rx="10" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.6"/>
+  <text x="44" y="216" font-size="12" font-weight="700" fill="#115e59">③ 领域知识（&lt;available_skills&gt;）</text>
+  <text x="44" y="234" font-size="10.5" fill="#134e4a">SKILL.md —— 随任务走，按需 read，被 read 工具闸住</text>
+
+  <!-- inheritance arrow (right) -->
+  <rect x="500" y="60" width="194" height="150" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="514" y="82" font-size="11.5" font-weight="700" fill="#0f172a">② 的向上遍历继承</text>
+  <g font-size="10.5" fill="#334155">
+    <text x="514" y="102">cwd 逐级 dirname 向上，</text>
+    <text x="514" y="118">每层找 AGENTS.md/CLAUDE.md，</text>
+    <text x="514" y="134">根部的 unshift 到前、去重。</text>
+  </g>
+  <line x1="514" y1="146" x2="600" y2="146" stroke="#64748b" stroke-width="1.2"/>
+  <text x="514" y="162" font-size="10.5" fill="#334155">AGENTS.override.md 可覆盖，</text>
+  <text x="514" y="178" font-size="10.5" fill="#334155">git worktree shadow 有专门处理。</text>
+  <text x="514" y="198" font-size="10" fill="#64748b">→ monorepo / 子目录场景正确。</text>
+
+  <!-- why separate -->
+  <rect x="30" y="272" width="664" height="62" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="46" y="293" font-size="11" font-weight="700" fill="#0f172a">为什么分层</text>
+  <text x="46" y="310" font-size="10.5" fill="#334155">三份知识来源不同、生命周期不同。混成一段，改任何一处都要重排整段；</text>
+  <text x="46" y="325" font-size="10.5" fill="#334155">分层让每份可独立维护、独立变更，也支撑「AGENTS.md 双向服务」。</text>
+</svg>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">无默认沙箱：扩展 = 宿主进程同等权限</text>
+
+  <!-- host process -->
+  <rect x="30" y="60" width="340" height="150" rx="12" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <text x="46" y="84" font-size="12.5" font-weight="700" fill="#0f172a">宿主进程（pi）</text>
+  <rect x="46" y="96" width="150" height="46" rx="8" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.5"/>
+  <text x="58" y="114" font-size="11" font-weight="700" fill="#4c1d95">extension 代码</text>
+  <text x="58" y="130" font-size="10" fill="#6b21a8">factory 直接执行</text>
+  <rect x="46" y="150" width="150" height="46" rx="8" fill="#e2e8f0" stroke="#64748b" stroke-width="1.4"/>
+  <text x="58" y="168" font-size="11" font-weight="700" fill="#334155">内置工具（bash 等）</text>
+  <text x="58" y="184" font-size="10" fill="#475569">gondolin 可沙它</text>
+
+  <text x="224" y="120" font-size="11" fill="#334155">同进程、同权限</text>
+  <text x="224" y="136" font-size="11" fill="#334155">扩展能 fs / child_process / 偷 env</text>
+
+  <!-- two threat models -->
+  <text x="404" y="70" font-size="12.5" font-weight="700" fill="#0f172a">两条威胁模型，只防了一条</text>
+
+  <rect x="404" y="84" width="292" height="92" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+  <text x="420" y="106" font-size="11.5" font-weight="700" fill="#14532d">① 模型跑危险命令 → 有沙</text>
+  <text x="420" y="124" font-size="10.5" fill="#166534">gondolin 把工具执行路由进 micro-VM；</text>
+  <text x="420" y="139" font-size="10.5" fill="#166534">examples/extensions/sandbox 用 sandbox-runtime。</text>
+  <text x="420" y="158" font-size="10.5" fill="#15803d">但这都是 opt-in example，不是默认。</text>
+
+  <rect x="404" y="188" width="292" height="92" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
+  <text x="420" y="210" font-size="11.5" font-weight="700" fill="#7f1d1d">② 扩展代码本身恶意 → 没防</text>
+  <text x="420" y="228" font-size="10.5" fill="#991b1b">没有「把扩展 factory 跑进沙箱」的机制；</text>
+  <text x="420" y="243" font-size="10.5" fill="#991b1b">pi install 一个包 = 执行其任意代码。</text>
+  <text x="420" y="262" font-size="10.5" fill="#b91c1c">现有沙箱只覆盖 ①，覆盖不到 ②。</text>
+
+  <text x="30" y="240" font-size="12.5" font-weight="700" fill="#0f172a">severity 随「自用 / 分发」翻转</text>
+  <text x="30" y="260" font-size="11" fill="#334155">自用：无风险（信任自己）。</text>
+  <text x="30" y="276" font-size="11" fill="#334155">团队内部：中（靠 code review 兜）。</text>
+  <text x="30" y="292" font-size="11" fill="#334155">公开分发 / 陌生安装：高（信任完全转给用户警觉）。</text>
+  <text x="30" y="312" font-size="11" fill="#64748b">进程内护栏（1.4）成了唯一防线，但防不了「主动 rm -rf / 偷 env」。</text>
+
+  <text x="20" y="332" font-size="10.5" fill="#64748b">结论：不是「pi 有 sandbox example 所以安全」——example 是给你看怎么做，不是帮你做了。</text>
+</svg>

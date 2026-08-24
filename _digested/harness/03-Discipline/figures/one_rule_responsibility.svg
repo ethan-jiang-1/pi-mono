@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#15803d"/>
+    </marker>
+    <marker id="arrowX" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">「一条规则」：责任从工具钉回人</text>
+
+  <!-- AI produces code -->
+  <rect x="30" y="60" width="150" height="60" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="44" y="84" font-size="11.5" font-weight="700" fill="#334155">AI 产出代码</text>
+  <text x="44" y="102" font-size="10.5" fill="#64748b">「Using AI to write</text>
+  <text x="44" y="116" font-size="10.5" fill="#64748b">code is fine.」</text>
+
+  <line x1="182" y1="90" x2="250" y2="90" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- gate -->
+  <rect x="254" y="56" width="200" height="68" rx="11" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="268" y="80" font-size="11.5" font-weight="700" fill="#1e3a8a">验收标准 = 理解</text>
+  <text x="268" y="98" font-size="10.5" fill="#1e40af">「你必须能解释这段代码做什么、</text>
+  <text x="268" y="113" font-size="10.5" fill="#1e40af">和系统怎么交互。」</text>
+
+  <!-- two outcomes -->
+  <line x1="354" y1="124" x2="354" y2="150" stroke="#64748b" stroke-width="1.4"/>
+  <line x1="354" y1="150" x2="150" y2="150" stroke="#15803d" stroke-width="1.4" marker-end="url(#arrowG)"/>
+  <line x1="354" y1="150" x2="520" y2="150" stroke="#dc2626" stroke-width="1.4" marker-end="url(#arrowX)"/>
+
+  <rect x="46" y="162" width="180" height="52" rx="9" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+  <text x="58" y="184" font-size="11" font-weight="700" fill="#14532d">能解释 → merge</text>
+  <text x="58" y="200" font-size="10.5" fill="#166534">责任在人，不在工具</text>
+
+  <rect x="430" y="162" width="200" height="52" rx="9" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
+  <text x="442" y="184" font-size="11" font-weight="700" fill="#7f1d1d">不能解释 → 关闭</text>
+  <text x="442" y="200" font-size="10.5" fill="#991b1b">「AI-generated slop</text>
+  <text x="442" y="214" font-size="10.5" fill="#991b1b">  without understanding is not」</text>
+
+  <!-- self-referential -->
+  <rect x="30" y="236" width="660" height="48" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="46" y="258" font-size="11" font-weight="700" fill="#0f172a">自指性</text>
+  <text x="46" y="274" font-size="10.5" fill="#334155">规则要求 agent 从根目录跑、捡起 AGENTS.md —— pi 用同一套「AGENTS.md 自动注入」机制，同时服务「开发 pi」和「用 pi」两件事。</text>
+</svg>

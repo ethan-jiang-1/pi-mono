@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">分发闭环：从「本地一个 .ts」到「npm 包」是同一条路径</text>
+
+  <!-- five stages on a continuous line -->
+  <g stroke="#2563eb" stroke-width="2">
+    <line x1="50" y1="150" x2="690" y2="150"/>
+  </g>
+
+  <g font-size="11.5" text-anchor="middle">
+    <circle cx="70" cy="150" r="7" fill="#2563eb"/>
+    <rect x="28" y="74" width="84" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="70" y="94" font-weight="700" fill="#1e3a8a">单文件</text>
+    <text x="70" y="110" fill="#1e40af">my.ts</text>
+
+    <circle cx="195" cy="150" r="7" fill="#2563eb"/>
+    <rect x="143" y="74" width="104" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="195" y="94" font-weight="700" fill="#1e3a8a">目录</text>
+    <text x="195" y="110" fill="#1e40af">index.ts + 多文件</text>
+
+    <circle cx="330" cy="150" r="7" fill="#2563eb"/>
+    <rect x="260" y="74" width="140" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="330" y="94" font-weight="700" fill="#1e3a8a">manifest</text>
+    <text x="330" y="110" fill="#1e40af">package.json「pi」键</text>
+
+    <circle cx="485" cy="150" r="7" fill="#2563eb"/>
+    <rect x="403" y="74" width="164" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="485" y="94" font-weight="700" fill="#1e3a8a">pi install</text>
+    <text x="485" y="110" fill="#1e40af">npm:@foo/bar · git:…</text>
+
+    <circle cx="640" cy="150" r="7" fill="#2563eb"/>
+    <rect x="586" y="74" width="108" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="640" y="94" font-weight="700" fill="#1e3a8a">一次性试跑</text>
+    <text x="640" y="110" fill="#1e40af">pi -e npm:…</text>
+  </g>
+
+  <g font-size="10.5" fill="#64748b" text-anchor="middle">
+    <text x="70" y="188">放进去即生效</text>
+    <text x="195" y="188">多文件组织</text>
+    <text x="330" y="188">声明资源（4 字段）</text>
+    <text x="485" y="188">分发给别人</text>
+    <text x="640" y="188">无副作用试跑</text>
+  </g>
+
+  <!-- key point -->
+  <rect x="30" y="220" width="664" height="64" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="46" y="242" font-size="11.5" font-weight="700" fill="#0f172a">关键：本地和分发共用同一套加载，没有两套 SDK</text>
+  <text x="46" y="259" font-size="11" fill="#334155">manifest 只有 4 个字段（extensions/skills/prompts/themes），但背后藏着整套包管理逻辑</text>
+  <text x="46" y="274" font-size="11" fill="#334155">（来源解析 + 安装 + 去重 + scope 冲突）——接口（4 字段）与实现（上千行）的比值 = depth</text>
+</svg>

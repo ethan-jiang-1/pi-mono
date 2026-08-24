@@ -60,6 +60,8 @@ pi-mono 里需要严格区分两种 harness：
 
 前者是"给 Agent 补能力和护栏"，后者是"把 Agent 接进另一个宿主系统"。两者共享同一套源码事实，但读者问题完全不同。
 
+> **第三种视角（`harness/`）**：上面两种 harness 是 pi 内部的**能力机制**。此外还有一个评价维度——pi 作为开源 coding harness，**结构优不优秀、好不好扩展、开发有没有纪律、对自己上面的 coding agent 自描述够不够**。这个评价维度放在 [`harness/`](harness/)，它不做机制解剖（引用 `agent/`），只做评价。
+
 ## 推荐阅读路径
 
 ### 10 分钟：快速判断能不能嵌入
@@ -83,6 +85,8 @@ pi-mono 里需要严格区分两种 harness：
 - 想理解外部宿主怎么接：[`integration/`](integration/)
 - 想理解扩展系统怎么注入能力：`agent/01-Anatomy/1.4_Extension_System.md`
 - 想理解工具怎么注册、怎么执行：`agent/01-Anatomy/1.3_Tool_Registry.md`
+- 想评价 pi 的结构优不优秀、好不好扩展：`harness/01-Architecture/`（1.1–1.4）+ `harness/02-Boundaries/`（2.1–2.4）
+- 想看 pi 开发有没有策略/纪律、自描述够不够：`harness/03-Discipline/`（3.1–3.4）+ `harness/04-Self-Description/`（4.1–4.4）
 
 ## 研究背后的期望
 
@@ -90,7 +94,9 @@ pi-mono 里需要严格区分两种 harness：
 
 当前最关心的方向是**外部集成 harness**：也就是不直接使用终端 TUI，而是用合适的接入方式把 pi-mono 的 agent 运行时能力接到其他宿主系统里。SDK（进程内）和 RPC（子进程 JSONL）是两条已经存在的集成路径。
 
-换句话说，`_digested/` 不只是读源码笔记；它也是在回答一个更实际的问题：**pi-mono 能不能成为别的产品里的 agent 引擎，应该怎么接，边界在哪里。**
+2026-08-24 起新增一个评价维度（[`harness/`](harness/)）：不只问"怎么接进去"，还问"pi 本身作为开源 coding harness 结构优不优秀、好不好扩展、开发有没有纪律、对上面的 coding agent 自描述够不够"。
+
+换句话说，`_digested/` 不只是读源码笔记；它也在回答一个更实际的问题：**pi-mono 能不能成为别的产品里的 agent 引擎，应该怎么接，边界在哪里，以及它作为一个开源 harness 平台到底成色如何。**
 
 ## 事实锚点
 
@@ -110,6 +116,7 @@ pi-mono 里需要严格区分两种 harness：
 |------|------|--------|
 | `agent/` | Agent 内核解剖 | 静态结构、运行时、内存管理、harness 机制 |
 | `integration/` | 外部集成 | SDK/RPC 两种接入路径、事件模型、recipes |
+| `harness/` | 平台评价 | 结构优不优秀、好不好扩展、开发纪律、自描述 |
 | `_change_log/` | 上游同步记录 | 每次 upstream 版本同步的变更摘要和影响评估 |
 
 ## 与同级目录的关系

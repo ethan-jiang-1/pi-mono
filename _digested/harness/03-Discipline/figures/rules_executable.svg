@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">工程规则：粒度匹配执行者，且能离线自测 coding agent</text>
+
+  <!-- left: AGENTS.md rules granularity -->
+  <rect x="30" y="58" width="330" height="240" rx="12" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="46" y="82" font-size="12.5" font-weight="700" fill="#1e3a8a">规则粒度 = 执行者的精确度</text>
+
+  <text x="46" y="106" font-size="11" font-weight="700" fill="#1e40af">写给 agent（可判定对错）</text>
+  <g font-size="10.5" fill="#1e40af">
+    <text x="46" y="124">✓ 「禁 any，除非绝对必要」</text>
+    <text x="46" y="140">✓ 「只用 erasable TS 语法」</text>
+    <text x="46" y="156">✓ 「禁内联 import，只用顶层 import」</text>
+    <text x="46" y="172">✓ 「改 models.generated.ts 前先改 generator 再重生成」</text>
+  </g>
+
+  <text x="46" y="200" font-size="11" font-weight="700" fill="#94a3b8">写给人（模糊，agent 判不了）</text>
+  <g font-size="10.5" fill="#94a3b8">
+    <text x="46" y="218">✗ 「注意类型安全」</text>
+    <text x="46" y="234">✗ 「import 要规范」</text>
+  </g>
+
+  <text x="46" y="266" font-size="10.5" fill="#1e40af">执行机制：npm run check 全绿才过；</text>
+  <text x="46" y="282" font-size="10.5" fill="#1e40af">CI（ci.yml）强制 build + check。</text>
+
+  <!-- right: faux provider -->
+  <rect x="380" y="58" width="312" height="240" rx="12" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="396" y="82" font-size="12.5" font-weight="700" fill="#14532d">faux provider：离线测 coding agent</text>
+
+  <text x="396" y="106" font-size="10.5" fill="#166534">test/suite/harness.ts 的 createHarness()：</text>
+  <text x="396" y="124" font-size="10.5" fill="#166534">registerFauxProvider + streamSimple 伪造 LLM</text>
+  <text x="396" y="140" font-size="10.5" fill="#166534">SessionManager.inMemory()</text>
+  <text x="396" y="156" font-size="10.5" fill="#166534">SettingsManager.inMemory()</text>
+  <text x="396" y="172" font-size="10.5" fill="#166534">AuthStorage.inMemory()</text>
+
+  <line x1="396" y1="186" x2="676" y2="186" stroke="#cbd5e1" stroke-width="1"/>
+
+  <text x="396" y="206" font-size="10.5" fill="#166534">不依赖真实 API key，跑 agent turn 的</text>
+  <text x="396" y="222" font-size="10.5" fill="#166534">完整生命周期：loop / tool 调用 / compaction /</text>
+  <text x="396" y="238" font-size="10.5" fill="#166534">扩展 hook，断言事件流。</text>
+  <text x="396" y="260" font-size="10.5" fill="#14532d">→ 「测 coding agent」被当成可离线问题。</text>
+
+  <rect x="30" y="308" width="662" height="0" fill="none"/>
+  <text x="20" y="316" font-size="10.5" fill="#64748b">自指闭环：pi 用同一套 AGENTS.md 规则开发自己，也用同一套纪律约束上面跑的 agent（见 3.2）。</text>
+</svg>

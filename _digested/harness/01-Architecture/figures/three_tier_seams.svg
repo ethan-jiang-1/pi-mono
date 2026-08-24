@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6d28d9"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">三层同心接缝：operations → tool → extension</text>
+
+  <!-- extension (outermost) -->
+  <rect x="30" y="62" width="360" height="316" rx="14" fill="#ede9fe" stroke="#6d28d9" stroke-width="2"/>
+  <text x="46" y="88" font-size="13" font-weight="700" fill="#4c1d95">extension（最外）</text>
+  <text x="46" y="106" font-size="11" fill="#6b21a8">接口最大：32 个 on() 事件 + ~20 方法</text>
+  <text x="46" y="121" font-size="11" fill="#6b21a8">reach-deep（大接口换全触达）</text>
+
+  <!-- tool factory (middle) -->
+  <rect x="90" y="140" width="240" height="180" rx="12" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+  <text x="106" y="166" font-size="12.5" font-weight="700" fill="#713f12">tool factory（中）</text>
+  <text x="106" y="184" font-size="11" fill="#854d0e">ToolDefinition ~8 字段</text>
+  <text x="106" y="199" font-size="11" fill="#854d0e">consistency-deep（自述与定义同源）</text>
+
+  <!-- operations (innermost) -->
+  <rect x="150" y="220" width="120" height="72" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+  <text x="163" y="243" font-size="12" font-weight="700" fill="#14532d">operations</text>
+  <text x="163" y="259" font-size="10.5" fill="#166534">exec() 1 方法</text>
+  <text x="163" y="273" font-size="10.5" fill="#166534">compression-deep</text>
+
+  <!-- reuse descent arrow -->
+  <path d="M 390 200 C 430 200 430 260 392 262" fill="none" stroke="#6d28d9" stroke-width="1.6" marker-end="url(#arrowD)"/>
+  <text x="398" y="238" font-size="10.5" fill="#6d28d9">复用下坠</text>
+
+  <!-- legend (right) -->
+  <text x="428" y="70" font-size="12.5" font-weight="700" fill="#0f172a">三层对应三条「变化轴」</text>
+  <rect x="428" y="82" width="14" height="14" rx="3" fill="#ede9fe" stroke="#6d28d9"/>
+  <text x="450" y="94" font-size="11.5" fill="#1e293b">extension → 行为组合（命令/事件/provider）</text>
+  <rect x="428" y="108" width="14" height="14" rx="3" fill="#fef9c3" stroke="#a16207"/>
+  <text x="450" y="120" font-size="11.5" fill="#1e293b">tool → 工具集（哪些 primitive + 怎么自述）</text>
+  <rect x="428" y="134" width="14" height="14" rx="3" fill="#dcfce7" stroke="#15803d"/>
+  <text x="450" y="146" font-size="11.5" fill="#1e293b">operations → 执行后端（本地 / SSH / 沙箱）</text>
+
+  <line x1="428" y1="168" x2="702" y2="168" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="428" y="190" font-size="12.5" font-weight="700" fill="#0f172a">真 seam 检验</text>
+  <text x="428" y="210" font-size="11" fill="#1e293b">operations 有两个 adapter：</text>
+  <text x="428" y="226" font-size="11" fill="#1e293b">  createLocalBashOperations（本地）</text>
+  <text x="428" y="242" font-size="11" fill="#1e293b">  examples/extensions/ssh.ts（远程）</text>
+  <text x="428" y="262" font-size="11" fill="#1e293b">两个 adapter = 真 seam，不是空壳。</text>
+
+  <text x="428" y="290" font-size="12.5" font-weight="700" fill="#0f172a">deletion test</text>
+  <text x="428" y="310" font-size="11" fill="#1e293b">删掉 operations 层：</text>
+  <text x="428" y="326" font-size="11" fill="#1e293b">ssh 委托要复制进 read/edit/write/bash</text>
+  <text x="428" y="342" font-size="11" fill="#1e293b">四份，复杂度 ×4 散开。</text>
+
+  <text x="20" y="392" font-size="10.5" fill="#64748b">三种「深」各在其位：operations=compression / tool=consistency / extension=reach。详见 1.1 判断四。</text>
+</svg>

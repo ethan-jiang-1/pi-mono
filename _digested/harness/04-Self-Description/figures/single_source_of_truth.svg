@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
+    <marker id="arrowX" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">工具 prompt 契约：自述与定义同源，漂移被结构性消除</text>
+
+  <!-- single source -->
+  <rect x="30" y="70" width="220" height="130" rx="12" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/>
+  <text x="44" y="94" font-size="12.5" font-weight="700" fill="#115e59">ToolDefinition（唯一源头）</text>
+  <g font-size="10.5" fill="#134e4a">
+    <text x="44" y="114">• name / description / parameters</text>
+    <text x="44" y="130">• execute（能力）</text>
+    <text x="44" y="150">• promptSnippet（自述）</text>
+    <text x="44" y="166">• promptGuidelines（准则）</text>
+    <text x="44" y="186">能力和自述锁在同一个对象。</text>
+  </g>
+
+  <!-- two consumers -->
+  <line x1="252" y1="105" x2="330" y2="88" stroke="#0f766e" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="252" y1="150" x2="330" y2="160" stroke="#0f766e" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <rect x="334" y="66" width="180" height="52" rx="9" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+  <text x="348" y="88" font-size="11" font-weight="700" fill="#14532d">agent 运行时</text>
+  <text x="348" y="104" font-size="10.5" fill="#166534">execute 被调用</text>
+
+  <rect x="334" y="140" width="180" height="52" rx="9" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.5"/>
+  <text x="348" y="162" font-size="11" font-weight="700" fill="#4c1d95">system prompt</text>
+  <text x="348" y="178" font-size="10.5" fill="#6b21a8">snippet → "Available tools"</text>
+
+  <line x1="514" y1="166" x2="560" y2="166" stroke="#0f766e" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- aggregated section -->
+  <rect x="564" y="140" width="130" height="52" rx="9" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="578" y="162" font-size="10.5" font-weight="700" fill="#334155">聚合进 prompt</text>
+  <text x="578" y="178" font-size="10" fill="#64748b">只取 active 工具</text>
+
+  <!-- crossed-out parallel copy -->
+  <rect x="30" y="228" width="664" height="74" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
+  <text x="46" y="250" font-size="11.5" font-weight="700" fill="#7f1d1d">反例（手写平行副本 → 会漂移）</text>
+  <text x="46" y="268" font-size="10.5" fill="#991b1b">手写 "Available tools: read(...), bash(...), edit(...), write(...)" 会：</text>
+  <text x="46" y="284" font-size="10.5" fill="#991b1b">① 加工具要改两处 ② allowlist 过滤对不上 ③ 扩展动态注册的工具永远上不了 prompt</text>
+  <line x1="70" y1="244" x2="120" y2="296" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="82" y="272" font-size="11" font-weight="700" fill="#dc2626">✗ 不要</text>
+
+  <text x="20" y="316" font-size="10.5" fill="#64748b">promptSnippet 兼作闸门：没 snippet 的工具仍可用，但不出现在 "Available tools"（system-prompt.test.ts 验证）。</text>
+</svg>

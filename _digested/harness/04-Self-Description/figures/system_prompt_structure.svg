@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">system prompt 结构：自报家门 + 文档地图（按需，不背全文）</text>
+
+  <!-- stacked layers -->
+  <g font-size="11" fill="#134e4a">
+    <rect x="30" y="52" width="420" height="42" rx="8" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.5"/>
+    <text x="44" y="70" font-weight="700" fill="#115e59">① 自报家门（第一句）</text>
+    <text x="180" y="70" fill="#134e4a">"operating inside pi, a coding agent harness"</text>
+
+    <rect x="30" y="100" width="420" height="42" rx="8" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.5"/>
+    <text x="44" y="118" font-weight="700" fill="#115e59">② Available tools</text>
+    <text x="180" y="118" fill="#134e4a">从工具的 promptSnippet 动态聚合（见 4.2）</text>
+
+    <rect x="30" y="148" width="420" height="42" rx="8" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.5"/>
+    <text x="44" y="166" font-weight="700" fill="#115e59">③ Guidelines</text>
+    <text x="180" y="166" fill="#134e4a">从工具的 promptGuidelines 聚合 + 固定准则</text>
+
+    <rect x="30" y="196" width="420" height="58" rx="8" fill="#0f766e" stroke="#115e59" stroke-width="1.8"/>
+    <text x="44" y="214" font-weight="700" fill="#ecfeff">④ 文档地图（关键）</text>
+    <text x="44" y="232" fill="#ccfbf1">按主题映射：extensions→docs/extensions.md、tui→docs/tui.md…</text>
+    <text x="44" y="247" fill="#ccfbf1">教 agent 怎么查自己，而不是替 agent 背下自己。</text>
+
+    <rect x="30" y="260" width="420" height="42" rx="8" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.5"/>
+    <text x="44" y="278" font-weight="700" fill="#115e59">⑤ &lt;project_context&gt;</text>
+    <text x="180" y="278" fill="#134e4a">AGENTS.md / CLAUDE.md（见 4.4）</text>
+
+    <rect x="30" y="308" width="420" height="42" rx="8" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.5"/>
+    <text x="44" y="326" font-weight="700" fill="#115e59">⑥ &lt;available_skills&gt; + cwd</text>
+    <text x="240" y="326" fill="#134e4a">skills 只在 read 工具可用时生成</text>
+  </g>
+
+  <!-- right notes -->
+  <rect x="472" y="52" width="222" height="150" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="486" y="74" font-size="11.5" font-weight="700" fill="#0f172a">三处克制（边界清晰）</text>
+  <text x="486" y="94" font-size="10.5" fill="#334155">• skills 无 read 工具 → 整块消失</text>
+  <text x="486" y="112" font-size="10.5" fill="#334155">• 相对路径显式按 docs 目录解析</text>
+  <text x="486" y="130" font-size="10.5" fill="#334155">• customPrompt 下身份/工具/guidelines</text>
+  <text x="486" y="146" font-size="10.5" fill="#334155">  全不生成，但 context/skills/cwd 仍在</text>
+  <text x="486" y="170" font-size="10.5" fill="#64748b">成熟度在字数，不在边界清晰。</text>
+
+  <rect x="472" y="214" width="222" height="110" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+  <text x="486" y="236" font-size="11.5" font-weight="700" fill="#7c2d12">为什么不背全文</text>
+  <text x="486" y="256" font-size="10.5" fill="#9a3412">30+ 篇 docs 全塞进 prompt 会撑爆窗口。</text>
+  <text x="486" y="274" font-size="10.5" fill="#9a3412">给「地图」+ 让文档在 read 够得到的地方</text>
+  <text x="486" y="292" font-size="10.5" fill="#9a3412">（见 4.3）——按需取，省窗口、不盲跑。</text>
+
+  <text x="20" y="352" font-size="10.5" fill="#64748b">身份定位放在 prompt 最开头：后面所有指令（工具/文档/项目上下文）都以「你在这个 harness 里」为前提。</text>
+</svg>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">生命周期护栏：三道护栏兜住「托管第三方代码」的三个险点</text>
+
+  <!-- timeline axis -->
+  <line x1="40" y1="90" x2="700" y2="90" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="688" y="80" font-size="10.5" fill="#64748b">时间</text>
+
+  <!-- phase 1: load (stubs) -->
+  <rect x="52" y="52" width="130" height="30" rx="7" fill="#e2e8f0" stroke="#64748b" stroke-width="1.4"/>
+  <text x="64" y="71" font-size="11" font-weight="700" fill="#334155">load（throwing stub）</text>
+
+  <!-- phase 2: bindCore -->
+  <rect x="210" y="52" width="150" height="30" rx="7" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.6"/>
+  <text x="222" y="71" font-size="11" font-weight="700" fill="#4c1d95">bindCore（绑定真实实现）</text>
+
+  <!-- phase 3: event loop -->
+  <rect x="390" y="52" width="150" height="30" rx="7" fill="#dcfce7" stroke="#15803d" stroke-width="1.6"/>
+  <text x="402" y="71" font-size="11" font-weight="700" fill="#14532d">事件循环（emit*）</text>
+
+  <!-- phase 4: invalidate -->
+  <rect x="570" y="52" width="120" height="30" rx="7" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.6"/>
+  <text x="582" y="71" font-size="11" font-weight="700" fill="#7f1d1d">invalidate（失效）</text>
+
+  <!-- guard 1 -->
+  <rect x="52" y="128" width="330" height="78" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="68" y="150" font-size="12" font-weight="700" fill="#0f172a">护栏 1：两阶段绑定（何时绑定）</text>
+  <text x="68" y="168" font-size="10.5" fill="#334155">扩展加载期调的 registerProvider 只进 pending 队列，</text>
+  <text x="68" y="183" font-size="10.5" fill="#334155">bindCore 后 stub → 真实实现、队列 flush 到 ModelRegistry。</text>
+  <text x="68" y="198" font-size="10.5" fill="#64748b">→ 宿主不必围绕第三方代码排序自己的初始化。</text>
+
+  <!-- guard 2 -->
+  <rect x="52" y="222" width="330" height="78" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="68" y="244" font-size="12" font-weight="700" fill="#0f172a">护栏 2：stale 保护（上下文过期）</text>
+  <text x="68" y="262" font-size="10.5" fill="#334155">session 切换后，extension 存的旧 ctx 被打 stale 标记，</text>
+  <text x="68" y="277" font-size="10.5" fill="#334155">再访问 assertActive() 抛带指引的错误，而非写错 session。</text>
+  <text x="68" y="292" font-size="10.5" fill="#64748b">→ fail loud over fail silent（数据完整性）。</text>
+
+  <!-- guard 3 -->
+  <rect x="404" y="128" width="290" height="172" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+  <text x="420" y="150" font-size="12" font-weight="700" fill="#7c2d12">护栏 3：fail-close 例外（隔离破例）</text>
+  <text x="420" y="170" font-size="10.5" fill="#7c2d12">普通 emit* 都 try-catch 隔离 handler 异常，</text>
+  <text x="420" y="185" font-size="10.5" fill="#7c2d12">唯独 emitToolCall 故意不 try-catch。</text>
+  <text x="420" y="205" font-size="10.5" fill="#7c2d12">→ 权限钩子崩溃 = 工具被拦（fail-close），</text>
+  <text x="420" y="220" font-size="10.5" fill="#7c2d12">  而非静默放行。</text>
+  <text x="420" y="242" font-size="10.5" fill="#9a3412">安全默认值被写进「哪些 emit 允许隔离」。</text>
+  <text x="420" y="262" font-size="10.5" fill="#9a3412">这是三道里最难做对的一处。</text>
+  <text x="420" y="286" font-size="10.5" fill="#7c2d12">传播：agent-session.ts:479 _installAgentToolHooks</text>
+
+  <text x="20" y="320" font-size="10.5" fill="#64748b">三道护栏合起来 = 「在进程内跑不可信第三方代码」这一问题的完整答案（见 1.4 判断四）。</text>
+</svg>

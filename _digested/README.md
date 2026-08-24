@@ -14,6 +14,8 @@ Agent 内核入口：[`agent/`](agent/)
 
 集成入口：[`integration/`](integration/)
 
+扩充思路入口：[`extensions/`](extensions/)
+
 ## pi-mono 是什么
 
 pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不仅是一个可以在终端使用的 coding agent，更是一个可以被其他产品嵌入的 agent 引擎。
@@ -83,6 +85,7 @@ pi-mono 里需要严格区分两种 harness：
 
 - 想理解 Agent 内核和消息循环：[`agent/`](agent/)
 - 想理解外部宿主怎么接：[`integration/`](integration/)
+- 想理解"极简核 + 靠扩展长能力"的扩充思路：[`extensions/`](extensions/)（核有多小 / 扩充四轴 / 扩充套路）
 - 想理解扩展系统怎么注入能力：`agent/01-Anatomy/1.4_Extension_System.md`
 - 想理解工具怎么注册、怎么执行：`agent/01-Anatomy/1.3_Tool_Registry.md`
 - 想评价 pi 的结构优不优秀、好不好扩展：`harness/01-Architecture/`（1.1–1.4）+ `harness/02-Boundaries/`（2.1–2.4）
@@ -117,6 +120,7 @@ pi-mono 里需要严格区分两种 harness：
 | `agent/` | Agent 内核解剖 | 静态结构、运行时、内存管理、harness 机制 |
 | `integration/` | 外部集成 | SDK/RPC 两种接入路径、事件模型、recipes |
 | `harness/` | 平台评价 | 结构优不优秀、好不好扩展、开发纪律、自描述 |
+| `extensions/` | 扩充思路 | 极简核 + 靠扩展长能力：核有多小、扩充四轴、扩充套路 |
 | `_change_log/` | 上游同步记录 | 每次 upstream 版本同步的变更摘要和影响评估 |
 
 ## 与同级目录的关系

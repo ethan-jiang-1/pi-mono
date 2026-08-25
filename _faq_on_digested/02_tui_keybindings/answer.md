@@ -2,7 +2,7 @@
 
 ## 一句话
 
-pi-mono 的 TUI 是 React Ink 渲染的一个终端应用，它是 SDK 的 **consumer**——所有 TUI 操作最终都调 `AgentSession` 的方法。快捷键定义在 `packages/coding-agent/src/core/keybindings.ts`，可以通过 `~/.pi/agent/keybindings.json` 自定义。
+pi-mono 的 TUI 是自研 terminal 渲染器（`packages/tui`，依赖仅 `get-east-asian-width` + `marked`，无 react/ink）渲染的一个终端应用，它是 SDK 的 **consumer**——所有 TUI 操作最终都调 `AgentSession` 的方法。快捷键定义在 `packages/coding-agent/src/core/keybindings.ts`，可以通过 `~/.pi/agent/keybindings.json` 自定义。
 
 ---
 
@@ -10,7 +10,7 @@ pi-mono 的 TUI 是 React Ink 渲染的一个终端应用，它是 SDK 的 **con
 
 ```
 ┌─────────────────────────────────┐
-│ TUI (React Ink)                 │  ← 终端用户看到的
+│ TUI (自研渲染器)              │  ← 终端用户看到的
 │   interactive-mode.ts           │
 │   └─ 快捷键 → AgentSession 方法 │
 ├─────────────────────────────────┤
@@ -119,7 +119,7 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 
 ## 架构要点
 
-- **TUI 用 React Ink 渲染**，源码在 `packages/coding-agent/src/modes/interactive/`
+- **TUI 用自研渲染器**（`packages/tui` 的 tokenizer/布局，依赖仅 `get-east-asian-width` + `marked`，无 react/ink），源码在 `packages/coding-agent/src/modes/interactive/`
 - **TUI 是 SDK consumer**——它创建 `AgentSession`、订阅事件、通过快捷键调 session 方法
 - **TUI 组件**：assistant message 渲染、diff 预览、session 选择器、模型选择器、thinking 选择器、OAuth 登录对话框等
 - **启动方式**：`node dist/cli.js`（默认 interactive mode）或 `node dist/cli.js --mode interactive`

@@ -13,7 +13,7 @@
   <!-- extension (outermost) -->
   <rect x="30" y="62" width="360" height="316" rx="14" fill="#ede9fe" stroke="#6d28d9" stroke-width="2"/>
   <text x="46" y="88" font-size="13" font-weight="700" fill="#4c1d95">extension（最外）</text>
-  <text x="46" y="106" font-size="11" fill="#6b21a8">接口最大：33 个 on() 事件 + ~20 方法</text>
+  <text x="46" y="106" font-size="11" fill="#6b21a8">接口最大：34 个 on() 事件 + ~20 方法</text>
   <text x="46" y="121" font-size="11" fill="#6b21a8">reach-deep（大接口换全触达）</text>
 
   <!-- tool factory (middle) -->

@@ -1,6 +1,7 @@
 # extensions/ — pi 的扩充思路：极简核 + 靠扩展长能力
 
-> **基线**：pi-mono `v0.84.2+8`（upstream `d3ab2af9`，merge `1c91e97a5`），源码锚点对应工作树。本目录是 2026-08 新增的第三个维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`integration/`](../integration/)（外部嵌入）并列。
+> **基线**：pi-mono `v0.84.3`（upstream tag `4e58f324f`，merge `6f8312a52`），源码锚点对应工作树。本目录是 2026-08 新增的第三个维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`integration/`](../integration/)（外部嵌入）并列。
+> v0.84.3 变更：内置工具 7→8（新增 Windows-only 的 powershell，`ToolName` 联合在 `tools/index.ts:95`），本目录"7 个"表述已同步为 8。
 
 ## 这是什么
 
@@ -18,7 +19,7 @@ pi 的 README 自己把立场说得很白：
 
 把这些句子翻成结构事实，就是本目录的三个子议题：
 
-1. **核有多小**（[`01-Core/`](01-Core/)）——核里只剩"跑循环的引擎 + 7 个摸文件/跑命令的最小工具 + 扩展系统这个骨架本身"。连 plan-mode、subagent 这种别的 coding harness 几乎必内置的功能，都被**故意不做**，放进了 `examples/extensions/`。
+1. **核有多小**（[`01-Core/`](01-Core/)）——核里只剩"跑循环的引擎 + 8 个摸文件/跑命令的最小工具 + 扩展系统这个骨架本身"。连 plan-mode、subagent 这种别的 coding harness 几乎必内置的功能，都被**故意不做**，放进了 `examples/extensions/`。
 2. **扩充怎么发生**（[`02-Expansion/`](02-Expansion/)）——读完 70+ 个示例归纳出来的四条扩充轴：沿着 agent loop 的接缝拦截改写、往循环里注册新东西、改变循环的长相、让扩充活过重启。
 3. **扩充靠什么套路成立**（[`03-Patterns/`](03-Patterns/)）——一个工厂函数、覆盖与复用、安全护栏。这是"极简核能长期不膨胀、又敢挂第三方代码"的原因。
 
@@ -35,7 +36,7 @@ session ──► input ──► before_agent_start ──► ┌─ agent loop
                                             ──► compaction / fork / switch
 ```
 
-- **留在核里的**：让这个循环转起来的最小件——消息图、session 树、provider 抽象、7 个内置工具、以及"让扩展能挂在循环上"的接缝本身。
+- **留在核里的**：让这个循环转起来的最小件——消息图、session 树、provider 抽象、8 个内置工具、以及"让扩展能挂在循环上"的接缝本身。
 - **被赶出去的**：所有"工作流"（plan-mode、subagent、todo、preset、git-checkpoint）、所有"护栏偏好"（permission-gate、protected-paths、dirty-repo-guard）、所有"长相"（minimal-mode、footer、header、snake）、所有"后端接入"（custom-provider、ssh、sandbox）。
 
 关键不是"pi 有很多扩展"，而是**这些被赶出去的东西，和核里的东西走的是同一条接缝（seam）**——一个 `pi` 对象（`ExtensionAPI`）、一个工厂函数（`export default function (pi) {}`）。这让"扩充"成为一种**可预测、可组合、可分发**的动作，而不是每次都要 fork 内部。
@@ -56,7 +57,7 @@ session ──► input ──► before_agent_start ──► ┌─ agent loop
 | 两阶段绑定 | two-phase binding | 加载期排队，`bindCore()` 时统一生效 |
 | stale 保护 | stale-context guard | `invalidate()` / `assertActive()` 抛错 |
 | fail-close | fail-closed | `tool_call` 异常不吞、阻断执行 |
-| 原子动作 | atomic operations | 7 个内置工具 `read`/`bash`/`edit`/`write`/`grep`/`find`/`ls` |
+| 原子动作 | atomic operations | 8 个内置工具 `read`/`bash`/`edit`/`write`/`grep`/`find`/`ls`/`powershell` |
 | 工作流 | workflow | plan-mode / subagent / todo 这类偏好组装 |
 | 护栏 | guard / guardrail | permission-gate 这类拦截 |
 | 偏好 | preference | "价值依赖偏好"——进核 vs 扩展的判据关键词 |

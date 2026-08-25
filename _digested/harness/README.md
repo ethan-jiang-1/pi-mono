@@ -1,6 +1,7 @@
 # harness/ — pi 作为 harness 平台的评价层
 
-> **基线**：pi-mono `v0.84.2+8`（upstream `d3ab2af9`，merge `1c91e97a5`），源码锚点对应工作树。本目录是 2026-08-24 新增的评价维度，与 [`agent/`](../agent/)（机制解剖）和 [`integration/`](../integration/)（外部嵌入）并列。
+> **基线**：pi-mono `v0.84.3`（upstream tag `4e58f324f`，merge `6f8312a52`），源码锚点对应工作树。本目录是 2026-08-24 新增的评价维度，与 [`agent/`](../agent/)（机制解剖）和 [`integration/`](../integration/)（外部嵌入）并列。
+> v0.84.3 变更：内置工具 7→8（`ToolName` 联合 `tools/index.ts:95`）；`ExtensionAPI` `on()` 重载 33→34（新增 `session_compact_failed` 与 PowerShell 工具事件）；1.4 新增"失败 factory 状态丢弃"护栏（#8424）。本目录相关篇目已同步。
 
 ## 这是什么
 

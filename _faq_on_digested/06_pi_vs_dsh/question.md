@@ -17,7 +17,7 @@ pi-mono 和 DeepSeek Harness（DSH）都被认为是"灵活的 coding harness"�
 
 ## 证据边界
 
-- pi 侧引用本仓库 `_digested/`（harness/ 评价维度、extensions/ 扩充思路、agent/01-Anatomy/1.4 扩展系统），源码以 pi-mono `v0.84.2+8`（upstream `d3ab2af9`）为基线。
+- pi 侧引用本仓库 `_digested/`（harness/ 评价维度、extensions/ 扩充思路、agent/01-Anatomy/1.4 扩展系统），源码以 pi-mono `v0.84.3`（upstream `4e58f324f`）为基线。
 - DSH 侧引用 `/Users/bowhead/deepseek-harness/_digested/`（system/、composition/、cordis-runtime/、capability-seams/、harness-idea/），源码基线 DSH `0.1.1-rc.1`（commit `528c682e061696f5a160f363f236ecbf53cbd006`）。
 - 两边只做"消化材料→判断"，不做对方源码的新审计。
 

@@ -139,4 +139,4 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 - 官方文档：`packages/coding-agent/docs/models.md`（custom models / override / modelOverrides）、`docs/custom-provider.md`、`docs/providers.md`
 - 消化材料：`_digested/agent/05-Infra/5.2_AI_Auth_Subsystem.md`（credential 生命周期、models.json 在 auth 层的位置）
 
-> 基线：以上源码路径以本仓库工作树 v0.84.2+8 为准（commit `d3ab2af9` merged）。
+> 基线：以上源码路径以本仓库工作树 v0.84.3 为准（tag `4e58f324f` merged）。

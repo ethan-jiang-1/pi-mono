@@ -50,7 +50,7 @@
   <text x="420" y="220" font-size="10.5" fill="#7c2d12">  而非静默放行。</text>
   <text x="420" y="242" font-size="10.5" fill="#9a3412">安全默认值被写进「哪些 emit 允许隔离」。</text>
   <text x="420" y="262" font-size="10.5" fill="#9a3412">这是三道里最难做对的一处。</text>
-  <text x="420" y="286" font-size="10.5" fill="#7c2d12">传播：agent-session.ts:479 _installAgentToolHooks</text>
+  <text x="420" y="286" font-size="10.5" fill="#7c2d12">传播：agent-session.ts:484 _installAgentToolHooks</text>
 
   <text x="20" y="320" font-size="10.5" fill="#64748b">三道护栏合起来 = 「在进程内跑不可信第三方代码」这一问题的完整答案（见 1.4 判断四）。</text>
 </svg>

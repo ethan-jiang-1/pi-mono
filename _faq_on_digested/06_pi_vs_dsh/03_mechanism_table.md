@@ -1,7 +1,7 @@
 # 机制对照表：六个维度的逐项对比
 
 > 这张表是 01（共性）和 02（差异）的压缩版，用于快速查阅。证据锚点：
-> - pi：`_digested/harness/01-Architecture/{1.1,1.2,1.3,1.4}`、`_digested/harness/02-Boundaries/`、`_digested/extensions/`（`01-Core/1.2`、`02-Expansion/`）、`_digested/agent/01-Anatomy/1.4`（源码或引用统一以 `v0.84.2+8` / `d3ab2af9` 为基线）。
+> - pi：`_digested/harness/01-Architecture/{1.1,1.2,1.3,1.4}`、`_digested/harness/02-Boundaries/`、`_digested/extensions/`（`01-Core/1.2`、`02-Expansion/`）、`_digested/agent/01-Anatomy/1.4`（源码或引用统一以 `v0.84.3` / `4e58f324f` 为基线）。
 > - DSH：`/Users/bowhead/deepseek-harness/_digested/` 的 `system/00-map.md`、`cordis-runtime/00-map.md`、`composition/00-map.md`、`capability-seams/00-map.md`、`harness-idea/07-boundaries-costs-fit.md`（基线 `528c682e…`）。
 
 | 维度 | pi | DSH |

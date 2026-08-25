@@ -1,8 +1,8 @@
 # _digested
 
-> **当前源码基线**：pi-mono `v0.84.2+8`（upstream commit `d3ab2af9`，**已 merge 进本仓库**——merge `1c91e97a5`，源码锚点对应工作树）。2026-08-17 完成第二轮 catch-up：integration/ 事件模型与能力表已更新到 v0.84 实测行为；agent/ 25 篇（叶子文档）带 v0.84 演进警示，session v4 新专题已写（3.5）。行号复核仍不完全——agent/ 各篇的"行号未复核"提示以警示为准。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)。
+> **当前源码基线**：pi-mono `v0.84.3`（tag `4e58f324f`，**已 merge 进本仓库**——merge `6f8312a52`，源码锚点对应工作树）。2026-08-25 完成第三轮 catch-up（v0.84.2→v0.84.3）：integration/ 补 PowerShell 工具、`toolcall_start` wire 带 id/toolName、persist 语义、`--` end-of-options，重锚 03/04 行号；agent/ 各篇补 v0.84.3 警示（compaction toolChoice/zero-usage、skills isDeclaredSkill、jiti 四模式、fromId 语义等）；5.1/5.2 补 AI 层新增能力。行号复核仍不完全——以各篇警示为准。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)。
 >
-> 上一轮（v0.75.3→v0.83.0）记录见 [`_change_log/0002-v0.75.3-to-v0.83.0.md`](./_change_log/0002-v0.75.3-to-v0.83.0.md) 与 [`_change_log/_plan-1-v0.83.0.md`](./_change_log/_plan-1-v0.83.0.md)；本轮见 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](./_change_log/0003-v0.83.0-to-v0.84.2.md) 与 [`_change_log/_plan-2-v0.84.2.md`](./_change_log/_plan-2-v0.84.2.md)。
+> 上一轮（v0.75.3→v0.83.0）记录见 [`_change_log/0002-v0.75.3-to-v0.83.0.md`](./_change_log/0002-v0.75.3-to-v0.83.0.md) 与 [`_change_log/_plan-1-v0.83.0.md`](./_change_log/_plan-1-v0.83.0.md)；v0.83→v0.84.2 见 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](./_change_log/0003-v0.83.0-to-v0.84.2.md) 与 [`_change_log/_plan-2-v0.84.2.md`](./_change_log/_plan-2-v0.84.2.md)；本轮 v0.84.2→v0.84.3 见 [`_change_log/0004-v0.84.2-to-v0.84.3.md`](./_change_log/0004-v0.84.2-to-v0.84.3.md)。
 
 ## 这是什么
 

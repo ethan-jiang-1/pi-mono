@@ -26,10 +26,10 @@
 | session fork / clone | SDK：`session.sessionManager.fork()`（AgentSession 无 fork 方法）/ RPC：`{"type":"fork"}`、`{"type":"clone"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts)、[`rpc-mode.ts`](../../packages/coding-agent/src/modes/rpc/rpc-mode.ts) |
 | session 切换 | SDK：`session.sessionManager.switchSession()` / RPC：`{"type":"switch_session"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts) |
 | 状态快照（重连恢复） | RPC：`{"type":"get_state"}` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
-| 模型切换 | SDK：`session.setModel()` / RPC：`{"type":"set_model"}`、`{"type":"cycle_model"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 模型切换 | SDK：`session.setModel(model, { persist })` / RPC：`{"type":"set_model"}`、`{"type":"cycle_model"}`（v0.84.3：默认只在 session 内生效；`persist: true` 才写全局默认，RPC 路径不传 `persist`，故不再改全局默认） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 可用模型查询 | RPC：`{"type":"get_available_models"}` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | 模型轮换范围（scoped models） | SDK：`session.setScopedModels()` / `CreateAgentSessionOptions.scopedModels` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
-| 思考深度控制 | SDK：`session.setThinkingLevel()` / `cycleThinkingLevel()` / `getAvailableThinkingLevels()`（`thinkingLevel` getter）；RPC：`set_thinking_level`、`cycle_thinking_level`、`get_available_thinking_levels` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 思考深度控制 | SDK：`session.setThinkingLevel(level, { persist })` / `cycleThinkingLevel()` / `getAvailableThinkingLevels()`（`thinkingLevel` getter）；RPC：`set_thinking_level`、`cycle_thinking_level`、`get_available_thinking_levels`（v0.84.3：`persist: true` 才写全局默认；解析顺序改为 per-model 覆盖 → 全局默认） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | bash 直接执行 | SDK：`session.executeBash()`（实际方法名）/ RPC：`{"type":"bash"}`（支持 `excludeFromContext`） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`bash-executor.ts`](../../packages/coding-agent/src/core/bash-executor.ts) |
 | bash 中断 | SDK：`session.abortBash()` / RPC：`{"type":"abort_bash"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | session 统计 | SDK：`session.getSessionStats()` / RPC：`{"type":"get_session_stats"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
@@ -38,7 +38,7 @@
 | 最后一条 assistant 文本 | RPC：`{"type":"get_last_assistant_text"}`（05 Recipe 2 推荐取最终文本方式） | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | RPC 命令自省 | RPC：`{"type":"get_commands"}` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | HTML 导出 | SDK：`session.exportToHtml()` / RPC：`{"type":"export_html"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| JSONL 导出 | SDK：`session.exportToJsonl()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| JSONL 导出 | SDK：`session.exportToJsonl()`（v0.84.3 起委托给 `core/session-export.ts`） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`session-export.ts`](../../packages/coding-agent/src/core/session-export.ts) |
 | fork 消息获取 | SDK：`session.getUserMessagesForForking()` / RPC：`{"type":"get_fork_messages"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | session 命名 | SDK：`session.setSessionName()` / RPC：`{"type":"set_session_name"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | session entries 浏览 | RPC：`get_entries`、`get_tree` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
@@ -53,7 +53,10 @@
 | auth/runtime（ModelRuntime） | SDK：`CreateAgentSessionOptions.modelRuntime`（替代旧 `authStorage` + `modelRegistry`） | [`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | 扩展终止整批工具调用 | 扩展 `tool_call` hook 返回 `terminate`（v0.84.1） | [`extensions/types.ts`](../../packages/coding-agent/src/core/extensions/types.ts) |
 | auth 预检 | CLI：`pi auth check`（provider/model 级，可输出解析后的 credential）（v0.84.1） | `packages/coding-agent/src/main.ts` |
-| 默认工具集配置 | `defaultTools` setting（全局或按项目，v0.84.2） | [`docs/settings.md`](../../packages/coding-agent/docs/settings.md) |
+| 默认工具集配置 | `defaultTools` setting（全局或按项目，v0.84.2；v0.84.3 起可选值含 `powershell`） | [`docs/settings.md`](../../packages/coding-agent/docs/settings.md) |
+| PowerShell 执行 | SDK：`createPowerShellTool()`（内置工具，v0.84.3；基于 bash 工具定义，自带 UTF-8 输出 shim） | [`tools/powershell.ts`](../../packages/coding-agent/src/core/tools/powershell.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
+| 每模型思考深度 | `modelThinkingLevels` setting（v0.84.3，per-model 覆盖全局默认） | [`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
+| CLI `--` end-of-options | CLI：`pi -p -- "- 以破折号开头的参数"`（v0.84.3，`#7269`） | [`cli/args.ts`](../../packages/coding-agent/src/cli/args.ts) |
 
 ## 第三条集成路径：protocol / client / server（v0.84，experimental）
 
@@ -84,6 +87,8 @@ v0.84 出现了成型的 client/server 栈，**明确标注 experimental、API �
 | 权限确认弹窗 | 自己实现阻断交互（hook-based，没有内置弹窗 API） |
 | extension UI（TUI 内的自定义界面） | 可选实现 `ExtensionUIContext`，第一版不必要 |
 | 交互式 bash（TUI 中的实时 stdin） | SDK/RPC 的 `bash` 命令只支持一次性执行 |
+| `/thinking` 斜杠命令（v0.84.3，TUI-only） | 等价于 SDK `setThinkingLevel` / RPC `set_thinking_level`，但无独立 RPC 命令 |
+| radius session 分享（v0.84.3，experimental、TUI-only） | 宿主自己实现分享链接/上传（`interactive/session-share.ts`，登录 radius 后可用） |
 | Markdown 渲染 | 宿主自渲染（事件中是原始文本） |
 
 TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages/coding-agent/src/modes/interactive/)，使用 React Ink 渲染。它不是 SDK 的 UI 层——它是 SDK 的一个 consumer，外部 UI 是另一个 consumer。

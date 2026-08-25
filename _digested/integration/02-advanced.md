@@ -36,7 +36,7 @@ pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集
 |---|---|---|---|
 | pi-ai | `streamSimple()` | 统一的 LLM provider 抽象、流式响应 | 工具执行、session、权限 |
 | pi-agent-core | `Agent` class（循环内核 `agentLoop`/`runAgentLoop`） | LLM + 工具循环、消息树、compaction hook | 具体工具定义、扩展系统、session 持久化 |
-| pi-coding-agent | `createAgentSession()` 或 RPC | 完整产品：7 个内置工具（read/bash/edit/write/grep/find/ls，默认激活前 4 个）、扩展、session 树、bash 安全 | HTTP server、多租户、认证 |
+| pi-coding-agent | `createAgentSession()` 或 RPC | 完整产品：8 个内置工具（read/bash/edit/write/grep/find/ls/powershell，默认激活前 4 个）、扩展、session 树、bash 安全 | HTTP server、多租户、认证 |
 
 第一版集成建议直接用 `pi-coding-agent`。只有在你已经有一套自己的工具/扩展系统，只想要纯循环逻辑时，才退到 `pi-agent-core`。
 
@@ -133,7 +133,7 @@ stdout 上有两类 JSONL 消息：
 ```
 
 - `response`：对一个带 `id` 命令的应答——`{ id?, type: "response", command, success: true, data? }` 或 `{ ..., success: false, error }`（完整 union 见 `RpcResponse`，rpc-types.ts:110 起）。注意 payload 在 `data` 字段，且必须回显 `command` 名；不存在 `payload` 字段。
-- 事件：**有 `{"type":"event", ...}` 外层包装**——`rpc-mode.ts:355-356` 是 `session.subscribe((event) => output(toJsonEvent(event)))`，`toJsonEvent()` 只改写 `message_update`（剥离累积 `partial` 快照，见 `json-event.ts`）；其余事件原样放 `event` 字段（`agent_start`/`turn_start`/`tool_execution_start|update|end`/`message_end`/`agent_end`/`agent_settled`/`compaction_*`/`auto_retry_*`/`queue_update` 等）。宿主解析时按 `04-event-model.md` 的三种顶层类型（event / response）处理。
+- 事件：**有 `{"type":"event", ...}` 外层包装**——`rpc-mode.ts:355-356` 是 `session.subscribe((event) => output(toJsonEvent(event)))`，`toJsonEvent()` 改写 `message_update`（剥离累积 `partial` 快照；v0.84.3 起对 `toolcall_start` delta 额外补上 `id`/`toolName`，见 `json-event.ts`）；其余事件原样放 `event` 字段（`agent_start`/`turn_start`/`tool_execution_start|update|end`/`message_end`/`agent_end`/`agent_settled`/`compaction_*`/`auto_retry_*`/`queue_update` 等）。宿主解析时按 `04-event-model.md` 的三种顶层类型（event / response）处理。
 - **没有 `ended` 消息**。一轮 prompt 的完成信号是 `{"type":"event","event":{"type":"agent_settled"}}`（`RpcClient.waitForIdle()`/`collectEvents()` 靠它判断）。
 - `extension_ui_request`（stdout）与 `extension_ui_response`（stdin）：extension 需要宿主代答的 UI 请求（select/confirm/input/editor/notify/setStatus/setWidget/setTitle/set_editor_text），宿主以 `extension_ui_response` 回复。
 

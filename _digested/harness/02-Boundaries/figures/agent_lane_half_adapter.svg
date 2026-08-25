@@ -5,7 +5,7 @@
     </marker>
   </defs>
 
-  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">AgentLane：契约画齐了，实现还是骨架（一个半 adapter）</text>
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">AgentLane：契约画齐了，实现还是骨架（唯一 consumer 也是 stub）</text>
 
   <!-- contract (rich) -->
   <rect x="30" y="58" width="320" height="150" rx="12" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>

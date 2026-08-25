@@ -36,7 +36,7 @@ const { session } = await createAgentSession({  // 返回 { session, extensionsR
 })
 ```
 
-`CreateAgentSessionOptions` 定义在 [`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts)（sdk.ts:38）。返回 `{ session, extensionsResult, modelFallbackMessage? }`（sdk.ts:90-97），要解构出 `session`。v0.75.3→v0.83.0 的重要变化：**`modelRuntime` 替代了旧的 `authStorage` + `modelRegistry`**（`ModelRegistry` 仍在，但已降级为暴露给 extension 的同步 facade，见 5.2）；新增 `scopedModels`、`excludeTools`、`sessionStartEvent`。
+`CreateAgentSessionOptions` 定义在 [`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts)（sdk.ts:38）。返回 `{ session, extensionsResult, modelFallbackMessage? }`（sdk.ts:90-97），要解构出 `session`。v0.75.3→v0.83.0 的重要变化：**`modelRuntime` 替代了旧的 `authStorage` + `modelRegistry`**（`ModelRegistry` 仍在，但已降级为暴露给 extension 的同步 facade，见 [`agent/05-Infra/5.2_AI_Auth_Subsystem.md`](../agent/05-Infra/5.2_AI_Auth_Subsystem.md)）；新增 `scopedModels`、`excludeTools`、`sessionStartEvent`。
 
 ### 发送 prompt
 
@@ -89,8 +89,9 @@ session.subscribe((event: AgentSessionEvent) => {
       // 工具执行完成（result + isError）
       break
     case "agent_settled":
-      // agent run 完全结束（替代旧的 agent_end）
-      // 用于 idle 检测：无 pending retries/compactions/continuations
+      // agent run 完全结束（v0.83.0 新增，与 agent_end 并存，不是替代）
+      // agent_end 仍是 run 边界（带 willRetry）；agent_settled 在其后、无 pending retries/compactions/continuations 时触发
+      // 用于 idle 检测
       break
     case "bash_execution_update":
       // bash 执行过程中的流式输出更新（v0.83.0 新增）
@@ -135,7 +136,7 @@ await session.exportToHtml({ outputPath: "/tmp/session.html" }) // 实际方法�
 await session.exportToJsonl("/tmp/session.jsonl")  // 返回 string（agent-session.ts:3251）
 
 // Bash 直接执行
-const bashResult = await session.bash("npm test")
+const bashResult = await session.executeBash("npm test")  // 方法名是 executeBash，不是 bash（agent-session.ts:2775）
 
 // 工具管理
 const allTools = session.getAllTools()            // 所有已注册工具
@@ -302,7 +303,7 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 
 最稳的完成信号：
 
-- SDK：`session.waitForIdle()` Promise resolve，或监听 `agent_settled` 事件（v0.83.0 中 `agent_settled` 替代了旧的 `agent_end`）。
+- SDK：`session.waitForIdle()` Promise resolve，或监听 `agent_settled` 事件（v0.83.0 新增，与 `agent_end` 并存：`agent_end` 是 run 边界、可能带 `willRetry`；`agent_settled` 在重试/compaction/continuation 静默后才触发，idle 检测用它）。
 - RPC：监听 `{"type":"event","event":{"type":"agent_settled"}}` 事件（没有 `ended` 消息）。
 
 ## 最小状态机

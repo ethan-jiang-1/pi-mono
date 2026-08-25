@@ -37,7 +37,7 @@ Session 是一个 append-only 树形结构。**注意模型归属**：coding-age
 | 2.1 | The Loop | `runLoop()` 双层循环、turn 边界、prepareNextTurn、shouldStopAfterTurn |
 | 2.2 | Processor | `streamAssistantResponse()` 与 `executeToolCalls()` 的流水线 |
 | 2.3 | LLM Bridge | pi-ai 的 `streamSimple`、api-registry、provider 注册与 Context 转换 |
-| 2.4 | Retry Scheduler | 双层重试：provider 级 HTTP 重试 + agent 级 tool failure 重试 |
+| 2.4 | Retry Scheduler | 双层重试：provider 级 HTTP 重试 + agent 级"可重试错误"回合重试（`_prepareRetry`→`agent.continue()`，非工具执行失败） |
 | 2.5 | Session Service | Session tree 模型、SessionStorage 接口、JSONL 存储、上下文重建 |
 | 2.6 | Queue Modes | steering/followUp 双队列、QueueMode（all/one-at-a-time）、SingleFlight |
 | 2.7 | Cancellation | AbortController 传播链、abort 后的事件表面、扩展 abort 支持 |

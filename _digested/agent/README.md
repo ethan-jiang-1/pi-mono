@@ -22,10 +22,26 @@
   - [1.3_Tool_Registry.md](./01-Anatomy/1.3_Tool_Registry.md): 三层工具系统与执行模式
   - [1.4_Extension_System.md](./01-Anatomy/1.4_Extension_System.md): 扩展生命周期、事件扇出与能力注入
 - [02-Runtime](./02-Runtime/README.md): Agent 运行时循环、pipeline、queue、cancellation
+  - [2.1_The_Loop.md](./02-Runtime/2.1_The_Loop.md): 双层循环驱动模型
+  - [2.2_Processor.md](./02-Runtime/2.2_Processor.md): 消息流的处理管线
+  - [2.3_LLM_Bridge.md](./02-Runtime/2.3_LLM_Bridge.md): 多 Provider 统一流式桥接
+  - [2.4_Retry_Scheduler.md](./02-Runtime/2.4_Retry_Scheduler.md): 双层重试调度
+  - [2.5_Session_Service.md](./02-Runtime/2.5_Session_Service.md): 会话的树形状态模型
+  - [2.6_Queue_Modes.md](./02-Runtime/2.6_Queue_Modes.md): 双队列并发控制
+  - [2.7_Cancellation.md](./02-Runtime/2.7_Cancellation.md): 运行中的取消与信号传播
 - [03-Memory](./03-Memory/README.md): Compaction、token 估算、session tree
+  - [3.1_Compaction.md](./03-Memory/3.1_Compaction.md): 上下文的自动压缩
+  - [3.2_Branch_Summary.md](./03-Memory/3.2_Branch_Summary.md): 分支导航的记忆桥梁
+  - [3.3_Token_Estimation.md](./03-Memory/3.3_Token_Estimation.md): 双层估算策略
+  - [3.4_Session_Tree.md](./03-Memory/3.4_Session_Tree.md): 以树形结构承载记忆
   - [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md): **v0.84.0 新增** — lane-based 会话存储（Entry/LaneRecord/facts、durable operations、JSONL 原子发布）
 - [04-Harness](./04-Harness/README.md): AgentHarness、Skills、System Prompt、Extension Runner、Bash/Edit/Write Tools
-  - ... (7 篇)
+  - [4.1_AgentHarness.md](./04-Harness/4.1_AgentHarness.md): **v0.84.2 已重写** — `AgentLane` 骨架与它的存储地基
+  - [4.2_Skills.md](./04-Harness/4.2_Skills.md): 从文件到 prompt 的能力注入机制
+  - [4.3_System_Prompt.md](./04-Harness/4.3_System_Prompt.md): system prompt 从哪里来、怎么拼出来
+  - [4.4_Extension_Runner.md](./04-Harness/4.4_Extension_Runner.md): 扩展模块的加载与事件分发
+  - [4.5_Tool_Bash.md](./04-Harness/4.5_Tool_Bash.md): 最复杂的内置工具 Bash
+  - [4.6_Tool_Edit_Write.md](./04-Harness/4.6_Tool_Edit_Write.md): 文件修改的安全机制 Edit & Write
   - [4.7_Harness_Tools.md](./04-Harness/4.7_Harness_Tools.md): **v0.83.0 新增** — factory 模式工具架构
 - [05-Infra](./05-Infra/README.md): **v0.83.0 新增** — AI 基础设施层（API adapter、auth 子系统）
   - [5.1_AI_API_Layer.md](./05-Infra/5.1_AI_API_Layer.md): wire-protocol streaming 与 lazy loading
@@ -90,7 +106,7 @@
   - `AgentEvent` → `AgentSessionEvent`（更正旧说法：`AgentEvent` 定义仍在 `agent/src/types.ts:428`，`AgentSessionEvent` 在 `coding-agent/src/core/agent-session.ts:141`，两者都不在 harness/types.ts）
   - AgentHarness 新增泛型 `TContext`（**v0.84.0 又全部移除**，见顶部警示）；`ExecutionEnv` 被 `Models` 替代
   - 新增 `agent/src/harness/tools/` 目录（factory 模式工具架构）
-  - `ThinkingLevel` 新增 `"max"`；Compaction 支持 retry 和 `retainedTail`
+  - `ThinkingLevel` 新增 `"xhigh"` 和 `"max"`；Compaction 支持 retry 和 `retainedTail`
   - ~~`ModelSelectEvent`/`ThinkingLevelSelectEvent` 改名~~（2026-08-17 复核：v0.84.2 源码中现名仍是 `ModelSelectEvent`/`ThinkingLevelSelectEvent`，`extensions/types.ts:794-806`；改名未发生，旧记载有误）
 - v0.84.0 的重要变化见顶部警示和 [`../_change_log/0003-v0.83.0-to-v0.84.2.md`](../_change_log/0003-v0.83.0-to-v0.84.2.md)。
 - 未来如果 `packages/agent` 和 `packages/coding-agent` 的职责边界有变化，需要更新本目录的映射。

@@ -8,7 +8,7 @@
 
 ## 三层架构（从集成视角看）
 
-pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集成面（外围还有 `pi-tui`、`pi-telemetry`、`pi-session-backends`、`pi-evals` 等配套包，以及 v0.84 新增的 experimental `pi-protocol`/`pi-client`/`pi-server` 远程会话三件套，见下文）：
+pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集成面（外围还有 `pi-tui`、`pi-telemetry`、session 存储后端 `packages/session-backends/`（其 npm 名是 `@earendil-works/pi-session-backend-sqlite-node`）、`pi-evals` 等配套包，以及 v0.84 新增的 experimental `pi-protocol`/`pi-client`/`pi-server` 远程会话三件套，见下文）：
 
 ```
 ┌──────────────────────────────────────┐

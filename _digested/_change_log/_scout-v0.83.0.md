@@ -52,7 +52,7 @@
 ### P1: rpc-client.ts (6 commits) → ADDITIVE + MECHANISM
 
 **新方法**: `getAvailableThinkingLevels()`, `getEntries()`, `getTree()`
-**事件改名**: `agent_end` → `agent_settled`
+**事件改名**: ~~`agent_end` → `agent_settled`~~（**更正**：v0.84.2 复核二者并存非改名——`agent_end` 仍为 run 边界（带 willRetry），`agent_settled` 为新增 idle 信号，见 `agent-session.ts:142/148/637/599`）
 **进程生命周期加固**: exitError tracking, rejectPendingRequests
 
 ### P1: extensions/types.ts (27 commits) → ADDITIVE
@@ -94,7 +94,7 @@
 
 ### P3: types.ts (9 commits) → ADDITIVE
 
-- `ThinkingLevel` + `"max"`
+- `ThinkingLevel` + `"xhigh"`、`"max"`
 - `AgentToolResult` + `usage`, `addedToolNames`
 - `StreamFn` type 解耦
 

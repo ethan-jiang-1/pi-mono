@@ -1,6 +1,6 @@
 # 04-Harness：内部接线层
 
-> **⚠️ v0.84.2 基线（2026-08-17）**：本节从 v0.75.3 语义进化，多处描述需以 4.1 的 v0.84.2 复核为准。核心变化：**`AgentHarness` 已在 v0.83/v0.84 两次重构**——v0.83 加泛型 `TContext`、v0.84 又移除并去泛型化为 `AgentLane` 骨架。在 v0.84.2 里 `AgentHarness` **是一个 stub/骨架**：绝大多数操作抛 `HarnessNotImplemented`、`create()` 遇已有 record 抛错、hooks/events 由 `UnavailableRegistry` 直接 throw，"当前没有任何可跑的行为"。真正可用的 live 实现是 **`AgentSession` / SDK**（`createAgentSession()`）。因此本篇"一句话总览"里把 AgentHarness 描述成完整运作层是**过时表述**，以 4.1 为准。
+> **⚠️ v0.84.2 基线（2026-08-17）**：本节从 v0.75.3 语义进化，多处描述需以 4.1 的 v0.84.2 复核为准。核心变化：**`AgentHarness` 已在 v0.83/v0.84 两次重构**——v0.83 加泛型 `TContext`、v0.84 又移除并去泛型化为 `AgentLane` 骨架。在 v0.84.2 里 `AgentHarness` **是一个 stub/骨架**：绝大多数操作抛 `HarnessNotImplemented`（`prompt`/`skill`/`compact` 等经 `unavailable()` reject）、`create()` 对非空 session 抛错、hooks/events 由 `UnavailableRegistry` 直接 throw，真正可跑的行为在 `AgentSession` / SDK。下方"一句话总览"已按 4.1 修正，不再把 AgentHarness 描述成完整运作层。
 >
 > 关于本目录标题里的 "harness"：它是顶层 README 四种含义里的 **① 内部能力 harness**（扩展/Skill/工具如何进入 agent loop），**不是** ③ 的 `AgentHarness` 类。二者抽象层次不同，勿混淆。
 

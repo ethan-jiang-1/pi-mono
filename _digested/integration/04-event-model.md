@@ -135,7 +135,7 @@ RPC 子进程如果崩溃或断连，宿主不能假设自己拿到了所有事�
 3. 调 `get_messages`（RPC）或 SDK `session.messages`（getter，`agent-session.ts:955`）重建消息历史——没有 `getMessages()` 方法。
 4. 如果有未完成的 prompt，用 `get_state` 检查状态再决定是重试还是继续。
 
-pi-mono 的 session 持久化在本地 JSONL 文件（`SessionManager`），重启后可以恢复。这跟 OpenCode 的 SSE 重连 + REST 恢复策略思路一致，但实现上更轻量——直接读文件，不需要调多个 REST endpoint。
+pi-mono 的 session 持久化在本地 JSONL 文件（`SessionManager`），重启后可以恢复。(注：agent 包的 session v4 在 JSONL 后端之外另有 `JsonlSessionRepo`，见 agent/03-Memory/3.5，但 coding-agent 层暂未接入。)这跟 OpenCode 的 SSE 重连 + REST 恢复策略思路一致，但实现上更轻量——直接读文件，不需要调多个 REST endpoint。
 
 ## 事件批处理
 
@@ -152,3 +152,13 @@ pi-mono 的 session 持久化在本地 JSONL 文件（`SessionManager`），重�
 pi-mono 有一个 Extension UI 协议（定义在 AgentSession 和 ExtensionRunner 的交互中）。extension 可以通过 `ExtensionAPI` 注册 UI context，在 TUI 中展示自定义界面。
 
 对于外部 UI 来说，这是**可选的进阶特性**。第一版集成不需要处理 Extension UI——它主要是为 TUI 插件设计的。但如果你的宿主也需要让 extension 渲染自定义 UI，需要实现 `ExtensionUIContext` 接口。
+
+## session v4 对新事件模型的影响
+
+v0.84.0 agent 包的 session 存储换代 lane-based v4（详见 `agent/03-Memory/3.5_Session_v4.md`），但 coding-agent 的 `SessionManager`（RPC/SDK 使用的 session 持久化）尚未接入这套新模型。对外部集成者来说：
+
+- SDK/RPC 当前事件的产生和存储不受 session v4 影响——事件仍由 `AgentSession` 管理、`SessionManager` 持久化。
+- 未来 `AgentHarness` / `AgentLane` 骨架填满后，事件模型可能增加 `lane` 相关事件（如 `operation_started`/`operation_finished`、`lane_switch`）及 `SessionSnapshot`（protocol/client/server 路径的权威快照订阅模型）。
+- `message_update` 增量化（v0.84.0，本节已有详述）是向快照模型靠拢的中间步。
+
+当前结论自洽：事件模型本篇描述的是 coding-agent 层事件的真实行为，不受 agent 包 session v4 未接入的影响。跟踪方向是 protocol/client/server 的 `SessionSnapshot` 模型（见 integration/06 的 experimental 路径介绍）。

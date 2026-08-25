@@ -18,7 +18,7 @@ Agent 内核入口：[`agent/`](agent/)
 
 ## pi-mono 是什么
 
-pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不仅是一个可以在终端使用的 coding agent，更是一个可以被其他产品嵌入的 agent 引擎。
+pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不仅是一个可以在终端使用的 coding agent，更是一个可以被其他产品嵌入的 agent 引擎。library-first 的承诺分两层：**SDK**（`createAgentSession()` 进程内嵌入）当前可用、成熟；**AgentLane 直接嵌入**（`packages/agent` 的内层 harness 骨架）契约已画好但多数操作是 stub，在填实现中。
 
 当前基线（v0.84.2）它由 10 个包组成一个 monorepo（v0.75.3 时代的 `web-ui`/`mom`/`pods` 已在上游移除；`storage` 于 v0.84 并入 `session-backends`）：
 
@@ -57,11 +57,13 @@ pi-mono 里需要严格区分两种 harness：
 
 | 名称 | 关心的问题 | 阅读入口 |
 |---|---|---|
-| 内部能力 harness | 扩展、工具、模型、快捷键、CLI flag、Skill、Prompt 如何进入 Agent loop | [`agent/01-Anatomy/1.4_Extension_System.md`](agent/01-Anatomy/1.4_Extension_System.md) |
+| 内部能力 harness | 扩展、工具、模型、快捷键、CLI flag、Skill、Prompt 如何进入 Agent loop | [`agent/04-Harness/README.md`](agent/04-Harness/README.md)（接线层总览）；机制细节见 [`agent/01-Anatomy/1.4_Extension_System.md`](agent/01-Anatomy/1.4_Extension_System.md) |
 | 外部集成 harness | 另一个产品如何启动 pi-mono、创建 session、发请求、听事件、处理状态 | [`integration/`](integration/) |
 
 前者是"给 Agent 补能力和护栏"，后者是"把 Agent 接进另一个宿主系统"。两者共享同一套源码事实，但读者问题完全不同。
 
+> **关于 "harness" 的四层含义**：在 _digested/ 中 "harness" 一词有四种相关但不同的含义，注意区分：① **内部能力 harness**（内部接线层，见 agent/04-Harness/）——让扩展、Skill、工具进入 Agent loop 的机制；② **外部集成 harness**（integration/）——让外部宿主嵌入 pi-mono 的接入方式；③ **AgentHarness / AgentLane**（agent/04-Harness/4.1）——agent 包内为 session 级操作编排设计的内层骨架契约，目前大多 stub；④ **`harness/` 本目录对 pi 作为开源 coding harness 的**评价维度**。含义① 和 ③ 容易混淆：前者是"扩展怎么挂上循环"，后者是"循环怎么被宿主驱动"——它们是不同抽象层次。
+>
 > **第三种视角（`harness/`）**：上面两种 harness 是 pi 内部的**能力机制**。此外还有一个评价维度——pi 作为开源 coding harness，**结构优不优秀、好不好扩展、开发有没有纪律、对自己上面的 coding agent 自描述够不够**。这个评价维度放在 [`harness/`](harness/)，它不做机制解剖（引用 `agent/`），只做评价。
 
 ## 推荐阅读路径
@@ -88,6 +90,7 @@ pi-mono 里需要严格区分两种 harness：
 - 想理解"极简核 + 靠扩展长能力"的扩充思路：[`extensions/`](extensions/)（核有多小 / 扩充四轴 / 扩充套路）
 - 想理解扩展系统怎么注入能力：`agent/01-Anatomy/1.4_Extension_System.md`
 - 想理解工具怎么注册、怎么执行：`agent/01-Anatomy/1.3_Tool_Registry.md`
+- 想理解 Agent 内层 harness 骨架（AgentLane 契约、AgentHarness 骨架、它在 library-first 中的角色）：`agent/04-Harness/4.1_AgentHarness.md`
 - 想评价 pi 的结构优不优秀、好不好扩展：`harness/01-Architecture/`（1.1–1.4）+ `harness/02-Boundaries/`（2.1–2.4）
 - 想看 pi 开发有没有策略/纪律、自描述够不够：`harness/03-Discipline/`（3.1–3.4）+ `harness/04-Self-Description/`（4.1–4.4）
 

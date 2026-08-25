@@ -1,6 +1,6 @@
 # pi-mono Agent 架构手册
 
-> **⚠️ v0.84.2 基线（2026-08-17）**：本仓库代码已同步到 v0.84.2+8（merge `1c91e97a5`），源码锚点对应工作树。v0.84.0 重点变化：① **session v4**——agent 包 session 模型整体重写（lane-based，旧 JSONL/in-memory repo API 删除），新专题 [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md)；② **`AgentHarness` 去泛型化重设计为 `AgentLane` 骨架**（多数操作 `HarnessNotImplemented`），4.1 大半失效；③ `FileSystem.renameFile()` 变必需；④ `message_update` wire 事件改纯 delta；⑤ auth 一批 breaking（见 5.2 警示）。
+> **⚠️ v0.84.2 基线（2026-08-17）**：本仓库代码已同步到 v0.84.2+8（merge `1c91e97a5`），源码锚点对应工作树。v0.84.0 重点变化：① **session v4**——agent 包 session 模型整体重写（lane-based，旧 JSONL/in-memory repo API 删除），新专题 [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md)；② **`AgentHarness` 去泛型化重设计为 `AgentLane` 骨架**（多数操作 `HarnessNotImplemented`），4.1 已按 v0.84.2 完全重写；③ `FileSystem.renameFile()` 变必需；④ `message_update` wire 事件改纯 delta；⑤ auth 一批 breaking（见 5.2 警示）。
 >
 > **⚠️ v0.83.0 注意**：本文档集基于 v0.75.3 源码编写。v0.75.3→v0.83.0 有重大 API 变更：`AgentEvent`→`AgentSessionEvent`、`ExecutionEnv`→`Models`、AgentHarness 新增泛型 `TContext`、`AgentHarnessTool` 新增 context 参数、新增 `agent/src/harness/tools/` 目录。行号和部分 API 描述可能已过时。参见 [`../_change_log/`](../_change_log/README.md)。
 
@@ -37,7 +37,7 @@
 - 想看"消息怎么从用户输入变成 LLM 可理解的内容，以及自定义消息怎么注入": 读 [1.2_Message_Graph.md](./01-Anatomy/1.2_Message_Graph.md)
 - 想看"工具为什么有三层类型系统、怎么注册、怎么控制执行顺序": 读 [1.3_Tool_Registry.md](./01-Anatomy/1.3_Tool_Registry.md)
 - 想看"扩展怎么加载、事件怎么扇出、runtime provider 怎么注册": 读 [1.4_Extension_System.md](./01-Anatomy/1.4_Extension_System.md)
-- 想看"Agent 一次回答为什么会分多轮继续跑、steering 和 follow-up 有什么区别": 读 [1.1_Agent_Info.md](./01-Anatomy/1.1_Agent_Info.md) 的 QueueMode 部分 + `packages/agent/src/agent-loop.ts` 的 `runLoop()`
+- 想看"Agent 一次回答为什么会分多轮继续跑、steering 和 follow-up 有什么区别": 读 [2.1_The_Loop.md](./02-Runtime/2.1_The_Loop.md)（双层循环主干）+ [2.6_Queue_Modes.md](./02-Runtime/2.6_Queue_Modes.md)（队列模式）
 - 想看"Agent 的双层 loop 和 stream/execute pipeline": 读 [02-Runtime/](./02-Runtime/README.md)
 - 想看"compaction、token 估算和 session tree": 读 [03-Memory/](./03-Memory/README.md)
 - 想看"AgentHarness、skills、bash/edit/write 工具怎么执行": 读 [04-Harness/](./04-Harness/README.md)

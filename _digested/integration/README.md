@@ -134,4 +134,4 @@ node dist/cli.js --mode rpc
 - Agent 类型：[`../../packages/agent/src/types.ts`](../../packages/agent/src/types.ts)
 - Session 管理：[`../../packages/coding-agent/src/core/session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts)
 - Bash 执行器：[`../../packages/coding-agent/src/core/bash-executor.ts`](../../packages/coding-agent/src/core/bash-executor.ts)
-- ~~web-ui 入口~~：[`../../apps/web-ui/`](../../apps/web-ui/)（**包已移除**，v0.83.0 前即删除；仅保留历史锚点）
+- `web-ui` 入口（`apps/web-ui/`）：~~已移除~~（v0.83.0 前即删除；仅保留历史锚点，目录不存在）

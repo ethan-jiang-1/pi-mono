@@ -63,8 +63,8 @@ pi-mono 在把这 2.5 个月变成一个**更模块化、更可嵌入的平台**
 |---|---|
 | `AgentEvent` | `AgentSessionEvent`（移入 `harness/types.ts`） |
 | `agent_end` | `agent_settled` |
-| `ModelSelectEvent` | `ModelUpdateEvent` |
-| `ThinkingLevelSelectEvent` | `ThinkingLevelUpdateEvent` |
+| ~~`ModelSelectEvent`~~ | ~~`ModelUpdateEvent`~~（**存疑**：2026-08-17 复核，v0.84.2 源码 `extensions/types.ts:794/802` 现名仍是 `ModelSelectEvent`/`ThinkingLevelSelectEvent`，改名未发生——见 agent/README.md:94 更正） |
+| ~~`ThinkingLevelSelectEvent`~~ | ~~`ThinkingLevelUpdateEvent`~~（同上，未发生） |
 
 **新增事件**：`bash_execution_update`、`entry_appended`、`summarization_retry_scheduled`、`summarization_retry_attempt_start`、`summarization_retry_finished`
 

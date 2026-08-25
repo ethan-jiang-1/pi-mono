@@ -1,5 +1,7 @@
 # 05-Infra：AI 基础设施层
 
+> **⚠️ v0.84.2 基线（2026-08-17）**：v0.83.0 重构出 `api/`/`providers/`/`auth/` 三层，v0.84.2 该目录已有 32 个文件（见 5.1），auth 一批 breaking（OAuth 流程拆分、`oauth-page.ts` 新增）见 5.2 警示；本节与 5.1/5.2 为准。
+
 ## 一句话定位
 
 `packages/ai` 是 pi-mono 的 LLM 抽象层。v0.83.0 中它经历了最大的架构重构：从 provider 定义与 API 实现混在一起的单一 `providers/` 目录，拆分为三层——`api/`（wire-protocol streaming）、`providers/`（model catalog）、`auth/`（credential resolution）。理解这三层的边界是理解 pi-mono 如何支持多 provider 的关键。
@@ -19,6 +21,6 @@
 
 ## 边界
 
-- 不逐文件解释 31 个 API adapter 的实现细节——只讲架构模式和合约
+- 不逐文件解释 32 个 API adapter 的实现细节——只讲架构模式和合约
 - 不讲每个 provider 的 model catalog——那是 `providers/` 的数据，不是机制
 - 不讲 TUI 中的 OAuth login UI——只讲 auth 子系统的接口和 pipeline

@@ -241,7 +241,7 @@ Phase 5: Verification（交叉验证收尾）
 
 - ✅ 06-coverage-and-parity.md：Runtime 能力覆盖表从 19 行扩展到 32 行，覆盖所有 v0.83.0 新增 SDK/RPC 能力
 - ✅ 03-runtime-api.md：更新 SDK `createAgentSession` 参数（modelRuntime、scopedModels、excludeTools）、事件类型、新增方法（setScopedModels、getContextUsage、exportToJsonl 等 10+）、RPC 新命令（get_available_thinking_levels、get_entries、get_tree）、bash excludeFromContext、completion detection（agent_settled）
-- ✅ 04-event-model.md：更新事件类型引用（AgentEvent→AgentSessionEvent）、新增事件表（agent_settled、bash_execution_update 等）、事件改名（ModelSelect→ModelUpdate、ThinkingLevelSelect→ThinkingLevelUpdate）
+- ✅ 04-event-model.md：更新事件类型引用（AgentEvent→AgentSessionEvent）、新增事件表（agent_settled、bash_execution_update 等）、事件改名（ModelSelect→ModelUpdate、ThinkingLevelSelect→ThinkingLevelUpdate）【**更正**：v0.84.2 复核 ModelSelect/ThinkingLevelSelect 改名未发生，现名不变——见 agent/README.md:94；本行旧的"改名"描述已过时】
 - ✅ 02-advanced.md：修正 AgentEvent→AgentSessionEvent 引用
 - ✅ integration/README.md：修正 3 处 AgentEvent→AgentSessionEvent
 - ⏭️ 01-start-here.md、05-recipes.md：未做实质修改（内容偏架构判断和 recipes，不依赖具体 API 签名）

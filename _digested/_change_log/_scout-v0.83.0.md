@@ -69,7 +69,7 @@
 - `ExecutionEnv` 删除 → `Models` 替代
 - `AgentHarnessTool` — 5-arg execute (加 context)
 - `ActiveToolsChangeEntry` 新 session entry type
-- event 改名: `ModelSelect`→`ModelUpdate`, `ThinkingLevelSelect`→`ThinkingLevelUpdate`
+- event 改名: `ModelSelect`→`ModelUpdate`, `ThinkingLevelSelect`→`ThinkingLevelUpdate`（**存疑**：v0.84.2 复核此改名未发生，现名仍 ModelSelect/ThinkingLevelSelect——见 agent/README.md:94）
 - `CompactResult.firstKeptEntryId` → optional
 
 ### P2: agent-loop.ts (13 commits) → MECHANISM

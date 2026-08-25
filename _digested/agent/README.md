@@ -25,7 +25,7 @@
 - [03-Memory](./03-Memory/README.md): Compaction、token 估算、session tree
   - [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md): **v0.84.0 新增** — lane-based 会话存储（Entry/LaneRecord/facts、durable operations、JSONL 原子发布）
 - [04-Harness](./04-Harness/README.md): AgentHarness、Skills、System Prompt、Extension Runner、Bash/Edit/Write Tools
-  - ... (6 篇)
+  - ... (7 篇)
   - [4.7_Harness_Tools.md](./04-Harness/4.7_Harness_Tools.md): **v0.83.0 新增** — factory 模式工具架构
 - [05-Infra](./05-Infra/README.md): **v0.83.0 新增** — AI 基础设施层（API adapter、auth 子系统）
   - [5.1_AI_API_Layer.md](./05-Infra/5.1_AI_API_Layer.md): wire-protocol streaming 与 lazy loading
@@ -84,7 +84,7 @@
 
 ## 收敛说明
 
-- 当前 5 个 section（01-Anatomy / 02-Runtime / 03-Memory / 04-Harness / 05-Infra），共 23 篇。
+- 当前 5 个 section（01-Anatomy / 02-Runtime / 03-Memory / 04-Harness / 05-Infra），共 25 篇叶子文档。
 - 正文基于 v0.75.3 编写，v0.83.0 / v0.84.2 两轮以警示标注演进；本仓库代码已同步到 v0.84.2+8，行号锚点对应工作树。
 - v0.83.0 的重要变化（影响 agent/ 文档）：
   - `AgentEvent` → `AgentSessionEvent`（更正旧说法：`AgentEvent` 定义仍在 `agent/src/types.ts:428`，`AgentSessionEvent` 在 `coding-agent/src/core/agent-session.ts:141`，两者都不在 harness/types.ts）

@@ -1,6 +1,6 @@
 # 01-Architecture — 结构评价：pi 的扩展面是深还是浅
 
-> 本节回答 `harness/` 的第一个问题：**结构优不优秀、好不好扩充。** 用 [`codebase-design`](../../../.agents/skills/codebase-design/) 的词汇（module / interface / implementation / seam / depth / leverage / locality / adapter）做严格评价，不做 cheerleading。
+> 本节回答 `harness/` 的第一个问题：**结构优不优秀、好不好扩充。** 用 `codebase-design` 技能的词汇（module / interface / implementation / seam / depth / leverage / locality / adapter，见 `~/.agents/skills/codebase-design/`，不在本仓库内）做严格评价，不做 cheerleading。
 
 ## 本节的立场
 

@@ -37,6 +37,7 @@ _faq_on_digested/
 - [`03_third_party_provider_baseurl/`](03_third_party_provider_baseurl/question.md) — 第三方中转模型怎么挂才不和官方 DeepSeek 冲突？（模型身份、同名 upsert、deepseek.com 魔法探测失效）
 - [`04_root_entry_doc_design/`](04_root_entry_doc_design/question.md) — Pi 根入口文档的**静态设计**：这张地图怎么画？（Pi 静态层几乎没画地图，把它委托给运行时）
 - [`05_root_entry_doc_navigation/`](05_root_entry_doc_navigation/question.md) — Pi 跑起来之后根入口文档怎么被**动态消费**？（注入 buildSystemPrompt + read 拉取 + compaction 回收）
+- [`06_pi_vs_dsh/`](06_pi_vs_dsh/question.md) — pi vs DSH：两个"很灵活"的 harness，共性、差异、优缺点？——可扩展性 vs 可组合性
 
 ## 引用规范
 

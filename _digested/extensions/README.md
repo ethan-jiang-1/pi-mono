@@ -4,7 +4,7 @@
 
 ## 这是什么
 
-一句话：**pi 的核被刻意做到极小，产品里绝大多数能力都不是"核"，而是通过 extension 这一个口子扩充出来的。** 本目录就是把这句话讲清楚——不是讲扩展系统怎么运转（那是 `agent/`），也不是评它优不优秀（那是 `harness/`），而是讲 **pi 靠扩展"长能力"的这套思路本身**，以及它在 `packages/coding-agent/examples/extensions/` 里体现出来的扩充维度。
+一句话：**pi 的核（core）被刻意做到极小，产品里绝大多数能力都不是"核"，而是通过 extension 这一个口子扩充（expand）出来的。** 本目录就是把这句话讲清楚——不是讲扩展系统怎么运转（那是 `agent/`），也不是评它优不优秀（那是 `harness/`），而是讲 **pi 靠扩展"长能力"的这套思路本身**，以及它在 `packages/coding-agent/examples/extensions/` 里体现出来的扩充维度。
 
 ## 核心命题
 
@@ -24,7 +24,7 @@ pi 的 README 自己把立场说得很白：
 
 ## 先建立一张心理图
 
-pi 的"核"是一个**循环**，不是一堆功能：
+pi 的"核"是一个**循环（agent loop）**，不是一堆功能：
 
 ```
 session ──► input ──► before_agent_start ──► ┌─ agent loop（每轮）───────────┐
@@ -38,7 +38,29 @@ session ──► input ──► before_agent_start ──► ┌─ agent loop
 - **留在核里的**：让这个循环转起来的最小件——消息图、session 树、provider 抽象、7 个内置工具、以及"让扩展能挂在循环上"的接缝本身。
 - **被赶出去的**：所有"工作流"（plan-mode、subagent、todo、preset、git-checkpoint）、所有"护栏偏好"（permission-gate、protected-paths、dirty-repo-guard）、所有"长相"（minimal-mode、footer、header、snake）、所有"后端接入"（custom-provider、ssh、sandbox）。
 
-关键不是"pi 有很多扩展"，而是**这些被赶出去的东西，和核里的东西走的是同一条接缝**——一个 `pi` 对象、一个工厂函数。这让"扩充"成为一种**可预测、可组合、可分发**的动作，而不是每次都要 fork 内部。
+关键不是"pi 有很多扩展"，而是**这些被赶出去的东西，和核里的东西走的是同一条接缝（seam）**——一个 `pi` 对象（`ExtensionAPI`）、一个工厂函数（`export default function (pi) {}`）。这让"扩充"成为一种**可预测、可组合、可分发**的动作，而不是每次都要 fork 内部。
+
+## 术语对照（中英，方便对代码）
+
+| 中文 | 英文 / 代码 | 一句话 |
+|---|---|---|
+| 核 / 极简核 | core / minimal core | `CONTRIBUTING.md` 的 "pi's core is minimal" |
+| 扩充 | extension / expansion | 靠扩展（extension）把能力"长"出来 |
+| 扩展 | extension | 一个默认导出的工厂函数模块 |
+| 接缝 | seam | 循环上可被扩展挂住的节点，即 `pi.on(...)` 的事件点 |
+| 循环 | agent loop | `session → input → before_agent_start → … → agent_end` 的主循环 |
+| 注册面 | register surface | `registerTool` / `registerCommand` / `registerShortcut` / `registerFlag` / `registerProvider` |
+| 长相 | presentation / rendering | `renderCall` / `renderResult` / `setFooter` / overlay |
+| 持久化 | persistence | `details` / `appendEntry` / session 树重建 |
+| 同名覆盖 | same-name override | 注册与内置同名的工具替换内置 |
+| 两阶段绑定 | two-phase binding | 加载期排队，`bindCore()` 时统一生效 |
+| stale 保护 | stale-context guard | `invalidate()` / `assertActive()` 抛错 |
+| fail-close | fail-closed | `tool_call` 异常不吞、阻断执行 |
+| 原子动作 | atomic operations | 7 个内置工具 `read`/`bash`/`edit`/`write`/`grep`/`find`/`ls` |
+| 工作流 | workflow | plan-mode / subagent / todo 这类偏好组装 |
+| 护栏 | guard / guardrail | permission-gate 这类拦截 |
+| 偏好 | preference | "价值依赖偏好"——进核 vs 扩展的判据关键词 |
+| 开放集 | open set | 模型 provider / 执行后端这类"核枚举不完"的集合 |
 
 ## 本目录的边界（不重复什么）
 

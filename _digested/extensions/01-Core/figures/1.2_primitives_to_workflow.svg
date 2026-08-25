@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">故意不做：plan-mode / subagent 是通用积木拼出来的工作流</text>
+
+  <!-- primitives (core provides) -->
+  <rect x="30" y="60" width="300" height="190" rx="12" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="44" y="86" font-size="12.5" font-weight="700" fill="#1e3a8a">通用接缝（primitives，核提供）</text>
+  <text x="44" y="112" font-size="11" fill="#1e40af">· pi.setActiveTools() —— 切工具集</text>
+  <text x="44" y="134" font-size="11" fill="#1e40af">· pi.on("tool_call") —— 拦截 / block</text>
+  <text x="44" y="156" font-size="11" fill="#1e40af">· pi.on("before_agent_start") —— 注入</text>
+  <text x="44" y="178" font-size="11" fill="#1e40af">· pi.appendEntry() —— 持久化</text>
+  <text x="44" y="200" font-size="11" fill="#1e40af">· registerCommand / registerFlag</text>
+  <text x="44" y="232" font-size="10.5" fill="#64748b">核只提供积木，不提供拼好的工作流</text>
+
+  <!-- arrow -->
+  <line x1="332" y1="155" x2="372" y2="155" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="352" y="145" font-size="10" fill="#64748b" text-anchor="middle">组装</text>
+  <text x="352" y="175" font-size="10" fill="#64748b" text-anchor="middle">compose</text>
+
+  <!-- assembled workflows -->
+  <rect x="376" y="60" width="314" height="190" rx="12" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="390" y="86" font-size="12.5" font-weight="700" fill="#4c1d95">拼出来的工作流（workflow，扩展组装）</text>
+  <text x="390" y="114" font-size="11" fill="#5b21b6">plan-mode（plan-mode/index.ts，390 行）</text>
+  <text x="402" y="134" font-size="10.5" fill="#6b21a8">只读 + 步骤跟踪 + [DONE:n] + 进度 widget</text>
+  <text x="390" y="162" font-size="11" fill="#5b21b6">subagent（subagent/agents/*.md）</text>
+  <text x="402" y="182" font-size="10.5" fill="#6b21a8">隔离上下文 + 委派协议（markdown frontmatter）</text>
+  <text x="390" y="232" font-size="10.5" fill="#7c3aed">没有用到任何"plan-mode 专用"的核能力</text>
+
+  <!-- bottom note -->
+  <rect x="30" y="268" width="660" height="30" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="46" y="288" font-size="11" fill="#334155">README 原话 "skips features like sub agents and plan mode" —— 主动跳过（skips），不是欠账（lacks）。</text>
+</svg>

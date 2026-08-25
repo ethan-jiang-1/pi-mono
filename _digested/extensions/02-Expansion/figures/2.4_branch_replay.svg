@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">持久化（persistence）：状态沿 session 树的条目流重放，分支各得各的</text>
+
+  <!-- session tree -->
+  <rect x="30" y="84" width="100" height="40" rx="8" fill="#e2e8f0" stroke="#64748b" stroke-width="1.4"/>
+  <text x="80" y="108" font-size="11" font-weight="700" fill="#334155" text-anchor="middle">root</text>
+
+  <rect x="180" y="84" width="150" height="40" rx="8" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.6"/>
+  <text x="255" y="104" font-size="10.5" font-weight="700" fill="#1e3a8a" text-anchor="middle">node A</text>
+  <text x="255" y="118" font-size="9.5" fill="#1e40af" text-anchor="middle">todo: A, B（2 条）</text>
+
+  <rect x="400" y="52" width="170" height="40" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.6"/>
+  <text x="485" y="72" font-size="10.5" font-weight="700" fill="#14532d" text-anchor="middle">分支 L → node B</text>
+  <text x="485" y="86" font-size="9.5" fill="#166534" text-anchor="middle">todo: A, B, C（3 条）</text>
+
+  <rect x="400" y="170" width="170" height="40" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.6"/>
+  <text x="485" y="190" font-size="10.5" font-weight="700" fill="#14532d" text-anchor="middle">分支 R → node C</text>
+  <text x="485" y="204" font-size="9.5" fill="#166534" text-anchor="middle">todo: A, B, X（2 条 + X）</text>
+
+  <!-- tree arrows -->
+  <line x1="130" y1="104" x2="176" y2="104" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <line x1="330" y1="96" x2="396" y2="80" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <line x1="330" y1="112" x2="396" y2="186" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- replay annotation -->
+  <g font-size="9.5" fill="#475569">
+    <text x="585" y="72" font-size="9.5" fill="#64748b">getBranch() 重放该分支</text>
+    <text x="585" y="86" font-size="9.5" fill="#64748b">的 details → 3 条 todo</text>
+    <text x="585" y="190" font-size="9.5" fill="#64748b">getBranch() 重放该分支</text>
+    <text x="585" y="204" font-size="9.5" fill="#64748b">的 details → 2 条 + X</text>
+  </g>
+
+  <!-- fork arrow -->
+  <text x="240" y="60" font-size="10" fill="#64748b">fork</text>
+
+  <!-- bottom note -->
+  <rect x="30" y="246" width="660" height="50" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="46" y="266" font-size="11.5" font-weight="700" fill="#0f172a">状态 = 沿"当前分支"重放的结果（每次执行存完整快照）</text>
+  <text x="46" y="284" font-size="11" fill="#334155">fork 到任意历史点，重放那条分支的 details 就得那个历史时刻的状态——扩展一行分支逻辑都不用写。</text>
+</svg>

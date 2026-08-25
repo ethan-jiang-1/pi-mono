@@ -1,4 +1,4 @@
-# 02-Expansion — 扩充的四条轴
+# 02-Expansion — 扩充（extension）的四条轴
 
 > 本节回答 `extensions/` 的核心问题：**核那么小，能力是怎么长出来的。** 读完 `examples/extensions/` 70+ 个示例，可以归纳成四条扩充轴——不是按 README 的九类（Lifecycle / Tools / UI / Git / …）切，而是按"扩充发生在循环的哪里、注入的是什么"切。前者是目录排版，后者才是扩充思路。
 
@@ -6,12 +6,12 @@
 
 扩充不是"随便加东西"，而是**沿着循环的既定接缝、以四种不同的动作展开**：
 
-| 轴 | 动作 | 一句话 |
-|---|---|---|
-| [2.1 循环接缝](./2.1_loop_seams.md) | **拦截 / 改写** 循环里流动的东西 | 在输入、上下文、provider 请求、工具调用、结果、compaction 这些既定节点上，改写或阻断 |
-| [2.2 注册面](./2.2_register_surface.md) | **往循环里加东西** | 注册新工具、命令、快捷键、CLI flag、provider、skill/prompt/theme 资源 |
-| [2.3 长相](./2.3_presentation.md) | **改变循环的显示** | 覆盖工具渲染、消息/条目渲染、footer/header/editor/overlay |
-| [2.4 持久化](./2.4_persistence.md) | **让扩充活过重启与分支** | 用 `details` / `appendEntry` / session 树重建，把扩展状态绑进 session |
+| 轴 | 动作 | 一句话 | 配图 |
+|---|---|---|---|
+| [2.1 循环接缝 / loop seam](./2.1_loop_seams.md) | **拦截（intercept）/ 改写（rewrite）** 循环里流动的东西 | 在输入、上下文、provider 请求、工具调用、结果、compaction 这些既定节点上，改写或阻断 | [2.1_loop_seams.svg](figures/2.1_loop_seams.svg) |
+| [2.2 注册面 / register surface](./2.2_register_surface.md) | **注册（register）** 新东西进循环 | 注册新工具、命令、快捷键、CLI flag、provider、skill/prompt/theme 资源 | [2.2_register_surface.svg](figures/2.2_register_surface.svg) |
+| [2.3 长相 / presentation](./2.3_presentation.md) | **改变循环的显示（render）** | 覆盖工具渲染、消息/条目渲染、footer/header/editor/overlay | [2.3_slot_orthogonality.svg](figures/2.3_slot_orthogonality.svg) |
+| [2.4 持久化 / persistence](./2.4_persistence.md) | **让扩充活过重启与分支（persist）** | 用 `details` / `appendEntry` / session 树重建，把扩展状态绑进 session | [2.4_branch_replay.svg](figures/2.4_branch_replay.svg) |
 
 ## 为什么这四条轴能把 70+ 示例装下
 
@@ -32,3 +32,4 @@
 - 每条轴都要回答：**为什么这类扩充不能并进核、必须走扩展**。
 - 机制（事件扇出怎么实现、`emit*` 怎么合并）回指 `../../agent/`，本节只讲"这条轴让作者能做什么、示例里怎么做的"。
 - 每个示例锚点给出**它用了哪个具体 API**，不停在"它演示了 X"。
+- 术语中英对照见 [`../README.md`](../README.md) 的对照表；正文里 `接缝 = seam`、`注册面 = register surface`、`长相 = presentation`、`持久化 = persistence`。

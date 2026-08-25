@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">覆盖与复用（override &amp; reuse）：三个机制，让扩充不必重写核</text>
+
+  <!-- 1: same-name override -->
+  <rect x="30" y="56" width="660" height="64" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="46" y="78" font-size="12" font-weight="700" fill="#7f1d1d">① 同名覆盖（same-name override）</text>
+  <text x="46" y="98" font-size="10.5" fill="#7f1d1d">pi.registerTool({ name: "read", ... }) —— 内置 read 是"默认实现"，不是禁区；覆盖后对 LLM / session 而言 read 就是 read。</text>
+  <text x="46" y="114" font-size="10" fill="#9f1239">代价：同名冲突靠规则收场（后注册胜 / 命令加 :1 :2 后缀）</text>
+
+  <!-- 2: factory reuse -->
+  <rect x="30" y="132" width="660" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5"/>
+  <text x="46" y="154" font-size="12" font-weight="700" fill="#1e3a8a">② 工厂复用（factory reuse）</text>
+  <text x="46" y="174" font-size="10.5" fill="#1e40af">createReadTool(cwd) / createBashTool(cwd) —— 拿默认实现，只改一个维度（minimal-mode 复用 execute、只换 render）。</text>
+  <text x="46" y="190" font-size="10" fill="#1e40af">工具是"可参数化的对象"，不是写死的黑盒。</text>
+
+  <!-- 3: operations interface -->
+  <rect x="30" y="208" width="660" height="76" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+  <text x="46" y="230" font-size="12" font-weight="700" fill="#14532d">③ operations 接口 —— 执行后端是可替换的 adapter</text>
+  <text x="46" y="250" font-size="10.5" fill="#166534">createReadTool(cwd, { operations }) —— ReadOperations / BashOperations / ...</text>
+  <text x="46" y="268" font-size="10.5" fill="#166534">本地 createLocalBashOperations ↔ SSH createRemoteBashOps（ssh.ts）↔ 沙箱 / Gondolin</text>
+  <text x="46" y="282" font-size="10" fill="#166534">两个 adapter = 真 seam（real seam），不是假想 seam。</text>
+
+  <text x="20" y="310" font-size="10.5" fill="#64748b">共同点：行为变化被引流到核开好的接口（工具 / operations / slot）上，而不是让扩展去改核内部。</text>
+</svg>

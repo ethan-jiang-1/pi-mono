@@ -103,10 +103,10 @@
 - 当前 5 个 section（01-Anatomy / 02-Runtime / 03-Memory / 04-Harness / 05-Infra），共 25 篇叶子文档。
 - 正文基于 v0.75.3 编写，v0.83.0 / v0.84.2 / v0.84.3 三轮以警示标注演进；本仓库代码已同步到 v0.84.3，行号锚点对应工作树。
 - v0.83.0 的重要变化（影响 agent/ 文档）：
-  - `AgentEvent` → `AgentSessionEvent`（更正旧说法：`AgentEvent` 定义仍在 `agent/src/types.ts:428`，`AgentSessionEvent` 在 `coding-agent/src/core/agent-session.ts:141`，两者都不在 harness/types.ts）
+  - `AgentEvent` → `AgentSessionEvent`（更正旧说法：`AgentEvent` 定义仍在 `agent/src/types.ts:429`，`AgentSessionEvent` 在 `coding-agent/src/core/agent-session.ts:144`，两者都不在 harness/types.ts）
   - AgentHarness 新增泛型 `TContext`（**v0.84.0 又全部移除**，见顶部警示）；`ExecutionEnv` 被 `Models` 替代
   - 新增 `agent/src/harness/tools/` 目录（factory 模式工具架构）
   - `ThinkingLevel` 新增 `"xhigh"` 和 `"max"`；Compaction 支持 retry 和 `retainedTail`
-  - ~~`ModelSelectEvent`/`ThinkingLevelSelectEvent` 改名~~（2026-08-17 复核：v0.84.2 源码中现名仍是 `ModelSelectEvent`/`ThinkingLevelSelectEvent`，`extensions/types.ts:794-806`；改名未发生，旧记载有误）
+  - ~~`ModelSelectEvent`/`ThinkingLevelSelectEvent` 改名~~（2026-08-17 复核：v0.84.2 源码中现名仍是 `ModelSelectEvent`/`ThinkingLevelSelectEvent`，`extensions/types.ts:830-848`（v0.84.4 重锚）；改名未发生，旧记载有误）
 - v0.84.0 的重要变化见顶部警示和 [`../_change_log/0003-v0.83.0-to-v0.84.2.md`](../_change_log/0003-v0.83.0-to-v0.84.2.md)。
 - 未来如果 `packages/agent` 和 `packages/coding-agent` 的职责边界有变化，需要更新本目录的映射。

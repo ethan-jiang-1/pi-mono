@@ -6,13 +6,13 @@
 
 pi-mono 的事件通道：
 
-- **SDK**：`session.subscribe(listener)` — 返回取消函数（`agent-session.ts:826`），不是 EventEmitter 风格。
+- **SDK**：`session.subscribe(listener)` — 返回取消函数（`agent-session.ts:858`），不是 EventEmitter 风格。
 - **RPC**：stdout 的 `{"type":"event",...}` JSONL 行。
 
 事件类型定义在两处（v0.84.2 验证）：
 
 - [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts) `AgentEvent`（types.ts:428）——Agent 内核级事件：消息、turn、工具执行
-- [`packages/coding-agent/src/core/agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) `AgentSessionEvent`（agent-session.ts:143）= `AgentEvent`（重定义了带 `willRetry` 的 `agent_end`）+ session 级扩展事件（compaction、retry、queue 等）
+- [`packages/coding-agent/src/core/agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) `AgentSessionEvent`（agent-session.ts:144）= `AgentEvent`（重定义了带 `willRetry` 的 `agent_end`）+ session 级扩展事件（compaction、retry、queue 等）
 
 SDK 事件监听拿到的就是 `AgentSessionEvent`；JSON/RPC 输出经 `toJsonEvent()`（[`modes/json-event.ts`](../../packages/coding-agent/src/modes/json-event.ts)）做了一次 wire 级裁剪（见下文 `message_update`）。
 
@@ -34,7 +34,8 @@ Agent 运行时会产生一系列 `AgentSessionEvent`。每个事件有 `type` �
 | **Agent 级** | `agent_start` / `agent_end` / `agent_settled` | run 边界；`agent_end` 带 `willRetry`；`agent_settled`（v0.83.0 新增）表示 agent 完全安静下来，**idle 检测用它** |
 | **队列** | `queue_update` | steering / followUp 排队消息变化 |
 | **Compaction** | `compaction_start` / `compaction_end` + `summarization_retry_*` | 上下文压缩及 summarization 重试（v0.83.0 新增 retry 系列） |
-| **Compaction 失败** | `session_compact_failed`（v0.84.3，**扩展专属，不上 wire**） | compaction 失败/中止（manual/threshold/overflow）时通知扩展（`extensions/types.ts:619`）；外部 UI 无法通过 JSON/RPC 监听，只能走 SDK 的 `AgentSession` 扩展事件 |
+| **Compaction 失败** | `session_compact_failed`（v0.84.3，**扩展专属，不上 wire**） | compaction 失败/中止（manual/threshold/overflow）时通知扩展（`extensions/types.ts:618`）；外部 UI 无法通过 JSON/RPC 监听，只能走 SDK 的 `AgentSession` 扩展事件 |
+| **扩展 UI 提示** | `ui_prompt_start` / `ui_prompt_end`（v0.84.4，**扩展专属，不上 wire**） | 阻塞式扩展 UI 提示（`ctx.ui.select/confirm/input/editor/custom`）前后通知扩展（`extensions/types.ts:748-762`，runner 包装见 agent/4.4）；`queueMicrotask` 异步发射不阻塞 prompt；外部 UI 若自己实现了扩展宿主可参考此模式 |
 | **自动重试** | `auto_retry_start` / `auto_retry_end` | provider 错误后的自动重试 |
 | **Bash 更新** | `bash_execution_update` | bash 执行期间的流式 stdout/stderr delta |
 | **杂项** | `entry_appended`、`session_info_changed`、`thinking_level_changed` | session entry 追加、session 改名、thinking level 变化 |
@@ -59,6 +60,8 @@ Agent 运行时会产生一系列 `AgentSessionEvent`。每个事件有 `type` �
 累积 `usage` 保留在每条 `message_update` 里——它大小恒定，不构成平方增长。
 
 **v0.84.3 增强**：wire 上的 `toolcall_start` delta 现在**额外带 `id` 和 `toolName`**（[`modes/json-event.ts:23-30`](../../packages/coding-agent/src/modes/json-event.ts)，从 partial content 提取，`id`/`toolName` 大小恒定不构成增长）。外部 UI 可以在 `message_start` 之前就拿到工具调用的 id 和名称来关联 tool card，而不必等 `toolcall_delta` 或 `tool_execution_*`。
+
+**v0.84.4 注意（custom message 时序）**：扩展在 run 中途 `sendMessage(..., { triggerTurn: false })` 发的自定义消息不再立即入 tree/发事件——入 `_pendingCustomMessages` 队列（agent-session.ts:332），在 `turn_end` 处理末尾 flush（:722/:1533-1537），flush 时才发 `message_start`/`message_end`。这保证自定义消息不会插在 assistant tool call 与其 tool result 之间（严格校验消息顺序的 provider 会拒绝重放），外部 UI 也不会看到"tree 里还没有的消息"的事件。
 
 做图形 UI 时，把 content 投影成自己的组件：
 
@@ -134,8 +137,8 @@ RPC 子进程如果崩溃或断连，宿主不能假设自己拿到了所有事�
 建议恢复策略：
 
 1. 重新 spawn RPC 子进程，或重新创建 AgentSession。
-2. 调 `get_state`（RPC）重建运行状态；SDK 用只读 getter `session.state`（`AgentState`，`agent-session.ts:874`）——没有 `getState()` 方法。
-3. 调 `get_messages`（RPC）或 SDK `session.messages`（getter，`agent-session.ts:966`）重建消息历史——没有 `getMessages()` 方法。
+2. 调 `get_state`（RPC）重建运行状态；SDK 用只读 getter `session.state`（`AgentState`，`agent-session.ts:906`）——没有 `getState()` 方法。
+3. 调 `get_messages`（RPC）或 SDK `session.messages`（getter，`agent-session.ts:998`）重建消息历史——没有 `getMessages()` 方法。
 4. 如果有未完成的 prompt，用 `get_state` 检查状态再决定是重试还是继续。
 
 pi-mono 的 session 持久化在本地 JSONL 文件（`SessionManager`），重启后可以恢复。(注：agent 包的 session v4 在 JSONL 后端之外另有 `JsonlSessionRepo`，见 agent/03-Memory/3.5，但 coding-agent 层暂未接入。)这跟 OpenCode 的 SSE 重连 + REST 恢复策略思路一致，但实现上更轻量——直接读文件，不需要调多个 REST endpoint。

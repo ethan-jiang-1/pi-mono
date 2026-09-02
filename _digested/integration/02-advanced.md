@@ -67,9 +67,9 @@ RPC 协议定义在 [`packages/coding-agent/src/modes/rpc/rpc-types.ts`](../../p
 
 JSONL 成帧逻辑在 [`packages/coding-agent/src/modes/rpc/jsonl.ts`](../../packages/coding-agent/src/modes/rpc/jsonl.ts)。注意它**故意没有使用 Node readline**——readline 会把 Unicode 行分隔符（U+2028, U+2029）当作换行，而它们在 JSON 字符串里是合法的，所以必须用 LF-only 分割。
 
-### 32 个 RPC 命令
+### 33 个 RPC 命令
 
-`RpcCommand` union（`rpc-types.ts`）当前有 32 个变体：
+`RpcCommand` union（`rpc-types.ts`）当前有 33 个变体（v0.84.4 起，新增 `clear_queue`）：
 
 | 分类 | 命令 | 说明 |
 |---|---|---|
@@ -87,6 +87,7 @@ JSONL 成帧逻辑在 [`packages/coding-agent/src/modes/rpc/jsonl.ts`](../../pac
 | | `get_available_thinking_levels` | 列出当前模型支持的思考深度 |
 | **Queue** | `set_steering_mode` | 调整 steering 队列模式 |
 | | `set_follow_up_mode` | 调整 follow-up 队列模式 |
+| | `clear_queue`（v0.84.4） | 清空 steering/followUp 队列，返回被清掉的文本（Esc 时先清队列再 abort，把文本还原进编辑器） |
 | **Compaction** | `compact` | 手动触发 compaction，可带 customInstructions |
 | | `set_auto_compaction` | 开关自动 compaction |
 | **Retry** | `set_auto_retry` | 开关自动重试 |
@@ -136,6 +137,8 @@ stdout 上有两类 JSONL 消息：
 - 事件：**有 `{"type":"event", ...}` 外层包装**——`rpc-mode.ts:355-356` 是 `session.subscribe((event) => output(toJsonEvent(event)))`，`toJsonEvent()` 改写 `message_update`（剥离累积 `partial` 快照；v0.84.3 起对 `toolcall_start` delta 额外补上 `id`/`toolName`，见 `json-event.ts`）；其余事件原样放 `event` 字段（`agent_start`/`turn_start`/`tool_execution_start|update|end`/`message_end`/`agent_end`/`agent_settled`/`compaction_*`/`auto_retry_*`/`queue_update` 等）。宿主解析时按 `04-event-model.md` 的三种顶层类型（event / response）处理。
 - **没有 `ended` 消息**。一轮 prompt 的完成信号是 `{"type":"event","event":{"type":"agent_settled"}}`（`RpcClient.waitForIdle()`/`collectEvents()` 靠它判断）。
 - `extension_ui_request`（stdout）与 `extension_ui_response`（stdin）：extension 需要宿主代答的 UI 请求（select/confirm/input/editor/notify/setStatus/setWidget/setTitle/set_editor_text），宿主以 `extension_ui_response` 回复。
+
+**v0.84.4 行为备注**（宿主可感知，均无 API 变化）：① `persist` 模型默认时若带非空 `--models` scope，该 model 会同时追加进 scope 与 enabledModels（agent-session.ts:1679，见 03）；② 运行中扩展自定义消息延迟到 `turn_end` 后追加，`message_start`/`message_end` 相应推迟（见 04）；③ 上一轮 session 文件若末行无换行符，读入时自动补 `\n` 修复（session-manager.ts:555，#8345）——宿主直接读 session JSONL 时遇到残尾可按此处理。
 
 ## 远程/server 形态：protocol / client / server 三件套（experimental）
 

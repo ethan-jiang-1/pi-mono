@@ -54,12 +54,12 @@ await session.followUp("also add tests for the edge case we discussed")
 await session.abort()
 ```
 
-（旧版文档说 prompt 返回含 `messageId`/`turnId` 的结果——v0.84.2 的 `AgentSession.prompt()` 签名是 `Promise<void>`（agent-session.ts:1127），不返回这些；消息 id 从 `message_start`/`message_end` 事件里拿。）
+（旧版文档说 prompt 返回含 `messageId`/`turnId` 的结果——v0.84.2 的 `AgentSession.prompt()` 签名是 `Promise<void>`（agent-session.ts:1160），不返回这些；消息 id 从 `message_start`/`message_end` 事件里拿。）
 
 ### 订阅事件
 
 ```ts
-// 订阅：AgentSession.subscribe(listener)（agent-session.ts:826），返回取消函数；
+// 订阅：AgentSession.subscribe(listener)（agent-session.ts:858），返回取消函数；
 // 注意没有 EventEmitter 风格的 .on("event", ...)。SDK 订阅拿到的是完整 AgentSessionEvent
 // （message_update 带累积 message）；JSON/RPC wire 上会被 toJsonEvent() 裁成纯 delta。
 session.subscribe((event: AgentSessionEvent) => {
@@ -109,34 +109,37 @@ session.subscribe((event: AgentSessionEvent) => {
 
 ### session 管理操作
 
-> 方法名已对照 v0.84.3 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:2900`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork 在 `session.sessionManager` 上（RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:617-627）。
+> 方法名已对照 v0.84.4 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:2976`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork 在 `session.sessionManager` 上（RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:616-631）。
 
 ```ts
 // Compaction
-await session.compact()                      // agent-session.ts:1864
+await session.compact()                      // agent-session.ts:1940
 await session.setAutoCompactionEnabled(true) // 注意：不是 setAutoCompaction
-await session.abortBranchSummary()           // 取消 branch summary（agent-session.ts:2025）
+await session.abortBranchSummary()           // 取消 branch summary（agent-session.ts:2101）
 
 // Session 树
 await session.sessionManager.fork(entryId)   // SDK 层 fork 在 SessionManager 上
 await session.sessionManager.fork(session.sessionManager.getLeafId(), { position: "at" }) // 等价 RPC clone
 await session.sessionManager.switchSession(sessionPath)   // 等价 RPC switch_session
-session.setSessionName("auth-fix")          // 命名 session（agent-session.ts:3008）
+session.setSessionName("auth-fix")          // 命名 session（agent-session.ts:3084）
 
 // 查询
-const stats = await session.getSessionStats()     // tokens, 消息数（agent-session.ts:3247）
-const msgs = session.messages                     // getter：消息列表（agent-session.ts:966），无 getMessages()
-const text = session.getLastAssistantText()       // 最后 assistant 文本（agent-session.ts:3389）
-const usage = session.getContextUsage()            // context 窗口使用情况（agent-session.ts:3299）
-const forkMsgs = session.getUserMessagesForForking() // fork 候选消息（agent-session.ts:3225）
-void session.prompt(text, { images, streamingBehavior: "steer" })  // PromptOptions（agent-session.ts:242）
+const stats = await session.getSessionStats()     // tokens, 消息数（agent-session.ts:3323）
+const msgs = session.messages                     // getter：消息列表（agent-session.ts:998），无 getMessages()
+const text = session.getLastAssistantText()       // 最后 assistant 文本（agent-session.ts:3465）
+const usage = session.getContextUsage()            // context 窗口使用情况（agent-session.ts:3375）
+const forkMsgs = session.getUserMessagesForForking() // fork 候选消息（agent-session.ts:3301）
+void session.prompt(text, { images, streamingBehavior: "steer" })  // PromptOptions（agent-session.ts:243）
+
+// 队列
+const cleared = session.clearQueue()         // v0.84.4 新增（agent-session.ts:1588）：清空 steering/followUp，返回被清掉的文本
 
 // 导出
 await session.exportToHtml({ outputPath: "/tmp/session.html" }) // 实际方法名 exportToHtml
-await session.exportToJsonl("/tmp/session.jsonl")  // 返回 string（agent-session.ts:3376）
+await session.exportToJsonl("/tmp/session.jsonl")  // 返回 string（agent-session.ts:3452）
 
 // Bash 直接执行
-const bashResult = await session.executeBash("npm test")  // 方法名是 executeBash，不是 bash（agent-session.ts:2900）
+const bashResult = await session.executeBash("npm test")  // 方法名是 executeBash，不是 bash（agent-session.ts:2976）
 
 // 工具管理
 const allTools = session.getAllTools()            // 所有已注册工具
@@ -152,7 +155,7 @@ session.setScopedModels([                         // 设置模型轮换范围（
 session.hasExtensionHandlers("project_trust")     // 检查扩展是否处理某事件（v0.83.0 新增）
 
 // 收尾
-session.dispose()                                  // 取消所有运行 + 断开 agent + 清空 listeners（agent-session.ts:850）
+session.dispose()                                  // 取消所有运行 + 断开 agent + 清空 listeners（agent-session.ts:882）
 ```
 
 （再核对一次：SDK 侧事件用 `session.subscribe()`；模型读取用 `session.state`/`session.model`/`session.thinkingLevel` getter；所有"方法级"列举以上面注释的行号为准。）
@@ -215,6 +218,15 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 
 取消正在运行的 prompt/steer/follow_up。
 
+### clear_queue（v0.84.4 新增）
+
+```
+→ {"type":"clear_queue"}
+← {"type":"response","command":"clear_queue","success":true,"data":{"steering":["..."],"followUp":["..."]}}
+```
+
+清空 steering / followUp 队列，返回被清掉的消息文本（rpc-types.ts:26/:125、分发 rpc-mode.ts:434、`RpcClient.clearQueue()` rpc-client.ts:226）。配套交互模式（docs/rpc.md:137-158）：用户按 Esc 时宿主先 `clear_queue` 再 `abort`，把返回的文本还原进编辑器——排队中的输入不丢。
+
 ### 状态查询
 
 ```
@@ -236,7 +248,9 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 ← {"type":"response","command":"get_available_thinking_levels","success":true,"data":{"levels":["off","minimal","low","medium","high","xhigh","max"]}}
 ```
 
-**v0.84.3 语义**：SDK 的 `setModel(model, { persist })` / `cycleModel` / `setThinkingLevel(level, { persist })` / `cycleThinkingLevel` 接受 `ModelMutationOptions { persist?: boolean }`（agent-session.ts:256），**默认只在 session 内生效**，`persist: true` 才写入全局默认（`ctrl+s` 走这条路径）。RPC 的 `set_model` / `set_thinking_level` 不传 `persist`，因此 v0.84.3 起**不再更新全局默认**。默认思考深度解析顺序改为 **per-model 覆盖（`modelThinkingLevels` setting）→ 全局默认**。
+**v0.84.3 语义**：SDK 的 `setModel(model, { persist })` / `cycleModel` / `setThinkingLevel(level, { persist })` / `cycleThinkingLevel` 接受 `ModelMutationOptions { persist?: boolean }`（agent-session.ts:257），**默认只在 session 内生效**，`persist: true` 才写入全局默认（`ctrl+s` 走这条路径）。RPC 的 `set_model` / `set_thinking_level` 不传 `persist`，因此 v0.84.3 起**不再更新全局默认**。默认思考深度解析顺序改为 **per-model 覆盖（`modelThinkingLevels` setting）→ 全局默认**。
+
+**v0.84.4 补充**：`persist: true` 且本次会话带非空 `--models` scope 时，还会把该 model **追加进 scope 与 enabledModels**（`_addPersistedDefaultToNonEmptyScope`，agent-session.ts:1679；调用点 :1668/:1735/:1770）——persist 的默认模型不会落在 scope 之外变得不可达。
 
 ### compaction
 

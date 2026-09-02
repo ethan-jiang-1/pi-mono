@@ -26,7 +26,7 @@
 | session fork / clone | SDK：`session.sessionManager.fork()`（AgentSession 无 fork 方法）/ RPC：`{"type":"fork"}`、`{"type":"clone"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts)、[`rpc-mode.ts`](../../packages/coding-agent/src/modes/rpc/rpc-mode.ts) |
 | session 切换 | SDK：`session.sessionManager.switchSession()` / RPC：`{"type":"switch_session"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts) |
 | 状态快照（重连恢复） | RPC：`{"type":"get_state"}` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
-| 模型切换 | SDK：`session.setModel(model, { persist })` / RPC：`{"type":"set_model"}`、`{"type":"cycle_model"}`（v0.84.3：默认只在 session 内生效；`persist: true` 才写全局默认，RPC 路径不传 `persist`，故不再改全局默认） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
+| 模型切换 | SDK：`session.setModel(model, { persist })` / RPC：`{"type":"set_model"}`、`{"type":"cycle_model"}`（v0.84.3：默认只在 session 内生效；`persist: true` 才写全局默认，RPC 路径不传 `persist`，故不再改全局默认；v0.84.4：persist 时若带非空 scope，model 同时追加进 scope 与 enabledModels） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 可用模型查询 | RPC：`{"type":"get_available_models"}` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | 模型轮换范围（scoped models） | SDK：`session.setScopedModels()` / `CreateAgentSessionOptions.scopedModels` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | 思考深度控制 | SDK：`session.setThinkingLevel(level, { persist })` / `cycleThinkingLevel()` / `getAvailableThinkingLevels()`（`thinkingLevel` getter）；RPC：`set_thinking_level`、`cycle_thinking_level`、`get_available_thinking_levels`（v0.84.3：`persist: true` 才写全局默认；解析顺序改为 per-model 覆盖 → 全局默认） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
@@ -44,6 +44,7 @@
 | session entries 浏览 | RPC：`get_entries`、`get_tree` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | 重试控制 | RPC：`set_auto_retry`、`abort_retry` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | 队列模式 | RPC：`set_steering_mode`、`set_follow_up_mode` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
+| 队列清空 | SDK：`session.clearQueue()` / RPC：`{"type":"clear_queue"}`（v0.84.4，返回被清掉的 steering/followUp 文本，Esc-restore 模式见 03） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts)、[`rpc-client.ts`](../../packages/coding-agent/src/modes/rpc/rpc-client.ts) |
 | 工具管理 | SDK：`getActiveToolNames()`、`getAllTools()`、`getToolDefinition()`、`setActiveToolsByName()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 工具排除（excludeTools） | SDK：`CreateAgentSessionOptions.excludeTools`、`noTools` | [`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | 自定义工具 | SDK：`customTools` 参数 | [`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
@@ -56,6 +57,8 @@
 | 默认工具集配置 | `defaultTools` setting（全局或按项目，v0.84.2；v0.84.3 起可选值含 `powershell`） | [`docs/settings.md`](../../packages/coding-agent/docs/settings.md) |
 | PowerShell 执行 | SDK：`createPowerShellTool()`（内置工具，v0.84.3；基于 bash 工具定义，自带 UTF-8 输出 shim） | [`tools/powershell.ts`](../../packages/coding-agent/src/core/tools/powershell.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | 每模型思考深度 | `modelThinkingLevels` setting（v0.84.3，per-model 覆盖全局默认） | [`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
+| 终端能力覆盖 | `terminal.hyperlinks/images/trueColor` setting + env `PI_HYPERLINKS`/`PI_TRUE_COLOR`/`PI_IMAGE_PROTOCOL`（v0.84.4；优先级 settings > env > 自动检测） | [`terminal-image.ts`](../../packages/tui/src/terminal-image.ts)、[`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
+| 模型目录 | v0.84.4：DeepSeek 新增 `deepseek-v4-flash-vision-exp`（vision，1M ctx）；Cloudflare gateway 补 `workers-ai/*` passthrough；OpenRouter 图像模型刷新 | [`scripts/generate-models.ts`](../../packages/ai/scripts/generate-models.ts) |
 | CLI `--` end-of-options | CLI：`pi -p -- "- 以破折号开头的参数"`（v0.84.3，`#7269`） | [`cli/args.ts`](../../packages/coding-agent/src/cli/args.ts) |
 
 ## 第三条集成路径：protocol / client / server（v0.84，experimental）
@@ -79,6 +82,7 @@ v0.84 出现了成型的 client/server 栈，**明确标注 experimental、API �
 | TUI 能力 | 外部 harness 应怎么处理 |
 |---|---|
 | 快捷键（Ctrl+P 切模型、Ctrl+T 切换思考等） | 宿主 UI 自己定义 |
+| 全屏选区复制 | `fullscreenCopyOnSelect` setting（v0.84.4，默认拖选即复制；关闭后 `app.message.copy`/ctrl+x 优先复制活动选区）——宿主可抄语义，无 SDK/RPC 等价物 |
 | dialog / picker | 宿主 UI 自己实现 |
 | toast / status bar / sidebar | 从事件和 agent state 投影 |
 | prompt draft / local stash | 宿主自存 |

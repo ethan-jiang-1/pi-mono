@@ -2,7 +2,7 @@
 
 ## 一句话结论
 
-Pi 没有像 DSH 那样在静态层把"地图"画出来（薄内核页表 + tier + 预算 + 机器检查）。Pi 的静态层是**故意少画地图**：根 `AGENTS.md` 是厚规则不是地图、没有 root `architecture.md`、没有 tier taxonomy、没有字数预算、没有链接门禁。它唯一显眼的静态选择是**把地图交给运行时**——`README.md:24` 那句 *"you can also ask the agent to explain itself"*，以及 docs 随 npm 包分发（不在 repo 根）。
+Pi 没有像 DSH 那样在静态层把"地图"画出来（薄内核页表 + tier + 预算 + 机器检查）。Pi 的静态层是**故意少画地图**：根 `AGENTS.md` 是厚规则不是地图、没有 root `architecture.md`、没有 tier taxonomy、没有字数预算、没有链接门禁。它唯一显眼的静态选择是**把地图交给运行时**——`README.md:20` 那句 *"you can also ask the agent to explain itself"*，以及 docs 随 npm 包分发（不在 repo 根）。
 
 （这是**静态**结论：它说的是"图"本身长什么样。图在运行时怎么被组装、被走完、超预算怎么收，见 [`05_root_entry_doc_navigation`](../05_root_entry_doc_navigation/answer.md)。）
 
@@ -44,7 +44,7 @@ Pi 静态层**没有**的东西，恰好是 DSH 静态层的核心：
 ## 静态层唯一显眼的两个选择
 
 1. **docs 随包分发**（`packages/coding-agent/package.json` 的 `files` 含 `docs`、`examples`）：文档不活在 repo 根的 `docs/`，而是跟着 npm 包走。这是静态层为运行时铺的路——文档的位置决定了它"运行时够得着"（见 05）。
-2. **"ask the agent to explain itself"**（`README.md:24`）：把"文档在哪"这个问题，从静态层推给运行时（agent 自述）。
+2. **"ask the agent to explain itself"**（`README.md:20`）：把"文档在哪"这个问题，从静态层推给运行时（agent 自述）。
 
 这两个选择的共同点是：**Pi 不在静态层承诺"地图"，而是把"地图"这个责任整体移交到运行时。**
 

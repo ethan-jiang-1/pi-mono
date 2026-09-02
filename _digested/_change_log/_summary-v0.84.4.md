@@ -3,7 +3,7 @@
 **日期**: 2026-09-01
 **范围**: `4e58f324f`(v0.84.3) → `b79e4cc83`(v0.84.4)（41 commits，112 文件 +2786/-378，~4 天）
 **标签**: v0.84.4（2026-08-28 发布；main 在 v0.84.4 后另有 11 个未发布 commit）
-**本轮特殊性**：第四次 catch-up，**fix-heavy 维护版本**——唯一 breaking 是 agent-loop `prepareNextTurn` 时序重排；一处同版本内自我回退（tool_choice 守卫）；一处上轮文档笔误更正（`on()` 重载 34→实为 31，现 33）。
+**本轮特殊性**：第四次 catch-up，**fix-heavy 维护版本**——唯一 breaking 是 agent-loop `prepareNextTurn` 时序重排；一处同版本内自我回退（tool_choice 守卫）；一处计数复核（`on()` 重载 v0.84.3=34 → v0.84.4=36；单行 grep 口径曾误计 31/33，2026-09-01 二次复核更正）。
 
 ---
 
@@ -26,7 +26,7 @@ v0.84.4 把 compaction / turn 边界的正确性补齐：摘要不再强制禁�
 ### 2. RPC / 公共 API
 
 - 新 RPC 命令 **`clear_queue`**（rpc-types.ts:26/:125、`AgentSession.clearQueue()` :1588、`RpcClient.clearQueue()` :226）：Esc 交互"清队列→abort→文本还原编辑器"（#8432）
-- 扩展事件 **`ui_prompt_start` / `ui_prompt_end`**（#8355）：`UIPromptKind` 五种（types.ts:745-762）；runner 包装 5 个阻塞式 UI 方法，嵌套合并、`queueMicrotask` 发射不阻塞 prompt；`on()` 重载 31→**33**
+- 扩展事件 **`ui_prompt_start` / `ui_prompt_end`**（#8355）：`UIPromptKind` 五种（types.ts:745-762）；runner 包装 5 个阻塞式 UI 方法，嵌套合并、`queueMicrotask` 发射不阻塞 prompt；`on()` 重载 34→**36**
 - 导出 `detectSupportedImageMimeTypeFromFile`（index.ts:421）；~~ToolExecution*Event 导出（#6847）~~ 实为**空 commit**，v0.84.3 已导出
 
 ### 3. session / turn 行为
@@ -61,7 +61,7 @@ v0.84.4 把 compaction / turn 边界的正确性补齐：摘要不再强制禁�
 - **merge**：v0.84.4 进 ethan（`f9a1cf489`，零冲突）
 - **agent/**：2.1 prepareNextTurn 时序重写 + 重锚；2.6 steering 二次轮询；3.1/3.2 toolChoice 纠错 + 两个 compaction.ts 澄清 + getSummarizationFailure/between-turn 压缩；1.4/4.4 ui_prompt 事件 + runner 重锚；5.1 四处 ADD + tool_choice 纠错；5.2 无需动；4.1 无需动（骨架零变更）
 - **integration/**：03 `clear_queue` + persist-to-scope + ~15 处重锚；04 ui_prompt 事件 + custom message 延迟追加；06 TUI parity/模型行扩充；02 行为备注
-- **extensions/、harness/**：事件清单 +2、`on()` 33；harness/1.1/1.2/2.2 计数与锚点更正（34→33 @ L1252）
+- **extensions/、harness/**：事件清单 +2、`on()` 36；harness/1.1/1.2/2.2 锚点更正（L1232→L1252，计数 34→36）
 - **`_digested/README.md` / `_faq_on_digested/README.md`**：基线声明 → v0.84.4
 - **遗留缺口**（沿用）：`agent/src/search/`、`coding-agent/src/extensions/`（llama.cpp）、`ai/src/compat/`、telemetry 专题、agent/ 各篇行号逐篇复核
 

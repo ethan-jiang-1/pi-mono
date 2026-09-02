@@ -34,7 +34,7 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 | 快捷键 | 动作 | 说明 |
 |--------|------|------|
 | `Escape` | 取消/中断 | 中断当前 agent run |
-| `Ctrl+C` | 清空编辑器 | 在输入为空时复制，否则清空 |
+| `Ctrl+C` | 清空编辑器 | `app.clear`，只清空编辑器（**不复制**——复制是 `Ctrl+X`，见下） |
 | `Ctrl+D` | 退出 | 编辑器为空时退出 pi |
 
 ### 模型和思考
@@ -55,23 +55,24 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 
 ### 消息操作
 
-| 快捷键 | 动作 |
-|--------|------|
-| `Ctrl+E` | 用外部编辑器打开当前消息 |
-| `Ctrl+J` | follow-up（新起一轮对话） |
-| `Ctrl+K` | 从队列中移除消息 |
-| `Ctrl+V` | 粘贴剪贴板图片 |
+| 快捷键 | 动作 | key 名 |
+|--------|------|--------|
+| `Ctrl+X` | 复制最后一条 assistant 消息；v0.84.4 起全屏下有活动选区时**优先复制选区** | `app.message.copy` |
+| `Ctrl+G` | 用外部编辑器打开当前消息 | `app.editor.external` |
+| `Alt+Enter`（Windows `Ctrl+Q`） | follow-up（新起一轮对话） | `app.message.followUp` |
+| `Alt+↑`（Windows `Alt+Q`） | 取回队列中的消息 | `app.message.dequeue` |
+| `Ctrl+V` | 粘贴剪贴板图片 | `app.clipboard.pasteImage` |
 
 ### Session 管理
 
-| 快捷键 | 动作 |
-|--------|------|
-| `Ctrl+N` | 创建新 session |
-| `Ctrl+R` | 打开 session 树（浏览/切换） |
-| `Ctrl+F` | fork 当前 session |
-| `Ctrl+G` | 恢复上次 session |
-| `Ctrl+B` | 切换 session 排序方式 |
-| `Ctrl+Y` | 重命名 session |
+**注意：`app.session.new` / `tree` / `fork` / `resume` 目前没有默认键绑定**（`defaultKeys: []`，只能通过 keybindings.json 或命令面板触发）。实际被占用的是：
+
+| 快捷键 | 动作 | key 名 |
+|--------|------|--------|
+| `Ctrl+N` | 切换命名过滤器 | `app.session.toggleNamedFilter` |
+| `Ctrl+R` | 重命名 session | `app.session.rename` |
+| `Ctrl+S` | 切换 session 排序方式 | `app.session.toggleSort` |
+| `Ctrl+G` | 外部编辑器 | `app.editor.external` |
 
 ### Session 树内快捷键
 
@@ -91,8 +92,15 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 | `Ctrl+S` | 保存当前选择 |
 | `Ctrl+A` | 全选 |
 | `Ctrl+X` | 清除所有选择 |
-| `Ctrl+↑↓` | 调整顺序 |
-| `Tab` | 切换 provider 分组 |
+| `Ctrl+P` | 切换 provider 分组（`app.models.toggleProvider`） |
+| `Alt+↑` / `Alt+↓` | 调整顺序（`app.models.reorderUp/Down`） |
+
+---
+
+## v0.84.4 相关的复制/显示行为
+
+- **`fullscreenCopyOnSelect`** setting（默认 `true`）：全屏模式下拖选释放即复制（OSC 52）。关闭后 `Ctrl+X`（`app.message.copy`，`interactive-mode.ts:6114-6125`）在有活动选区时优先复制选区，否则复制最后一条 assistant 消息
+- **终端能力覆盖**：settings `terminal.hyperlinks/images/trueColor` + env `PI_HYPERLINKS` / `PI_TRUE_COLOR` / `PI_IMAGE_PROTOCOL`（优先级 settings > env > 自动检测，#8665）
 
 ---
 
@@ -113,7 +121,7 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 }
 ```
 
-`key` 名称来自 `AppKeybindings` 接口（`keybindings.ts:13-55`）。设为空数组 `[]` 可禁用该快捷键。
+`key` 名称来自 `AppKeybindings` 接口（`keybindings.ts:14-58`）。设为空数组 `[]` 可禁用该快捷键。
 
 ---
 

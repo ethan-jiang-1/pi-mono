@@ -25,7 +25,7 @@ pi-coding-agent   ← 完整产品层（`@earendil-works/pi-coding-agent`）。S
 
 - **SDK**：[`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) — `createAgentSession()` 工厂。
 - **AgentSession**：[`packages/coding-agent/src/core/agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) — 核心编排器，封装 prompt、compaction、bash、event 订阅、session 切换。
-- **RPC**：[`packages/coding-agent/src/modes/rpc/rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) — 32 个命令的 JSONL 协议（`RpcCommand` union，rpc-types.ts:20）。
+- **RPC**：[`packages/coding-agent/src/modes/rpc/rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) — 33 个命令（v0.84.4 起，新增 `clear_queue`）的 JSONL 协议（`RpcCommand` union，rpc-types.ts:20）。
 - **SessionManager**：[`packages/coding-agent/src/core/session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts) — JSONL 持久化和 session 树管理。
 
 ## 第一版接入应该怎么想

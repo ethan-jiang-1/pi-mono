@@ -38,5 +38,5 @@
 | 互操作（MCP/ACP） | DSH（多面） | 有 ACP/JSON-RPC 等入口；pi 无 MCP/ACP |
 | 机器保证（模型可见） | DSH | visible ⟺ logged 不变量（harness-idea 判断层，源码落点 invariant.ts） |
 | 对陌生插件安全 | 两个都烂 | pi 无沙箱；DSH 插件化≠安全 |
-| 默认开箱 | pi | 7 工具直接可用；DSH 靠 bundle/profile 组合（`dsh-base` 打底） |
+| 默认开箱 | pi | 8 工具直接可用；DSH 靠 bundle/profile 组合（`dsh-base` 打底） |
 | 分发闭环 | pi 略强 | manifest+install+-e |

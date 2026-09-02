@@ -11,7 +11,7 @@ pi-mono 的事件通道：
 
 事件类型定义在两处（v0.84.2 验证）：
 
-- [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts) `AgentEvent`（types.ts:428）——Agent 内核级事件：消息、turn、工具执行
+- [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts) `AgentEvent`（types.ts:429）——Agent 内核级事件：消息、turn、工具执行
 - [`packages/coding-agent/src/core/agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) `AgentSessionEvent`（agent-session.ts:144）= `AgentEvent`（重定义了带 `willRetry` 的 `agent_end`）+ session 级扩展事件（compaction、retry、queue 等）
 
 SDK 事件监听拿到的就是 `AgentSessionEvent`；JSON/RPC 输出经 `toJsonEvent()`（[`modes/json-event.ts`](../../packages/coding-agent/src/modes/json-event.ts)）做了一次 wire 级裁剪（见下文 `message_update`）。

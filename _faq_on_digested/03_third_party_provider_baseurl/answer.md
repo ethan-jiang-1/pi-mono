@@ -78,7 +78,7 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 | `maxTokensField = useMaxTokens ? "max_tokens" : ...`，`useMaxTokens` 含 `isDeepSeek` | `max_tokens` | **默认 `max_completion_tokens`** | 手动 `"max_tokens"` |
 | `supportsReasoningEffort`（deepseek 分支关掉） | false | 默认可能 true | 手动 `false`（第三方不支持 `reasoning_effort` 时） |
 
-**核心结论：** 只要第三方 baseUrl 不含 `deepseek.com`、provider 名不是 `deepseek`，上面四条就全要手动补。最关键是 `thinkingFormat: "deepseek"`——它决定思考参数发成 DeepSeek 的 `thinking: { type: "enabled" }` 格式（`openai-completions.ts:802-811`），不补的话 reasoning 模型会发成普通 OpenAI 的格式。
+**核心结论：** 只要第三方 baseUrl 不含 `deepseek.com`、provider 名不是 `deepseek`，上面四条就全要手动补。最关键是 `thinkingFormat: "deepseek"`——它决定思考参数发成 DeepSeek 的 `thinking: { type: "enabled" }` 格式（`openai-completions.ts:905-915`），不补的话 reasoning 模型会发成普通 OpenAI 的格式。
 
 - `thinkingLevelMap`（可选）：官方 `deepseek-v4-flash` = `{ high: "high", max: "max" }`（flash 另有 `low: "low"`），其余 null（`generate-models.ts` `DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP`）。第三方行为一致可以照抄；拿不准就留空走默认。
 - `apiKey`：支持 `$ENV` / `${ENV}` 插值、`!command` 执行、字面量。也可以不写，用 `/login micuapi` 交互式录入（存 `auth.json`）。
@@ -131,12 +131,12 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 
 ## 6. 引用
 
-- 源码：`packages/coding-agent/src/core/provider-composer.ts` — `applyModelsJson()` (L168)、`modelFromJson()` (L124)、`applyExtension()` (L205)
+- 源码：`packages/coding-agent/src/core/provider-composer.ts` — `applyModelsJson()` (L168)、`modelFromJson()` (L130)、`applyExtension()` (L208)
 - 源码：`packages/coding-agent/src/core/model-runtime.ts` — `registerProvider()` (L742)、`providerIds()` (L236)、models.json 组合 (L260)
-- 源码：`packages/ai/src/api/openai-completions.ts` — deepseek 魔法探测 (L1471)、`thinkingFormat:"deepseek"` 发送逻辑 (L802-811)
-- 源码：`packages/ai/scripts/generate-models.ts` — 内置 deepseek 模型与 thinkingLevelMap (L2428-2465)、`DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP` (L266)
+- 源码：`packages/ai/src/api/openai-completions.ts` — deepseek 魔法探测 (L1589)、`thinkingFormat:"deepseek"` 发送逻辑 (L905-915)
+- 源码：`packages/ai/scripts/generate-models.ts` + `scripts/providers/deepseek.models.ts` — 内置 deepseek 模型拆到独立文件（generate-models.ts:12 引入）、`DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP` (L286)
 - 源码：`packages/coding-agent/src/core/model-resolver.ts` — `provider/model` 解析与歧义报错 (L443-500)
 - 官方文档：`packages/coding-agent/docs/models.md`（custom models / override / modelOverrides）、`docs/custom-provider.md`、`docs/providers.md`
 - 消化材料：`_digested/agent/05-Infra/5.2_AI_Auth_Subsystem.md`（credential 生命周期、models.json 在 auth 层的位置）
 
-> 基线：以上源码路径以本仓库工作树 v0.84.3 为准（tag `4e58f324f` merged）。
+> 基线：以上源码路径以本仓库工作树 v0.84.4 为准（tag `b79e4cc83` merged）。

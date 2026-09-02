@@ -20,15 +20,15 @@
 
 | 段 | 来源 | 性质 |
 |---|---|---|
-| 自报家门（L121） | 写死的身份句 *"operating inside pi, a coding agent harness"* | 静态 |
+| 自报家门（L128） | 写死的身份句 *"operating inside pi, a coding agent harness"* | 静态 |
 | `Available tools`（L80-84） | 从**工具定义**的 `promptSnippet` 聚合，只列有 snippet 的工具 | **动态聚合**（工具集变了自动变） |
 | `Guidelines`（L89-117） | 工具的 `promptGuidelines` + 条件准则 + 固定准则 | 动态聚合 |
-| 文档地图（L131-138） | 写死的按主题映射（extensions→`docs/extensions.md`…） | 静态，但指向随包路径 |
-| `<project_context>`（L145-152） | `resource-loader.loadProjectContextFiles` 注入 `AGENTS.md`/`CLAUDE.md` | **推**（向上遍历 + 去重） |
-| `<available_skills>`（L155） | `skills` 目录，**只在 read 工具可用时**生成 | 闸门 |
-| cwd（L159） | 当前工作目录 | 静态 |
+| 文档地图（L138-149） | 写死的按主题映射（extensions→`docs/extensions.md`…） | 静态，但指向随包路径 |
+| `<project_context>`（L153-160） | `resource-loader.loadProjectContextFiles` 注入 `AGENTS.md`/`CLAUDE.md` | **推**（向上遍历 + 去重） |
+| `<available_skills>`（L164） | `skills` 目录，**只在 read 工具可用时**生成 | 闸门 |
+| cwd（L167） | 当前工作目录 | 静态 |
 
-**关键**：注入不是模型"主动读根 README/AGENTS"，而是 `AgentSession._rebuildSystemPrompt()`（`agent-session.ts:1023`）在会话时调 `buildSystemPrompt()` 组装，然后作为 system prompt 发给 LLM。`AGENTS.md` 作为项目上下文被 `resource-loader` 从 cwd 向上遍历**推**进 prompt——模型不用自己去找它。
+**关键**：注入不是模型"主动读根 README/AGENTS"，而是 `AgentSession._rebuildSystemPrompt()`（`agent-session.ts:1066`）在会话时调 `buildSystemPrompt()` 组装，然后作为 system prompt 发给 LLM。`AGENTS.md` 作为项目上下文被 `resource-loader` 从 cwd 向上遍历**推**进 prompt——模型不用自己去找它。
 
 ### 2. 导航（pull）：模型用 `read` 工具按地图走
 
@@ -69,10 +69,10 @@
 
 ## 引用
 
-- `packages/coding-agent/src/core/system-prompt.ts`：`buildSystemPrompt`（L28）、自报家门（L121）、文档地图（L131-138）、`Available tools`（L80-84）、skills 闸门（L155）
-- `packages/coding-agent/src/core/agent-session.ts`：`_rebuildSystemPrompt`（L1023）
+- `packages/coding-agent/src/core/system-prompt.ts`：`buildSystemPrompt`（L28）、自报家门（L128）、文档地图（L138-149）、`Available tools`（L80-84）、skills 闸门（L164）
+- `packages/coding-agent/src/core/agent-session.ts`：`_rebuildSystemPrompt`（L1066）
 - `packages/coding-agent/src/core/resource-loader.ts`：`loadProjectContextFiles`（L118）、`loadContextFileFromDir`（L70）
-- `packages/coding-agent/src/core/skills.ts`：`formatSkillsForPrompt`（L335）
+- `packages/coding-agent/src/core/skills.ts`：`formatSkillsForPrompt`（L355）
 - `packages/agent/src/harness/compaction/`：compaction 回收
 - `_digested/`：[`harness/04-Self-Description/4.1_system_prompt_self.md`](../../_digested/harness/04-Self-Description/4.1_system_prompt_self.md)、[`4.2_tool_prompt_contract.md`](../../_digested/harness/04-Self-Description/4.2_tool_prompt_contract.md)、[`agent/04-Harness/4.2_Skills.md`](../../_digested/agent/04-Harness/4.2_Skills.md)
 - 静态设计（另一半）：[`04_root_entry_doc_design`](../04_root_entry_doc_design/answer.md)

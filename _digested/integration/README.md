@@ -18,7 +18,7 @@
 |---|---|---|
 | 集成范式 | **server-first**（HTTP/SSE） | **library-first**（SDK in-process，RPC 子进程） |
 | 主要嵌入方式 | `opencode serve` + SDK v2 sidecar | `createAgentSession()` 直接嵌入，或 `RpcClient` 子进程 |
-| 跨语言方案 | HTTP + SSE | JSONL over stdin/stdout（32 个 RPC 命令） |
+| 跨语言方案 | HTTP + SSE | JSONL over stdin/stdout（33 个 RPC 命令） |
 | web-ui 架构 | 连接本地 server 的前端 | 曾有纯前端 web-ui（浏览器直接调 LLM provider）；包已移除 |
 | 权限模型 | 事件驱动交互式弹窗（`/permission` reply） | hook-based（`beforeToolCall` 可与外部阻断逻辑集成） |
 | 事件通道 | SSE stream（`/event`） | `session.subscribe()` in-process 或 RPC response/event JSONL |

@@ -6,7 +6,7 @@
 
 | | pi | DSH |
 |---|---|---|
-| 不可变锚点 | 稳定核心（loop + 7 工具 + 统一扩展口） | 组合内核（Cordis 五原语为基础；`new Context()` 硬编码根，Loader 由 `boot()` 安装） |
+| 不可变锚点 | 稳定核心（loop + 8 工具 + 统一扩展口） | 组合内核（Cordis 五原语为基础；`new Context()` 硬编码根，Loader 由 `boot()` 安装） |
 | 可变面 | 扩展口（能力从核里长出） | 插件树（能力由节点拼出） |
 | 边界声明 | `CONTRIBUTING.md` Philosophy 节："pi's core is minimal … If your feature does not belong in the core, it should be an extension." | `docs/architecture.md` L13："There is no privileged core to patch"，但 DSH 自己的消化材料承认：**"核心没有消失，而是下沉成了组合内核（composition kernel）"**（`/Users/bowhead/deepseek-harness/_digested/harness-idea/07-boundaries-costs-fit.md` L115-119） |
 

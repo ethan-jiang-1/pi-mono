@@ -37,5 +37,5 @@ DSH 的 `harness-idea/07`（L129）给了一条可迁移给 pi 的判据：**"�
 
 ## 引用
 
-- pi 侧：`_digested/harness/01-Architecture/1.1-1.4`、`harness/02-Boundaries/`、`extensions/01-Core/1.2`（基线 `v0.84.3` / `4e58f324f`）
+- pi 侧：`_digested/harness/01-Architecture/1.1-1.4`、`harness/02-Boundaries/`、`extensions/01-Core/1.2`（基线 `v0.84.4` / `b79e4cc83`）
 - DSH 侧：`/Users/bowhead/deepseek-harness/_digested/harness-idea/07-boundaries-costs-fit.md`（基线 `0.1.1-rc.1` / `528c682e…`）、`harness-idea/00-map.md`

@@ -2,6 +2,8 @@
 
 一套可直接拷贝的最小文件组合:拷进你的项目,启动 pi 就"配好了"。
 
+> **先接线,再拷贝**:这套 kit 是"零依赖兜底"。如果你已经(或愿意)接现成的方法论资产,优先看 [03_starter_kit.md](../03_starter_kit.md) 第一层——`npx skills add mattpocock/skills --agent pi -g`,或在 `~/.pi/agent/settings.json` 加 `"skills": ["~/.claude/skills"]` 直接复用 Claude Code 已装的技能。装了那些之后,本 kit 的 `/plan`/`/review`/`/done` 与其部分重叠,选一套顺手的即可。
+
 ## 拷贝
 
 ```bash

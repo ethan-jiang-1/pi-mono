@@ -17,10 +17,10 @@
 ## 证据边界
 
 - pi 侧:本仓库源码与文档 v0.84.4(upstream tag `b79e4cc83`),`packages/coding-agent/docs/`、`examples/extensions/`、`.pi/prompts/`;`_digested/` 消化材料。
-- Claude Code 侧:Anthropic 官方 [Best practices for Claude Code](https://www.anthropic.com/engineering/claude-code-best-practices)(2026-09-02 抓取全文),只取其"用户该做什么"的建议层,不审计 CC 源码。
-- Codex 侧:openai/codex 公开 repo docs(`docs/` 下多为指向 developers.openai.com 的 stub,后者反爬),只取可核对部分;不深审计。
-- 生态数据:[pi.dev/packages](https://pi.dev/packages) 首页快照(2026-09-02,共 5637 个包,含下载量)。
-- 方法:把 CC/Codex 的"最佳实践动作"逐条映射到 pi 的能力面;映射不上的条目标出来,追问 pi 的替代物;仍无替代物的记为真差距。
+- **本机实证(2026-09-02 补充)**:`~/.pi/agent/`、`~/.claude/`、`~/.codex/`、`~/mattpocock-skills` 等路径的文件系统实况,见 [04 篇](04_local_audit.md)。用户直觉"要离开这个项目才能找到答案"的这一半,靠本机审计回答。
+- Claude Code 侧:Anthropic 官方 Best practices(2025 末重写版)及 Common workflows / Skills / Memory / goal 等新页;Codex 侧:官方页反爬,经检索摘要与已核对镜像重建;agents.md 标准。细节见 [07 篇](07_cross_harness.md)。
+- 生态与社区(2026-09-02 补充):pi.dev/packages 全量爬取(5,626 包)+ 约 18 个包 README 逐个核对,见 [05 篇](05_package_ecosystem.md);pi 社区实战用法(作者博文、pi.dev 官方材料、HN/Reddit、GitHub 生态),见 [06 篇](06_field_usage.md)。
+- 方法:先把 CC/Codex 的"最佳实践动作"逐条映射到 pi 的能力面(01 篇);再用本机审计 + 三路网络深挖验证与加深;映射不上或有更好实践的,修订前文。
 
 ## 篇章
 
@@ -28,5 +28,9 @@
 |---|---|
 | [01_capability_map.md](01_capability_map.md) | "能力有限"是默认值差异:CC 最佳实践 16 条 → pi 逐条映射表 + 真差距清单 |
 | [02_scenario_playbook.md](02_scenario_playbook.md) | 三个场景的标准动作:写代码 / 信息加工 / 自动化与嵌入 |
-| [03_starter_kit.md](03_starter_kit.md) | 最小组装:pi 启动时看到的文件系统三层 + 可直接拷贝的 [starter-kit/](starter-kit/) 成品 |
+| [03_starter_kit.md](03_starter_kit.md) | 最小组装(v2 三层):接线已有资产 → 场景装包 → [starter-kit/](starter-kit/) 文件件 |
+| [04_local_audit.md](04_local_audit.md) | 本机实证:`~/.pi/agent` 全局层为空 vs 一墙之隔的 37 个技能与两本手册 |
+| [05_package_ecosystem.md](05_package_ecosystem.md) | 包生态深挖:头部 18 包逐个核到 README;开发栈 / 研究栈组合 |
+| [06_field_usage.md](06_field_usage.md) | 社区实战:作者用法、HN 共识与反方、dotfiles、被证伪材料 |
+| [07_cross_harness.md](07_cross_harness.md) | 2026 跨 harness 新实践(CC/Codex 官方更新)及其 pi 落地;15 条排序 |
 | [answer.md](answer.md) | 总论:"我应该做什么"行动清单、反模式、什么时候不用 pi |

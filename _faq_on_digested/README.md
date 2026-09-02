@@ -38,7 +38,7 @@ _faq_on_digested/
 - [`04_root_entry_doc_design/`](04_root_entry_doc_design/question.md) — Pi 根入口文档的**静态设计**：这张地图怎么画？（Pi 静态层几乎没画地图，把它委托给运行时）
 - [`05_root_entry_doc_navigation/`](05_root_entry_doc_navigation/question.md) — Pi 跑起来之后根入口文档怎么被**动态消费**？（注入 buildSystemPrompt + read 拉取 + compaction 回收）
 - [`06_pi_vs_dsh/`](06_pi_vs_dsh/question.md) — pi vs DSH：两个"很灵活"的 harness，共性、差异、优缺点？——可扩展性 vs 可组合性
-- [`07_pi_usage_scenarios/`](07_pi_usage_scenarios/question.md) — Pi"只是命令行"是不是能力有限？正常/合理用法有哪些？（对标 Claude Code / Codex 最佳实践：写代码、信息加工、自动化三个场景）
+- [`07_pi_usage_scenarios/`](07_pi_usage_scenarios/question.md) — Pi"只是命令行"是不是能力有限？正常/合理用法有哪些？（三路深挖修订版：CC/Codex 映射、本机审计、包生态、社区实战、2026 跨 harness 新实践、三层组装 starter kit）
 
 ## 引用规范
 

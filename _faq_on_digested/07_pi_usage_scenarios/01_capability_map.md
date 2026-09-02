@@ -53,3 +53,7 @@ pi 默认工具集的源码核对(v0.84.4):`packages/coding-agent/docs/quickstar
 ## 小结
 
 "Pi 能力有限"把两个变量混成了一个:**默认注入的能力宽度**(pi 确实窄)和**可达的能力上限**(pi 不窄——AGENTS.md / prompt templates / skills / extensions / packages 五条生长线全通)。CC 官方 16 条主要建议里,过半在 pi 中形态不变或等价,其余有明确的替代物;真正买不到的只有"产品化审批"和"官方托管编排"两样,而这两样恰是 pi 设计上主动放弃的(见 `_digested/extensions/01-Core/1.2_skipped_features.md`)。
+
+## 2026-09 增补
+
+本篇写于深挖之前,三处结论已被 [07_cross_harness.md](07_cross_harness.md) 修正/加固:① CC 现在也官方读取 AGENTS.md,"换文件名"升级为"AGENTS.md 是唯一跨 harness 标准";② CC 新增的验证阶梯(/goal→Stop hook→验证 subagent)在 pi 无内置,但包生态四级全有货(05 篇);③ CC 的 plan 最终也落成 markdown 文件,与 PLAN.md 同构——"模式 → 文件"的形态差正在消失。本篇映射表其余结论经 05/06/07 三篇证据复核后维持。

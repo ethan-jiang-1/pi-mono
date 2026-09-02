@@ -124,6 +124,7 @@ pi-mono 里需要严格区分两种 harness：
 | `integration/` | 外部集成 | SDK/RPC 两种接入路径、事件模型、recipes |
 | `harness/` | 平台评价 | 结构优不优秀、好不好扩展、开发纪律、自描述 |
 | `extensions/` | 扩充思路 | 极简核 + 靠扩展长能力：核有多小、扩充四轴、扩充套路 |
+| `composition/` | 配置哲学与用户决策 | 从设计哲学到配置决策的完整映射——五层框架、七条轴、AGENTS.md 设计艺术 |
 | `_change_log/` | 上游同步记录 | 每次 upstream 版本同步的变更摘要和影响评估 |
 
 ## 与同级目录的关系

@@ -26,6 +26,8 @@
 | 想"机器可检查"的参与契约（门禁/负例测试/不变量） | **DSH** | visible ⟺ logged、dump-config、生成目录 |
 | 想要一个安静稳定的内核 + 熟人生态自用扩展 | **pi** | core-minimal 纪律 + 护栏写在 host |
 
+> 补充（[05_out_of_box.md](05_out_of_box.md)）：上表比的是"选谁"。若只看"开箱能不能直接写代码"：DSH 赢在**默认组合宽**（standard preset 整队挂载，paved road 落到配置层），pi 的开箱是裸 loop + 4 工具（core-minimal 落到配置层，配置要自己拼）。这是默认 outfit 的差异，不是运行时能力差异——`sdk-minimal` profile 的 DSH 同样"没配置好"，拼齐 examples 的 pi 同样不话唠。
+
 ## 挖到底的那句话
 
 > **两个 harness 都认为"扩展（插件）是参与的一等公民，不是附加功能"；分歧只在"谁扩、扩在哪"。pi 让核心（稳定 loop）决定扩展的资格；DSH 让组合内核（五原语为基础，Loader 由 `boot()` 安装）决定扩展的资格。**

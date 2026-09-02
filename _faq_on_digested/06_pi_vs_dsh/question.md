@@ -29,4 +29,5 @@ pi-mono 和 DeepSeek Harness（DSH）都被认为是"灵活的 coding harness"�
 | [02_differences.md](02_differences.md) | 差异：灵活的位置不同，不是多 vs 少 |
 | [03_mechanism_table.md](03_mechanism_table.md) | 机制对照表：六个维度的逐项对比 |
 | [04_strengths_weaknesses.md](04_strengths_weaknesses.md) | 各自突出优点与硬伤 |
+| [05_out_of_box.md](05_out_of_box.md) | 开箱 outfit：为什么"DSH 拿来就能写程序，pi 像没配置好、话唠"（默认组合宽度差异，含两边源码逐项盘点） |
 | [answer.md](answer.md) | 总论：一句话判断 + 适用场景 |

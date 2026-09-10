@@ -12,7 +12,7 @@
 | 3.2 | Branch Summary | 分支导航时的自动摘要生成、collectEntriesForBranchSummary |
 | 3.3 | Token Estimation | 双层 token 估算策略（provider 上报 + chars/4 启发式） |
 | 3.4 | Session Tree | 树形对话结构如何支撑记忆保留、分叉、导航与上下文重建（**v0.84.0 起被 v4 取代，见 3.5**） |
-| 3.5 | Session v4 | **v0.84.0 新**：lane-based 会话存储——Entry/LaneRecord/facts、全局 seq、durable operations、JSONL 原子发布 |
+| 3.5 | Session v4 | **已对照 v0.85.1 重写**：bound values/lists 取代 Facts 与三种 change entry、13-leaf `OperationState`、keyless mutation barrier、fork 强制 union、JSONL v4 原地重写 + v3 只读迁移 |
 
 ## 核心问题链
 

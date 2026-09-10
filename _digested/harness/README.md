@@ -18,7 +18,7 @@
 | 问题 | 阅读入口 | 篇章 |
 |---|---|---|
 | 结构优秀不优秀、第三方好不好加能力 | [01-Architecture/](./01-Architecture/README.md) | 1.1 三层接缝 · 1.2 统一注入点 · 1.3 分发闭环 · 1.4 生命周期护栏 |
-| 扩展的边界在哪、哪些能力加不了或没护栏 | [02-Boundaries/](./02-Boundaries/README.md) | 2.1 无沙箱 · 2.2 无 MCP/ACP · 2.3 AgentLane 半成品 · 2.4 无版本契约 |
+| 扩展的边界在哪、哪些能力加不了或没护栏 | [02-Boundaries/](./02-Boundaries/README.md) | 2.1 无沙箱 · 2.2 无 MCP/ACP · 2.3 内层 harness 契约优先已兑现（边界上移到 experimental-only） · 2.4 无版本契约 |
 | 它开发有没有策略和纪律 | [03-Discipline/](./03-Discipline/README.md) | 3.1 core-minimal · 3.2 一条规则 · 3.3 贡献门 · 3.4 工程规则 |
 | 它有没有把自己说清楚给上面的 coding agent 听 | [04-Self-Description/](./04-Self-Description/README.md) | 4.1 system prompt 自述 · 4.2 工具 prompt 契约 · 4.3 文档随包 · 4.4 上下文分层 |
 

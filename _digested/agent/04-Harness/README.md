@@ -1,6 +1,10 @@
 # 04-Harness：内部接线层
 
-> **⚠️ v0.84.2 基线（2026-08-17）**：本节从 v0.75.3 语义进化，多处描述需以 4.1 的 v0.84.2 复核为准。核心变化：**`AgentHarness` 已在 v0.83/v0.84 两次重构**——v0.83 加泛型 `TContext`、v0.84 又移除并去泛型化为 `AgentLane` 骨架。在 v0.84.2 里 `AgentHarness` **是一个 stub/骨架**：绝大多数操作抛 `HarnessNotImplemented`（`prompt`/`skill`/`compact` 等经 `unavailable()` reject）、`create()` 对非空 session 抛错、hooks/events 由 `UnavailableRegistry` 直接 throw，真正可跑的行为在 `AgentSession` / SDK。下方"一句话总览"已按 4.1 修正，不再把 AgentHarness 描述成完整运作层。
+> **⚠️ v0.85.1 基线（2026-09-10）**：本节从 v0.75.3 语义进化，**`AgentHarness` 已在 v0.83 / v0.84 / v0.85 三次重构**——v0.83 加泛型 `TContext`、v0.84 移除并去泛型化为 `AgentLane` 骨架、**v0.85 把这副骨架填成了真实现**。
+>
+> **本文档集里"`AgentHarness` 是 stub/骨架、不能用"的说法全部过时。** v0.85.1 里 `HarnessNotImplemented` 在源码中**零命中**，`AgentHarness` 现在由 `Drive` + effect gate + 13 个扁平 durable `OperationState` 组成、能跑完整 turn；唯一剩下的未实现方法是 `watchSession()`（`packages/agent/src/harness/runtime/harness.ts:305-307`）。hooks 由 `hooks.ts:15` 的 `HookRegistry` 实现，且 **`HookMap` 的 11 个 hook 全部有真实调用点**（不再是抛错的 `UnavailableRegistry`）。[4.1_AgentHarness.md](4.1_AgentHarness.md) 已按 v0.85.1 整体重写。
+>
+> **但产品集成路径仍然不变**：`AgentSession` / SDK 仍是推荐入口。原因是 harness 线目前只被 `coding-agent/src/experimental/` 消费，且 **`AgentSession` / `sdk.ts` 完全不 import harness**——两者是**并列实现**，不是上下堆叠。完整变更见 [`../../_change_log/0006-v0.84.4-to-v0.85.1.md`](../../_change_log/0006-v0.84.4-to-v0.85.1.md)。
 >
 > 关于本目录标题里的 "harness"：它是顶层 README 四种含义里的 **① 内部能力 harness**（扩展/Skill/工具如何进入 agent loop），**不是** ③ 的 `AgentHarness` 类。二者抽象层次不同，勿混淆。
 
@@ -19,7 +23,7 @@
 | 维度 | `04-Harness`（内部接线） | `integration/`（外部接线） |
 |---|---|---|
 | 研究什么 | 能力如何**进入** agent loop | 外部产品如何**嵌入** pi-mono |
-| 关键角色 | 内部接线层的机制：ExtensionRunner、Skills、Tools、System Prompt（`AgentHarness` 类只是其中的 stub 骨架，见 4.1） | SDK、RPC、web-ui、CLI |
+| 关键角色 | 内部接线层的机制：ExtensionRunner、Skills、Tools、System Prompt（`AgentHarness` 是 v0.85 填好的内层 harness，但产品路径不用它，见 4.1） | SDK、RPC、web-ui、CLI |
 | 谁在用 | pi-mono 自身的 TUI、RPC、print mode | 外部产品（IDE、Web App、Slack bot） |
 | 典型问题 | "system prompt 怎么拼出来的" | "我怎么在自己的 App 里调 `session.prompt()`" |
 | 源码位置 | `packages/agent/src/harness/`、`packages/coding-agent/src/core/` | `packages/coding-agent/src/modes/`、`packages/coding-agent/src/core/sdk.ts` |
@@ -40,13 +44,19 @@
 
 ## 一句话总览
 
-`Agent` 是裸循环（接收 messages，调用 LLM，执行 tool calls，产生 events）。在 v0.83/v0.84 里曾有一个 `AgentHarness` 想在它上面加 **session 持久化**（每次 turn 写回 session tree）、**typed hooks**（`on(type, handler)` 拦截/修改能力行为）、**高级方法**（`compact()`、`navigateTree()`、`skill()`）——**但这些在 v0.84.2 都是 stub**（多数抛 `HarnessNotImplemented`，见 4.1）。真正把这些能力做出来的是 **`AgentSession`**：extension runner、resource loader、auto-compaction、retry，全部可用。
+`Agent` 是裸循环（接收 messages，调用 LLM，执行 tool calls，产生 events）。`AgentHarness` 在它上面加 **durable session 状态**（每次 turn 把 effect 落进 bound values/lists）、**typed hooks**（`on(name, handler)` 拦截/修改行为）、**高级操作**（`compact()`、`navigateTree()`、`skill()`）——**这一层在 v0.85 已经是真实现**（v0.83/v0.84 曾是纯骨架）。
 
-可以理解为：`AgentHarness` 是"设计好的骨架契约"，`AgentSession` 是"把它实现出来的 live orchestrator"：
+**但真正被产品使用的那条线是 `AgentSession`**：extension runner、resource loader、auto-compaction、retry，全部可用。
+
+关键结构事实（v0.85.1 复核）：**这两者是并列实现，不是上下堆叠。** `packages/coding-agent/src/core/agent-session.ts` 与 `sdk.ts` **完全不 import `agent/src/harness/`**（grep 零命中）——`AgentSession` 直接建在 `Agent` 类之上，走的是另一条路。所以不要把它们画成"骨架 → live 实现"的替补关系：
 
 ```
-Agent (裸循环) → AgentHarness (骨架契约，v0.84.2 多为 stub) → AgentSession (live 实现，完整 orchestrator) → SDK/扩展
+                    ┌─ AgentHarness (v0.85 填好的内层 harness；消费方：experimental 线)
+Agent (裸循环) ─────┤
+                    └─ AgentSession (产品路径的 live orchestrator；消费方：SDK / RPC / TUI)
 ```
+
+选型结论不变：**产品集成走 `AgentSession` / SDK**。理由从"harness 是 stub"变成了"harness 虽已实现，但只被 `coding-agent/src/experimental/` 消费、且仍有 `watchSession` 一个 stub"。
 
 ## 源码锚点
 

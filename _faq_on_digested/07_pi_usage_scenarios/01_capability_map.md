@@ -16,7 +16,7 @@ Claude Code / Codex 把一整套工作流设施(to-do、plan mode、subagent、M
 
 pi 侧出处:Mario 的设计博文(极简系统提示 <1000 token、四工具论、YOLO 默认、明确不做 to-do/plan mode/MCP/subagent/background bash)。CC 侧出处:官方 best practices 页。
 
-pi 默认工具集的源码核对(v0.84.4):`packages/coding-agent/docs/quickstart.md` L77-84——"By default, pi gives the model four tools",只读工具 `grep`/`find`/`ls` 需通过 `--tools` 显式加;全部 8 个内置工具名单见 `packages/coding-agent/src/core/tools/index.ts:95`。
+pi 默认工具集的源码核对(v0.85.1):`packages/coding-agent/docs/quickstart.md` L77-84——"By default, pi gives the model four tools",只读工具 `grep`/`find`/`ls` 需通过 `--tools` 显式加;全部 8 个内置工具名单见 `packages/coding-agent/src/core/tools/index.ts:95`。
 
 ## 映射表:CC 官方最佳实践 → pi 等价物
 

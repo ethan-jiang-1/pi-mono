@@ -76,9 +76,9 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 | `isDeepSeek` = `provider==="deepseek" \|\| baseUrl.includes("deepseek.com")` | 命中 | **不命中** | `compat.thinkingFormat = "deepseek"` |
 | `requiresReasoningContentOnAssistantMessages: isDeepSeek` | true | **false（默认）** | 手动 `true` |
 | `maxTokensField = useMaxTokens ? "max_tokens" : ...`，`useMaxTokens` 含 `isDeepSeek` | `max_tokens` | **默认 `max_completion_tokens`** | 手动 `"max_tokens"` |
-| `supportsReasoningEffort`（deepseek 分支关掉） | false | 默认可能 true | 手动 `false`（第三方不支持 `reasoning_effort` 时） |
+| `supportsReasoningEffort` = `!isGrok && !isZai && !isMoonshot && !isTogether && !isCloudflareAiGateway && !isNvidia && !isAntLing` | **true**（`isDeepSeek` **不在**排除列表里，内置 `providers/data/deepseek.json` 也没写这个字段） | 同样是 **true**（排除列表里没有你的第三方） | 一般不用管；只有第三方明确拒绝 `reasoning_effort` 才手动 `false`（`openai-completions.ts:1635-1636`） |
 
-**核心结论：** 只要第三方 baseUrl 不含 `deepseek.com`、provider 名不是 `deepseek`，上面四条就全要手动补。最关键是 `thinkingFormat: "deepseek"`——它决定思考参数发成 DeepSeek 的 `thinking: { type: "enabled" }` 格式（`openai-completions.ts:905-915`），不补的话 reasoning 模型会发成普通 OpenAI 的格式。
+**核心结论：** 只要第三方 baseUrl 不含 `deepseek.com`、provider 名不是 `deepseek`，前三条就都要手动补（第四条 `supportsReasoningEffort` 默认不会变）。最关键是 `thinkingFormat: "deepseek"`——它决定思考参数发成 DeepSeek 的 `thinking: { type: "enabled" }` 格式（`openai-completions.ts:914-923`），不补的话 reasoning 模型会发成普通 OpenAI 的格式。
 
 - `thinkingLevelMap`（可选）：官方 `deepseek-v4-flash` = `{ high: "high", max: "max" }`（flash 另有 `low: "low"`），其余 null（`generate-models.ts` `DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP`）。第三方行为一致可以照抄；拿不准就留空走默认。
 - `apiKey`：支持 `$ENV` / `${ENV}` 插值、`!command` 执行、字面量。也可以不写，用 `/login micuapi` 交互式录入（存 `auth.json`）。
@@ -123,7 +123,7 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 | `POST /v1/chat/completions` model=`deepseek-v4-flash-0731` | 正常返回；`message` 带 `reasoning` + `reasoning_details`，`usage` 有 `reasoning_tokens` |
 | `thinking: {"type":"enabled"}` | 接受，返回 reasoning 内容 |
 | `thinking: {"type":"disabled"}` | 接受 |
-| `reasoning_effort:"high"` | 接受（不报错）——所以 `supportsReasoningEffort` 可以留 `true`，发 `high` 档无副作用 |
+| `reasoning_effort:"high"` | 接受（不报错）——所以 `supportsReasoningEffort` 可以留 `true`，发 `high` 档无副作用；本节示例 JSON 里显式写 `false` 只是保守选择（等价于让 pi 不发这个字段），不是必须 |
 | 带 `tools`（function calling） | 正常返回 `tool_calls`（`finish_reason:"tool_calls"`） |
 | 不存在的模型名 | `{"error":{"code":"model_not_found","message":"No available channel for model ..."}}` —— 所以 models.json 里 **id 必须写第三方原名** |
 
@@ -131,12 +131,13 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 
 ## 6. 引用
 
-- 源码：`packages/coding-agent/src/core/provider-composer.ts` — `applyModelsJson()` (L168)、`modelFromJson()` (L130)、`applyExtension()` (L208)
-- 源码：`packages/coding-agent/src/core/model-runtime.ts` — `registerProvider()` (L742)、`providerIds()` (L236)、models.json 组合 (L260)
-- 源码：`packages/ai/src/api/openai-completions.ts` — deepseek 魔法探测 (L1589)、`thinkingFormat:"deepseek"` 发送逻辑 (L905-915)
-- 源码：`packages/ai/scripts/generate-models.ts` + `scripts/providers/deepseek.models.ts` — 内置 deepseek 模型拆到独立文件（generate-models.ts:12 引入）、`DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP` (L286)
+- 源码：`packages/coding-agent/src/core/provider-composer.ts` — `applyModelsJson()` (L177)、`modelFromJson()` (L130)、`applyExtension()` (L217)
+- 源码：`packages/coding-agent/src/core/model-runtime.ts` — `registerProvider()` (L750)、`providerIds()` (L236)、models.json 组合 (L260)、`modelsPath` 默认 `join(getAgentDir(), "models.json")` (L174-175)
+- 源码：`packages/ai/src/api/openai-completions.ts` — deepseek 魔法探测 (L1598)、`thinkingFormat:"deepseek"` 发送逻辑 (L914-923)、`supportsReasoningEffort` 排除列表 (L1635-1636)
+- 源码：`packages/ai/scripts/generate-models.ts` — 生成 `packages/ai/src/providers/deepseek.models.ts`（`models.generated.ts:12`、`providers/deepseek.ts:4` 引入）、`DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP` (L286)
+- 新增可选 compat 字段（v0.85.1）：`vllmPriority`（`OpenAICompletionsCompat`，`packages/ai/src/types.ts:642`）把 vLLM 的调度优先级作为顶层 `priority` 发出，仅在 vLLM 以 `--scheduling-policy priority` 运行时有意义；`supportsMaxOutputTokens`（`OpenAIResponsesCompat`，`:664`）控制 Responses 请求是否带 `max_output_tokens`（部分 Codex 协议网关会拒绝），默认 `true`
 - 源码：`packages/coding-agent/src/core/model-resolver.ts` — `provider/model` 解析与歧义报错 (L443-500)
 - 官方文档：`packages/coding-agent/docs/models.md`（custom models / override / modelOverrides）、`docs/custom-provider.md`、`docs/providers.md`
 - 消化材料：`_digested/agent/05-Infra/5.2_AI_Auth_Subsystem.md`（credential 生命周期、models.json 在 auth 层的位置）
 
-> 基线：以上源码路径以本仓库工作树 v0.84.4 为准（tag `b79e4cc83` merged）。
+> 基线：以上源码路径以本仓库工作树 v0.85.1 为准（tag `d981de122`，merge `e3aa42f46`）。

@@ -35,6 +35,7 @@
 
 - pi：`createAgentSession()` 进程内 SDK + JSONL RPC 子进程；TUI（`packages/tui`）是自研 terminal 渲染器——依赖仅 `get-east-asian-width` + `marked`，无 react/ink，作为 SDK 的 consumer 参考实现。
 - DSH：CLI / Web / ACP / JSON-RPC 复用同一套 runtime spine，入口只是"组合出不同插件树的 profile"；`dsh --profile web` 是 bootstrap 组合时序，比 pi 的 SDK 启动复杂得多。
+- 注（v0.85.x）：pi 这一侧 2026-09 长出了实验性的连接层——`packages/chord`（0.85.0 进入 `dependencies`，0.85.1 列入 README 的 All Packages 表）、`packages/protocol`（`PROTOCOL_VERSION = 8`）、`packages/client`、`packages/server`。0.85.1 把它们往回圈：`pi-client` / `pi-protocol` 从 `dependencies` 挪到 `devDependencies`（`pi-server` 也只在 devDeps），`./client` 与 `./experimental/plugin` 子路径从 `dist` 改为 `source`-only，`files` 里加上 `!dist/client`、`!dist/experimental`、`!dist/cli/experimental`。所以"接入形态"这条轴目前仍是：**pi 的稳定面是进程内 SDK + JSONL RPC，连接层是圈起来的实验品**（`pi-test.sh` 能用，npm 包不再带它们）。
 
 ## 一张表收束
 

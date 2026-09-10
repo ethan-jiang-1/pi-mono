@@ -5,7 +5,7 @@
 ## 证据边界说明
 
 本章应"实际对照"的要求，**两边都做了新源码核对**（超出 question.md 原"只做消化材料→判断"的边界）：
-- pi：本仓库 `a27c36749`（v0.84.4，2026-09-02，与既有基线一致）。
+- pi：本仓库 v0.85.1（upstream tag `d981de122`，merge `e3aa42f46`，2026-09-05）；本章引用的 pi 侧断言已在 v0.85.1 重核，均成立。
 - DSH：`/Users/bowhead/deepseek-harness` 工作树 `ab0f5864bd`（0.1.2-alpha.3，2026-09-01），比 question.md 记的 `0.1.1-rc.1 / 528c682e` 新；引用处均为当前工作树路径。
 
 ## 1. 开箱默认装了什么（逐项盘点）
@@ -16,14 +16,14 @@
 |---|---|---|
 | 激活工具 | **4 个**：read / bash / edit / write | `packages/coding-agent/src/core/sdk.ts` L256 `defaultActiveToolNames` |
 | 内置但默认不激活 | grep / find / ls（只读模式用）、powershell（Windows） | `src/core/tools/index.ts` L96-105、L164-180 |
-| 找文件方式 | 提示词直接叫模型**用 bash 跑 `ls, rg, find`** | `src/core/system-prompt.ts` L111 |
-| 默认 system prompt | **约 25 行 / ~1.5KB**：身份一句 + 4 条工具一行简介 + 3 条 guideline（含"Be concise in your responses"）+ pi 自身文档路径 + cwd | `src/core/system-prompt.ts` L128-166 |
+| 找文件方式 | 提示词直接叫模型**用 bash 跑 `ls, rg, find`** | `src/core/system-prompt.ts` L110 |
+| 默认 system prompt | **约 25 行 / ~1.5KB**：身份一句 + 4 条工具一行简介 + 3 条 guideline（含"Be concise in your responses"）+ pi 自身文档路径 + cwd | `src/core/system-prompt.ts` L127-165 |
 | 工作区指令 | AGENTS.override.md / AGENTS.md / CLAUDE.md → `<project_context>` 注入 | `src/core/resource-loader.ts` L72 |
 | skills | 有加载机制（`.pi/skills` 项目级 + 全局），但**不预装任何 skill** | `src/core/skills.ts` L452-456 |
 | compaction | 内置，默认开 | `src/core/settings-manager.ts` L830 |
 | plan mode / subagent / todo | **是 `examples/extensions/` 79 个示例中的 3 个，默认不装** | `examples/extensions/{plan-mode,subagent,todo.ts}` |
 | 沙箱 / 审批 | 无（`confirm-destructive.ts` 也是示例扩展） | 同上 |
-| 模型路由 | 完全留给用户（`/model`、providers、baseURL——FAQ 01/03 的全部起因） | `src/core/models/` |
+| 模型路由 | 完全留给用户（`/model`、providers、baseURL——FAQ 01/03 的全部起因） | `src/core/model-runtime.ts` / `model-registry.ts` / `provider-composer.ts`（**没有** `src/core/models/` 这个目录） |
 
 ### DSH 标准会话（standard preset + host）
 
@@ -63,5 +63,5 @@ DSH 并非处处开箱即写代码：`sdk-minimal` profile 就把工具面收窄
 
 ## 引用
 
-- pi（`a27c36749` / v0.84.4）：`packages/coding-agent/src/core/sdk.ts`、`src/core/system-prompt.ts`、`src/core/tools/index.ts`、`src/core/resource-loader.ts`、`src/core/skills.ts`、`src/core/settings-manager.ts`、`examples/extensions/`
+- pi（`d981de122` / v0.85.1）：`packages/coding-agent/src/core/sdk.ts`、`src/core/system-prompt.ts`、`src/core/tools/index.ts`、`src/core/resource-loader.ts`、`src/core/skills.ts`、`src/core/settings-manager.ts`、`examples/extensions/`
 - DSH（`ab0f5864bd` / 0.1.2-alpha.3）：`packages/preset/agent-presets/presets/standard/agent.cordis.yml`、`packages/core/system-prompt/src/index.ts`、`packages/context/agent-instructions/`、`_digested/runtime-profiles/00-map.md`、`_digested/tools-prompt-llm/01-…前缀.md`

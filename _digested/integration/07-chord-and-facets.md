@@ -121,7 +121,7 @@ packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 
 
 ## 4. chord 与 Pi 既有 extension 系统的关系：**并存，不是替代**
 
-**【硬事实】** `core/extensions` 那套**完好无损**：`ExtensionAPI`（`packages/coding-agent/src/core/extensions/types.ts:1252`）与 `ExtensionFactory`（同文件 `:1588`）都还在，`packages/coding-agent/examples/extensions/` 的 79 个文件一行未动。
+**【硬事实】** `core/extensions` 那套**完好无损**：`ExtensionAPI`（`packages/coding-agent/src/core/extensions/types.ts:1252`）与 `ExtensionFactory`（同文件 `:1588`）都还在，`packages/coding-agent/examples/extensions/` 本轮零改动（该目录顶层 79 个条目、递归 118 个文件，其中 86 个是 `.ts`/`.js` 源文件——**引用数字时说明口径**）。
 
 **【解释】** 所以 facet/plugin 是**平行的第二套组合机制**，不是 extension 系统 2.0。两者的差别不在功能，而在**代码住在哪个进程里**：
 

@@ -16,7 +16,7 @@
 
 ## 证据边界
 
-- pi 侧:本仓库源码与文档 v0.84.4(upstream tag `b79e4cc83`),`packages/coding-agent/docs/`、`examples/extensions/`、`.pi/prompts/`;`_digested/` 消化材料。
+- pi 侧:本仓库源码与文档 v0.85.1(upstream tag `d981de122`),`packages/coding-agent/docs/`、`examples/extensions/`、`.pi/prompts/`;`_digested/` 消化材料。
 - **本机实证(2026-09-02 补充)**:`~/.pi/agent/`、`~/.claude/`、`~/.codex/`、`~/mattpocock-skills` 等路径的文件系统实况,见 [04 篇](04_local_audit.md)。用户直觉"要离开这个项目才能找到答案"的这一半,靠本机审计回答。
 - Claude Code 侧:Anthropic 官方 Best practices(2025 末重写版)及 Common workflows / Skills / Memory / goal 等新页;Codex 侧:官方页反爬,经检索摘要与已核对镜像重建;agents.md 标准。细节见 [07 篇](07_cross_harness.md)。
 - 生态与社区(2026-09-02 补充):pi.dev/packages 全量爬取(5,626 包)+ 约 18 个包 README 逐个核对,见 [05 篇](05_package_ecosystem.md);pi 社区实战用法(作者博文、pi.dev 官方材料、HN/Reddit、GitHub 生态),见 [06 篇](06_field_usage.md)。

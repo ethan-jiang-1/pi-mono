@@ -17,7 +17,7 @@
 
 ## 背景约束
 
-- 研究基线：pi-mono v0.85.1，本仓库 commit `bec2f968`（HEAD）。
+- 研究基线：pi-mono v0.85.1（upstream tag `d981de122`，本仓库 merge `e3aa42f46`）。
 - 主要证据来自源码，而不是文档措辞：
   - `packages/coding-agent/src/core/package-manager.ts`
   - `packages/coding-agent/src/core/resource-loader.ts`

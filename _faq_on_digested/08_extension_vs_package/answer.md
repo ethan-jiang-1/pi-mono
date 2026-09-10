@@ -1,6 +1,6 @@
 # 08 — Extension vs Package
 
-> 基线：pi-mono v0.85.1，本仓库 commit `bec2f968`。结论以源码为准。
+> 基线：pi-mono v0.85.1（upstream tag `d981de122`，本仓库 merge `e3aa42f46`）。结论以源码为准。
 >
 > 本篇是结论。**看不懂就直接看 [`examples.md`](examples.md)**——同一套机制用四个例子从头走一遍。
 
@@ -106,9 +106,9 @@ CLI 的 `--extension` 参数走 `resolveExtensionSources(sources, {temporary: tr
 
 ## 引用
 
-- `packages/coding-agent/src/core/package-manager.ts@bec2f968`（`resolve:912`、`resolvePackageSources:1251`、`resolveLocalExtensionSource:1327`、`collectPackageResources:2153`、`resolveLocalEntries:2329`、`resourcePrecedenceRank:188`）
-- `packages/coding-agent/src/core/resource-loader.ts@bec2f968`（`reload:388`、`loadFinalExtensionSet:574`、`detectExtensionConflicts:1060`）
-- `packages/coding-agent/src/core/pi-manifest.ts@bec2f968`
-- `packages/coding-agent/src/core/settings-manager.ts@bec2f968`（`PackageSource:82`、`Settings.packages:119`、`Settings.extensions:120`）
+- `packages/coding-agent/src/core/package-manager.ts@d981de122`（`resolve:912`、`resolvePackageSources:1251`、`resolveLocalExtensionSource:1327`、`collectPackageResources:2153`、`resolveLocalEntries:2329`、`resourcePrecedenceRank:188`）
+- `packages/coding-agent/src/core/resource-loader.ts@d981de122`（`reload:388`、`loadFinalExtensionSet:574`、`detectExtensionConflicts:1060`）
+- `packages/coding-agent/src/core/pi-manifest.ts@d981de122`
+- `packages/coding-agent/src/core/settings-manager.ts@d981de122`（`PackageSource:82`、`Settings.packages:119`、`Settings.extensions:120`）
 - `packages/coding-agent/docs/packages.md`、`docs/extensions.md`
 - 相关：[`07_pi_usage_scenarios/05_package_ecosystem.md`](../07_pi_usage_scenarios/05_package_ecosystem.md)、[`06_pi_vs_dsh/03_mechanism_table.md`](../06_pi_vs_dsh/03_mechanism_table.md)

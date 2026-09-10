@@ -22,4 +22,4 @@
 
 - 运行时机制引用 pi-mono 源码：`packages/coding-agent/src/core/system-prompt.ts`、`agent-session.ts`、`resource-loader.ts`、`skills.ts`、`packages/agent/src/harness/compaction/`。
 - 静态设计（docs 随包、无架构地图、AGENTS.md 厚规则）只引用 04 的结论，不重证。
-- 当前源码基线：pi-mono `v0.84.4`（upstream tag `b79e4cc83`，已 merge 进本仓库）。
+- 当前源码基线：pi-mono `v0.85.1`（upstream tag `d981de122`，已 merge 进本仓库）。

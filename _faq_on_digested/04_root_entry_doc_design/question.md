@@ -21,4 +21,4 @@
 
 - 结论只引用 pi-mono 官方文件：根 `README.md`、根 `AGENTS.md`、`CONTRIBUTING.md`、`packages/coding-agent/docs/`、package README、`packages/coding-agent/package.json`（`files`）。
 - 运行时的加载/导航机制（`buildSystemPrompt`、`resource-loader`、`read` 工具、compaction）不属于本问题，归 [`05_root_entry_doc_navigation`](../05_root_entry_doc_navigation/question.md)。
-- 当前源码基线：pi-mono `v0.84.4`（upstream tag `b79e4cc83`，已 merge 进本仓库）。
+- 当前源码基线：pi-mono `v0.85.1`（upstream tag `d981de122`，已 merge 进本仓库）。

@@ -57,6 +57,7 @@ flowchart LR
 | 我要做界面，要知道事件怎么渲染 | [`04-event-model.md`](04-event-model.md) |
 | 我要按产品形态选方案 | [`05-recipes.md`](05-recipes.md) |
 | 我要核对某类能力能不能外部调用 | [`06-coverage-and-parity.md`](06-coverage-and-parity.md) |
+| 我看到源码里到处是 `chord` / `facet`，想知道那是什么、要不要管 | [`07-chord-and-facets.md`](07-chord-and-facets.md) |
 
 如果你是第一次看，先读 `01-start-here.md` 就够。读完能回答一句话：
 
@@ -111,6 +112,7 @@ node dist/cli.js --mode rpc
 - [`04-event-model.md`](04-event-model.md)：做自己的 UI 时读，AgentSessionEvent 分类、渲染策略、重连恢复。
 - [`05-recipes.md`](05-recipes.md)：按产品形态选方案，Web/Tauri、本地后台、CI、IDE 插件。
 - [`06-coverage-and-parity.md`](06-coverage-and-parity.md)：更细的能力边界表，保留给需要核对 parity 的读者。
+- [`07-chord-and-facets.md`](07-chord-and-facets.md)：第四条 authoring 面。`packages/chord`（第 11 个包、零 Pi 依赖）与 facet/service 体系是什么、为什么它已在**非实验源码**里（Harness 的 `Context` 就是 chord 的）、与 `core/extensions` 扩展系统的关系、术语碰撞、以及**现状 vs 规格**陷阱（`facets.md` 自称取代 `plugins.md`，但核心改动一条未实现）。dev-only 限定同 06。
 
 ## 当前最重要的边界
 

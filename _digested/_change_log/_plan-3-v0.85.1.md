@@ -222,3 +222,30 @@ Phase 6: 收尾（README、summary、交叉引用）
 - merge `v0.85.1` 进 ethan：`e3aa42f46`，零冲突（upstream 不碰 `_digested/`/`_faq_on_digested/`）
 - 6 个并行取证 subagent（harness runtime 重写 / harness.md spec 收敛复核 / chord-facets / coding-agent experimental+接口面 / 其余包 / FAQ），外加主线元数据收集
 - 写 `0006-v0.84.4-to-v0.85.1.md`（commit `3ef134264`）
+
+### 2026-09-10 — Phase 1–6 完成
+
+- **Phase 1**：三篇结论级失效整体重写（`3.5_Session_v4` 81→544 行、`4.1_AgentHarness` 143→320 行、`2.3` 改名 `2.3_agent_lane_contract_first` + SVG 重绘）；连带修两个 README 的警示块与那张**画错的架构图**（原画成堆叠，实为并列实现）→ `41896eac7`
+- **Phase 2**：`integration/06` 第三条路径整节重写 + 新增 experimental remote runtime / mini 两节；`03` 补 abort 语义 + 18 处重锚；`02/04/05` 同步 → `31f78a2cd`
+- **Phase 3**：显式反转 0003 旧结论；`2.1` 加 facet 沙箱 scope；`2.4` 换 v0.85.1 例子；`01-Architecture` 四篇补 `renderers/` 与重锚；`03-Discipline` 补 entry-graph 预算物证（check 7→9）→ `b5caf4d39`
+- **Phase 4**：新增 `integration/07-chord-and-facets.md`（302 行）→ `dd546cee9`
+- **Phase 5**：`agent/` 各篇事实错误与锚点（含 `2.6` 的 `isIdle` 漏 `!isCompacting`、`2.5` 的 `buildSessionContext` 误判）；`extensions/` 加 `2.5_second_axis_facets.md`；`composition/` 加 `10i_process_axis.md` 与 `12` 的 scope 块 → `75b5eceff`
+- **Phase 6**：顶层 README 基线 + 包清单 10→11 + harness 四义项/extension 三义项声明 + 修 `on()` 33/36 自相矛盾 → `3a89a69d2`；FAQ 6 篇补丁 + 基线统一 → `2c4861403`；`_summary-v0.85.1.md` → `43f7555ef`
+- **交叉引用检查**：相对链接全部有效；清掉 4 处残留旧结论（`2.7_Cancellation` ×2、`4.2_Skills`、`4.5_Tool_Bash`、`3.1_Compaction`、`3.5` 的"全仓零命中"口径）→ `efdf69e41`
+
+### 2026-09-10 — 事故记录（必须留档）
+
+本轮的并行 agent 执行方式出过一次事故：**一个后台 agent 在共享工作区上执行了 git 历史操作**（`commit --amend` → `reset` → `rebase`），把当时未提交的工作区改动（Phase 3 / Phase 5 / FAQ 补丁，共 ~30 个文件）全部丢弃。已提交的部分（Phase 1/2/4）未受影响。
+
+- **恢复**：打了 5 个 `wip-v0851-*` 标签保护候选状态；`git checkout HEAD -- _digested/` 救回被暂存删除的 chord 篇；三个 agent 从原上下文唤醒、重放编辑（研究结论本来就在 `0006` 里）
+- **根因**：给多个 agent 共享工作区的 Bash 权限，却**只在 brief 里划了"不要改哪些目录"，没有禁止 git 写操作**
+- **教训**：并行 agent 改文档时，① brief 必须明令禁止一切 git 命令（只允许读写文件，提交由主线统一做）；② 每个 agent 一完成就立刻提交，不积压未提交改动。本条对后续所有轮次有效
+
+### 遗留（未做，留待下轮）
+
+- `agent/` 各篇行号逐篇复核（沿用五轮）
+- `2.5_Session_Service` 的锚点表未动，而 `session-manager.ts` 本轮 +45/−15，19 行锚点很可能已漂移
+- `3.1`/`3.2` 的最小例子仍是 v0.84.x 形状（只加了"哪几处失效"的提示块，未重写）
+- `agent/src/search/`（S3）、telemetry 词表、`ai/src/compat/`
+- **未跑测试**（工作树缺 `@earendil-works/chord`，且 gitignored 的 `packages/ai/src/providers/data/` 是 2026-09-02 hydrate 产物、不含 `gpt-6-astra`，`tsgo --noEmit` 必挂）
+- 未追 main 上 v0.85.1 之后的 46 个未发布 commit（含 `system-prompt-refactor` / `system-role` / `system-tool-deltas` 三同族分支）

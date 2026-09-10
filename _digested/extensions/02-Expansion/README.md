@@ -13,6 +13,10 @@
 | [2.3 长相 / presentation](./2.3_presentation.md) | **改变循环的显示（render）** | 覆盖工具渲染、消息/条目渲染、footer/header/editor/overlay | [2.3_slot_orthogonality.svg](figures/2.3_slot_orthogonality.svg) |
 | [2.4 持久化 / persistence](./2.4_persistence.md) | **让扩充活过重启与分支（persist）** | 用 `details` / `appendEntry` / session 树重建，把扩展状态绑进 session | [2.4_branch_replay.svg](figures/2.4_branch_replay.svg) |
 
+### 一条平行的第二轴（v0.85.1 追加）
+
+[2.5 第二条扩展轴：chord facet 插件](./2.5_second_axis_facets.md) **不是**上面四条轴的第五条。上面四条切的是"沿循环的哪个接缝、注入什么"；它切的是"**同一份 feature 的代码跑在哪个进程/环境**"——v0.85 引入的 `packages/chord` facet 插件轴，形状与 `core/extensions` 完全不同（没有 `export default function (pi)`，靠 shared service ID + wire contract 连接多份 host 专属 bundle）。读它之前先接受一件事：**"扩展"这个词在 v0.85 以后的 pi-mono 里至少有三个义项**，该篇开头就把它声明清楚。
+
 ## 为什么这四条轴能把 70+ 示例装下
 
 对照几个示例验证一下：

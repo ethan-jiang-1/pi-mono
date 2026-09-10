@@ -10,6 +10,17 @@ Pi YOLO 默认——agent 在终端里全权操作。这听上去很危险。"�
 
 Pi 没有内置沙箱。你只有 YOLO 全权和工具白名单两个内置机制。其余的都是"你自己加的"——容器、VM、bwrap——它们和 pi 无关，只是你在运行 pi 之前就把环境准备好了。
 
+> **⚠️ scope 限定（v0.85.1 追加）**：上面这句对 **`core/extensions` 这条扩展轴**（也就是本框架前七条轴、以及你日常写的所有扩展）**仍然成立**——普通扩展就是宿主进程里的一段 JS，没有隔离。
+>
+> 但 v0.85 引入的**第二条扩展轴**（chord facet 插件，见 [`10_extension_axes/10i_process_axis.md`](10_extension_axes/10i_process_axis.md)）**在规格上已经选了另一条路**：facet 投递路径的隔离方案是 **isolated-vm + 字符串膜**（`packages/agent/docs/mobile-handoff/02-plugins/02-sandbox/`，自述"Unmodified pi facet code running in a V8 isolate with no ambient authority"，**412 条属性断言**，配套 escape audit 与 bench）。
+>
+> **但这是"规格 + PoC"，不是产品。** 三点必须分清：
+> 1. `mobile-handoff/README.md:22` 自己写着 "**Three units ship working code. Four are specifications.** Do not assume a doc describes something that exists."；`02-plugins/02-sandbox/` 被标为 `[CODE + 412 tests]`，但它是独立 PoC 包（要 `npm install` 单独跑），**不是 pi 的内置沙箱**，也**没有**接入可安装的 pi 发行物。
+> 2. 隔离对象是 **facet bundle**，不是 bash 工具——所以它**不改变**"agent 在终端里全权操作"这件事。你的 `rm -rf` 风险与 v0.84 完全一样。
+> 3. facet 路径本身目前只在 repo checkout + `PI_EXPERIMENTAL=1` 下可用（不在 npm 包/二进制里）。
+>
+> 一句话：**四档隔离这张表仍然是你要配的东西；facet 沙箱不是它的第五档，而是一条还没落地的另一条路。**
+
 从最松到最严：
 
 | 档位 | 配置 | 保护范围 | 配置成本 | 日常成本 |
@@ -113,10 +124,11 @@ docker run -v $(pwd):/workspace pi "deploy to staging"
 
 ## 锚点
 
-- `harness/02-Boundaries/2.1_no_sandbox.md`（无内置沙箱的分析）
+- `harness/02-Boundaries/2.1_no_sandbox.md`（无内置沙箱的分析）——**结论截至 v0.85.1 对 `core/extensions` 仍成立**
 - `_faq_on_digested/07/06_field_usage.md` C5（YOLO + 隔离是共识）
 - `@trim21/personal-pi-extensions`：bwrap 扩展源码
 - `packages/coding-agent/docs/containerization.md`
+- facet 沙箱（**规格 + PoC，非产品**）：`packages/agent/docs/mobile-handoff/02-plugins/02-sandbox/`、`packages/agent/docs/mobile-handoff/README.md:22`、[`10_extension_axes/10i_process_axis.md`](10_extension_axes/10i_process_axis.md)
 
 ## 最小例证
 

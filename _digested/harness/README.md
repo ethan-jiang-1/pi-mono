@@ -1,7 +1,28 @@
 # harness/ — pi 作为 harness 平台的评价层
 
-> **基线**：pi-mono `v0.84.4`（upstream tag `b79e4cc83`，merge `f9a1cf489`），源码锚点对应工作树。本目录是 2026-08-24 新增的评价维度，与 [`agent/`](../agent/)（机制解剖）和 [`integration/`](../integration/)（外部嵌入）并列。
-> v0.84.3 变更：内置工具 7→8（`ToolName` 联合 `tools/index.ts:95`）；`ExtensionAPI` `on()` 重载 34→36（v0.84.4 新增 `ui_prompt_start`/`ui_prompt_end`；注意重载列表含 3 个多行格式——`session_before_switch`/`session_before_compact`/`before_provider_request`——单行 grep 口径会少计 3）；1.4 新增"失败 factory 状态丢弃"护栏（#8424）。v0.84.4 变更：扩展事件新增 `ui_prompt_start`/`ui_prompt_end`（#8355）、runner.ts +52 行（相关锚点已重锚）；本目录相关篇目已同步。
+> **基线**：pi-mono `v0.85.1`（upstream tag `d981de122`，merge `e3aa42f46`），源码锚点对应工作树。本目录是 2026-08-24 新增的评价维度，与 [`agent/`](../agent/)（机制解剖）和 [`integration/`](../integration/)（外部嵌入）并列。
+> v0.84.3 变更：内置工具 7→8（`ToolName` 联合 `tools/index.ts:95`）；`ExtensionAPI` `on()` 重载 34→36（v0.84.4 新增 `ui_prompt_start`/`ui_prompt_end`；注意重载列表含 3 个多行格式——`session_before_switch`/`session_before_compact`/`before_provider_request`——单行 grep 口径会少计 3）；1.4 新增"失败 factory 状态丢弃"护栏（#8424）。v0.84.4 变更：扩展事件新增 `ui_prompt_start`/`ui_prompt_end`（#8355）、runner.ts +52 行（相关锚点已重锚）。
+> **v0.85.1 变更（2026-09-10）**：2.3 **整篇重写**并改名（`2.3_agent_lane_skeleton.md` → [`2.3_agent_lane_contract_first.md`](./02-Boundaries/2.3_agent_lane_contract_first.md)，图同改名）——旧标题两半立论都被反证；2.1 加 scope 限定并新增"facet 隔离"判断；2.4 把 breaking 实例换成 v0.85.1 并改图；1.1 补 `renderers/` 分层 + 重锚；1.2/1.3/1.4 行号复核；3.1/3.4 补两条物证。**01-Architecture 四篇对本轮 `packages/agent` harness 重写免疫**（grep 确认 1.1–1.4 全文零提及 `AgentLane`/`AgentHarness`/`HarnessNotImplemented`）——它们评的是 coding-agent 的 extension / tool-factory / operations 三层接缝，与 `packages/agent` 的 harness 运行时无关；1.1 只因为 coding-agent 的 tool 层同轮被大改（`core/tools/` +1092/−946，新增 `renderers/`）而需要重锚。详见 [`../_change_log/0006-v0.84.4-to-v0.85.1.md`](../_change_log/0006-v0.84.4-to-v0.85.1.md)。
+
+## 旧结论反转：0003 那条"harness.md 与代码不是一套 API"已失效
+
+**旧结论**（记录在 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](../_change_log/0003-v0.83.0-to-v0.84.2.md) 与 [`_plan-2-v0.84.2.md`](../_change_log/_plan-2-v0.84.2.md)）：
+
+> 官方 `packages/agent/docs/harness.md` 描述的是更超前的 registers/SQLite 目标模型，**与已发布代码不是一套 API**。
+
+**现状（硬事实，v0.85.1）**：这条**已失效**，三个分句都被反证：
+
+| 旧分句 | 现状 | 证据 |
+|---|---|---|
+| "registers 存储模型" | 从 spec 和代码里**同时消失** | `harness.md` 体量 2941 → **1468** 行；`register` 在 spec 里只剩 **3** 次，且全是英文动词 `registered`/`registers`（`harness.md:941,1238,1353`），**没有一处是存储模型**；配套代码 `session/state.ts` 的 `LaneRecord`/`LogItem` 已删除 |
+| "更超前的目标态文档" | 不再准确 | 现在的 spec **自带 §0.9 implementation-status 清单**（`harness.md:141-158`），逐项点名未实现项（J1 JSONL 回收、C1 RemoteSession、R12 `watchSession`、T1 telemetry、S3 search、R11 schema migration、WP08 fork、H1 契约闭合）——它现在是"**实现规格 + 未实现项清单**"，不是"目标态宣言" |
+| "与已发布代码不是一套 API" | **反了** | 22 条核心概念中 **15 条已实现（68%）**、1 条部分（fork WP08 Slice A）、6 条仅 spec；6 条"仅 spec"**没有一条落在核心对话主路径上** |
+
+**收敛的机制证据（硬事实）**：不是"文档追代码"，而是**同一个 commit 同时改两边**——`d09576def fix(agent): finalize durable lane replication`（2026-08-26）在**同一个 commit** 里改了 `harness.md`（−1352 行）、`runtime/lane.ts`、`events.ts`、`telemetry.ts`、`values.md`（11 文件 +621/−1027）。这是 registers → values/lists 的转折点。
+
+**一个易被文件名误导的点**：`packages/agent/docs/values.md`（735 行）是 WP01 的**详细设计规格**，不是"价值观宣言"——内容是 `value<T>()`/`list<T>()` 的 bound typed address 模型（`values.md:7-8`、构造 `:93,98`）、后端语义、事务写与 conformance 清单。
+
+**对评价的含义**：0003 时代的判断**在当时是有据的**（v0.84.x 正处在 runtime 重写窗口期，spec 确实超前于代码）；但它描述的是**时点状态**，不是 pi 的永久特征。v0.85.1 把 spec 与实现收敛到了同一批 commit 上。评价一个 design-first 的项目，"现在处在哪个时点"比"它是不是 design-first"更值钱——[2.3](./02-Boundaries/2.3_agent_lane_contract_first.md) 的"契约优先已兑现"就是这条反转的正面表述。
 
 ## 这是什么
 

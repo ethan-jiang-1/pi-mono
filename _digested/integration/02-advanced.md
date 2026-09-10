@@ -1,6 +1,6 @@
 # 02 进阶：架构、协议和设计原理
 
-> 本文已对照 v0.84.2 复核（2026-08-17）。
+> 本文已对照 v0.85.1 复核（2026-09-10）。
 
 ## 前提
 
@@ -8,7 +8,7 @@
 
 ## 三层架构（从集成视角看）
 
-pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集成面（外围还有 `pi-tui`、`pi-telemetry`、session 存储后端 `packages/session-backends/`（其 npm 名是 `@earendil-works/pi-session-backend-sqlite-node`）、`pi-evals` 等配套包，以及 v0.84 新增的 experimental `pi-protocol`/`pi-client`/`pi-server` 远程会话三件套，见下文）：
+pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集成面（外围还有 `pi-tui`、`pi-telemetry`、session 存储后端 `packages/session-backends/`（其 npm 名是 `@earendil-works/pi-session-backend-sqlite-node`）、`pi-evals`，以及 v0.85.0 新增的**第 11 个包** `packages/chord`（`@earendil-works/chord`，零 Pi 依赖的应用组合运行时，见下文）；另有已被降级为 **dev-only** 的 experimental `pi-protocol`/`pi-client`/`pi-server` 远程会话三件套，见下文）：
 
 ```
 ┌──────────────────────────────────────┐
@@ -76,7 +76,7 @@ JSONL 成帧逻辑在 [`packages/coding-agent/src/modes/rpc/jsonl.ts`](../../pac
 | **Prompt** | `prompt` | 普通用户请求，可附带 images、`streamingBehavior: "steer"\|"followUp"` |
 | | `steer` | 在当前 turn 中调整方向 |
 | | `follow_up` | 启动新一轮 follow-up |
-| | `abort` | 取消当前运行的 prompt |
+| | `abort` | 取消当前运行的 prompt/steer/follow_up，**并同时取消 retry、compaction 与 branch summary**；**v0.85.1 起阻塞到 session idle 才回响应**（`agent-session.ts:1619-1624`，RPC 侧 `rpc-mode.ts:428-430` 是 `await session.abort()`；上游 `docs/rpc.md:126` 据此改写） |
 | | `new_session` | 创建新 session，可指定 parent session |
 | **State** | `get_state` | 获取 `RpcSessionState` |
 | **Model** | `set_model` | 切换 provider 和 model |
@@ -138,24 +138,30 @@ stdout 上有两类 JSONL 消息：
 - **没有 `ended` 消息**。一轮 prompt 的完成信号是 `{"type":"event","event":{"type":"agent_settled"}}`（`RpcClient.waitForIdle()`/`collectEvents()` 靠它判断）。
 - `extension_ui_request`（stdout）与 `extension_ui_response`（stdin）：extension 需要宿主代答的 UI 请求（select/confirm/input/editor/notify/setStatus/setWidget/setTitle/set_editor_text），宿主以 `extension_ui_response` 回复。
 
-**v0.84.4 行为备注**（宿主可感知，均无 API 变化）：① `persist` 模型默认时若带非空 `--models` scope，该 model 会同时追加进 scope 与 enabledModels（agent-session.ts:1679，见 03）；② 运行中扩展自定义消息延迟到 `turn_end` 后追加，`message_start`/`message_end` 相应推迟（见 04）；③ 上一轮 session 文件若末行无换行符，读入时自动补 `\n` 修复（session-manager.ts:555，#8345）——宿主直接读 session JSONL 时遇到残尾可按此处理。
+**v0.84.4 行为备注**（宿主可感知，均无 API 变化）：① `persist` 模型默认时若带非空 `--models` scope，该 model 会同时追加进 scope 与 enabledModels（agent-session.ts:1680，见 03）；② 运行中扩展自定义消息延迟到 `turn_end` 后追加，`message_start`/`message_end` 相应推迟（见 04）；③ 上一轮 session 文件若末行无换行符，读入时自动补 `\n` 修复（session-manager.ts:555，#8345）——宿主直接读 session JSONL 时遇到残尾可按此处理。
 
-## 远程/server 形态：protocol / client / server 三件套（experimental）
+## 远程/server 形态：protocol / client / server 三件套（v0.85 重建，dev-only）
 
-本文早先版本描述的 web-ui（把 agent 编译进浏览器、直连 LLM provider）**已删除**——v0.75.3 → v0.83.0 之间就已移除，v0.84.2 树里没有 `apps/web-ui/`。如果需要 server-first / 远程会话形态，现在有一条官方路径——三个 experimental 新包：
+本文早先版本描述的 web-ui（把 agent 编译进浏览器、直连 LLM provider）**已删除**——v0.75.3 → v0.83.0 之间就已移除，v0.85.1 树里没有 `apps/web-ui/`。
 
-| 包 | npm 名 | 角色 |
+v0.84 曾出现过一条 experimental 的 client/server 路径（协议版本 **1**、`PiClient`、`PiServerService` + `SessionSnapshot` 权威快照订阅）。**v0.85 把它整个拆掉重建**：三包现在只是 chord（`packages/chord`）的薄适配层，协议版本 **1 → 8**。重建后的形状：
+
+| 包 | npm 名 | v0.85.1 角色 |
 |---|---|---|
-| `packages/protocol/` | `@earendil-works/pi-protocol` | transport 中立的 CBOR 协议：length-prefixed framing + schema（`framing.ts`、`schemas.ts`、`codec.ts`） |
-| `packages/client/` | `@earendil-works/pi-client` | `PiClient`：通过 `ByteTransport` 接口（WebSocket/Unix socket 等任意有序字节流）与 server 交换 framed CBOR；session lease（exclusive/shared）、快照订阅、按 ID 关联请求。无 Node 专属 import，可在浏览器运行 |
-| `packages/server/` | `@earendil-works/pi-server` | `PiServer` session server：宿主实现 `PiServerService`（listSessions/listModels/createSession/openSession...），`createUnixServer()` 等 listener 组装传输层。README 明确标注 "Experimental... may change or be removed without notice" |
+| `packages/protocol/` | `@earendil-works/pi-protocol` | runtime-neutral routed envelopes + CBOR 编码 + framing（`framing.ts`、`protocol.ts`、`codec.ts`）。framing **没变**（4 字节大端长度前缀 + definite-length CBOR）；寻址改为 service-addressed：`RpcTarget = ServerTarget{serverId} \| SessionTarget{serverId,sessionId,attachmentId}`。业务 payload 是 opaque 的 chord 调用 `{ serviceId, instance?, member, args }` |
+| `packages/client/` | `@earendil-works/pi-client` | `Client`（`client/src/index.ts:1`，已去 `Pi` 前缀）。`ByteTransport` 接口仍在，可接 WebSocket/Unix socket/任意有序字节流。**旧的 `session.subscribe(snapshot => ...)` 快照订阅已删除**，改为 `ServiceSubscription` + `createClientServiceTransport()`（`client.ts:448`）。无 Node 专属 import |
+| `packages/server/` | `@earendil-works/pi-server` | 宿主实现 `ServerHost`（`server/src/types.ts:59-64`，只剩 `serverServices`/`resolveSession`/`openSession`），`createUnixServer()` 组装传输层。README 仍标 "Experimental local server" |
 
-这条路径与 JSONL RPC 的分工：JSONL RPC（`pi --mode rpc`）面向**同机子进程**、人类可读、面向流式 stdout；protocol/client/server 面向**远程/多客户端**会话管理，二进制成帧、快照一致。做 web/远程产品时，现在有四种选择：
+三包都依赖 `@earendil-works/chord`，且**已被降级为开发期依赖**：`packages/coding-agent/package.json` 里 `pi-client`/`pi-protocol`/`pi-server` 从 `dependencies` 降为 `devDependencies`；`files` 排除 `dist/client`/`dist/experimental`/`dist/cli/experimental`；`./client`、`./experimental/plugin` 子路径只有 `{"source": ...}` 一个条件（标准 Node 解析不出来）；`scripts/coding-agent-consumer.mjs:11,73` 断言三包不得进入外部消费者的安装闭包；三包 CHANGELOG 在 v0.85.0/v0.85.1 段**完全是空的**。背景是 v0.85.0 把它们误发布进 npm、导致消费者 import 失败（#9132），v0.85.1 修复。
 
-1. **pi-client + pi-server**（官方 experimental server 栈，适合远程会话/多前端）
-2. 用 SDK 在 Node server 中包装，暴露 HTTP/WS 给前端（自建 server，最可控）
-3. 用 RPC 子进程方案，让 server 管理 spawn 的 agent 进程（JSONL 协议）
-4. 纯前端直连 provider（pi-ai 本身可在浏览器跑，但没有文件/系统工具，是受限子集）
+同时 **v0.85 起有了第二个相关面**：`packages/coding-agent/src/experimental/` 从 0 → **47 文件**（v0.84.4 该目录不存在），让 durable agent 跑在 worker 进程里、presentation 通过 RPC service 目录远程接上去。它是 chord 的 facet/service 概念在 coding-agent 侧的落地（service token 全带 `pi.` 前缀，如 `pi.agent-controller`/`pi.transcript`/`pi.local.slash-commands`，见 `experimental/services/README.md`）；其下的 `experimental/mini/` 是**并列**的独立探针（自带 newline-delimited JSON transport 与自己的 `defineService`，不用 CBOR 栈）。**两者都只能在 repo checkout 里跑（`PI_EXPERIMENTAL=1 ./pi-test.sh server|client`，或 `node packages/coding-agent/src/experimental/mini/main.ts`），不在 npm 包和 standalone binary 里，明确非 supported。**
+
+这条路径与 JSONL RPC 的分工**不再成立**：旧版说"protocol 面向远程/多客户端、走长连接快照"，但快照模型（`SessionSnapshot`）已被删除，`SessionSnapshot` 在 `protocol/src`/`client/src`/`server/src` 里零命中；且协议无兼容窗口（`isSupportedProtocolVersion`，`codec.ts:139-140`，只接受精确相等，一个周期内版本号破坏性变了 7 次）。做 web/远程产品时，实际可选项是：
+
+1. 用 SDK 在 Node server 中包装，暴露 HTTP/WS 给前端（**推荐**；自建 server，最可控）
+2. 用 RPC 子进程方案，让 server 管理 spawn 的 agent 进程（JSONL 协议）
+3. 纯前端直连 provider（pi-ai 本身可在浏览器跑，但没有文件/系统工具，是受限子集）
+4. ~~pi-client + pi-server~~——**dev-only、非 supported，不要作为产品集成面**
 
 ## 权限模型：hook-based 而非交互弹窗
 

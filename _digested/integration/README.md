@@ -106,7 +106,7 @@ node dist/cli.js --mode rpc
 ## 文档分工
 
 - [`01-start-here.md`](01-start-here.md)：入门版，判断路线、SDK vs RPC、最小闭环。
-- [`02-advanced.md`](02-advanced.md)：进阶版，三层架构、为什么 library-first、RPC 协议设计、web-ui 架构史、protocol/client/server 三件套。
+- [`02-advanced.md`](02-advanced.md)：进阶版，三层架构、为什么 library-first、RPC 协议设计、web-ui 架构史、protocol/client/server 三件套（v0.85 已重建为 chord 适配层，**dev-only、非 supported**）、experimental remote runtime 与 mini。
 - [`03-runtime-api.md`](03-runtime-api.md)：真正开始写代码时读，RPC 命令全集、SDK API 调用顺序。
 - [`04-event-model.md`](04-event-model.md)：做自己的 UI 时读，AgentSessionEvent 分类、渲染策略、重连恢复。
 - [`05-recipes.md`](05-recipes.md)：按产品形态选方案，Web/Tauri、本地后台、CI、IDE 插件。

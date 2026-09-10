@@ -54,12 +54,12 @@ await session.followUp("also add tests for the edge case we discussed")
 await session.abort()
 ```
 
-（旧版文档说 prompt 返回含 `messageId`/`turnId` 的结果——v0.84.2 的 `AgentSession.prompt()` 签名是 `Promise<void>`（agent-session.ts:1160），不返回这些；消息 id 从 `message_start`/`message_end` 事件里拿。）
+（旧版文档说 prompt 返回含 `messageId`/`turnId` 的结果——`AgentSession.prompt()` 签名是 `Promise<void>`（agent-session.ts:1159），不返回这些；消息 id 从 `message_start`/`message_end` 事件里拿。）
 
 ### 订阅事件
 
 ```ts
-// 订阅：AgentSession.subscribe(listener)（agent-session.ts:858），返回取消函数；
+// 订阅：AgentSession.subscribe(listener)（agent-session.ts:857），返回取消函数；
 // 注意没有 EventEmitter 风格的 .on("event", ...)。SDK 订阅拿到的是完整 AgentSessionEvent
 // （message_update 带累积 message）；JSON/RPC wire 上会被 toJsonEvent() 裁成纯 delta。
 session.subscribe((event: AgentSessionEvent) => {
@@ -109,37 +109,37 @@ session.subscribe((event: AgentSessionEvent) => {
 
 ### session 管理操作
 
-> 方法名已对照 v0.84.4 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:2976`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork 在 `session.sessionManager` 上（RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:616-631）。
+> 方法名已对照 v0.85.1 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:2983`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork 在 `session.sessionManager` 上（RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:616-631）。
 
 ```ts
 // Compaction
-await session.compact()                      // agent-session.ts:1940
+await session.compact()                      // agent-session.ts:1946
 await session.setAutoCompactionEnabled(true) // 注意：不是 setAutoCompaction
-await session.abortBranchSummary()           // 取消 branch summary（agent-session.ts:2101）
+await session.abortBranchSummary()           // 取消 branch summary（agent-session.ts:2107）
 
 // Session 树
 await session.sessionManager.fork(entryId)   // SDK 层 fork 在 SessionManager 上
 await session.sessionManager.fork(session.sessionManager.getLeafId(), { position: "at" }) // 等价 RPC clone
 await session.sessionManager.switchSession(sessionPath)   // 等价 RPC switch_session
-session.setSessionName("auth-fix")          // 命名 session（agent-session.ts:3084）
+session.setSessionName("auth-fix")          // 命名 session（agent-session.ts:3091）
 
 // 查询
-const stats = await session.getSessionStats()     // tokens, 消息数（agent-session.ts:3323）
-const msgs = session.messages                     // getter：消息列表（agent-session.ts:998），无 getMessages()
-const text = session.getLastAssistantText()       // 最后 assistant 文本（agent-session.ts:3465）
-const usage = session.getContextUsage()            // context 窗口使用情况（agent-session.ts:3375）
-const forkMsgs = session.getUserMessagesForForking() // fork 候选消息（agent-session.ts:3301）
-void session.prompt(text, { images, streamingBehavior: "steer" })  // PromptOptions（agent-session.ts:243）
+const stats = await session.getSessionStats()     // tokens, 消息数（agent-session.ts:3331）
+const msgs = session.messages                     // getter：消息列表（agent-session.ts:997），无 getMessages()
+const text = session.getLastAssistantText()       // 最后 assistant 文本（agent-session.ts:3473）
+const usage = session.getContextUsage()            // context 窗口使用情况（agent-session.ts:3383）
+const forkMsgs = session.getUserMessagesForForking() // fork 候选消息（agent-session.ts:3309）
+void session.prompt(text, { images, streamingBehavior: "steer" })  // PromptOptions（agent-session.ts:242）
 
 // 队列
-const cleared = session.clearQueue()         // v0.84.4 新增（agent-session.ts:1588）：清空 steering/followUp，返回被清掉的文本
+const cleared = session.clearQueue()         // v0.84.4 新增（agent-session.ts:1587）：清空 steering/followUp，返回被清掉的文本
 
 // 导出
 await session.exportToHtml({ outputPath: "/tmp/session.html" }) // 实际方法名 exportToHtml
-await session.exportToJsonl("/tmp/session.jsonl")  // 返回 string（agent-session.ts:3452）
+await session.exportToJsonl("/tmp/session.jsonl")  // 返回 string（agent-session.ts:3460）
 
 // Bash 直接执行
-const bashResult = await session.executeBash("npm test")  // 方法名是 executeBash，不是 bash（agent-session.ts:2976）
+const bashResult = await session.executeBash("npm test")  // 方法名是 executeBash，不是 bash（agent-session.ts:2983）
 
 // 工具管理
 const allTools = session.getAllTools()            // 所有已注册工具
@@ -155,7 +155,7 @@ session.setScopedModels([                         // 设置模型轮换范围（
 session.hasExtensionHandlers("project_trust")     // 检查扩展是否处理某事件（v0.83.0 新增）
 
 // 收尾
-session.dispose()                                  // 取消所有运行 + 断开 agent + 清空 listeners（agent-session.ts:882）
+session.dispose()                                  // 取消所有运行 + 断开 agent + 清空 listeners（agent-session.ts:881）
 ```
 
 （再核对一次：SDK 侧事件用 `session.subscribe()`；模型读取用 `session.state`/`session.model`/`session.thinkingLevel` getter；所有"方法级"列举以上面注释的行号为准。）
@@ -210,13 +210,17 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 → {"type":"follow_up","message":"also add tests for the edge case"}
 ```
 
-### abort
+### abort（v0.85.1 语义变化：阻塞到 idle）
 
 ```
 → {"type":"abort"}
 ```
 
 取消正在运行的 prompt/steer/follow_up。
+
+**v0.85.1 语义（宿主必须注意）**：`abort()` 除了取消 run + retry，现在还**同时取消正在进行的 compaction 与 branch summary**，并在末尾 `await waitForIdle()`（`agent-session.ts:1619-1624`）。RPC 侧 `rpc-mode.ts:428-430` 是 `await session.abort()` 后再回 `success`，因此 **RPC 的 `abort` 现在阻塞到 session 真正 idle 才回响应**。上游 `docs/rpc.md` 本轮唯一的改动就是这一行（`:126`）："Abort the current operation and wait for the session to become idle before responding."，对应 CHANGELOG `Fixed RPC abort reporting success without cancelling an in-progress manual compaction (#8920)`。
+
+**风险场景**：宿主若 `await {"type":"abort"}` 后立刻发下一条命令、且对 abort 设了短超时，行为可能从"成功"变成"超时"；若 session 正卡在一次长时间 compaction 里，`abort` 现在会先把它取消掉再返回（这正是要修的 bug）。
 
 ### clear_queue（v0.84.4 新增）
 
@@ -248,9 +252,9 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 ← {"type":"response","command":"get_available_thinking_levels","success":true,"data":{"levels":["off","minimal","low","medium","high","xhigh","max"]}}
 ```
 
-**v0.84.3 语义**：SDK 的 `setModel(model, { persist })` / `cycleModel` / `setThinkingLevel(level, { persist })` / `cycleThinkingLevel` 接受 `ModelMutationOptions { persist?: boolean }`（agent-session.ts:257），**默认只在 session 内生效**，`persist: true` 才写入全局默认（`ctrl+s` 走这条路径）。RPC 的 `set_model` / `set_thinking_level` 不传 `persist`，因此 v0.84.3 起**不再更新全局默认**。默认思考深度解析顺序改为 **per-model 覆盖（`modelThinkingLevels` setting）→ 全局默认**。
+**v0.84.3 语义**：SDK 的 `setModel(model, { persist })` / `cycleModel` / `setThinkingLevel(level, { persist })` / `cycleThinkingLevel` 接受 `ModelMutationOptions { persist?: boolean }`（agent-session.ts:256），**默认只在 session 内生效**，`persist: true` 才写入全局默认（`ctrl+s` 走这条路径）。RPC 的 `set_model` / `set_thinking_level` 不传 `persist`，因此 v0.84.3 起**不再更新全局默认**。默认思考深度解析顺序改为 **per-model 覆盖（`modelThinkingLevels` setting）→ 全局默认**。
 
-**v0.84.4 补充**：`persist: true` 且本次会话带非空 `--models` scope 时，还会把该 model **追加进 scope 与 enabledModels**（`_addPersistedDefaultToNonEmptyScope`，agent-session.ts:1679；调用点 :1668/:1735/:1770）——persist 的默认模型不会落在 scope 之外变得不可达。
+**v0.84.4 补充**：`persist: true` 且本次会话带非空 `--models` scope 时，还会把该 model **追加进 scope 与 enabledModels**（`_addPersistedDefaultToNonEmptyScope`，agent-session.ts:1680；调用点 :1669/:1736/:1771）——persist 的默认模型不会落在 scope 之外变得不可达。
 
 ### compaction
 
@@ -321,6 +325,12 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 
 - SDK：`session.waitForIdle()` Promise resolve，或监听 `agent_settled` 事件（v0.83.0 新增，与 `agent_end` 并存：`agent_end` 是 run 边界、可能带 `willRetry`；`agent_settled` 在重试/compaction/continuation 静默后才触发，idle 检测用它）。
 - RPC：监听 `{"type":"event","event":{"type":"agent_settled"}}` 事件（没有 `ended` 消息）。
+
+**v0.85.1 补：idle 的定义变了。** `isIdle` 现在含 `!isCompacting`（`agent-session.ts:925-927`），而 `isCompacting` 覆盖 auto-compaction / 手动 compaction / branch summary 三个 abort controller（`:988-994`）。因此：
+
+- **compaction 或 branch summary 进行期间 `isIdle === false`**（此前只看 agent run 是否活跃）；
+- `waitForIdle()` 因此**会等** compaction / branch summary 结束才 resolve（`abort()` 也复用同一个等待，见上）；
+- 宿主若用 `isIdle`/`waitForIdle` 判断"可以发下一条命令"，语义比 v0.84.4 更严格——这是好事，但也意味着重试/压缩期间发起的命令会等更久。
 
 ## 最小状态机
 

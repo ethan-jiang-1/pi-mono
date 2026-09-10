@@ -1,6 +1,6 @@
 # 05 Recipes：按产品形态选接法
 
-> 本文已对照 v0.84.2 复核（2026-08-17）。代码示例中的 API 均按 `@earendil-works/pi-coding-agent`（SDK/RPC）与 `@earendil-works/pi-ai`（模型对象）逐一核对。
+> 本文已对照 v0.85.1 复核（2026-09-10）。代码示例中的 API 均按 `@earendil-works/pi-coding-agent`（SDK/RPC）与 `@earendil-works/pi-ai`（模型对象）逐一核对；v0.84.4 → v0.85.1 期间 SDK/RPC 接口面（`sdk.ts`/`rpc-types.ts`/`rpc-mode.ts`/`json-event.ts`）**逐字节未变**，本文 recipe 全部仍然有效。
 
 ## 这张表解决什么问题
 
@@ -312,7 +312,7 @@ class PiAgent:
 - **编码**：stdin/stdout 使用 UTF-8。
 - **进程管理**：确保 agent 进程在宿主退出时被 kill。
 - **超时**：设置读写超时，避免卡死。
-- **其他路径**：多客户端/远程场景可评估 experimental 的 `@earendil-works/pi-client` + `pi-server`（CBOR framing，见 `integration/02-advanced.md`）；不想手写成帧的话，把 `rpc-client.ts` 的 JSONL 语义移植过去即可。
+- **其他路径（必须加限定）**：`@earendil-works/pi-client` + `pi-protocol` + `pi-server` 这一路**不适合产品集成**——v0.85.1 起三者已是 `pi-coding-agent` 的 `devDependencies`（不是运行时依赖），`files` 把它们排除出 npm 包、standalone binary 也不含，`./client`/`./experimental/plugin` 子路径只有 `{"source": ...}` 一个条件（标准 Node 解析不出来），三个包的 CHANGELOG 在 v0.85.0/0.85.1 段为空。它们的 API 也在 v0.85 被整体重建（客户端类名 `PiClient` → `Client`，快照订阅删除，协议版本 1 → 8），见 `integration/02-advanced.md`。**想做多客户端/远程，请用上面的"自建 server 包装 SDK"或 RPC 子进程方案**；如果只是不想手写 JSONL 成帧，把 `rpc-client.ts` 的语义移植过去即可。
 
 ## 各 Recipe 对比
 

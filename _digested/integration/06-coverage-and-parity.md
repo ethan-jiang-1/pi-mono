@@ -7,7 +7,7 @@
 - 看到 pi-mono 有 TUI，就以为能遥控所有 TUI 行为。
 - 看到 TUI 有各种快捷键和面板，就以为它们都有 SDK/RPC 等价物。
 
-更准确的说法是：pi-mono 的核心 runtime 能力可以通过 SDK（进程内）或 RPC（JSONL 子进程）接入，v0.84 又出现了第三条实验性路径（protocol/client/server 二进制协议，见下文），但 TUI 的产品外壳要由宿主自己实现。
+更准确的说法是：pi-mono 的核心 runtime 能力可以通过 SDK（进程内）或 RPC（JSONL 子进程）接入，v0.84 出现的第三条路径（protocol/client/server 二进制协议）在 v0.85 被拆掉重建、且已降级为 **dev-only、非 supported**（见下文），而 TUI 的产品外壳始终要由宿主自己实现。
 
 ## Runtime 能力覆盖
 
@@ -61,19 +61,59 @@
 | 模型目录 | v0.84.4：DeepSeek 新增 `deepseek-v4-flash-vision-exp`（vision，1M ctx）；Cloudflare gateway 补 `workers-ai/*` passthrough；OpenRouter 图像模型刷新 | [`scripts/generate-models.ts`](../../packages/ai/scripts/generate-models.ts) |
 | CLI `--` end-of-options | CLI：`pi -p -- "- 以破折号开头的参数"`（v0.84.3，`#7269`） | [`cli/args.ts`](../../packages/coding-agent/src/cli/args.ts) |
 
-## 第三条集成路径：protocol / client / server（v0.84，experimental）
+## 第三条集成路径：protocol / client / server（v0.85 重建，dev-only，非 supported）
 
-v0.84 出现了成型的 client/server 栈，**明确标注 experimental、API 不稳定**：
+v0.84 曾出现过一套 client/server 栈（协议版本 **1**、`PiClient`、`PiServerService` + `SessionSnapshot` 快照订阅）。**v0.85 把它整个拆掉重建**：三个包现在只是 chord（`packages/chord`，本轮新增的第 11 个包）的薄适配层，协议版本 **1 → 8**。下表按 v0.85.1 现状。
 
-| 包 | 角色 |
+| 包 | v0.85.1 角色 |
 |----|------|
-| [`packages/protocol`](../../packages/protocol/README.md) | runtime-neutral schemas + CBOR 编码 + 字节流 framing。协议版本 1：4 字节大端长度前缀 + 1 个 definite-length CBOR item；首条消息必须 `hello`；请求/响应 envelope + server event envelope；**Session snapshot 是权威状态，progress event 只是 UI 提示** |
-| [`packages/client`](../../packages/client/README.md) | 传输无关的 `PiClient`：实现 `ByteTransport` 接口（WebSocket / Unix socket / 任意有序字节流）即可，无 Node 专属依赖；`session.subscribe(snapshot => ...)` 快照订阅模型 |
-| [`packages/server`](../../packages/server/README.md) | `PiServer` session server，`PiServerService` 接口挂 storage / modelRegistry，提供 `createUnixServer` |
+| [`packages/protocol`](../../packages/protocol/README.md) | runtime-neutral routed envelopes + CBOR 编码 + 字节流 framing。协议版本 **8**（`protocol.ts:5`）：4 字节大端长度前缀 + 1 个 definite-length CBOR item 的 framing **没变**；首条消息 `hello` 带 `serverId`；**寻址模型改为 service-addressed**——`RpcTarget = ServerTarget{serverId} \| SessionTarget{serverId,sessionId,attachmentId}`（`protocol.ts:36-47`）。业务 payload 是 opaque 的 chord 调用 `{ serviceId, instance?, member, args }`，协议层只校验 strict-JSON 边界、不解释其语义 |
+| [`packages/client`](../../packages/client/README.md) | 传输无关的 `Client`（`client/src/index.ts:1`，已去掉 `Pi` 前缀；错误类型相应变为 `ClientDisposedError`/`DisconnectedError`/`ServerError`，`errors.ts:3,13,20`）。`ByteTransport` 接口仍在（`client/src/transport.ts:1`），可接 WebSocket / Unix socket / 任意有序字节流。**旧的 `session.subscribe(snapshot => ...)` 快照订阅已删除**，改为 service 订阅（`ServiceSubscription`，`types.ts:16`；`createClientServiceTransport()`，`client.ts:448`——先 hydrate 服务快照再 `start()` 释放缓冲更新） |
+| [`packages/server`](../../packages/server/README.md) | 服务宿主接口从 `PiServerService` 变为 `ServerHost`（`server/src/types.ts:59-64`，只剩 `serverServices`/`resolveSession`/`openSession`）；`createUnixServer` 仍在（`transports/unix/preset.ts:8`）。wire 语义上移到 chord（commit `1a7bc80e7 feat: move service wire semantics into Chord`） |
 
-与 RPC mode 的关键差异：RPC 是"子进程 + stdout 事件流"（事件驱动、宿主拼状态），protocol 路径是"长连接 + 权威快照"（服务端推 `SessionSnapshot`，宿主直接渲染）。JSON/RPC 的 `message_update` 增量化（v0.84.0）可以视为向这个模型靠拢的中间步。
+`SessionSnapshot` 在 `protocol/src`、`client/src`、`server/src` 里**已无任何命中**——"服务端推权威快照、宿主直接渲染"的旧模型已被 chord service 路由取代，业务观测（如 coding-agent 的 `Transcript`）现在只是普通 chord service。
 
-**当前建议**：生产集成仍走 SDK/RPC；protocol 栈适合跟踪和试点。`modes/rpc/` 没有被移除的计划公告，但 upstream 的开发重心明显在这里。
+**兼容性**：`isSupportedProtocolVersion`（`protocol/src/codec.ts:139-140`）只接受精确等于 `PROTOCOL_VERSION`，**没有兼容窗口**；协议版本在一个 release 周期内破坏性改了 7 次（1→3→4→5→6→7→8）。客户端与服务端**必须同版本**才能握手。
+
+### ⚠️ 三包是 dev-only、source-only，不是 supported 集成面
+
+- `packages/coding-agent/package.json` 里 `pi-client`/`pi-protocol`/`pi-server` 已从 `dependencies` **降为 `devDependencies`**（`pi-ai`/`pi-agent-core`/`pi-tui`/`chord` 仍是运行时依赖）。
+- `files` 排除 `dist/client`、`dist/experimental`、`dist/cli/experimental`；`./client` 与 `./experimental/plugin` 两个 exports 子路径**只有 `{"source": ...}` 一个条件**，标准 Node 解析不出来。
+- `scripts/coding-agent-consumer.mjs:11,73` 硬编码断言这三包**不得出现在外部消费者的安装闭包里**（`must not be installed`）。
+- 三个包的 CHANGELOG 在 v0.85.0/v0.85.1 段**完全是空的**——不为它们写用户可见 changelog。
+- 背景：v0.85.0 曾把整套 experimental 远程栈误发布进 npm 包，消费者一装就 import 失败（#9132），v0.85.1 用上述手段修复（`1382777ed`、`6f11c31d1`）。
+
+**当前建议**：生产集成走 SDK/RPC。这条路径只适合**读源码跟踪**，不要基于它做产品；`modes/rpc/` 没有被移除的计划公告，且本轮 `rpc-types.ts`/`rpc-mode.ts` **逐字节未变**。
+
+## 另一条 authoring 面：experimental remote runtime 与 mini（dev-only，source-only）
+
+`packages/coding-agent/src/experimental/` 在 v0.84.4 **文件数为 0**（目录不存在），v0.85.1 = **47 个文件**。它不是上面三件套的替代，而是让 durable agent 跑在 worker 进程里、presentation 通过 RPC service 目录远程接上去的运行时，**明确非 supported**。
+
+### experimental remote runtime（chord facet/service 概念在 coding-agent 侧的落地）
+
+`experimental/services/README.md` 自述 "Experimental client/server service slices"。服务 token 全带 `pi.` 前缀：
+
+```
+pi.agent-controller      AgentLane 的 presentation-safe 门面（prompt/queue/abort/resume/compaction/navigation）
+pi.models                ReplicatedState
+pi.session-directory / pi.session-management
+pi.transcript            ReplicatedState，复制 lane 状态
+pi.presentation-plugins / pi.session-plugins
+pi.local.slash-commands  {local:true} —— 永不进 RPC catalogue
+pi.local.presentation-ui {local:true}
+```
+
+token 定义分别在 `services/agent-controller.ts:54`、`models.ts:35`、`sessions.ts:26/:35`、`transcript.ts:15`、`plugins.ts:12/:19`、`slash-commands.ts:30`、`presentation-ui.ts:20`。带 `{local:true}` 的两个只在 presentation 进程本地、不会出口到 RPC catalogue。
+
+**唯一入口是 repo checkout**：`PI_EXPERIMENTAL=1 ./pi-test.sh server|client`（本轮 `pi-test.sh` 已把入口从 `src/cli.ts` 换成 `src/experimental/cli.ts`；`runExperimentalCommand` 在 `commands.ts:94` 同时校验 `PI_EXPERIMENTAL=1` 与 `server`/`client` 子命令）。**不在 npm 包、也不在 standalone binary 里**——发布的 `bin` 是 `dist/bundle/cli.js`，走的是不含 experimental 的 `src/cli.ts`。
+
+### mini —— 独立探针，不是上面那套的上层
+
+`experimental/mini/`（`mini/README.md`）自述 *"It exists to exercise the harness from a real client and to find out what an RPC-shaped presentation actually needs from it."* 它把 durable `AgentHarness` 拆成 server / worker / presentation 三进程，用 socket + pipe 说 JSON。
+
+**它不用 pi-client/pi-protocol 的 CBOR 栈**：自带 newline-delimited JSON transport（`mini/shared/transport.ts`）、自研 frame 集（`mini/shared/rpc.ts:14-21` 的 `Frame` union，实列 `call`/`result`/`error`/`cancel`/`event`/`announce`/`ping` **七**项——README 自称 "six frame kinds"，与代码对不上，以代码为准）、**自己的 `defineService`**（`mini/shared/protocol.ts:56`）——与 chord 的 `defineService`（`packages/chord/src/api.ts:70`）是**两套不同的东西**。它与 `experimental/services/` 那套 chord 栈是**并列**关系，不是其上层。
+
+直接入口：`node packages/coding-agent/src/experimental/mini/main.ts [--continue]`（源码变动期用 `./node_modules/.bin/tsx packages/coding-agent/src/experimental/mini/main.ts`）。**标研究性质，不是集成 API。**
 
 ## TUI parity 不覆盖
 
@@ -94,6 +134,8 @@ v0.84 出现了成型的 client/server 栈，**明确标注 experimental、API �
 | `/thinking` 斜杠命令（v0.84.3，TUI-only） | 等价于 SDK `setThinkingLevel` / RPC `set_thinking_level`，但无独立 RPC 命令 |
 | radius session 分享（v0.84.3，experimental、TUI-only） | 宿主自己实现分享链接/上传（`interactive/session-share.ts`，登录 radius 后可用） |
 | Markdown 渲染 | 宿主自渲染（事件中是原始文本） |
+| 跳到底部指示器（`TuiAltScreen.scrollToEndIndicator`，v0.85.0 新增） | 宿主自己渲染：follow-end 主 scroll view 滚离末端时，在最后一行居中显示一个可点击的"跳到底部"标签（选项 `tui-alt-screen.ts:180`，渲染 `:1618-1634`）。无 SDK/RPC 等价物 |
+| 鼠标区域组件（`MouseRegion`） | pi-tui 已从 `packages/tui/src/index.ts:21` 导出（`components/mouse-region.ts`），可作为宿主自绘 UI 的复用原语；无 SDK/RPC 等价物 |
 
 TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages/coding-agent/src/modes/interactive/)，使用 React Ink 渲染。它不是 SDK 的 UI 层——它是 SDK 的一个 consumer，外部 UI 是另一个 consumer。
 
@@ -106,7 +148,7 @@ TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages
 | 多用户服务 | 没有认证、隔离、审计。需要宿主自己实现多用户管理层 |
 | 权限自动批准 | hook 层面可以总是返回 approve，但产品上要非常保守 |
 | 长会话恢复 | session 持久化到 JSONL 文件（coding-agent 的 `SessionManager`），重启后可恢复。RPC 进程崩溃后需重新 spawn。agent 包另有 session v4（`JsonlSessionRepo`，lane-based），但 coding-agent 尚未接入 |
-| ~~web-ui 的纯前端方案~~ | **web-ui 包已被上游移除**（v0.83.0 前即删除）。浏览器方案需宿主自建或跟踪 protocol/client 栈 |
+| ~~web-ui 的纯前端方案~~ | **web-ui 包已被上游移除**（v0.83.0 前即删除）。浏览器方案需宿主自建，或（仅限读源码跟踪）参考 dev-only 的 protocol/client 栈 |
 | 扩展系统 | 通过 SDK 加载，jiti 运行时编译 TypeScript。外部集成通常不需要直接操作 |
 | 文件变更追踪 | `edit` 和 `write` 工具使用队列+去重机制，但不提供显式 diff API（需从 tool result 提取） |
 
@@ -133,7 +175,7 @@ TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages
 | Slack bot | 预置集成 | 无预置集成 |
 | MCP server 能力 | 有 CLI 管理工具 | 无 |
 | ACP 编辑器协议 | 支持 | 无 |
-| SDK 跨语言方案 | `@opencode-ai/sdk` (JS/TS) | RPC JSONL（任意语言可实现）；v0.84 起另有 CBOR 二进制 protocol（任意语言，experimental） |
+| SDK 跨语言方案 | `@opencode-ai/sdk` (JS/TS) | RPC JSONL（任意语言可实现）；另有 CBOR 二进制 protocol，但**已降级为 dev-only/source-only、非 supported**（见上文） |
 | CI JSON stream | `opencode run --format json` | RPC stdout JSONL |
 | in-process 嵌入 | SDK v2（实际 spawn 子进程） | SDK 真 in-process（同一事件循环） |
 
@@ -141,4 +183,4 @@ TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages
 
 对外介绍 pi-mono integration harness 时，可以这样说：
 
-> pi-mono 可以作为本地 headless agent runtime 被其他产品嵌入。JS/TS 宿主优先用 SDK（`createAgentSession`，同进程调用），非 JS 宿主用 RPC 子进程方案（JSONL over stdin/stdout）。没有 HTTP server——这是 library-first 设计（experimental 的 protocol/client/server 栈走 Unix socket + CBOR 二进制，方向是长连接快照而非 HTTP REST）。TUI 只是一个参考实现（React Ink），不是必须复刻的 API surface。
+> pi-mono 可以作为本地 headless agent runtime 被其他产品嵌入。JS/TS 宿主优先用 SDK（`createAgentSession`，同进程调用），非 JS 宿主用 RPC 子进程方案（JSONL over stdin/stdout）。没有 HTTP server——这是 library-first 设计。历史上曾有一条 experimental 的 protocol/client/server 栈（Unix socket + CBOR 二进制），但它在 v0.85 被重建为 chord 适配层、且已降级为 **dev-only、非 supported**，不构成对外的集成面。TUI 只是一个参考实现（React Ink），不是必须复刻的 API surface。

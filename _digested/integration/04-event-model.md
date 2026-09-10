@@ -6,7 +6,7 @@
 
 pi-mono 的事件通道：
 
-- **SDK**：`session.subscribe(listener)` — 返回取消函数（`agent-session.ts:858`），不是 EventEmitter 风格。
+- **SDK**：`session.subscribe(listener)` — 返回取消函数（`agent-session.ts:857`），不是 EventEmitter 风格。
 - **RPC**：stdout 的 `{"type":"event",...}` JSONL 行。
 
 事件类型定义在两处（v0.84.2 验证）：
@@ -61,7 +61,7 @@ Agent 运行时会产生一系列 `AgentSessionEvent`。每个事件有 `type` �
 
 **v0.84.3 增强**：wire 上的 `toolcall_start` delta 现在**额外带 `id` 和 `toolName`**（[`modes/json-event.ts:23-30`](../../packages/coding-agent/src/modes/json-event.ts)，从 partial content 提取，`id`/`toolName` 大小恒定不构成增长）。外部 UI 可以在 `message_start` 之前就拿到工具调用的 id 和名称来关联 tool card，而不必等 `toolcall_delta` 或 `tool_execution_*`。
 
-**v0.84.4 注意（custom message 时序）**：扩展在 run 中途 `sendMessage(..., { triggerTurn: false })` 发的自定义消息不再立即入 tree/发事件——入 `_pendingCustomMessages` 队列（agent-session.ts:332），在 `turn_end` 处理末尾 flush（:722/:1533-1537），flush 时才发 `message_start`/`message_end`。这保证自定义消息不会插在 assistant tool call 与其 tool result 之间（严格校验消息顺序的 provider 会拒绝重放），外部 UI 也不会看到"tree 里还没有的消息"的事件。
+**v0.84.4 注意（custom message 时序）**：扩展在 run 中途 `sendMessage(..., { triggerTurn: false })` 发的自定义消息不再立即入 tree/发事件——入 `_pendingCustomMessages` 队列（agent-session.ts:331），在 `turn_end` 处理末尾 flush（:721/:1532-1536），flush 时才发 `message_start`/`message_end`。这保证自定义消息不会插在 assistant tool call 与其 tool result 之间（严格校验消息顺序的 provider 会拒绝重放），外部 UI 也不会看到"tree 里还没有的消息"的事件。
 
 做图形 UI 时，把 content 投影成自己的组件：
 
@@ -137,8 +137,8 @@ RPC 子进程如果崩溃或断连，宿主不能假设自己拿到了所有事�
 建议恢复策略：
 
 1. 重新 spawn RPC 子进程，或重新创建 AgentSession。
-2. 调 `get_state`（RPC）重建运行状态；SDK 用只读 getter `session.state`（`AgentState`，`agent-session.ts:906`）——没有 `getState()` 方法。
-3. 调 `get_messages`（RPC）或 SDK `session.messages`（getter，`agent-session.ts:998`）重建消息历史——没有 `getMessages()` 方法。
+2. 调 `get_state`（RPC）重建运行状态；SDK 用只读 getter `session.state`（`AgentState`，`agent-session.ts:905`）——没有 `getState()` 方法。
+3. 调 `get_messages`（RPC）或 SDK `session.messages`（getter，`agent-session.ts:997`）重建消息历史——没有 `getMessages()` 方法。
 4. 如果有未完成的 prompt，用 `get_state` 检查状态再决定是重试还是继续。
 
 pi-mono 的 session 持久化在本地 JSONL 文件（`SessionManager`），重启后可以恢复。(注：agent 包的 session v4 在 JSONL 后端之外另有 `JsonlSessionRepo`，见 agent/03-Memory/3.5，但 coding-agent 层暂未接入。)这跟 OpenCode 的 SSE 重连 + REST 恢复策略思路一致，但实现上更轻量——直接读文件，不需要调多个 REST endpoint。
@@ -163,8 +163,10 @@ pi-mono 有一个 Extension UI 协议（定义在 AgentSession 和 ExtensionRunn
 
 v0.84.0 agent 包的 session 存储换代 lane-based v4（详见 `agent/03-Memory/3.5_Session_v4.md`），但 coding-agent 的 `SessionManager`（RPC/SDK 使用的 session 持久化）尚未接入这套新模型。对外部集成者来说：
 
-- SDK/RPC 当前事件的产生和存储不受 session v4 影响——事件仍由 `AgentSession` 管理、`SessionManager` 持久化。
-- 未来 `AgentHarness` / `AgentLane` 骨架填满后，事件模型可能增加 `lane` 相关事件（如 `operation_started`/`operation_finished`、`lane_switch`）及 `SessionSnapshot`（protocol/client/server 路径的权威快照订阅模型）。
-- `message_update` 增量化（v0.84.0，本节已有详述）是向快照模型靠拢的中间步。
+- SDK/RPC 当前事件的产生和存储不受 session v4 影响——事件仍由 `AgentSession` 管理、`SessionManager` 持久化（`core/session-manager.ts` 只从 `pi-agent-core` 取 `AgentMessage`，不 import `harness/session`；唯一接入 harness 的是 **dev-only** 的 `src/experimental/`）。
+- 未来 coding-agent 若把主线接入 agent 包的 lane/harness，事件模型才可能增加 lane 相关事件（如 operation / attachment 相关）。
+- `message_update` 增量化（v0.84.0，本节已有详述）与快照无关——它是 JSON/RPC wire 的体积优化。
 
-当前结论自洽：事件模型本篇描述的是 coding-agent 层事件的真实行为，不受 agent 包 session v4 未接入的影响。跟踪方向是 protocol/client/server 的 `SessionSnapshot` 模型（见 integration/06 的 experimental 路径介绍）。
+**v0.85.1 更正**：上一版本文写的"跟踪方向是 protocol/client/server 的 `SessionSnapshot` 模型"**已失效**——`SessionSnapshot` 在 `protocol/src`、`client/src`、`server/src` 里**零命中**，旧的 `session.subscribe(snapshot => ...)` 快照订阅也已删除。该路径在 v0.85 被重建为 chord（`packages/chord`）的薄适配层，寻址模型改为 **service-addressed**（`RpcTarget = ServerTarget{serverId} | SessionTarget{serverId,sessionId,attachmentId}`），presentation 状态模型是 **chord service 订阅 + `LaneSnapshot`/`reduceLaneSnapshot`**（`LaneSnapshot` 定义在 `harness/agent-harness.ts:228`，经 `index.ts:43` 的 `export *` 公开；`reduceLaneSnapshot` 由 `index.ts:77` 自 `harness/runtime/reducer.ts` 导出）。**注意这条路径整体已降级为 dev-only、非 supported**（三包从 `dependencies` 降为 `devDependencies`、`files` 排除其 dist、CHANGELOG 在 v0.85.0/0.85.1 段为空）——详见 integration/06，不要把它当"未来方向"来规划。
+
+当前结论自洽：事件模型本篇描述的是 coding-agent 层事件的真实行为，不受 agent 包 session v4 未接入的影响。

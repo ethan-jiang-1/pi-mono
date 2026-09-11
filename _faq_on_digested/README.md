@@ -40,6 +40,7 @@ _faq_on_digested/
 - [`06_pi_vs_dsh/`](06_pi_vs_dsh/question.md) — pi vs DSH：两个"很灵活"的 harness，共性、差异、优缺点？——可扩展性 vs 可组合性
 - [`07_pi_usage_scenarios/`](07_pi_usage_scenarios/question.md) — Pi"只是命令行"是不是能力有限？正常/合理用法有哪些？（三路深挖修订版：CC/Codex 映射、本机审计、包生态、社区实战、2026 跨 harness 新实践、三层组装 starter kit）
 - [`08_extension_vs_package/`](08_extension_vs_package/question.md) — 为什么同时有 Extension 和 Package？区别是什么？（运行时单位 vs 分发单位；源码级判据：文件=extension，目录=按 package 规则；附 [`examples.md`](08_extension_vs_package/examples.md) 例子驱动版）
+- [`09_package_ecosystem/`](09_package_ecosystem/question.md) — pi 包生态（pi.dev/packages 5412 包）全景：分布、品类、头部包、趋势、空白？（全量抓取 + 社区调研，2026-09-11 快照；answer.md 为索引，拆 7 篇展开 + 4 张 SVG）
 
 ## 引用规范
 

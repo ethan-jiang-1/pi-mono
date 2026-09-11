@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 430" font-family="-apple-system, 'PingFang SC', 'Noto Sans CJK SC', sans-serif">
+  <rect width="780" height="430" fill="#ffffff"/>
+  <text x="390" y="28" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">下载集中度：5412 个包，少数包吃掉多数流量</text>
+  <text x="390" y="48" text-anchor="middle" font-size="12" fill="#888">累计下载占比 vs 包排名（对数横轴），月下载总量 ~6.01M（2026-09-11 快照）</text>
+
+  <!-- grid -->
+  <g stroke="#e5e5e5" stroke-width="1">
+    <line x1="60" y1="40"  x2="720" y2="40"/>
+    <line x1="60" y1="125" x2="720" y2="125"/>
+    <line x1="60" y1="210" x2="720" y2="210"/>
+    <line x1="60" y1="295" x2="720" y2="295"/>
+    <line x1="60" y1="380" x2="720" y2="380"/>
+  </g>
+  <!-- axes -->
+  <line x1="60" y1="40" x2="60" y2="380" stroke="#333" stroke-width="1.5"/>
+  <line x1="60" y1="380" x2="720" y2="380" stroke="#333" stroke-width="1.5"/>
+
+  <!-- y labels -->
+  <g font-size="11" fill="#666" text-anchor="end">
+    <text x="54" y="44">100%</text>
+    <text x="54" y="129">75%</text>
+    <text x="54" y="214">50%</text>
+    <text x="54" y="299">25%</text>
+    <text x="54" y="384">0%</text>
+  </g>
+  <!-- x labels (log) -->
+  <g font-size="11" fill="#666" text-anchor="middle">
+    <text x="60"  y="398">#1</text>
+    <text x="237" y="398">#10</text>
+    <text x="414" y="398">#100</text>
+    <text x="591" y="398">#1000</text>
+    <text x="712" y="398">#5412</text>
+  </g>
+  <text x="390" y="418" text-anchor="middle" font-size="12" fill="#888">包排名（按月下载降序，对数刻度）</text>
+
+  <!-- curve -->
+  <polyline fill="none" stroke="#4a6fd4" stroke-width="2.5"
+    points="60,331 144,285 209,243 290,204 360,159 410,125 467,120 537,106 591,88 644,65 720,40"/>
+
+  <!-- data dots -->
+  <g fill="#4a6fd4">
+    <circle cx="60"  cy="331" r="4"/>
+    <circle cx="209" cy="243" r="4"/>
+    <circle cx="290" cy="204" r="4"/>
+    <circle cx="360" cy="159" r="4"/>
+    <circle cx="467" cy="120" r="4"/>
+    <circle cx="591" cy="88"  r="4"/>
+    <circle cx="720" cy="40"  r="4"/>
+  </g>
+
+  <!-- annotations -->
+  <g font-size="11.5" fill="#333">
+    <text x="70" y="325">#1 pi-mcp-adapter = 14.4%</text>
+    <text x="219" y="237">top7 = 40%（7 个 ≥100K/mo 的包）</text>
+    <text x="300" y="198">top20 = 52%</text>
+    <text x="370" y="153">top50 = 65%</text>
+    <text x="477" y="114">top200 = 77%</text>
+    <text x="600" y="82">top1000 = 86%</text>
+    <text x="600" y="55">全部 = 100%</text>
+  </g>
+
+  <text x="390" y="38" text-anchor="middle" font-size="11" fill="#4a6fd4"></text>
+</svg>

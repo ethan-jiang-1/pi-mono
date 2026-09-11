@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 480" font-family="-apple-system, 'PingFang SC', 'Noto Sans CJK SC', sans-serif">
+  <rect width="780" height="480" fill="#ffffff"/>
+  <text x="390" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">品类地图：包数（横轴）× 下载占比（纵轴）</text>
+  <text x="390" y="46" text-anchor="middle" font-size="12" fill="#888">气泡大小 = 月下载量；主类归类（每包一类），关键词启发式，2026-09-11</text>
+
+  <!-- axes -->
+  <line x1="60" y1="420" x2="740" y2="420" stroke="#333" stroke-width="1.5"/>
+  <line x1="60" y1="60"  x2="60"  y2="420" stroke="#333" stroke-width="1.5"/>
+  <g font-size="11" fill="#666" text-anchor="middle">
+    <text x="60"  y="438">0%</text>
+    <text x="230" y="438">5%</text>
+    <text x="400" y="438">10%</text>
+    <text x="570" y="438">15%</text>
+    <text x="740" y="438">20%</text>
+  </g>
+  <g font-size="11" fill="#666" text-anchor="end">
+    <text x="54" y="424">0%</text>
+    <text x="54" y="297">10%</text>
+    <text x="54" y="170">20%</text>
+    <text x="54" y="66">30%</text>
+  </g>
+  <text x="400" y="460" text-anchor="middle" font-size="12" fill="#888">包数占比 →</text>
+  <text x="20" y="240" font-size="12" fill="#888" transform="rotate(-90 20 240)">↑ 月下载占比</text>
+
+  <!-- guide annotations (moved to clear areas) -->
+  <text x="120" y="80" font-size="11" fill="#bbb">右上：又多又赚流量（金矿区）</text>
+  <text x="735" y="404" font-size="11" fill="#bbb" text-anchor="end">右下：数量多、单体小（红海区）</text>
+
+  <!-- bubbles: cx = 60 + x%*34, cy = 420 - y%*12.67 -->
+  <!-- 记忆/上下文 (14%,26%) r44 -->
+  <circle cx="536" cy="91" r="44" fill="#4a6fd4" fill-opacity="0.75" stroke="#2f4fa8"/>
+  <text x="536" y="86" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">记忆/上下文</text>
+  <text x="536" y="100" text-anchor="middle" font-size="10" fill="#fff">744包 · 27%</text>
+
+  <!-- 编排/子代理 (9.5%,21%) r40 -->
+  <circle cx="383" cy="154" r="40" fill="#d4704a" fill-opacity="0.75" stroke="#a84f2f"/>
+  <text x="383" y="150" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">编排/子代理</text>
+  <text x="383" y="164" text-anchor="middle" font-size="10" fill="#fff">685包 · 22%</text>
+
+  <!-- web (9%,11%) r28 -->
+  <circle cx="366" cy="281" r="28" fill="#3f9d6b" fill-opacity="0.75" stroke="#2d7049"/>
+  <text x="366" y="278" text-anchor="middle" font-size="10.5" fill="#fff" font-weight="600">web/搜索</text>
+  <text x="366" y="291" text-anchor="middle" font-size="9.5" fill="#fff">491包 · 11%</text>
+
+  <!-- provider (12%,7%) r23 -->
+  <circle cx="468" cy="331" r="23" fill="#8a5fd0" fill-opacity="0.75" stroke="#6a43a8"/>
+  <text x="468" y="328" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">provider</text>
+  <text x="468" y="340" text-anchor="middle" font-size="9" fill="#fff">570 · 7%</text>
+
+  <!-- 未分类 (17.5%,8%) r24 -->
+  <circle cx="655" cy="319" r="24" fill="#999" fill-opacity="0.55" stroke="#777"/>
+  <text x="655" y="316" text-anchor="middle" font-size="10" fill="#333" font-weight="600">未分类</text>
+  <text x="655" y="328" text-anchor="middle" font-size="9.5" fill="#333">946 · 8%</text>
+
+  <!-- 审查/质量 (5%,7%) r22 -->
+  <circle cx="230" cy="331" r="22" fill="#c94f7c" fill-opacity="0.75" stroke="#9c3a5e"/>
+  <text x="230" y="329" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="600">审查/质量</text>
+  <text x="230" y="341" text-anchor="middle" font-size="8.5" fill="#fff">279 · 7%</text>
+
+  <!-- 其他 (7.5%,4.5%) r19 -->
+  <circle cx="315" cy="363" r="19" fill="#5fa7c9" fill-opacity="0.75" stroke="#3f7c99"/>
+  <text x="315" y="358" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">观测/远程/</text>
+  <text x="315" y="369" text-anchor="middle" font-size="8.5" fill="#fff">图像等</text>
+
+  <!-- UI/主题 (13.5%,2.5%) r16 -->
+  <circle cx="519" cy="388" r="16" fill="#d0a53f" fill-opacity="0.8" stroke="#a87f2a"/>
+  <text x="519" y="392" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">UI/主题</text>
+
+  <!-- 计划/任务 (4%,2.5%) r13.5 -->
+  <circle cx="196" cy="388" r="13" fill="#6b9e4f" fill-opacity="0.8" stroke="#4d7438"/>
+  <text x="196" y="392" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">计划</text>
+
+  <!-- 安全/权限 (3%,3.5%) r14.6 -->
+  <circle cx="162" cy="376" r="14" fill="#c96b4f" fill-opacity="0.8" stroke="#9c4f38"/>
+  <text x="162" y="380" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">安全</text>
+
+  <!-- 技能包 (5.8%,1.8%) r13.5 -->
+  <circle cx="257" cy="397" r="13" fill="#4fa3c9" fill-opacity="0.8" stroke="#38799a"/>
+  <text x="257" y="401" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">技能</text>
+
+  <!-- 用量/成本 (2.2%,1.2%) r11 -->
+  <circle cx="135" cy="405" r="11" fill="#9a9a4f" fill-opacity="0.85" stroke="#74743a"/>
+  <text x="135" y="408" text-anchor="middle" font-size="7.5" fill="#fff" font-weight="600">用量</text>
+
+  <!-- MCP (1.5%,4.8%) r8.6 -->
+  <circle cx="111" cy="359" r="9" fill="#333" fill-opacity="0.8" stroke="#000"/>
+  <text x="111" y="362" text-anchor="middle" font-size="7" fill="#fff" font-weight="700">MCP</text>
+
+  <text x="700" y="470" text-anchor="end" font-size="10" fill="#999">注：MCP 流量实际被 pi-mcp-adapter（主类归记忆/上下文）带走，见 2-categories.md；小气泡数值见本篇各节</text>
+</svg>

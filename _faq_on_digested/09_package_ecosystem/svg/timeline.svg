@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 420" font-family="-apple-system, 'PingFang SC', 'Noto Sans CJK SC', sans-serif">
+  <rect width="780" height="420" fill="#ffffff"/>
+  <text x="390" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">生态增长：2026-04 → 2026-09</text>
+  <text x="390" y="46" text-anchor="middle" font-size="12" fill="#888">包数（左轴）与主仓库 stars（右轴）；2026-04 被 Earendil 收购，RFC 0015 开放核心</text>
+
+  <!-- axes -->
+  <line x1="70" y1="60" x2="70" y2="330" stroke="#333" stroke-width="1.5"/>
+  <line x1="70" y1="330" x2="720" y2="330" stroke="#333" stroke-width="1.5"/>
+  <line x1="720" y1="60" x2="720" y2="330" stroke="#c94f7c" stroke-width="1.5"/>
+
+  <!-- x months -->
+  <g font-size="11" fill="#666" text-anchor="middle">
+    <text x="70"  y="348">04</text>
+    <text x="200" y="348">05</text>
+    <text x="330" y="348">06</text>
+    <text x="460" y="348">07</text>
+    <text x="590" y="348">08</text>
+    <text x="720" y="348">09</text>
+  </g>
+  <text x="395" y="368" text-anchor="middle" font-size="12" fill="#888">2026 年</text>
+
+  <!-- left axis: packages 0..6000 -->
+  <g font-size="10.5" fill="#4a6fd4" text-anchor="end">
+    <text x="64" y="334">0</text>
+    <text x="64" y="288">1k</text>
+    <text x="64" y="243">2k</text>
+    <text x="64" y="198">3k</text>
+    <text x="64" y="153">4k</text>
+    <text x="64" y="108">5k</text>
+    <text x="64" y="64">6k</text>
+  </g>
+  <!-- right axis: stars 0..110k -->
+  <g font-size="10.5" fill="#c94f7c" text-anchor="start">
+    <text x="726" y="334">0</text>
+    <text x="726" y="288">27.5k</text>
+    <text x="726" y="243">55k</text>
+    <text x="726" y="198">82.5k</text>
+    <text x="726" y="153">110k</text>
+  </g>
+
+  <!-- packages line: (05,2143)->233.6, (07,5890)->64.9, (09,5412)->86.5 -->
+  <polyline fill="none" stroke="#4a6fd4" stroke-width="2.5" points="200,234 460,65 590,86.5"/>
+  <line x1="590" y1="86.5" x2="712" y2="86.5" stroke="#4a6fd4" stroke-width="2" stroke-dasharray="4 4"/>
+  <g fill="#4a6fd4">
+    <circle cx="200" cy="234" r="4.5"/>
+    <circle cx="460" cy="65" r="4.5"/>
+    <circle cx="590" cy="86.5" r="4.5"/>
+  </g>
+  <g font-size="11" fill="#2f4fa8">
+    <text x="200" y="256" text-anchor="middle">2,143 包（5月）</text>
+    <text x="460" y="52" text-anchor="middle">5,890（7月末，npm）</text>
+    <text x="588" y="112" text-anchor="middle">5,412（9-11，gallery 索引）</text>
+  </g>
+
+  <!-- stars line: (05,45041)->219.4, (09,103976)->74.8 -->
+  <polyline fill="none" stroke="#c94f7c" stroke-width="2.5" points="200,219 712,75"/>
+  <g fill="#c94f7c">
+    <circle cx="200" cy="219" r="4.5"/>
+    <circle cx="712" cy="75" r="4.5"/>
+  </g>
+  <g font-size="11" fill="#9c3a5e">
+    <text x="212" y="200" text-anchor="middle">45.0k stars</text>
+    <text x="706" y="60" text-anchor="end">104.0k stars</text>
+  </g>
+
+  <!-- notes -->
+  <g font-size="10.5" fill="#888">
+    <text x="70" y="390">数据源：Implicator.ai（5月包数）、npm `pi-package` 检索（7月末）、pi.dev/packages 抓取（9-11）、GitHub API（stars）</text>
+    <text x="70" y="406">9 月的 5,412 是 gallery 索引数（滞后于 npm ~8%）；包生态 4 个月 ~2.5 倍，stars 4 个月 ~2.3 倍</text>
+  </g>
+</svg>

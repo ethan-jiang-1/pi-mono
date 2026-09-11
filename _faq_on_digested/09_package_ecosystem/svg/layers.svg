@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 480" font-family="-apple-system, 'PingFang SC', 'Noto Sans CJK SC', sans-serif">
+  <rect width="780" height="480" fill="#ffffff"/>
+  <text x="390" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">为什么生态长成这样：三层结构</text>
+  <text x="390" y="46" text-anchor="middle" font-size="12" fill="#888">极简内核 → 越来越宽的扩展 API → 全部功能长在包里（2026-09 快照）</text>
+
+  <!-- LAYER 3: ecosystem -->
+  <rect x="40" y="64" width="700" height="122" rx="10" fill="#eef3fd" stroke="#4a6fd4" stroke-width="1.5"/>
+  <text x="56" y="88" font-size="13.5" font-weight="700" fill="#2f4fa8">第三层：包生态（5412 包 · ~6.01M 月下载 · 2189 作者）</text>
+  <g font-size="11" fill="#2f4fa8">
+    <rect x="56"  y="100" width="104" height="26" rx="13" fill="#4a6fd4" fill-opacity="0.14"/><text x="108" y="117" text-anchor="middle">记忆/上下文 27%</text>
+    <rect x="168" y="100" width="104" height="26" rx="13" fill="#d4704a" fill-opacity="0.14"/><text x="220" y="117" text-anchor="middle">编排/子代理 22%</text>
+    <rect x="280" y="100" width="104" height="26" rx="13" fill="#3f9d6b" fill-opacity="0.14"/><text x="332" y="117" text-anchor="middle">web/搜索 11%</text>
+    <rect x="392" y="100" width="104" height="26" rx="13" fill="#8a5fd0" fill-opacity="0.14"/><text x="444" y="117" text-anchor="middle">provider 7%</text>
+    <rect x="504" y="100" width="104" height="26" rx="13" fill="#c94f7c" fill-opacity="0.14"/><text x="556" y="117" text-anchor="middle">审查/质量 7%</text>
+    <rect x="616" y="100" width="104" height="26" rx="13" fill="#999" fill-opacity="0.14"/><text x="668" y="117" text-anchor="middle">+11 个小类</text>
+  </g>
+  <text x="56" y="150" font-size="10.5" fill="#555">代表：pi-mcp-adapter · pi-subagents · pi-web-access · rpiv-todo · pi-lens · bigpowers · feynman（内核被产品化样本）</text>
+  <text x="56" y="170" font-size="10.5" fill="#888">官方明确不做进核心、由包补齐：MCP、subagents、plan mode、后台任务、权限弹窗、todos</text>
+
+  <!-- arrow down -->
+  <line x1="390" y1="196" x2="390" y2="222" stroke="#4a6fd4" stroke-width="2" marker-end="url(#arr1)"/>
+  <defs><marker id="arr1" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto"><path d="M0,0 L8,0 L4,8 Z" fill="#4a6fd4"/></marker></defs>
+  <text x="404" y="214" font-size="10.5" fill="#4a6fd4">pi install npm: / git:（包调用 API、注册资源）</text>
+
+  <!-- LAYER 2: extension API -->
+  <rect x="40" y="224" width="700" height="112" rx="10" fill="#fdf6ec" stroke="#d0a53f" stroke-width="1.5"/>
+  <text x="56" y="248" font-size="13.5" font-weight="700" fill="#8a6a1a">第二层：扩展 API（0.80 → 0.85 每个版本都在加宽）</text>
+  <g font-size="10.5" fill="#7a5c10">
+    <text x="56" y="270">~30 个生命周期事件：input / before_agent_start / context / tool_call(可拦截·可终止) / tool_result(可改写)</text>
+    <text x="56" y="287">session fork / compact / tree(可取消) · ui_prompt_start/end · agent_start/end/settled · before_provider_*</text>
+    <text x="56" y="304">注册面：registerTool / Command / Shortcut / Flag / Provider(完整 pi-ai + OAuth) · Message/EntryRenderer · ctx.ui.custom()</text>
+    <text x="56" y="321">分发面：pi install(npm/git/path) · pi -e 试用 · pi-package keyword 进 gallery · 项目级覆盖全局</text>
+  </g>
+
+  <!-- arrow down -->
+  <line x1="390" y1="338" x2="390" y2="364" stroke="#d0a53f" stroke-width="2" marker-end="url(#arr2)"/>
+  <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto"><path d="M0,0 L8,0 L4,8 Z" fill="#d0a53f"/></marker></defs>
+  <text x="404" y="356" font-size="10.5" fill="#a87f2a">API 只暴露"钩子"，不内置功能 → 每个钩子都长出一个包品类</text>
+
+  <!-- LAYER 1: core -->
+  <rect x="40" y="366" width="700" height="96" rx="10" fill="#f0f6f0" stroke="#3f9d6b" stroke-width="1.5"/>
+  <text x="56" y="390" font-size="13.5" font-weight="700" fill="#2d7049">第一层：pi 核心（&lt;1000 token 系统提示 · "shitty coding agent" 自嘲起家 · 104k stars）</text>
+  <g font-size="10.5" fill="#2d7049">
+    <text x="56" y="412">内置工具只有 4 个：read / write / edit / bash —— 其余一切能力都来自包</text>
+    <text x="56" y="429">官方亲自做：模型/认证运行时（ModelRuntime、OAuth device flow）、会话树 + 压缩、TUI 全屏、constrained sampling、llama.cpp</text>
+    <text x="56" y="446">官方明确不做：workflow、编排、UI 组件库、评测、包依赖解析 → 留给生态</text>
+  </g>
+</svg>

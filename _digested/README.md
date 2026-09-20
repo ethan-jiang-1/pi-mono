@@ -1,8 +1,8 @@
 # _digested
 
-> **当前源码基线**：pi-mono `v0.84.4`（tag `b79e4cc83`，**已 merge 进本仓库**——merge `f9a1cf489`，源码锚点对应工作树）。2026-09-01 完成第四轮 catch-up（v0.84.3→v0.84.4，41 commits，fix-heavy 维护版本）：agent-loop `prepareNextTurn` 时序 breaking 重排（between-turn 阈值压缩，#8782）、compaction `toolChoice` 撤回 + 截断 summary 拒绝、RPC `clear_queue`、扩展 `ui_prompt_*` 事件（`on()` 重载 33 个）、ai 层流式稳健性修复；重锚 2.1/2.4/2.6/3.1/3.2/1.4/4.4 等篇行号，并复核 `on()` 重载计数（v0.84.3=34 → v0.84.4=36；单行 grep 口径曾误计 31/33，已二次更正）。行号复核仍不完全——以各篇警示为准。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)。
+> **当前源码基线**：pi-mono `v0.86.1`（tag `13cbf77df`，**已 merge 进本仓库**——merge `b700a07be`，源码锚点对应工作树）。2026-09-21 完成第五轮 catch-up（v0.84.4→v0.86.1，636 commits，**建档以来最大一轮**）——架构分水岭：① agent 包 durable drive 大重构（328 commits，`Harness`/`Lane`/`driveOperation` 完整实现，"骨架多为 stub" 结论失效，de facto breaking 5 项且 CHANGELOG 静默）；② #9548 transcript-first（system prompt/tool 变 transcript 内 SystemMessage 流水，provider 输入 branded `TranscriptContext` 化，v0.86.0 明示 3 个 breaking）；③ 新架构层 chord/durable/server/session-backends 完整落地（`_digested/` 对此零覆盖，专题文档补齐进行中）。详细影响评估见 [`_change_log/0006-v0.84.4-to-v0.86.1.md`](./_change_log/0006-v0.84.4-to-v0.86.1.md)。行号复核仍不完全——以各篇警示为准。版本演进和旧行为只记录在 [`_change_log/`](./_change_log/README.md)。
 >
-> 上一轮（v0.75.3→v0.83.0）记录见 [`_change_log/0002-v0.75.3-to-v0.83.0.md`](./_change_log/0002-v0.75.3-to-v0.83.0.md) 与 [`_change_log/_plan-1-v0.83.0.md`](./_change_log/_plan-1-v0.83.0.md)；v0.83→v0.84.2 见 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](./_change_log/0003-v0.83.0-to-v0.84.2.md) 与 [`_change_log/_plan-2-v0.84.2.md`](./_change_log/_plan-2-v0.84.2.md)；v0.84.2→v0.84.3 见 [`_change_log/0004-v0.84.2-to-v0.84.3.md`](./_change_log/0004-v0.84.2-to-v0.84.3.md)；本轮 v0.84.3→v0.84.4 见 [`_change_log/0005-v0.84.3-to-v0.84.4.md`](./_change_log/0005-v0.84.3-to-v0.84.4.md)。
+> 上一轮（v0.75.3→v0.83.0）记录见 [`_change_log/0002-v0.75.3-to-v0.83.0.md`](./_change_log/0002-v0.75.3-to-v0.83.0.md) 与 [`_change_log/_plan-1-v0.83.0.md`](./_change_log/_plan-1-v0.83.0.md)；v0.83→v0.84.2 见 [`_change_log/0003-v0.83.0-to-v0.84.2.md`](./_change_log/0003-v0.83.0-to-v0.84.2.md) 与 [`_change_log/_plan-2-v0.84.2.md`](./_change_log/_plan-2-v0.84.2.md)；v0.84.2→v0.84.3 见 [`_change_log/0004-v0.84.2-to-v0.84.3.md`](./_change_log/0004-v0.84.2-to-v0.84.3.md)；v0.84.3→v0.84.4 见 [`_change_log/0005-v0.84.3-to-v0.84.4.md`](./_change_log/0005-v0.84.3-to-v0.84.4.md)；本轮 v0.84.4→v0.86.1 见 [`_change_log/0006-v0.84.4-to-v0.86.1.md`](./_change_log/0006-v0.84.4-to-v0.86.1.md) 与 [`_change_log/_summary-v0.86.1.md`](./_change_log/_summary-v0.86.1.md)。
 
 ## 这是什么
 
@@ -18,20 +18,22 @@ Agent 内核入口：[`agent/`](agent/)
 
 ## pi-mono 是什么
 
-pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不仅是一个可以在终端使用的 coding agent，更是一个可以被其他产品嵌入的 agent 引擎。library-first 的承诺分两层：**SDK**（`createAgentSession()` 进程内嵌入）当前可用、成熟；**AgentLane 直接嵌入**（`packages/agent` 的内层 harness 骨架）契约已画好但多数操作是 stub，在填实现中。
+pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不仅是一个可以在终端使用的 coding agent，更是一个可以被其他产品嵌入的 agent 引擎。library-first 的承诺分两层：**SDK**（`createAgentSession()` 进程内嵌入）当前可用、成熟；**AgentLane 直接嵌入**（`packages/agent` 的内层 harness）在 v0.85.x–0.86.x 已从 stub 骨架变为 **durable drive 完整运行时**（`Harness`/`Lane`/`driveOperation`，操作持久化、崩溃可恢复）——但该实现仍偏实验性，且另有平行的 pico3 kernel（`./experimental/pico3`）。
 
-当前基线（v0.84.2）它由 10 个包组成一个 monorepo（v0.75.3 时代的 `web-ui`/`mom`/`pods` 已在上游移除；`storage` 于 v0.84 并入 `session-backends`）：
+当前基线（v0.86.1）它由 12 个包组成一个 monorepo（v0.75.3 时代的 `web-ui`/`mom`/`pods` 已在上游移除；`storage` 于 v0.84 并入 `session-backends`；`chord`/`durable` 于 v0.85.x–0.86.x 新增）：
 
 | 包 | 职责 | 层级 |
 |---|---|---|
-| `packages/ai` | LLM 抽象层：模型定义、多 provider 适配、流式协议、消息类型 | 基础设施 |
-| `packages/agent` | 纯 Agent 运行时：消息管理、工具执行、事件系统、Agent loop、session v4 | Agent 内核 |
-| `packages/coding-agent` | 完整应用层：CLI/TUI/RPC/SDK、扩展系统、会话管理、内置工具 | 应用外壳 |
+| `packages/ai` | LLM 抽象层：模型定义、多 provider 适配、流式协议、消息类型（TranscriptContext） | 基础设施 |
+| `packages/agent` | 纯 Agent 运行时：消息管理、工具执行、事件系统、Agent loop、durable drive harness + pico3（experimental）、session format 4 | Agent 内核 |
+| `packages/coding-agent` | 完整应用层：CLI/TUI/RPC/SDK、扩展系统、会话管理、内置工具、experimental services | 应用外壳 |
 | `packages/tui` | 终端 UI 库：组件系统、渲染引擎、输入处理、fullscreen 模式 | UI 框架 |
-| `packages/protocol` | CBOR 二进制协议 + framing（experimental） | 集成 |
-| `packages/client` | 传输无关的远程 session 客户端（experimental） | 集成 |
-| `packages/server` | PiServer session server（experimental） | 集成 |
-| `packages/session-backends` | session 存储后端（sqlite-node） | 基础设施 |
+| `packages/chord` | 应用组合运行时：facets、services、replicated state、remote-service wire（**非 Pi 包**，零 Pi 依赖） | 新架构层 |
+| `packages/durable` | Pico 持久化 record contracts（conversation/task/document）+ MemoryStorage | 新架构层 |
+| `packages/protocol` | CBOR 二进制协议 + framing（experimental，chord/durable 线） | 集成 |
+| `packages/client` | 传输无关的远程 session 客户端（experimental，chord/durable 线） | 集成 |
+| `packages/server` | 实验性路由层：SessionRouter 把 client 连接路由到 session 服务（业务语义在 coding-agent/src/experimental/services/） | 集成 |
+| `packages/session-backends/` | session 存储后端子包目录（sqlite-node：begin-immediate txn、lease、conformance） | 基础设施 |
 | `packages/telemetry` | vendor-neutral typed telemetry | 辅助 |
 | `packages/evals` | eval harness | 辅助 |
 
@@ -62,7 +64,7 @@ pi-mono 里需要严格区分两种 harness：
 
 前者是"给 Agent 补能力和护栏"，后者是"把 Agent 接进另一个宿主系统"。两者共享同一套源码事实，但读者问题完全不同。
 
-> **关于 "harness" 的四层含义**：在 _digested/ 中 "harness" 一词有四种相关但不同的含义，注意区分：① **内部能力 harness**（内部接线层，见 agent/04-Harness/）——让扩展、Skill、工具进入 Agent loop 的机制；② **外部集成 harness**（integration/）——让外部宿主嵌入 pi-mono 的接入方式；③ **AgentHarness / AgentLane**（agent/04-Harness/4.1）——agent 包内为 session 级操作编排设计的内层骨架契约，目前大多 stub；④ **`harness/` 本目录对 pi 作为开源 coding harness 的**评价维度**。含义① 和 ③ 容易混淆：前者是"扩展怎么挂上循环"，后者是"循环怎么被宿主驱动"——它们是不同抽象层次。
+> **关于 "harness" 的四层含义**：在 _digested/ 中 "harness" 一词有四种相关但不同的含义，注意区分：① **内部能力 harness**（内部接线层，见 agent/04-Harness/）——让扩展、Skill、工具进入 Agent loop 的机制；② **外部集成 harness**（integration/）——让外部宿主嵌入 pi-mono 的接入方式；③ **AgentHarness / AgentLane**（agent/04-Harness/4.1）——agent 包内为 session 级操作编排设计的内层骨架契约；v0.86.1 起已有 durable drive 完整实现（不再是 stub），另有平行的 pico3 experimental kernel；④ **`harness/` 本目录对 pi 作为开源 coding harness 的**评价维度**。含义① 和 ③ 容易混淆：前者是"扩展怎么挂上循环"，后者是"循环怎么被宿主驱动"——它们是不同抽象层次。
 >
 > **第三种视角（`harness/`）**：上面两种 harness 是 pi 内部的**能力机制**。此外还有一个评价维度——pi 作为开源 coding harness，**结构优不优秀、好不好扩展、开发有没有纪律、对自己上面的 coding agent 自描述够不够**。这个评价维度放在 [`harness/`](harness/)，它不做机制解剖（引用 `agent/`），只做评价。
 
@@ -125,6 +127,7 @@ pi-mono 里需要严格区分两种 harness：
 | `harness/` | 平台评价 | 结构优不优秀、好不好扩展、开发纪律、自描述 |
 | `extensions/` | 扩充思路 | 极简核 + 靠扩展长能力：核有多小、扩充四轴、扩充套路 |
 | `composition/` | 配置哲学与用户决策 | 从设计哲学到配置决策的完整映射——五层框架、七条轴、AGENTS.md 设计艺术 |
+| `architecture-next/` | 新架构层（v0.85.x–0.86.x 落地） | chord/durable/server/session-backends/pico3：组合运行时、持久化事实层、路由交换机（experimental） |
 | `_change_log/` | 上游同步记录 | 每次 upstream 版本同步的变更摘要和影响评估 |
 
 ## 与同级目录的关系

@@ -1,7 +1,7 @@
 # harness/ — pi 作为 harness 平台的评价层
 
-> **基线**：pi-mono `v0.84.4`（upstream tag `b79e4cc83`，merge `f9a1cf489`），源码锚点对应工作树。本目录是 2026-08-24 新增的评价维度，与 [`agent/`](../agent/)（机制解剖）和 [`integration/`](../integration/)（外部嵌入）并列。
-> v0.84.3 变更：内置工具 7→8（`ToolName` 联合 `tools/index.ts:95`）；`ExtensionAPI` `on()` 重载 34→36（v0.84.4 新增 `ui_prompt_start`/`ui_prompt_end`；注意重载列表含 3 个多行格式——`session_before_switch`/`session_before_compact`/`before_provider_request`——单行 grep 口径会少计 3）；1.4 新增"失败 factory 状态丢弃"护栏（#8424）。v0.84.4 变更：扩展事件新增 `ui_prompt_start`/`ui_prompt_end`（#8355）、runner.ts +52 行（相关锚点已重锚）；本目录相关篇目已同步。
+> **基线**：pi-mono `v0.86.1`（upstream tag `13cbf77df`，merge `b700a07be`，2026-09-21 更新），源码锚点对应工作树。本目录是 2026-08-24 新增的评价维度，与 [`agent/`](../agent/)（机制解剖）和 [`integration/`](../integration/)（外部嵌入）并列。
+> v0.84.3 变更：内置工具 7→8（`ToolName` 联合 `tools/index.ts:95`）；`ExtensionAPI` `on()` 重载 34→36（v0.84.4 新增 `ui_prompt_start`/`ui_prompt_end`；注意重载列表含 3 个多行格式——`session_before_switch`/`session_before_compact`/`before_provider_request`——单行 grep 口径会少计 3）；1.4 新增"失败 factory 状态丢弃"护栏（#8424）。v0.84.4 变更：扩展事件新增 `ui_prompt_start`/`ui_prompt_end`（#8355）、runner.ts +52 行（相关锚点已重锚）；本目录相关篇目已同步。v0.86.1 变更（[`_change_log/0006`](../_change_log/0006-v0.84.4-to-v0.86.1.md)）：`on()` 36→37（`cache_warming_decision`）且全部返回 unsubscribe（#8967）；`AgentHarness` stub 世界被 durable drive 运行时取代（2.3 与 4.1 相关评价已加警示）。
 
 ## 这是什么
 

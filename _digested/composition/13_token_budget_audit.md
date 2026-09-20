@@ -62,6 +62,25 @@ token 成本取决于它挂载的事件和在事件中注入的内容：
 tools 白名单本身不消耗额外 token，只是 agent 的工具选择面增大。
 ```
 
+## Cache warming：token 成本有了"自动对冲"（v0.86.0 新增）
+
+> **警示（v0.85.x–0.86.x，见 `_change_log/0006`）**：本节描述的是新增机制，v0.84.x 没有。
+
+上面所有审计都假设"输入 token 每轮全价或缓存价由 provider 定"。v0.86.0 起 pi 主动管理缓存条目：长 tool run（`streaming` 模式，默认）或空闲期（`idle` 模式）按模型 `promptCache` TTL 定时重放当前 transcript，防止缓存过期导致下一轮全价重付输入。
+
+**成本模型（硬事实，`cache-warmer.ts`）**：
+
+- 刷新时机：TTL 的 **90%** 处，且保留 ≥10s margin（`getCacheWarmingDelayMs`，L29）。
+- 决策阈值：期望节省 **< $0.05 不刷**（`CACHE_WARMING_MINIMUM_EXPECTED_SAVINGS = 0.05`，L20）。
+- 期望节省公式：缓存价 × prompt 大小 × 续聊概率——streaming 期间概率为 1，idle 期间用实测常数 **0.15**（`IDLE_CONTINUATION_PROBABILITY`，L26）。
+- 模型无 `promptCache` 元数据（各 retention tier 的 TTL）则 warming 整体禁用。
+
+**对审计叙事的影响（解释）**：
+
+1. **"输入 token 成本"不再是纯被动**：一个长时间跑工具的会话，旧模型下每次工具返回都可能吃一次全价输入；现在缓存条目被持续续命，输入成本更接近"缓存价 × 轮数"。粗估你的小时级会话成本时应假设 cache-read 占比显著上升。
+2. **warming 本身有成本下限**：每次刷新 = 一次 cache read + 1 output token 的真实付费请求。$0.05 阈值保证只在划算时刷；但空闲会话挂一整晚（idle 模式）会持续产生小额请求——不想付就设 `"cacheWarming": "off"`。
+3. **compaction 预算可按模型调**（`compaction.modelOverrides`，`settings-manager.ts:27/:872`）：压缩触发点和保留窗口决定"压缩前你为多大 context 付缓存/全价 token"。大窗口模型可调高 `reserveTokens`/`keepRecentTokens` 少压缩几轮，小窗口模型反之——这是用 compaction 频率换单轮 token 量的显式旋钮。
+
 ## 审计方法
 
 ### 方法 1：观察 `/compact` 后的 token 量
@@ -107,6 +126,8 @@ pi.on("agent_end", (event, ctx) => {
 - `_faq_on_digested/07/06_field_usage.md` C3（5.3k 裸基准、20k hello-world）
 - pi-mono `.pi/extensions/tps.ts`（token 监控 extension）
 - `_faq_on_digested/07/05_package_ecosystem.md`（头部包的下载量参考，但不是 token 量参考）
+- `packages/coding-agent/src/core/cache-warmer.ts`：阈值（L20）、idle 概率（L26）、刷新时机（L29）
+- `packages/coding-agent/src/core/settings-manager.ts`：`cacheWarming`（L157）、`compaction.modelOverrides`（L27/L872）
 
 ## 最小例证
 

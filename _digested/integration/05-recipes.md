@@ -1,6 +1,6 @@
 # 05 Recipes：按产品形态选接法
 
-> 本文已对照 v0.84.2 复核（2026-08-17）。代码示例中的 API 均按 `@earendil-works/pi-coding-agent`（SDK/RPC）与 `@earendil-works/pi-ai`（模型对象）逐一核对。
+> 本文已对照 v0.86.1 复核。代码示例中的 API 均按 `@earendil-works/pi-coding-agent`（SDK/RPC）与 `@earendil-works/pi-ai`（模型对象）逐一核对。
 
 ## 这张表解决什么问题
 
@@ -336,3 +336,5 @@ class PiAgent:
 2. **多次同时 prompt**：Agent 有队列模式控制，默认 steering `one-at-a-time`（串行）。如果需要同时处理多个 prompt，用多个 AgentSession/RpcClient 实例。
 3. **cwd 不一致**：Agent 的 cwd 决定了它能看到哪些文件。确保 cwd 和宿主预期的项目根目录一致。
 4. **进程不清理**：RPC 子进程在宿主退出时必须 kill（`await client.stop()`；异常路径用 `process.on("exit", ...)` 兜底）。SDK 侧对应 `session.dispose()`。
+5. **自定义 provider（v0.86.0 起）**：pi-ai 的 provider 输入已改为 branded `TranscriptContext`（#9548）——自定义 `StreamFunction` 不能再读 `context.systemPrompt`/`context.tools`，必须用 `getCurrentSystemPrompt()`/`getCurrentTools()` 从 `context.messages` 重放；`ToolCall.arguments`/`ToolResultMessage.details` 只接受 JSON 兼容值。详见 03 的警示与 [`packages/ai/README.md`](../../packages/ai/README.md)。扩展侧想调已配置的模型，直接用 `ctx.modelRegistry.stream()/streamSimple()`（#8964），不用自己管 key。
+6. **报障渠道（v0.86.0 起）**：pi 自带 `/bug [description]`（interactive mode）打包 redact 后的环境/model/extension 元数据生成报告（zip 或上传 Radius gateway），崩溃记入 `~/.pi/agent/crashes.json` 并在下次启动通告。宿主集成遇到问题需要用户提交诊断信息时，可提示走这条路径；自建 harness 的等价物需自己实现。

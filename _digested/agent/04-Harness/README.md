@@ -1,6 +1,6 @@
 # 04-Harness：内部接线层
 
-> **⚠️ v0.84.2 基线（2026-08-17）**：本节从 v0.75.3 语义进化，多处描述需以 4.1 的 v0.84.2 复核为准。核心变化：**`AgentHarness` 已在 v0.83/v0.84 两次重构**——v0.83 加泛型 `TContext`、v0.84 又移除并去泛型化为 `AgentLane` 骨架。在 v0.84.2 里 `AgentHarness` **是一个 stub/骨架**：绝大多数操作抛 `HarnessNotImplemented`（`prompt`/`skill`/`compact` 等经 `unavailable()` reject）、`create()` 对非空 session 抛错、hooks/events 由 `UnavailableRegistry` 直接 throw，真正可跑的行为在 `AgentSession` / SDK。下方"一句话总览"已按 4.1 修正，不再把 AgentHarness 描述成完整运作层。
+> **⚠️ v0.84.2 基线（2026-08-17；v0.86.1 增补）**：本节从 v0.75.3 语义进化，多处描述需以 4.1 的复核为准。核心变化：**`AgentHarness` 已在 v0.83/v0.84 两次重构**——v0.83 加泛型 `TContext`、v0.84 又移除并去泛型化为 `AgentLane` 骨架。在 v0.84.2 里 `AgentHarness` **是一个 stub/骨架**：绝大多数操作抛 `HarnessNotImplemented`（`prompt`/`skill`/`compact` 等经 `unavailable()` reject）、`create()` 对非空 session 抛错、hooks/events 由 `UnavailableRegistry` 直接 throw，真正可跑的行为在 `AgentSession` / SDK。**v0.86.1 更正（`_change_log/0006`）**：v0.85.x–0.86.x 的 WP00–WP09 已把这套骨架填成完整的 **durable drive 运行时**——`HarnessNotImplemented` 删除（剩 `SliceNotImplemented`，仅个别 slice），`prompt`/`skill`/`compact`/`abort` 等均为持久化操作的真实实现（见 4.1 重写版）。下方"一句话总览"已按 4.1 修正，不再把 AgentHarness 描述成完整运作层。
 >
 > 关于本目录标题里的 "harness"：它是顶层 README 四种含义里的 **① 内部能力 harness**（扩展/Skill/工具如何进入 agent loop），**不是** ③ 的 `AgentHarness` 类。二者抽象层次不同，勿混淆。
 
@@ -40,7 +40,7 @@
 
 ## 一句话总览
 
-`Agent` 是裸循环（接收 messages，调用 LLM，执行 tool calls，产生 events）。在 v0.83/v0.84 里曾有一个 `AgentHarness` 想在它上面加 **session 持久化**（每次 turn 写回 session tree）、**typed hooks**（`on(type, handler)` 拦截/修改能力行为）、**高级方法**（`compact()`、`navigateTree()`、`skill()`）——**但这些在 v0.84.2 都是 stub**（多数抛 `HarnessNotImplemented`，见 4.1）。真正把这些能力做出来的是 **`AgentSession`**：extension runner、resource loader、auto-compaction、retry，全部可用。
+`Agent` 是裸循环（接收 messages，调用 LLM，执行 tool calls，产生 events）。在 v0.83/v0.84 里曾有一个 `AgentHarness` 想在它上面加 **session 持久化**（每次 turn 写回 session tree）、**typed hooks**（`on(type, handler)` 拦截/修改能力行为）、**高级方法**（`compact()`、`navigateTree()`、`skill()`）——**这些在 v0.84.2 还是 stub**（多数抛 `HarnessNotImplemented`，见 4.1）。真正把这些能力做出来的是 **`AgentSession`**：extension runner、resource loader、auto-compaction、retry，全部可用。**v0.86.1 更正（`_change_log/0006`）**：v0.85.x–0.86.x 起 `AgentHarness` 自身的 durable drive 运行时（`Harness`/`Lane`/`driveOperation`）也把这些方法做成了持久化、可恢复的真实实现——现在有两层完整实现：agent 包的 runtime（偏实验）与 coding-agent 的 `AgentSession`（产品主路径），见 4.1。
 
 可以理解为：`AgentHarness` 是"设计好的骨架契约"，`AgentSession` 是"把它实现出来的 live orchestrator"：
 

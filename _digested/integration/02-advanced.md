@@ -1,6 +1,6 @@
 # 02 进阶：架构、协议和设计原理
 
-> 本文已对照 v0.84.2 复核（2026-08-17）。
+> 本文已对照 v0.86.1 复核。
 
 ## 前提
 
@@ -138,7 +138,9 @@ stdout 上有两类 JSONL 消息：
 - **没有 `ended` 消息**。一轮 prompt 的完成信号是 `{"type":"event","event":{"type":"agent_settled"}}`（`RpcClient.waitForIdle()`/`collectEvents()` 靠它判断）。
 - `extension_ui_request`（stdout）与 `extension_ui_response`（stdin）：extension 需要宿主代答的 UI 请求（select/confirm/input/editor/notify/setStatus/setWidget/setTitle/set_editor_text），宿主以 `extension_ui_response` 回复。
 
-**v0.84.4 行为备注**（宿主可感知，均无 API 变化）：① `persist` 模型默认时若带非空 `--models` scope，该 model 会同时追加进 scope 与 enabledModels（agent-session.ts:1679，见 03）；② 运行中扩展自定义消息延迟到 `turn_end` 后追加，`message_start`/`message_end` 相应推迟（见 04）；③ 上一轮 session 文件若末行无换行符，读入时自动补 `\n` 修复（session-manager.ts:555，#8345）——宿主直接读 session JSONL 时遇到残尾可按此处理。
+**v0.84.4 行为备注**（宿主可感知，均无 API 变化）：① `persist` 模型默认时若带非空 `--models` scope，该 model 会同时追加进 scope 与 enabledModels（agent-session.ts:1823，见 03）；② 运行中扩展自定义消息延迟到 `turn_end` 后追加，`message_start`/`message_end` 相应推迟（见 04）；③ 上一轮 session 文件若末行无换行符，读入时自动补 `\n` 修复（session-manager.ts:579，#8345）——宿主直接读 session JSONL 时遇到残尾可按此处理。
+
+**v0.86.0 行为备注**：① `steer` / `follow_up` RPC 命令不再绕过扩展——所有 queued 消息（含 direct RPC）都走扩展 `input` 事件管线（transform/handled 语义生效，#8718；`agent-session.ts:253-259` `PromptOptions.streamingBehavior` + `source`，emitInput 调用点 agent-session.ts:1277）。如果宿主依赖"RPC 注入的输入不触发扩展 handler"的旧行为，需要重新评估。② 扩展的 `user_bash` hook 从 fail-open 改为 **fail-closed**（`runner.ts:1056-1085`）：handler 抛错或返回非法结果时命令直接中止（不回退本地执行、不调用后续 handler），**只有返回 `undefined` 才放行**到下一 handler / 本地 shell——宿主若自带扩展宿主实现，需对齐这个语义，否则拦截类扩展可能被绕过。
 
 ## 远程/server 形态：protocol / client / server 三件套（experimental）
 

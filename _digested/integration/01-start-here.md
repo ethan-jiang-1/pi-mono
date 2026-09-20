@@ -25,8 +25,10 @@ pi-coding-agent   ← 完整产品层（`@earendil-works/pi-coding-agent`）。S
 
 - **SDK**：[`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) — `createAgentSession()` 工厂。
 - **AgentSession**：[`packages/coding-agent/src/core/agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) — 核心编排器，封装 prompt、compaction、bash、event 订阅、session 切换。
-- **RPC**：[`packages/coding-agent/src/modes/rpc/rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) — 33 个命令（v0.84.4 起，新增 `clear_queue`）的 JSONL 协议（`RpcCommand` union，rpc-types.ts:20）。
+- **RPC**：[`packages/coding-agent/src/modes/rpc/rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) — 33 个命令（v0.84.4 起，新增 `clear_queue`；v0.86.1 复核仍为 33 个）的 JSONL 协议（`RpcCommand` union，rpc-types.ts:20）。
 - **SessionManager**：[`packages/coding-agent/src/core/session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts) — JSONL 持久化和 session 树管理。
+
+> **警示（v0.85.x–0.86.x 新增面，详见 06）**：runtime 侧新增 prompt cache warming（`cacheWarming` setting，扩展可经 `cache_warming_decision` 事件干预）、`/bug` 报告系统、Radius 离线模型 catalog、Meta Muse provider、per-model compaction budgets（`compaction.modelOverrides`）、`compat.allowedFallbackModels`。这些均不改变 SDK/RPC 的基本接线方式，但成本/模型目录相关的集成需要知道。
 
 ## 第一版接入应该怎么想
 

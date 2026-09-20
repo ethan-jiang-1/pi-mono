@@ -1,6 +1,6 @@
 # composition/ — Pi 的组装哲学与通用配置框架
 
-> **基线**：pi-mono `v0.84.4`。本维度是 2026-09-03 新增的第六个分析维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`extensions/`](../extensions/)（扩充思路）、[`integration/`](../integration/)（外部嵌入）、[`_change_log/`](../_change_log/)（版本追踪）并列。
+> **基线**：pi-mono `v0.86.1`（2026-09-21 更新，见 [`_change_log/0006`](../_change_log/0006-v0.84.4-to-v0.86.1.md)）。本维度是 2026-09-03 新增的第六个分析维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`extensions/`](../extensions/)（扩充思路）、[`integration/`](../integration/)（外部嵌入）、[`_change_log/`](../_change_log/)（版本追踪）并列。
 >
 > 它的主题不是"怎么运转"，而是"运转起来之后，作为用户应该怎么理解和配置它"。
 

@@ -4,7 +4,7 @@
 
 简单说：**一子目录 = 一个探究过的问题，答案是自己综合出来的，不是从某一份材料里直接抄的。**
 
-> **当前研究基线**：涉及运行时行为的结论以 pi-mono `v0.84.4`（upstream tag `b79e4cc83`，2026-09-01 已 merge 进本仓库）为准；旧版本仅用于变更史解释，不能替代当前源码验证。
+> **当前研究基线**：涉及运行时行为的结论以 pi-mono `v0.86.1`（upstream tag `13cbf77df`，2026-09-21 已 merge 进本仓库）为准；旧版本仅用于变更史解释，不能替代当前源码验证。**注意**：基线声明已随 sync-0006 更新，但本目录各篇结论尚未针对 v0.85.x–0.86.x（durable drive、TranscriptContext、chord/durable 等）重新研究——阅读时先对照 [`_digested/_change_log/0006-v0.84.4-to-v0.86.1.md`](../_digested/_change_log/0006-v0.84.4-to-v0.86.1.md) 的影响评估。
 
 ## 和 `_digested/` 的区别
 

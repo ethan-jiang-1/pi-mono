@@ -108,12 +108,26 @@ pi -c "read PROGRESS.md and continue with the next uncompleted feature"
 
 这两条路径说明：**文件模式和内置 UI 之间不是二选一——文件是持久层，UI 是交互层。** TODO.md 在磁盘上，rpiv-todo 在 TUI 里展示它；PLAN.md 在磁盘上，plannotator 在浏览器里批注它。
 
+## 会话文件的 UI 面（v0.85.x–0.86.x 更新）
+
+> **警示（v0.85.x–0.86.x，见 `_change_log/0006`）**：会话列表与查找行为在本周期有明显变化，涉及 session picker、`--continue`、精确 ID 查找三个入口。
+
+**session picker 渐进加载（硬事实）**：`listSessions()` 新增 `onProgress` 回调（`session-manager.ts:854`、`:876`）——目录扫描按文件 mtime 降序排（`:667-668`），边读 transcript 边增量发布 partial 结果，`signal` 可取消剩余读取；UI 侧（`session-selector.ts`）随之增量渲染。效果是 `--resume` 打开 picker 时**最新的会话先出现**，不必等整个目录读完。
+
+**`--continue` 与精确 ID 查找**：`readSessionHeader()`（`session-manager.ts:596`）只读文件头部就能判断一个文件是不是目标 session。`--continue` 沿 mtime 序读到**第一个（即最新）匹配 cwd 的 header 就停**，不再继续扫；给定精确 session ID 的查找同样只对每个候选文件读 header（#9601），不碰 transcript 正文。大 session 目录下两者的启动成本从"全目录正文扫描"降到"header 序列扫描"。
+
+**`/bug` 与 crashes.json（新 UI 面）**：`/bug [description]`（`interactive-mode.ts:3085`）打包环境/model/provider/extension/settings 元数据（secrets 逐一 redact）+ 诊断 + 可选 transcript，上传 Radius gateway 或导出 zip，报告 id 以 `pi.bug-report` custom entry 记进 session。崩溃写入 `~/.pi/agent/crashes.json`（`crash-log.ts:20`，最多 5 条、7 天过期），下次启动一次性通告并随下份报告自动附带。这是"文件即 UI"哲学的边界示例：**诊断面不走用户可编辑的文件**——crashes.json 是机器写的崩溃 ring buffer，不是共享状态文件。
+
 ## 锚点
 
 - `_faq_on_digested/07/02_scenario_playbook.md` A2（PLAN.md 标准流程）
 - `_faq_on_digested/07/06_field_usage.md` C2（`.scratch/` + `n2c:` 标注回路）
 - `_faq_on_digested/07/07_cross_harness.md` #7（长任务配方）
 - `_faq_on_digested/07/05_package_ecosystem.md`（rpiv-todo、plannotator）
+- `packages/coding-agent/src/core/session-manager.ts`：mtime 排序（L667-668）、`readSessionHeader`（L596）、`listSessions` 渐进回调（L854/L876）
+- `packages/coding-agent/src/modes/interactive/interactive-mode.ts`：`/bug` 入口（L3085）
+- `packages/coding-agent/src/core/crash-log.ts`：`~/.pi/agent/crashes.json`（L20）
+- `packages/coding-agent/src/core/bug-report.ts`：redact 与 `pi.bug-report` custom entry
 
 ## 最小例证
 

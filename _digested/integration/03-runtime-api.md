@@ -36,7 +36,7 @@ const { session } = await createAgentSession({  // 返回 { session, extensionsR
 })
 ```
 
-`CreateAgentSessionOptions` 定义在 [`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts)（sdk.ts:38）。返回 `{ session, extensionsResult, modelFallbackMessage? }`（sdk.ts:90-97），要解构出 `session`。v0.75.3→v0.83.0 的重要变化：**`modelRuntime` 替代了旧的 `authStorage` + `modelRegistry`**（`ModelRegistry` 仍在，但已降级为暴露给 extension 的同步 facade，见 [`agent/05-Infra/5.2_AI_Auth_Subsystem.md`](../agent/05-Infra/5.2_AI_Auth_Subsystem.md)）；新增 `scopedModels`、`excludeTools`、`sessionStartEvent`。
+`CreateAgentSessionOptions` 定义在 [`packages/coding-agent/src/core/sdk.ts`](../../packages/coding-agent/src/core/sdk.ts)（sdk.ts:41）。返回 `{ session, extensionsResult, modelFallbackMessage? }`（sdk.ts:96-99），要解构出 `session`。v0.75.3→v0.83.0 的重要变化：**`modelRuntime` 替代了旧的 `authStorage` + `modelRegistry`**（`ModelRegistry` 仍在，但已降级为暴露给 extension 的同步 facade，见 [`agent/05-Infra/5.2_AI_Auth_Subsystem.md`](../agent/05-Infra/5.2_AI_Auth_Subsystem.md)）；新增 `scopedModels`、`excludeTools`、`sessionStartEvent`。
 
 ### 发送 prompt
 
@@ -54,12 +54,12 @@ await session.followUp("also add tests for the edge case we discussed")
 await session.abort()
 ```
 
-（旧版文档说 prompt 返回含 `messageId`/`turnId` 的结果——v0.84.2 的 `AgentSession.prompt()` 签名是 `Promise<void>`（agent-session.ts:1160），不返回这些；消息 id 从 `message_start`/`message_end` 事件里拿。）
+（旧版文档说 prompt 返回含 `messageId`/`turnId` 的结果——v0.86.1 的 `AgentSession.prompt()` 签名是 `Promise<void>`（agent-session.ts:1296），不返回这些；消息 id 从 `message_start`/`message_end` 事件里拿。）
 
 ### 订阅事件
 
 ```ts
-// 订阅：AgentSession.subscribe(listener)（agent-session.ts:858），返回取消函数；
+// 订阅：AgentSession.subscribe(listener)（agent-session.ts:893），返回取消函数；
 // 注意没有 EventEmitter 风格的 .on("event", ...)。SDK 订阅拿到的是完整 AgentSessionEvent
 // （message_update 带累积 message）；JSON/RPC wire 上会被 toJsonEvent() 裁成纯 delta。
 session.subscribe((event: AgentSessionEvent) => {
@@ -109,37 +109,37 @@ session.subscribe((event: AgentSessionEvent) => {
 
 ### session 管理操作
 
-> 方法名已对照 v0.84.4 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:2976`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork 在 `session.sessionManager` 上（RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:616-631）。
+> 方法名已对照 v0.86.1 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:3125`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork 在 `session.sessionManager` 上（RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:616-631）。
 
 ```ts
 // Compaction
-await session.compact()                      // agent-session.ts:1940
+await session.compact()                      // agent-session.ts:2089
 await session.setAutoCompactionEnabled(true) // 注意：不是 setAutoCompaction
-await session.abortBranchSummary()           // 取消 branch summary（agent-session.ts:2101）
+await session.abortBranchSummary()           // 取消 branch summary（agent-session.ts:2258）
 
 // Session 树
 await session.sessionManager.fork(entryId)   // SDK 层 fork 在 SessionManager 上
 await session.sessionManager.fork(session.sessionManager.getLeafId(), { position: "at" }) // 等价 RPC clone
 await session.sessionManager.switchSession(sessionPath)   // 等价 RPC switch_session
-session.setSessionName("auth-fix")          // 命名 session（agent-session.ts:3084）
+session.setSessionName("auth-fix")          // 命名 session（agent-session.ts:3233）
 
 // 查询
-const stats = await session.getSessionStats()     // tokens, 消息数（agent-session.ts:3323）
-const msgs = session.messages                     // getter：消息列表（agent-session.ts:998），无 getMessages()
-const text = session.getLastAssistantText()       // 最后 assistant 文本（agent-session.ts:3465）
-const usage = session.getContextUsage()            // context 窗口使用情况（agent-session.ts:3375）
-const forkMsgs = session.getUserMessagesForForking() // fork 候选消息（agent-session.ts:3301）
-void session.prompt(text, { images, streamingBehavior: "steer" })  // PromptOptions（agent-session.ts:243）
+const stats = await session.getSessionStats()     // tokens, 消息数（agent-session.ts:3479）
+const msgs = session.messages                     // getter：消息列表（agent-session.ts:1045），无 getMessages()
+const text = session.getLastAssistantText()       // 最后 assistant 文本（agent-session.ts:3648）
+const usage = session.getContextUsage()            // context 窗口使用情况（agent-session.ts:3533）
+const forkMsgs = session.getUserMessagesForForking() // fork 候选消息（agent-session.ts:3457）
+void session.prompt(text, { images, streamingBehavior: "steer" })  // PromptOptions（agent-session.ts:253）
 
 // 队列
-const cleared = session.clearQueue()         // v0.84.4 新增（agent-session.ts:1588）：清空 steering/followUp，返回被清掉的文本
+const cleared = session.clearQueue()         // v0.84.4 新增（agent-session.ts:1727）：清空 steering/followUp，返回被清掉的文本
 
 // 导出
 await session.exportToHtml({ outputPath: "/tmp/session.html" }) // 实际方法名 exportToHtml
-await session.exportToJsonl("/tmp/session.jsonl")  // 返回 string（agent-session.ts:3452）
+await session.exportToJsonl("/tmp/session.jsonl")  // 返回 string（agent-session.ts:3610）
 
 // Bash 直接执行
-const bashResult = await session.executeBash("npm test")  // 方法名是 executeBash，不是 bash（agent-session.ts:2976）
+const bashResult = await session.executeBash("npm test")  // 方法名是 executeBash，不是 bash（agent-session.ts:3125）
 
 // 工具管理
 const allTools = session.getAllTools()            // 所有已注册工具
@@ -155,7 +155,7 @@ session.setScopedModels([                         // 设置模型轮换范围（
 session.hasExtensionHandlers("project_trust")     // 检查扩展是否处理某事件（v0.83.0 新增）
 
 // 收尾
-session.dispose()                                  // 取消所有运行 + 断开 agent + 清空 listeners（agent-session.ts:882）
+session.dispose()                                  // 取消所有运行 + 断开 agent + 清空 listeners（agent-session.ts:917）
 ```
 
 （再核对一次：SDK 侧事件用 `session.subscribe()`；模型读取用 `session.state`/`session.model`/`session.thinkingLevel` getter；所有"方法级"列举以上面注释的行号为准。）
@@ -238,7 +238,7 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 
 ```
 → {"type":"get_available_models"}
-← {"type":"response","command":"get_available_models","success":true,"data":{"models":[{"provider":"anthropic","id":"claude-sonnet-4-6","contextWindow":200000,"reasoning":true},...]}}  // 实际包在 data.models（rpc-mode.ts:488）
+← {"type":"response","command":"get_available_models","success":true,"data":{"models":[{"provider":"anthropic","id":"claude-sonnet-4-6","contextWindow":200000,"reasoning":true},...]}}  // 实际包在 data.models（rpc-mode.ts:490-492）
 
 → {"type":"set_model","provider":"openai","modelId":"gpt-5"}
 → {"type":"cycle_model"}
@@ -250,7 +250,21 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 
 **v0.84.3 语义**：SDK 的 `setModel(model, { persist })` / `cycleModel` / `setThinkingLevel(level, { persist })` / `cycleThinkingLevel` 接受 `ModelMutationOptions { persist?: boolean }`（agent-session.ts:257），**默认只在 session 内生效**，`persist: true` 才写入全局默认（`ctrl+s` 走这条路径）。RPC 的 `set_model` / `set_thinking_level` 不传 `persist`，因此 v0.84.3 起**不再更新全局默认**。默认思考深度解析顺序改为 **per-model 覆盖（`modelThinkingLevels` setting）→ 全局默认**。
 
-**v0.84.4 补充**：`persist: true` 且本次会话带非空 `--models` scope 时，还会把该 model **追加进 scope 与 enabledModels**（`_addPersistedDefaultToNonEmptyScope`，agent-session.ts:1679；调用点 :1668/:1735/:1770）——persist 的默认模型不会落在 scope 之外变得不可达。
+**v0.84.4 补充**：`persist: true` 且本次会话带非空 `--models` scope 时，还会把该 model **追加进 scope 与 enabledModels**（`_addPersistedDefaultToNonEmptyScope`，agent-session.ts:1823；调用点 :1812/:1879/:1914）——persist 的默认模型不会落在 scope 之外变得不可达。
+
+> **警示（v0.85.x–0.86.x，Breaking B1/B2，#9548）**：pi-ai 的 provider stream 输入从 `Context` 改为 branded 的 `TranscriptContext`（`packages/ai/src/types.ts:631`）。自定义 provider **不再能读 `context.systemPrompt` / `context.tools`**——system prompt 与工具声明现在是 transcript 内的 SystemMessage 流水，必须从 `context.messages` 用 `getCurrentSystemPrompt()`（`packages/ai/src/utils/transcript.ts:99`）与 `getCurrentTools()`（transcript.ts:58）重放；`normalizeContext()`（transcript.ts:30）会把旧式 `Context` 折叠成一条 leading `SystemMessage`。同时 `ToolCall.arguments` / `ToolResultMessage.details` 收紧为 JSON 兼容值，`ToolResultMessage` 是 conditional type（ai/types.ts:539-551）——含 `undefined`/函数/类实例的 details 直接编译失败（session/transcript 必须可无损 JSONL 序列化）。旧示例代码照抄会过不了类型检查。
+
+### 扩展侧调模型：ctx.modelRegistry（#8964）
+
+扩展里不用自己解析 API key——`ctx.modelRegistry` 暴露带 request-time auth 的流式入口（`packages/coding-agent/src/core/model-registry.ts:107-116`）：
+
+```ts
+// extension 内
+const stream = ctx.modelRegistry.stream(model, context)        // 完整 StreamOptions
+const stream2 = ctx.modelRegistry.streamSimple(model, context) // provider 中立 options
+```
+
+两者直接委托 `ModelRuntime`，走已配置 provider 的认证路径；custom provider 也可注册后从扩展流式（#9272）。
 
 ### compaction
 
@@ -295,7 +309,7 @@ steer 不会新起 turn，而是在当前 turn 内注入修正指令。
 ```
 → {"type":"bash","command":"npm test","excludeFromContext":false}  // excludeFromContext v0.83.0 新增
 ← {"type":"event","event":{"type":"bash_execution_update","delta":"..."}}
-← {"type":"response","command":"bash","success":true,"data":{"exitCode":0,"output":"...","cancelled":false,...}}  // BashResult 在 data 字段（rpc-mode.ts:579）
+← {"type":"response","command":"bash","success":true,"data":{"exitCode":0,"output":"...","cancelled":false,...}}  // BashResult 在 data 字段（rpc-mode.ts:583）
 → {"type":"abort_bash"}
 ```
 

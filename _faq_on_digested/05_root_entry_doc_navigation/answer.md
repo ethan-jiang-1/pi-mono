@@ -41,8 +41,8 @@
 ### 3. 回收（recycle）：compaction + read 闸门
 
 - **compaction**：手动 `/compact` 或自动（threshold / overflow）压缩上下文，回收超预算（`packages/agent/src/harness/compaction/`）。
-- **read 闸门**：没有 read 工具时 `<available_skills>` 整块不生成（`system-prompt.ts:155`）——不给模型一个"能看列表但读不了"的空承诺。
-- **工具闸门**：`Available tools` 只列有 `promptSnippet` 的工具，无 snippet 的工具仍可用但不上 prompt（`system-prompt.ts:80-84`）。
+- **read 闸门**：没有 read 工具时 `<available_skills>` 整块不生成（`system-prompt.ts:161-165`，v0.86.1 重锚）——不给模型一个"能看列表但读不了"的空承诺。
+- **工具闸门**：`Available tools` 只列有 `promptSnippet` 的工具，无 snippet 的工具仍可用但不上 prompt（`system-prompt.ts:149-151` 的 `visibleTools` 过滤 + `agent-session.ts:2845` 的 snippet 归一；v0.86.1 重锚）。
 
 ---
 

@@ -1,8 +1,8 @@
-# 02-Expansion — 扩充（extension）的四条轴
+# 02-Expansion — 扩充（extension）的四条代码轴 + 一条资源轴
 
-> 本节回答 `extensions/` 的核心问题：**核那么小，能力是怎么长出来的。** 读完 `examples/extensions/` 70+ 个示例，可以归纳成四条扩充轴——不是按 README 的九类（Lifecycle / Tools / UI / Git / …）切，而是按"扩充发生在循环的哪里、注入的是什么"切。前者是目录排版，后者才是扩充思路。
+> 本节回答 `extensions/` 的核心问题：**核那么小，能力是怎么长出来的。** 读完 `examples/extensions/` 70+ 个示例，可以归纳成四条代码扩充轴——不是按 README 的九类（Lifecycle / Tools / UI / Git / …）切，而是按"扩充发生在循环的哪里、注入的是什么"切。前者是目录排版，后者才是扩充思路。第五篇 [2.5](./2.5_declarative_resources.md) 补上**不写代码的声明式资源轴**（skills / prompt templates / themes / agent 定义）。
 
-## 四条轴
+## 四条代码轴
 
 扩充不是"随便加东西"，而是**沿着循环的既定接缝、以四种不同的动作展开**：
 
@@ -12,6 +12,8 @@
 | [2.2 注册面 / register surface](./2.2_register_surface.md) | **注册（register）** 新东西进循环 | 注册新工具、命令、快捷键、CLI flag、provider、skill/prompt/theme 资源 | [2.2_register_surface.svg](figures/2.2_register_surface.svg) |
 | [2.3 长相 / presentation](./2.3_presentation.md) | **改变循环的显示（render）** | 覆盖工具渲染、消息/条目渲染、footer/header/editor/overlay | [2.3_slot_orthogonality.svg](figures/2.3_slot_orthogonality.svg) |
 | [2.4 持久化 / persistence](./2.4_persistence.md) | **让扩充活过重启与分支（persist）** | 用 `details` / `appendEntry` / session 树重建，把扩展状态绑进 session | [2.4_branch_replay.svg](figures/2.4_branch_replay.svg) |
+
+第五条不是代码轴：[2.5 声明式资源轴](./2.5_declarative_resources.md)——skills / prompt templates / themes / agent 定义，**不写代码的扩充**，与代码轴共享发现、打包、分发机制，是生态广度（非程序员可发布）的主要来源。
 
 ## 为什么这四条轴能把 70+ 示例装下
 

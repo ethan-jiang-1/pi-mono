@@ -4,6 +4,13 @@
 >
 > 本篇回答的问题与前三子目录不同：01-Core 讲"核有多小"、02-Expansion 讲"怎么扩"、03-Patterns 讲"套路怎么成立"，本篇讲**按这套思路长出来的生态现在长什么样、upstream 管不管、往哪儿发展**。
 
+## 子篇
+
+| 篇 | 内容 |
+|----|------|
+| [1_package_protocol.md](./1_package_protocol.md) | 协议层详解：三种 source 的 pin/reconcile 语义、manifest 与发现、依赖隔离规则（独立模块根）、过滤/启停/作用域、安全立场 |
+| [2_case_studies.md](./2_case_studies.md) | 头部包解剖：pi-mcp-adapter（MCP 代理工具 + 搜索激活直通）与 pi-subagents（声明式 agent 舰队 + 后台 runner）如何组合 2.x 各轴，以及"单工具面 + 目录发现"的生态范式 |
+
 ## 一句话结论
 
 upstream 的治理边界画得很清楚：**管协议，不管内容**。包格式、安装器、目录聚合（pi.dev/packages）、举报通道是官方建的"公路系统"；但 npm 上自由发布、无审批、无质量分层、安全完全免责。生态侧已经用 5300+ 包把 core 故意留白的功能全部补齐——而且经常是多个竞争实现并存的自由市场形态。
@@ -16,11 +23,11 @@ upstream 的治理边界画得很清楚：**管协议，不管内容**。包格�
 |------|------|------|
 | 包格式 | extension/skill/prompt template/theme 四类资源，`package.json` 的 `pi` manifest 或约定目录 | docs/packages.md:118-160 |
 | 分发渠道 | `pi install npm:@foo/bar@1.0.0` / `git:github.com/user/repo@v1` / 裸 URL / 本地路径；版本化 spec 被 pin | docs/packages.md:13-18 |
-| 安装位置 | 用户级 `~/.pi/agent/npm/`，项目级 `.pi/npm/`（项目包随 project trust 自动装） | docs/packages.md:31-33 |
-| 试用 | `pi -e npm:@foo/bar` 临时安装，仅当次运行有效 | docs/packages.md:38-41 |
-| **官方目录** | npm keyword **`pi-package`** → 自动出现在 [pi.dev/packages](https://pi.dev/packages) 画廊（Most downloads / Recently published 排序），可附 video/image 预览 | docs/packages.md:118/137-142 |
+| 安装位置 | 用户级 `~/.pi/agent/npm/`，项目级 `.pi/npm/`（项目包随 project trust 自动装） | docs/packages.md:43 |
+| 试用 | `pi -e npm:@foo/bar` 临时安装，仅当次运行有效 | docs/packages.md:45-47 |
+| **官方目录** | npm keyword **`pi-package`** → 自动出现在 [pi.dev/packages](https://pi.dev/packages) 画廊（Most downloads / Recently published 排序），可附 video/image 预览 | docs/packages.md:118/135-154 |
 | 治理通道 | 每个包页有 `report` 链接 → upstream 仓库的 `package-report.yml` issue 模板 + `package-report` label——**举报驱动下架，不是审批准入** | pi.dev/packages 每个包卡片 |
-| 安全立场 | 明文警告"包以**完全系统权限**运行；安装前自审源码"——责任转移给用户 | docs/packages.md:8-9 |
+| 安全立场 | 明文警告"包以**完全系统权限**运行；安装前自审源码"——责任转移给用户 | docs/packages.md:20 |
 | 标准兼容 | skills 遵循 [Agent Skills 标准](https://agentskills.io)（跨 harness 的开放标准），不发明私有格式 | README.md:358 |
 | 社区广场 | 官方 Discord（README:7 badge） | README.md:7 |
 

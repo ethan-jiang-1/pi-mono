@@ -89,7 +89,7 @@ pi-mono 里需要严格区分两种 harness：
 
 - 想理解 Agent 内核和消息循环：[`agent/`](agent/)
 - 想理解外部宿主怎么接：[`integration/`](integration/)
-- 想理解"极简核 + 靠扩展长能力"的扩充思路：[`extensions/`](extensions/)（核有多小 / 扩充四轴 / 扩充套路）
+- 想理解"极简核 + 靠扩展长能力"的扩充思路：[`extensions/`](extensions/)（核有多小 / 扩充四轴 / 扩充套路 / 生态与治理）
 - 想理解扩展系统怎么注入能力：`agent/01-Anatomy/1.4_Extension_System.md`
 - 想理解工具怎么注册、怎么执行：`agent/01-Anatomy/1.3_Tool_Registry.md`
 - 想理解 Agent 内层 harness 骨架（AgentLane 契约、AgentHarness 骨架、它在 library-first 中的角色）：`agent/04-Harness/4.1_AgentHarness.md`

@@ -17,11 +17,12 @@ pi 的 README 自己把立场说得很白：
 
 > "**pi's core is minimal.** If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected."
 
-把这些句子翻成结构事实，就是本目录的三个子议题：
+把这些句子翻成结构事实，就是本目录的四个子议题：
 
 1. **核有多小**（[`01-Core/`](01-Core/)）——核里只剩"跑循环的引擎 + 8 个摸文件/跑命令的最小工具 + 扩展系统这个骨架本身"。连 plan-mode、subagent 这种别的 coding harness 几乎必内置的功能，都被**故意不做**，放进了 `examples/extensions/`。
 2. **扩充怎么发生**（[`02-Expansion/`](02-Expansion/)）——读完 70+ 个示例归纳出来的四条扩充轴：沿着 agent loop 的接缝拦截改写、往循环里注册新东西、改变循环的长相、让扩充活过重启。
 3. **扩充靠什么套路成立**（[`03-Patterns/`](03-Patterns/)）——一个工厂函数、覆盖与复用、安全护栏。这是"极简核能长期不膨胀、又敢挂第三方代码"的原因。
+4. **核外长出了什么、谁在管**（[`04-Ecosystem/`](04-Ecosystem/)）——官方包协议（`pi install`、npm `pi-package` keyword、pi.dev 目录、举报制治理）与生态快照：5300+ 包、core 留白功能全部被第三方补齐且多实现竞争（2026-09-21 快照）。
 
 ## 先建立一张心理图
 
@@ -80,6 +81,7 @@ session ──► input ──► before_agent_start ──► ┌─ agent loop
 1. 先读 [`01-Core/`](01-Core/)：建立"核到底有多小、判据是什么"的基准。
 2. 再读 [`02-Expansion/`](02-Expansion/)：四条扩充轴，每条都有具体示例锚点。这是本目录的主体。
 3. 最后读 [`03-Patterns/`](03-Patterns/)：这些扩充为什么能既安全又便宜地成立。
+4. 想看"这套思路跑起来之后世界长什么样"：[`04-Ecosystem/`](04-Ecosystem/)——官方包协议 + 生态快照 + 治理模式（数据带快照日期）。
 
 ## 写作定调
 

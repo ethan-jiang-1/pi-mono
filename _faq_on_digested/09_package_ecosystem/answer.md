@@ -23,6 +23,7 @@
 | [5-community.md](5-community.md) | 平台底盘、扩展 API 面、策展层、社区痛点 | [layers.svg](svg/layers.svg) |
 | [6-gaps.md](6-gaps.md) | 8 个空位：现状证据 → 为什么空 → 做成什么样 | — |
 | [7-method.md](7-method.md) | 抓取/分类方法、数字口径、局限 | — |
+| [8-install-shortlist.md](8-install-shortlist.md) | **选装菜单**：20 个包编号 + P0/P1/P2 分档 + 预设组合，按号安装 | — |
 
 ## 一张图记住结论
 

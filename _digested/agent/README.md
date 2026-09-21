@@ -1,13 +1,10 @@
 # pi-mono Agent 架构手册
 
-> **⚠️ v0.85.1 基线（2026-09-10）**：本仓库代码已同步到 v0.85.1（tag `d981de122`，merge `e3aa42f46`），源码锚点对应工作树。这一轮是 v0.84.2 之后的**第二次架构换代**，有两层地基被同时换掉：
+> **⚠️ v0.84.3 基线（2026-08-25）**：本仓库代码已同步到 v0.84.3（tag `4e58f324f`，merge `6f8312a52`），源码锚点对应工作树。v0.84.0 重点变化：① **session v4**——agent 包 session 模型整体重写（lane-based，旧 JSONL/in-memory repo API 删除），新专题 [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md)；② **`AgentHarness` 去泛型化重设计为 `AgentLane` 骨架**（多数操作 `HarnessNotImplemented`），4.1 已按 v0.84.2 完全重写；③ `FileSystem.renameFile()` 变必需；④ `message_update` wire 事件改纯 delta；⑤ auth 一批 breaking（见 5.2 警示）。v0.84.3 为渐进迭代（PowerShell 工具、compaction 加固、jiti 四模式等），各篇顶部已补 v0.84.3 警示。
 >
-> ① **session 的 durable 表示法整体换模型**——`Entry` 7→**4** 种、`LaneRecord` 9 种**整体删除**、`Facts` 与三种 change entry 收进 bound values、**全局严格连续 seq 校验随 `session/state.ts` 一并删除**。这是换表示法不是重构。[3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md) 已整体重写。**v0.84 时代写"lane-based record log"的段落全部失效。**
-> ② **`AgentHarness` 从骨架变成真实现**——`Drive` + effect gate + 13 个扁平 durable `OperationState`，`HarnessNotImplemented` 在源码里**零命中**，仅剩 `watchSession` 一个 stub。[4.1_AgentHarness.md](./04-Harness/4.1_AgentHarness.md) 已整体重写。**任何"AgentHarness 是 stub/骨架、不能用"的说法都已过时。**
+> **⚠️ v0.86.1 基线（sync 0006）**：本仓库代码已同步到 v0.86.1，各篇行号锚点已按需重锚。本轮重点：agent 包 328 commits 的 durable harness runtime / session v4 重构（3.4/3.5 已重写，含 branch/lanes 分离、JSONL format 4、legacy v3 升级、named-branch streaming fork）；ai 包 `Context` → branded `TranscriptContext` 重构（5.1 高影响警示）；Meta Muse OAuth（5.2）；`state.systemPrompt` readonly（#9548，1.1/1.2）。详见 [`../_change_log/0006-v0.84.4-to-v0.86.1.md`](../_change_log/0006-v0.84.4-to-v0.86.1.md)。
 >
-> 另：③ 新增第 11 个包 `packages/chord`（零 Pi 依赖的应用组合运行时），protocol/client/server 重建为其薄适配层（协议版本 1→**8**，且三包已降级为 dev-only）；④ `pi-tui` 去掉对 coding-agent 环境变量的耦合（`PI_DEBUG_REDRAW`→`PI_TUI_DEBUG_REDRAW`）。**完整变更、影响评估与遗留缺口见 [`../_change_log/0006-v0.84.4-to-v0.85.1.md`](../_change_log/0006-v0.84.4-to-v0.85.1.md)。**
->
-> **⚠️ 历史基线**：本文档集最初基于 v0.75.3 编写，v0.75.3→v0.83.0 有重大 API 变更（`AgentEvent`→`AgentSessionEvent`、`ExecutionEnv`→`Models`、新增 `agent/src/harness/tools/`）。部分历史行号可能仍有过时残留，以各篇顶部警示为准。版本演进只记录在 [`../_change_log/`](../_change_log/README.md)。
+> **⚠️ v0.83.0 注意**：本文档集基于 v0.75.3 源码编写。v0.75.3→v0.83.0 有重大 API 变更：`AgentEvent`→`AgentSessionEvent`、`ExecutionEnv`→`Models`、AgentHarness 新增泛型 `TContext`、`AgentHarnessTool` 新增 context 参数、新增 `agent/src/harness/tools/` 目录。行号和部分 API 描述可能已过时。参见 [`../_change_log/`](../_change_log/README.md)。
 
 本目录聚焦 pi-mono 的 Agent 内核：`packages/agent`（纯运行时）和 `packages/coding-agent`（应用层扩展）共同构成的 agent 系统。
 
@@ -39,9 +36,9 @@
   - [3.2_Branch_Summary.md](./03-Memory/3.2_Branch_Summary.md): 分支导航的记忆桥梁
   - [3.3_Token_Estimation.md](./03-Memory/3.3_Token_Estimation.md): 双层估算策略
   - [3.4_Session_Tree.md](./03-Memory/3.4_Session_Tree.md): 以树形结构承载记忆
-  - [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md): **已按 v0.85.1 整体重写** — session 的 durable 表示法（Entry 4 种、bound values/lists、13-leaf OperationState、keyless 独占 mutation 屏障、JSONL v4 原地重写与 v3 只读升级）
+  - [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md): **v0.84.0 新增** — lane-based 会话存储（Entry/LaneRecord/facts、durable operations、JSONL 原子发布）
 - [04-Harness](./04-Harness/README.md): AgentHarness、Skills、System Prompt、Extension Runner、Bash/Edit/Write Tools
-  - [4.1_AgentHarness.md](./04-Harness/4.1_AgentHarness.md): **已按 v0.85.1 整体重写** — `Drive` + effect gate + 13-leaf 扁平状态的真实现（不再是骨架；产品集成仍推荐 `AgentSession`/SDK）
+  - [4.1_AgentHarness.md](./04-Harness/4.1_AgentHarness.md): **v0.84.2 已重写** — `AgentLane` 骨架与它的存储地基
   - [4.2_Skills.md](./04-Harness/4.2_Skills.md): 从文件到 prompt 的能力注入机制
   - [4.3_System_Prompt.md](./04-Harness/4.3_System_Prompt.md): system prompt 从哪里来、怎么拼出来
   - [4.4_Extension_Runner.md](./04-Harness/4.4_Extension_Runner.md): 扩展模块的加载与事件分发
@@ -106,7 +103,7 @@
 ## 收敛说明
 
 - 当前 5 个 section（01-Anatomy / 02-Runtime / 03-Memory / 04-Harness / 05-Infra），共 25 篇叶子文档。
-- 正文基于 v0.75.3 编写，v0.83.0 / v0.84.2 / v0.84.3 三轮以警示标注演进；本仓库代码已同步到 v0.84.3，行号锚点对应工作树。
+- 正文基于 v0.75.3 编写，v0.83.0 / v0.84.2 / v0.84.3 / v0.86.1 多轮以警示标注演进；本仓库代码已同步到 v0.86.1，行号锚点对应工作树。
 - v0.83.0 的重要变化（影响 agent/ 文档）：
   - `AgentEvent` → `AgentSessionEvent`（更正旧说法：`AgentEvent` 定义仍在 `agent/src/types.ts:429`，`AgentSessionEvent` 在 `coding-agent/src/core/agent-session.ts:144`，两者都不在 harness/types.ts）
   - AgentHarness 新增泛型 `TContext`（**v0.84.0 又全部移除**，见顶部警示）；`ExecutionEnv` 被 `Models` 替代

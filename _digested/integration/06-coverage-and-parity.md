@@ -1,5 +1,7 @@
 # 06 Coverage And Parity：哪些能接，哪些不是 TUI API
 
+> 本文已对照 v0.86.1 复核。
+
 ## 这张表解决什么问题
 
 外部集成最容易掉进两个坑：
@@ -60,6 +62,12 @@
 | 终端能力覆盖 | `terminal.hyperlinks/images/trueColor` setting + env `PI_HYPERLINKS`/`PI_TRUE_COLOR`/`PI_IMAGE_PROTOCOL`（v0.84.4；优先级 settings > env > 自动检测） | [`terminal-image.ts`](../../packages/tui/src/terminal-image.ts)、[`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
 | 模型目录 | v0.84.4：DeepSeek 新增 `deepseek-v4-flash-vision-exp`（vision，1M ctx）；Cloudflare gateway 补 `workers-ai/*` passthrough；OpenRouter 图像模型刷新 | [`scripts/generate-models.ts`](../../packages/ai/scripts/generate-models.ts) |
 | CLI `--` end-of-options | CLI：`pi -p -- "- 以破折号开头的参数"`（v0.84.3，`#7269`） | [`cli/args.ts`](../../packages/coding-agent/src/cli/args.ts) |
+| prompt cache warming | setting：`cacheWarming`（`off/streaming/idle`，默认 `streaming`，global-only，v0.86.0 #9668）；扩展经 `cache_warming_decision` 事件可 stop/强制 refresh。无 SDK/RPC 命令——后台行为，宿主只需知道成本模型（预期节省 < $0.05 不刷新） | [`cache-warmer.ts`](../../packages/coding-agent/src/core/cache-warmer.ts)、[`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
+| `/bug` 报告 | interactive mode：`/bug [description]`（v0.86.0；zip 或上传 Radius gateway，secrets redact；崩溃记入 `~/.pi/agent/crashes.json`）。无 RPC/SDK 等价命令 | [`bug-report.ts`](../../packages/coding-agent/src/core/bug-report.ts)、[`interactive-mode.ts`](../../packages/coding-agent/src/modes/interactive/interactive-mode.ts) |
+| Radius 模型 catalog | Radius provider 自带 persisted + 动态刷新 catalog（v0.86.0），UI 侧 cached/live 合并支持**离线选模型**；Radius 登录后等待 catalog discovery 再报 missing-model | [`radius.ts`](../../packages/ai/src/providers/radius.ts)、[`model-selector.ts`](../../packages/coding-agent/src/modes/interactive/components/model-selector.ts) |
+| Meta Muse provider | 新增 Meta provider（v0.86.1）：Model API key + Muse 订阅 OAuth（auth.meta.com 设备授权流），默认 `muse-spark-1.3`；`getBuiltinModel("meta", ...)` 可用 | [`generate-models.ts`](../../packages/ai/scripts/generate-models.ts)、[`packages/ai/src/auth/oauth/meta.ts`](../../packages/ai/src/auth/oauth/meta.ts) |
+| per-model compaction budgets | setting：`compaction.modelOverrides["provider/modelId"]`（`reserveTokens`/`keepRecentTokens`，v0.86.0 #8133），按 modelKey 覆盖全局默认 | [`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
+| fallback 模型约束 | model compat：`compat.allowedFallbackModels`（v0.86.x；限制该模型可回落到的候选集，影响宿主侧 model fallback 提示） | [`packages/ai/src/types.ts`](../../packages/ai/src/types.ts) |
 
 ## 第三条集成路径：protocol / client / server（v0.85 重建，dev-only，非 supported）
 

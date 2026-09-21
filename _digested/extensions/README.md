@@ -1,10 +1,7 @@
 # extensions/ — pi 的扩充思路：极简核 + 靠扩展长能力
 
-> **基线**：pi-mono `v0.85.1`（upstream tag `d981de122`，merge `e3aa42f46`），源码锚点对应工作树。本目录是 2026-08 新增的第三个维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`integration/`](../integration/)（外部嵌入）并列。
->
-> v0.84.3 变更：内置工具 7→8（新增 Windows-only 的 powershell，`ToolName` 联合在 `tools/index.ts:96`），本目录"7 个"表述已同步为 8。
->
-> **⚠️ v0.85.1 变更（2026-09-10 核对）**：① 基线从 v0.84.4 升到 v0.85.1（上一版括注的 upstream tag `4e58f324f` 实际是 **v0.84.3** 的 tag，与"v0.84.4"自相矛盾，本次一并修正）。② **新增一篇** [`02-Expansion/2.5_second_axis_facets.md`](02-Expansion/2.5_second_axis_facets.md)：v0.85 引入的**第二条扩展轴**——`packages/chord` 的 facet 插件。它与本目录讲的第一条轴（`core/extensions` 的 `export default function (pi)`）**并存不是替代**，但让"pi 的每一个扩展都是同一个工厂形状"这句话不再绝对成立，因此 [`03-Patterns/3.1`](03-Patterns/3.1_one_factory.md) 的论断已收窄为"**凡走 `core/extensions` 的扩展**"。③ **术语碰撞**："extension" 在 v0.85 以后至少有三个义项（`core/extensions` 的扩展 / `plugins.md` 里"分发 facet 的包" / `plugins.md:949` 的"the extension layer"）；本目录不声明义项时一律指第一个。④ 本目录引用的 `examples/extensions/`（86 个 `.ts`/`.js` 源文件）与 `core/extensions` 在 v0.85.1 **零改动**，主体论断不受影响。
+> **基线**：pi-mono `v0.84.4`（upstream tag `4e58f324f`，merge `6f8312a52`）；工作树已同步至 **v0.86.1**，2026-08 起的新增机制（transcript SystemMessage 持久化、forced prompt 投影、`user_bash` fail-closed、`pi.on()` unsubscribe、cache warming 等）已在各篇以"警示"标注，锚点对应 v0.86.1 工作树。本目录是 2026-08 新增的第三个维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`integration/`](../integration/)（外部嵌入）并列。
+> v0.84.3 变更：内置工具 7→8（新增 Windows-only 的 powershell，`ToolName` 联合在 `tools/index.ts:95`），本目录"7 个"表述已同步为 8。
 
 ## 这是什么
 
@@ -20,11 +17,12 @@ pi 的 README 自己把立场说得很白：
 
 > "**pi's core is minimal.** If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected."
 
-把这些句子翻成结构事实，就是本目录的三个子议题：
+把这些句子翻成结构事实，就是本目录的四个子议题：
 
 1. **核有多小**（[`01-Core/`](01-Core/)）——核里只剩"跑循环的引擎 + 8 个摸文件/跑命令的最小工具 + 扩展系统这个骨架本身"。连 plan-mode、subagent 这种别的 coding harness 几乎必内置的功能，都被**故意不做**，放进了 `examples/extensions/`。
-2. **扩充怎么发生**（[`02-Expansion/`](02-Expansion/)）——读完 70+ 个示例归纳出来的四条扩充轴：沿着 agent loop 的接缝拦截改写、往循环里注册新东西、改变循环的长相、让扩充活过重启。**另有一条 v0.85 新增的平行轴**（[2.5](02-Expansion/2.5_second_axis_facets.md)：chord facet 插件），它切的是"代码跑在哪个进程/环境"，不在这四条之内。
+2. **扩充怎么发生**（[`02-Expansion/`](02-Expansion/)）——读完 70+ 个示例归纳出来的四条代码轴（拦截改写 / 注册 / 长相 / 持久化）+ 一条声明式资源轴（skills/prompt templates/themes/agent 定义，不写代码的扩充）。
 3. **扩充靠什么套路成立**（[`03-Patterns/`](03-Patterns/)）——一个工厂函数、覆盖与复用、安全护栏。这是"极简核能长期不膨胀、又敢挂第三方代码"的原因。
+4. **核外长出了什么、谁在管**（[`04-Ecosystem/`](04-Ecosystem/)）——官方包协议（`pi install`、npm `pi-package` keyword、pi.dev 目录、举报制治理）与生态快照：5300+ 包、core 留白功能全部被第三方补齐且多实现竞争（2026-09-21 快照）。
 
 ## 先建立一张心理图
 
@@ -50,7 +48,7 @@ session ──► input ──► before_agent_start ──► ┌─ agent loop
 |---|---|---|
 | 核 / 极简核 | core / minimal core | `CONTRIBUTING.md` 的 "pi's core is minimal" |
 | 扩充 | extension / expansion | 靠扩展（extension）把能力"长"出来 |
-| 扩展 | extension | 一个默认导出的工厂函数模块（**本目录默认义项**；v0.85 起 `plugins.md` 用同一个词指"分发 facet 的包"，见 [2.5](02-Expansion/2.5_second_axis_facets.md)） |
+| 扩展 | extension | 一个默认导出的工厂函数模块 |
 | 接缝 | seam | 循环上可被扩展挂住的节点，即 `pi.on(...)` 的事件点 |
 | 循环 | agent loop | `session → input → before_agent_start → … → agent_end` 的主循环 |
 | 注册面 | register surface | `registerTool` / `registerCommand` / `registerShortcut` / `registerFlag` / `registerProvider` |
@@ -83,6 +81,7 @@ session ──► input ──► before_agent_start ──► ┌─ agent loop
 1. 先读 [`01-Core/`](01-Core/)：建立"核到底有多小、判据是什么"的基准。
 2. 再读 [`02-Expansion/`](02-Expansion/)：四条扩充轴，每条都有具体示例锚点。这是本目录的主体。
 3. 最后读 [`03-Patterns/`](03-Patterns/)：这些扩充为什么能既安全又便宜地成立。
+4. 想看"这套思路跑起来之后世界长什么样"：[`04-Ecosystem/`](04-Ecosystem/)——官方包协议 + 生态快照 + 治理模式（数据带快照日期）。
 
 ## 写作定调
 

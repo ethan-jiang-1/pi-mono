@@ -89,6 +89,31 @@ Provider 认证不在 `settings.json` 里——它在以下位置：
 | `compactAtTokens` | number | 触发自动压缩的 token 阈值 | 内置默认 | 也在运行时 `/compact` 手动触发的范围 |
 | `telemetry` | boolean | 是否发送遥测 | `false` | |
 
+### 成本控制配置（v0.86.0 新增）
+
+```json
+{
+  "cacheWarming": "streaming",
+  "compaction": {
+    "reserveTokens": 16384,
+    "keepRecentTokens": 20000,
+    "modelOverrides": {
+      "anthropic/claude-opus-4": { "reserveTokens": 32768, "keepRecentTokens": 40000 }
+    }
+  }
+}
+```
+
+| 键 | 类型 | 作用 | 默认值 | 备注 |
+|---|------|------|--------|------|
+| `cacheWarming` | string | prompt cache 预热模式 | `"streaming"` | `"off"`/`"streaming"`/`"idle"`（`settings-manager.ts:77`、`:157`）。**global-only**——每次刷新是一次真实付费请求，不提供项目级覆盖 |
+| `compaction.reserveTokens` | number | 压缩预留 token | `16384` | |
+| `compaction.keepRecentTokens` | number | 压缩保留最近消息 token | `20000` | |
+| `compaction.modelOverrides` | Record | 按 `"provider/modelId"` 键覆盖上面两项 | `{}` | `settings-manager.ts:27` 声明、`:872` 读取（按当前 modelKey 查 override，未命中回落全局默认）；不同模型上下文窗口差异大时按模型调预算 |
+| `compat.allowedFallbackModels` | — | Bedrock/Anthropic 兼容层：声明允许的 fallback 模型 | 无 | `packages/ai/src/types.ts:839`（#9294）；为空/缺省时调用方必须省略 `fallbacks` 字段（Anthropic 对无许可 fallback 目标的模型拒绝该字段） |
+
+cache warming 的成本模型（何时值得刷）见 [13_token_budget_audit.md](./13_token_budget_audit.md)。
+
 ## 常见错误
 
 **错误 1：`skills` 数组写成了字符串（不是数组）**
@@ -143,6 +168,10 @@ pi 不读项目层的 `settings.json`。所有设置项都在全局 `~/.pi/agent
 - 本机审计的 settings：`~/.pi/agent/settings.json`（只有 `defaultProvider` / `defaultModel` / `thinking` / 主题）
 - `packages/coding-agent/docs/usage.md`（settings 的 CLI 参数对照表）
 - `packages/coding-agent/docs/skills.md`（"Using Skills from Other Harnesses" 的官方做法——`skills` 数组）
+- `packages/coding-agent/src/core/settings-manager.ts`：`CACHE_WARMING_MODES`（L77）、`cacheWarming`（L157）、`CompactionSettings.modelOverrides`（L27）、override 读取（L872）
+- `packages/ai/src/types.ts`：`allowedFallbackModels`（L839）
+- `packages/coding-agent/src/core/cache-warmer.ts`：成本模型常量与刷新时机（L20、L26、L29）
+- 官方 docs：`packages/coding-agent/docs/settings.md`（`#cache-warming` 小节）
 
 ## 最小例证
 

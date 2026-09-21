@@ -1,8 +1,6 @@
 # composition/ — Pi 的组装哲学与通用配置框架
 
-> **基线**：pi-mono `v0.85.1`（upstream tag `d981de122`，merge `e3aa42f46`；上一版写 v0.84.4）。本维度是 2026-09-03 新增的第六个分析维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`extensions/`](../extensions/)（扩充思路）、[`integration/`](../integration/)（外部嵌入）、[`_change_log/`](../_change_log/)（版本追踪）并列。
->
-> **v0.85.1 变更（2026-09-10）**：① 第四部分从"七条轴"扩为"**八条轴**"——新增 [10i 第八根轴：进程/环境轴](10_extension_axes/10i_process_axis.md)（v0.85 引入的 chord facet 插件轴；切"代码跑在哪个进程/环境"，与轴 1-7 是横切关系，目前是实验路径）。② [12 安全边界](12_security_boundaries.md) 加了 scope 限定："pi 没有内置沙箱"对 `core/extensions` 仍成立，而 facet 投递路径已选定 isolated-vm + 字符串膜（**是规格 + PoC，不是产品**）。③ 本 README 与 10 系列的锚点已按 v0.85.1 工作树复核。
+> **基线**：pi-mono `v0.86.1`（2026-09-21 更新，见 [`_change_log/0006`](../_change_log/0006-v0.84.4-to-v0.86.1.md)）。本维度是 2026-09-03 新增的第六个分析维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`extensions/`](../extensions/)（扩充思路）、[`integration/`](../integration/)（外部嵌入）、[`_change_log/`](../_change_log/)（版本追踪）并列。
 >
 > 它的主题不是"怎么运转"，而是"运转起来之后，作为用户应该怎么理解和配置它"。
 
@@ -51,13 +49,13 @@
 | 8 | [8_settings_json.md](8_settings_json.md) | `settings.json` 可配置项全解（provider、model、tools、skills、theme） |
 | 9 | [9_session_and_file_ui.md](9_session_and_file_ui.md) | Pi 的"文件即 UI"哲学：PLAN.md、TODO.md、PROGRESS.md 等文件的用法 |
 
-### 第四部分：Extension 八条轴（可定制性的完整边界）
+### 第四部分：Extension 七条轴（可定制性的完整边界）
 
-> 💡 八条轴的全部文档在 [`10_extension_axes/`](10_extension_axes/README.md) 子目录。
+> 💡 七条轴的全部文档在 [`10_extension_axes/`](10_extension_axes/README.md) 子目录。
 
 | 篇号 | 文件 | 轴 |
 |------|------|----|
-| 10 | [10_extension_axes/README.md](10_extension_axes/README.md) | 八条轴总览——前七条是什么、如何组合、与内置工具的关系；第八根轴单列 |
+| 10 | [10_extension_axes/README.md](10_extension_axes/README.md) | 七条轴总览——七条轴是什么、如何组合、与内置工具的关系 |
 | 10a | [10_extension_axes/10a_commands.md](10_extension_axes/10a_commands.md) | 轴 1：注册 `/command` |
 | 10b | [10_extension_axes/10b_event_hooks.md](10_extension_axes/10b_event_hooks.md) | 轴 2：挂事件钩子（36 个事件的分类、使用场景、安全模型） |
 | 10c | [10_extension_axes/10c_shortcuts.md](10_extension_axes/10c_shortcuts.md) | 轴 3：快捷键 |
@@ -65,8 +63,7 @@
 | 10e | [10_extension_axes/10e_ui_injection.md](10_extension_axes/10e_ui_injection.md) | 轴 5：注入/修改 TUI（widget、status、notify） |
 | 10f | [10_extension_axes/10f_persistence.md](10_extension_axes/10f_persistence.md) | 轴 6：跨会话持久化 |
 | 10g | [10_extension_axes/10g_providers.md](10_extension_axes/10g_providers.md) | 轴 7：注册模型提供商 |
-| 10h | [10_extension_axes/10h_combinatorics.md](10_extension_axes/10h_combinatorics.md) | 组合使用：一条扩展同时用多轴的真实案例解剖（+ 案例 4：轴 8 不走组合这套算法） |
-| 10i | [10_extension_axes/10i_process_axis.md](10_extension_axes/10i_process_axis.md) | **轴 8：进程/环境轴**（v0.85.1 追加）——facet 插件；切"代码跑在哪"，与轴 1-7 横切；目前是实验路径 |
+| 10h | [10_extension_axes/10h_combinatorics.md](10_extension_axes/10h_combinatorics.md) | 组合使用：一条扩展同时用多轴的真实案例解剖 |
 
 ### 第五部分：决策框架（每层加不加的判断方法）
 
@@ -102,13 +99,11 @@
 | 维度 | 本质 | 本维度的关系 |
 |------|------|-------------|
 | `harness/03-Discipline/3.1_core_minimal.md` | core-minimal 纪律分析 | 本维度 1 篇以此为起点 |
-| `harness/01-Architecture/1.2_single_injection.md` | 统一注入点取舍分析 | 本维度 10 篇的**前七条轴**以此为技术基础（轴 8 不走统一注入点） |
+| `harness/01-Architecture/1.2_single_injection.md` | 统一注入点取舍分析 | 本维度 10 篇七条轴以此为技术基础 |
 | `harness/04-Self-Description/4.4_context_layers.md` | 三层上下文分层加载 | 本维度 2 篇三层加载链以此为机制依据 |
 | `extensions/01-Core/1.2_skipped_features.md` | plan-mode/subagent 故意跳过分析 | 本维度 1 篇"不替你决定工作流"以此为例证 |
 | `agent/01-Anatomy/1.4_Extension_System.md` | 扩展系统运转机制 | 本维度 10 篇引用其事件列表，不重复机制 |
-| `harness/02-Boundaries/` | 四类边界 | 本维度 12 篇安全边界以此为锚（**已加 scope 限定**：对 `core/extensions` 仍成立） |
-| [`extensions/02-Expansion/2.5_second_axis_facets.md`](../extensions/02-Expansion/2.5_second_axis_facets.md) | 第二条扩展轴（facet 插件）的机制与术语碰撞 | 本维度 10i（轴 8）引用其机制，不重复 |
-| `packages/agent/docs/mobile-handoff/` | facet / 沙箱的**规格与 PoC** | 本维度 12 篇引用时一律标为"规格 + PoC，不是产品" |
+| `harness/02-Boundaries/` | 四类边界 | 本维度 12 篇安全边界以此为锚 |
 | `_faq_on_digested/07/` | 基于消化的 pi 用法场景问答 | 本维度 C 篇列出对应 |
 
 ## 阅读路径
@@ -117,7 +112,7 @@
 
 **已经用了 pi 但想优化的人**：5（AGENTS.md 体检）→ 9（文件即 UI 重新理解）→ 13（token 审计）→ 11 系列（按你现在卡在哪层进入）
 
-**想自己写扩展的人**：10 系列（前七条轴全部要读，特别是 10b 事件钩子和 10h 组合模式；10i 只在关心 facet/进程边界时读）
+**想自己写扩展的人**：10 系列（七条轴全部要读，特别是 10b 事件钩子和 10h 组合模式）
 
 **从 CC/Codex 迁移过来的人**：A → 1（先理解哲学差异再动手）→ 11 系列
 

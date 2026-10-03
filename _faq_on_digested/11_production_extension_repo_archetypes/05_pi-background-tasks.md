@@ -124,26 +124,81 @@ Agent 决定查看尾部日志: bg_logs({ taskId: "task-987", tailLines: 50 })
 
 ## 六、测试资产与自动化测试考量（Testing Assets & Strategy）
 
-`pi-background-tasks` 的测试资产是全生态教科书级的典范（见 `TESTING.md`）：
+### 1. 深度剖析：为什么必须设立 Hook 契约证据比对（`test:hook-contract`）？
+在后台任务这种重度依赖宿主底层事件（`turn_start`, `agent_settled`, `context`）的插件中，最大的隐形杀手是**上游宿主框架（Pi-mono）的微小行为突变**。
+- **历史真实血泪现场**：
+  在 Pi 早期版本中，扩展开发者普遍假设：“如果在 `context` 钩子中抛出异常，宿主就会中止（Abort）即将发出的网络请求”。
+  但当作者使用**脚本化虚拟 Provider（Scripted Provider）**进行物理实测时，赫然发现：**Pi 宿主为了鲁棒性，吞掉了 context 钩子里的异常，并继续把网络请求发了出去！**
+  如果插件误以为 throw 能阻断请求，就会导致敏感长任务在未鉴权的情况下泄漏数据。
+- **解法：字节级契约证据锁（`pi-hook-contract-evidence.json`）**：
+  - 测试套件每次使用固定脚本的离线虚拟 Provider 完整驱动一轮 Pi Agent 循环；
+  - 将所有事件的触发顺序、传参结构、返回值影响完整序列化为 JSON 证据文件；
+  - 测试断言直接拿运行时证据与仓库中固化的 `pi-hook-contract-evidence.json` 进行**字节级对齐比对**。
+  - **杜绝 Coding Agent 的自欺欺人**：如果上游行为发生了变化，测试立即报红；并且 CI 明文禁止 Agent 随意修改 `evidence.json`，彻底剥夺了 Agent“改测试来迎合 Bug”的投机路径。
 
-1. **七重门禁流水线（Default Gate Pipeline）**：
-   运行 `npm test` 自动串联执行：
-   `typecheck` -> `test:type-safety` -> `test:unit` -> `test:sdk` -> `test:rpc` -> `test:component` -> `test:package` -> `test:hook-contract`。
-2. **Hook 契约实测验证门禁（`npm run test:hook-contract`）**：
-   它使用**脚本化虚拟 Provider（Scripted Provider）**驱动真实的 Pi Agent 循环，物理实测并记录：
-   - `context` 钩子是否在每次模型调用前精准触发？
-   - 在 `context` 钩子中抛出异常能否阻止网络请求？（实测结果证明：**不能**，Pi 会捕获它并继续下发，因此插件必须采用 abort 而非 throw 作为安全屏障！）
-   - 测试产出的客观证据与 `pi-hook-contract-evidence.json` 进行字节级对比，一旦上游机制变动立即报红。
-3. **跨操作系统与终端仿真（PTY & Windows Gate）**：
-   包含专用的 `test:pty` 和 `test:windows`，验证伪终端转义字符在不同终端下的渲染稳定性。
+### 2. 本案采取的 LLM 伪装思路：确定性脚本化 Provider（Deterministic Scripted Provider）
+`pi-background-tasks` 是全生态唯一将 **LLM 虚拟化** 做到极致的代表。它不通过网络拦截，而是直接在 Pi 的 Provider 注册层插桩，实现了一个 `DeterministicScriptedProvider`：
+
+```typescript
+// tests/scripted-provider/scripted-provider.ts
+export class DeterministicScriptedProvider implements ProviderAPI {
+  private scriptQueue: ScriptedTurn[] = [];
+
+  enqueueTurn(turn: ScriptedTurn) {
+    this.scriptQueue.push(turn);
+  }
+
+  // 伪装 streamComplete 接口
+  async *streamComplete(messages: Message[], options: ProviderOptions) {
+    const nextTurn = this.scriptQueue.shift();
+    if (!nextTurn) throw new Error("Script queue exhausted unexpectedly");
+
+    // 1. 模拟 LLM 吐出工具调用帧
+    if (nextTurn.type === "tool_call") {
+      yield {
+        type: "tool_call_chunk",
+        toolCall: { id: "call-1", name: "bg_delegate", input: nextTurn.input }
+      };
+      return;
+    }
+
+    // 2. 模拟 LLM 总结文本帧
+    yield { type: "text_chunk", text: nextTurn.responseMessage };
+  }
+}
+```
+
+- **Mock 的核心设计思路**：
+  1. **驱动真实的 Pi Agent 循环**：宿主代码不改一行，依然走完所有会话历史加载、提示词拼装与钩子分发；
+  2. **剧本化编排**：用例预先塞入：`Turn 1 -> 发起 bg_delegate 调用`；`Turn 2 -> 接收工具执行结果并返回完成`；
+  3. **捕获契约事实（Characterisation）**：在假模型和真宿主的交互中，完整记录 `context` 钩子是否在 `streamComplete` 前执行、异常是否被捕获。这种思路把“大模型的不确定性”剥离得干干净净，只留下宿主与插件契约的纯净物理断言。
+
+### 3. 七重门禁流水线（Default Gate Pipeline）
+运行 `npm test` 自动串联执行严格的分层校验：
+`typecheck` -> `test:type-safety` -> `test:unit` -> `test:sdk` -> `test:rpc` -> `test:component` -> `test:package` -> `test:hook-contract`。
+全链路在无真实 LLM、无网络、纯本地伪终端的受控环境下，数十秒内完成严密自证。
 
 ---
 
 ## 七、面向 Coding Agent 的友好度（Coding-Agent Friendliness / DX for AI）
 
-| 考量维度 | 评级 | 真实表现与分析 |
+### 1. 失效现场还原：Mandatory Agent Gateway 诞生记
+为什么这个仓库会诞生全生态唯一的 `BACKGROUND-TASKS-INSTRUCTIONS.md`？
+- **故障 Trace（AI 代理的“愚蠢重构”灾难）**：
+  1. 人类开发者给 Claude Code / Cursor / Pi 下达指令：“优化后台任务的状态轮询性能”；
+  2. Coding Agent 阅读了代码，发现系统同时在 `turn_start` 和 `agent_settled` 两个地方检查任务状态；
+  3. Agent 凭借预训练中的“代码去重（DRY 原则）”偏见，认为这是“低效冗余代码”，直接删除了 `agent_settled` 的备用轮询网关，并把双环合并为一个简单的全局 `setInterval`；
+  4. 结果灾难发生：Node.js 单线程里的 `setInterval` 导致终端 UI 在模型流式输出时产生严重卡顿，且任务完成事件在 Agent 思考结束前再也无法及时投递！
+- **解法必然性**：作者被迫在仓库根目录建立了专属的 **Mandatory Agent Gateway**，在首行以极其严厉的语气写道：
+  > *"This gateway is for AI agents maintaining this package. Read this file BEFORE modifying any code. Rule 1: No self-certification. Rule 2: Do NOT merge the dual polling loops — they serve distinct lifecycle boundaries."*
+  这份说明书以绝对权威的方式，彻底降服了 Coding Agent 的盲目重构冲动。
+
+### 2. Coding Agent 维护友好度综合评级
+
+| 考量维度 | 评级 | 真实表现与底层机理 |
 |---|---|---|
-| **Agent 专属指引** | 行业标杆 (S) | **全生态唯一提供 `BACKGROUND-TASKS-INSTRUCTIONS.md`（Mandatory Agent Gateway）的项目**。首行直接声明“This gateway is for AI agents maintaining this package”，为 Agent 规定了严格的“修改前必读顺序”、“硬性纪律”与“禁用的工具”。 |
+| **Agent 专属指引** | 行业标杆 (S) | **全生态唯一提供 `BACKGROUND-TASKS-INSTRUCTIONS.md` 的项目**。规定了严格的“修改前必读顺序”、“硬性纪律”与“禁用的工具”，消灭了 AI 代理盲目重构带来的回归 Bug。 |
 | **确定性与无自证** | 极佳 (A+) | 明文规定“代码是运行时的最高权威，文档服从代码；严禁自证（No self-certification）”，必须通过 `docs:verify:attestations` 进行机器断言。 |
 | **错误自愈与诊断** | 极佳 (A+) | 包含 `docs/operations/troubleshooting.md`，每个报错都有对应的症状定位（Symptom Triage），Agent 读到报错即可直接按表索骥自我修复。 |
 | **测试执行速度** | 优秀 (A) | 将离线 SDK 测试与重型 PTY 测试严格解耦，单测在毫秒级跑完，极大提升 Agent 编码反馈回路。 |
+

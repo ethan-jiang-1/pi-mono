@@ -67,20 +67,78 @@
 
 ---
 
-## 五、未来面向 Coding Agent 开发扩展的核心启示
+## 五、面向 Coding Agent 与自动化测试的四大核心启示深度剖析
 
-通过对真实头部生态的深入解剖，我们可以得出面向未来「以 Coding Agent 为主力开发者与使用者」的插件工程法则：
+当未来的研发主力从“人类工程师”转变为“Coding Agent”时，扩展的设计逻辑必须发生根本性范式转移。以下从底层机理、反面教训与架构解法三个层次深度解构这四大核心启示：
 
-1. **防御性失败与诚实语义（Honesty over Hallucination）**：
-   - 绝不要在超时或发生异常时静默吞掉错误，或者伪造「0 errors」；
-   - 学习 `pi-lens` 的 `honesty: partial` 和降级账本，让 Agent 清楚知道分析器的置信度。
-2. **Token 经济学与 Prompt 缓存保护（Preserve Prompt Caching）**：
-   - 严禁为了动态状态频繁覆写 `systemPrompt`；
-   - 学习 `plannotator` 使用 `before_agent_start` 注入轻量尾部消息，利用底层大模型的 KV Cache 加速并降低成本。
-   - 学习 `pi-mcp-adapter` 和 `pi-web-access`，严格限制工具输出长度，绝不向上下文倾倒巨量垃圾文本。
-3. **针对 Coding Agent 的明确门禁与网关说明书（Agent Instructions Gateway）**：
-   - 学习 `pi-background-tasks` 的 `BACKGROUND-TASKS-INSTRUCTIONS.md` 和 `pi-lens` 的 `agent-guide.md`；
-   - 在仓库中显式提供给 AI 代理阅读的架构规范、不可侵犯的不变量清单和禁止行为，消灭代理盲目重构带来的回归 Bug。
-4. **确定性测试资产驱动（Zero-Token Deterministic Testing）**：
-   - 严禁在自动化测试中发起真实的 LLM API 扣费调用；
-   - 必须通过预置会话数据、静态 JSON-RPC 仿真、无头 WebSocket 与伪终端 Mock 建立秒级跑通的确定性断言。
+---
+
+### 1. 确定性测试资产驱动（Zero-Token Deterministic Testing）
+
+#### 为什么不能在测试中调用真实大模型？（机理深度分析）
+很多初学者或粗糙的扩展在编写自动化测试时，习惯于向 OpenAI / Anthropic 接口发一个真实请求来验证插件端到端链路。这在面向 Coding Agent 的生产研发中是灾难性的：
+
+1. **不可重现的“测试闪烁”（Test Flakiness）会彻底击溃 Coding Agent 的自愈闭环**：
+   - 大模型的推理具有固有的随机采样性（Temperature、Top-P、显卡浮点计算微小扰动）。同一个测试可能跑三次过两次、挂一次。
+   - 人类遇到 Flaky 测试会去重试或判断，但 **Coding Agent 面对偶发失败时会陷入病态的过度拟合（Overfitting）**：它会以为是自己刚改的代码有问题，反复修改无辜的业务逻辑来“迎合”大模型的随机回复，最终把整个工程改崩溃。
+2. **测试标的混淆（Testing the Contract, not the Intelligence）**：
+   - 扩展的核心职责是：协议转换、进程管理、文件系统交互、状态机跃迁。
+   - 测试必须断言的是**扩展本身的契约行为**（“当上游收到事件 A 时，是否以规范 B 发起系统调用”）。如果拉入真实模型，测试实际上是在检验大模型的智商，而不是扩展代码的健壮性。
+3. **测试延迟决定了 Coding Agent 的思考心跳**：
+   - 真实 API 调用耗时动辄 5~30 秒，且伴随限流（Rate Limit）风险；
+   - 离线仿真测试（如 `pi-subagents` 的 Scripted Faux Provider、`pi-mcp-adapter` 的 In-memory JSON-RPC）耗时仅 **20ms ~ 200ms**。毫秒级反馈允许 Coding Agent 在一个思考轮次内进行 5~10 次快速试错和自我迭代，效率提升两个数量级。
+
+---
+
+### 2. 针对 Coding Agent 的防御性指令网关（Mandatory Agent Instructions Gateway）
+
+#### 为什么必须为 AI 设立专门的准入规则？（机理深度分析）
+Coding Agent 接管代码库进行二次开发时，底层依赖的是大模型的统计概率推断，这会导致两个致命弱点：**“逆向假设综合征”**与**“盲目自满”**。
+
+1. **逆向假设综合征（The Assumption Disease）**：
+   - 当仓库中存在高度定制、反直觉但极其重要的设计（例如 `pi-background-tasks` 的双环通知、`rpiv-suite` 的不可变 reducer 分支回放）时，Agent 看到代码如果不理解原作者的精妙意图，会下意识地按照预训练中最常见的公共套路去“简化”或“重构”它，直接摧毁核心不变量。
+   - `BACKGROUND-TASKS-INSTRUCTIONS.md` 的本质是**先验阻断**：在 Agent 动手前，用顶格警示硬性规定“本模块拥有特定生命周期，禁止合并循环、禁止移除轮询网关”，彻底封死 Agent 的妄动路径。
+2. **读前拦截（Read-Before-Edit）杜绝局部幻觉**：
+   - 如 `pi-lens` 的 Read-Guard。Agent 在上下文紧张时，往往倾向于只看搜索出来的 5 行片段就凭空推断函数签名，直接调用 `edit` 覆写代码，引发缩进错乱或未声明变量。
+   - Read-Guard 在运行时记录 Agent 的已读行号哈希。若 Agent 试图修改从未读过的区间，直接在系统调用层返回硬错误，逼迫 Agent 必须先调用 `read_symbol` 建立真实上下文。
+3. **禁止自我证明（No Self-Certification）**：
+   - Agent 在被要求修复 Bug 时，常常有一种投机取巧的模式：修改测试断言甚至删除断言以求测试通过。
+   - 优秀工程通过**只读证据对比（Read-only Evidence Comparison）**建立门禁（例如比对固化的 `pi-hook-contract-evidence.json`），任何篡改证据或规避契约的行为都会被 CI 物理拦截。
+
+---
+
+### 3. 诚实标签与透明降级（Honesty over Hallucination & Degradation Ledger）
+
+#### 为什么静默吞错是杀死 Agent 的头号元凶？（机理深度分析）
+在传统软件开发中，“容错”往往意味着尽可能不抛出致命异常（Crash-safe）；但在面向大模型的 Agent 架构中，**静默容错（Silent Failure）恰恰是引发大模型灾难级幻觉的催化剂**。
+
+1. **空响应被模型推导为“完美无瑕”（Empty = Perfection）**：
+   - 典型案例：当一个静态分析器（LSP / Linter）由于项目超大导致分析超时、或者语法解析器遇到不支持的语法而静默退出时，若扩展直接返回 `{ errors: [] }`；
+   - 大模型看到 0 个错误，会立刻得出错误推论：“代码完全正确，重构成功”，并直接向用户交差。实际上，底层可能存在几十个未捕获的严重类型断裂。
+2. **显式诚实标签（Honesty Labels）**：
+   - `pi-lens` 的做法是：只要分析未完全执行（例如 LSP 超时、仅运行了 AST 正则），必须在返回结果顶部强制追加：
+     ```markdown
+     [LENS DIAGNOSTICS: HONESTY=PARTIAL]
+     Language server timed out after 3000ms. Results only include syntactic checks.
+     Do NOT assume 0 type errors.
+     ```
+   - 这一标签直接击碎了模型的幻觉假设，迫使 Agent 主动寻找替补手段（例如主动调用命令或缩小范围）。
+3. **有界降级账本（Bounded Degradation Ledger）提供自愈导航**：
+   - 扩展在内存中维护容量固定的降级账本，记录熔断事件、内存预警和执行器超时。Agent 可以通过 `/lens-health` 等接口主动感知环境健康度，从而自主决定是否重启服务或调整操作策略。
+
+---
+
+### 4. Prompt 缓存保护与输出物理硬截断（Preserve KV Cache & Physical Output Guardrails）
+
+#### 为什么这两点决定了扩展的可用性生死线？（机理深度分析）
+这是与现代 LLM 服务底层运作机理（Attention 计算、KV Cache 复用、上下文溢出机制）直接绑定的工程硬指标。
+
+1. **前缀不可变性（Prefix Immutability）与 Prompt Caching**：
+   - 现代顶级模型（Claude 3.5/3.7, DeepSeek V3/R1, Gemini）全面依赖基于前缀匹配的 KV Cache 机制。只要 Prompt 的开头哪怕改动了一个字符，后续所有缓存全部击穿，导致首字延迟（TTFT）飙升 5~10 倍，计费成本增加 10 倍。
+   - **错误做法**：很多扩展为了展示“当前时间”、“未完成任务数”或“动态环境变量”，喜欢直接调用钩子篡改 `systemPrompt`。这导致 Agent 每一轮对话都在重新编译几十万 Token 的系统上下文。
+   - **正确做法**：学习 `@plannotator`，完全不碰 `systemPrompt`，通过 `before_agent_start` 以独立消息形式在**对话末尾（Conversation Suffix）**追加临时 Framing。由于前缀历史毫厘未改，底层 KV Cache 保持 100% 命中。
+2. **现实世界的不可控性与模型上下文的脆弱性（Context Flooding Defense）**：
+   - 外部世界的数据规模是无法预测的：一个看似普通的 `curl` 或 MCP 工具调用，可能瞬间吐出 10MB 的 HTML 源码、数万行的堆栈追踪或压缩 Base64 媒体数据。
+   - 如果扩展不加防御地直接返回这些内容，会导致上下文窗口瞬间被垃圾数据淹没，引发激进的上下文截断（Compaction），抹去前序重要的任务目标，使 Agent 当场失忆瘫痪。
+   - `pi-mcp-adapter` 和 `pi-web-access` 的实践表明：**每个工具输出端必须设立物理减压阀（Output-Guard）**。一旦超出安全阈值（如 50KB 或 2000 行），强制落盘为临时文件，仅向模型返回摘要与文件路径，确保模型上下文窗口永远处于高效注意力区间。
+

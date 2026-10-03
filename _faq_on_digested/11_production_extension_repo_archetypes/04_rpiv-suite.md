@@ -119,18 +119,38 @@ Pi 运行时销毁旧上下文 ──► 重新加载扩展模块 ──► 触�
 
 ## 六、测试资产与自动化测试考量（Testing Assets & Strategy）
 
-1. **纯函数单测覆盖（State Reducer Unit Tests）**：
-   由于核心业务逻辑完全与 UI 和 Pi 宿主解耦，`state-reducer.test.ts` 能够在零 Mock 的情况下对各种极端任务序列（如空状态更新、循环依赖任务）进行毫秒级纯逻辑断言。
-2. **分支回溯场景测试（Branch Replay Simulation）**：
-   构造多组复杂的 Mock Session Entries（包含分叉、回滚、Compaction 摘要记录），断言 `replayFromBranch` 是否能精准滤除非活跃分支的脏数据。
+### 1. 深度剖析：为什么 TUI 扩展绝不能用真实终端驱动做自动化测试？
+如果使用真实的终端驱动（如 `node-pty`、`xterm.js` 或启动伪终端）来测试 TUI 交互：
+- **ANSI 逃逸码与渲染时序的“测试地狱”**：不同操作系统（macOS vs Linux）、不同终端宽度（80列 vs 120列）输出的 ANSI 颜色码和光标跳跃控制序列完全不同。微小的字符闪烁会导致 CI 测试全面翻红。Coding Agent 在面对乱码般的 ANSI diff 时，根本无法理解问题出在哪里。
+- **解法：无头字符网格断言与 Redux 状态纯函数测试（Headless Grid & Pure Reducers）**：
+  `rpiv-suite` 实现了**视图渲染与状态机的彻底物理剥离**：
+  - **核心层（`state-reducer.test.ts`）**：零 Mock、零 UI 依赖。把任务状态变更抽象为纯数学函数：`state' = reducer(state, action)`。无论多么复杂的任务依赖增删改查，全部在 5 毫秒内通过纯内存对象比对完成验证。
+  - **视图层（Headless Character Buffer）**：仅在无头内存缓冲区中断言纯文本字符串投影（例如断言某一行包含 `[x] 设计数据库`），彻底规避 ANSI 光标时序抖动。
+
+### 2. 跨分支与会话压缩仿真资产（Branch Replay Simulation）
+针对 Pi 独特的会话树分叉和历史压缩（Compaction）机制，测试套件构建了完整的离线会话树模拟器：
+- 构造伪造的 `sessionManager.getEntries()` 树状数组，包含 3 条不同分支的历史回滚；
+- 验证 `replayFromBranch` 是否能 100% 幂等恢复当前活跃分支的准确状态，绝不混入废弃分支的幽灵任务。
 
 ---
 
 ## 七、面向 Coding Agent 的友好度（Coding-Agent Friendliness / DX for AI）
 
-| 考量维度 | 评级 | 真实表现与分析 |
+### 1. 失效现场还原：/compact 导致的“任务失忆”惨剧
+在没有不可变事件回放机制前，传统的 Todo 插件存在致命缺陷：
+- **故障 Trace**：
+  1. 用户与 Agent 协作开发一个大型功能，Agent 建立了包含 15 个细分步骤的 Todo 树；
+  2. 经过 20 轮对话，Token 达到阈值，用户执行了 `/compact`（或系统自动触发 Compaction）；
+  3. 传统插件将 Todo 状态存放在内存单例变量中。Compaction 触发后，插件实例被重建或上下文被折叠，内存状态归零；
+  4. Agent 突然发现所有任务列表瞬间消失，用户发问“下一步做什么”，Agent 陷入深度迷茫和幻觉。
+- **解法必然性**：`rpiv-suite` 将状态真理源（Source of Truth）下沉至 Pi 原生的持久化会话日志中。只要会话文件还在，哪怕经历多次重载或分叉，状态归约机瞬间从事件流中重放计算出当前最新状态。
+
+### 2. Coding Agent 维护友好度综合评级
+
+| 考量维度 | 评级 | 真实表现与底层机理 |
 |---|---|---|
 | **架构规范性** | 极佳 (A+) | **整个生态中架构最优雅的代表**。采用成熟的 Redux 状态分层，输入清洗（`sanitize.ts`）、状态管理（`state/`）与视图呈现（`view/`）界限分明，非常符合 AI Agent 的认知模式。 |
 | **可恢复性设计** | 极佳 (A+) | 不把任何关键状态留在内存单例里，全部依靠 Session 树的纯事件回放，天然对 Agent 的非确定性调用免疫。 |
 | **软依赖容错** | 高 (A) | 对外围包（如 i18n）全部采用 try-catch 动态 import 降级，避免 Agent 在不完全安装依赖时跑飞。 |
-| **Agent 指引文档** | 良好 (B) | 包含非常详实的类型定义与 JSDoc 注释。 |
+| **Agent 指引文档** | 良好 (B) | 包含非常详实的类型定义与 JSDoc 注释，单模块行数极少，阅读消耗 Token 极低。 |
+

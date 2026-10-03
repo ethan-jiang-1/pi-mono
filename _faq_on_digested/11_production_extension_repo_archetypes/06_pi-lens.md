@@ -186,25 +186,46 @@ sequenceDiagram
 
 ## 6. 测试资产与自动化测试考量 (Testing Assets & Strategy)
 
-`pi-lens` 拥有生态中最严苛的工程测试资产体系，因为静态分析器一旦陷入无限递归或阻塞，会导致整个 Pi 进程卡死：
+`pi-lens` 拥有生态中最严苛的工程测试资产体系，因为静态分析器一旦陷入死锁或漏报，会直接导致 Coding Agent 产生严重的代码破坏：
 
-### 1. `with-test-lock.mjs` 测试并发排队锁
-由于多套测试用例会启动真实的 LSP 子进程或占用特定端口，`pi-lens` 编写了跨进程文件锁脚本：
+### 1. 深度剖析：为什么必须引入变异测试（Mutation Testing with Stryker）？
+在测试 Read-Guard 这种安全边界模块时，普通的单元测试存在巨大的“测试假阳性盲区”：
+- **普通测试的欺骗性**：测试用例可能只断言了“未读文件被拦截”，但如果在行号区间判定中写错了一个等号（例如将 `line >= start && line <= end` 误写为 `line > start`），常规测试依然能绿；
+- **变异测试的物理摧毁机制**：
+  在 `package.json` 中配置了：
+  ```json
+  "mutation:diff": "node scripts/stryker-diff.mjs --base origin/master --max-files 6"
+  ```
+  Stryker 会在 AST 层面主动篡改代码（变异边界条件、反转 if-else、清空返回值）。如果测试套件无法在 2 秒内杀死这些变异体（Mutant），CI 就会直接阻断 PR 合并。这确保了 Read-Guard 的每一行逻辑都拥有极其残暴的防漏击穿能力。
+
+### 2. `with-test-lock.mjs` 测试并发排队锁
+由于多套集成测试会并行启动真实的 LSP 语言服务器守护进程（如 `vtsls`, `gopls`）并监听 IPC 管道，`pi-lens` 编写了跨进程文件排队锁：
 ```bash
 node scripts/with-test-lock.mjs -- vitest run tests/index-integration.test.ts
 ```
-避免多个测试套件在并发运行时相互踩踏 LSP 临时文件或内存溢出。
+避免多个测试套件在并发运行时相互踩踏 LSP 临时工作区或引发内存 OOM。
 
-### 2. 变异测试基线 (Mutation Testing with Stryker)
-在 `package.json` 中配置了：
-```json
-"mutation:diff": "node scripts/stryker-diff.mjs --base origin/master --max-files 6"
-```
-专门用变异测试（改变条件判断、变异边界值）来检验 `read-guard` 和 `delta-calculator` 是否能准确拦截非法用例。如果测试套件无法杀死变异体，则 CI 拒绝合并。
+### 3. 本案采取的 Agent 行为伪装思路：合成工具调用发射桩（Synthetic Tool-Call Harness）
+`pi-lens` 的核心业务是监听 Agent 的写文件动作并反馈诊断。如果真的用大模型在测试里写代码，不仅速度慢，而且大模型每次写出的缩进和变量命名都不同，根本无法稳定触发特定的边界 Bug。
+- **Mock 设计思路（见 `scripts/run-harness.mjs` 与 `cases/*/pipeline-dispatch-poc`）**：
+  它构建了一个专门的测试发射桩（Harness Driver），**直接模拟 Agent 的底层工具调用序列**：
+  ```typescript
+  // 伪装 Agent 在未阅读状态下强行发起编辑
+  await harness.emitToolCall({
+    toolName: "edit",
+    input: { path: "cases/ts/bad-types.ts", range: [10, 15], text: "..." }
+  });
+  // 1. 验证 Read-Guard 是否准时抛出 [READ_GUARD_VIOLATION] 拦截
+  
+  // 伪装 Agent 先读后写
+  await harness.emitToolCall({ toolName: "read_symbol", input: { name: "User" } });
+  await harness.emitToolCall({ toolName: "edit", input: { ... } });
+  // 2. 验证 Read-Guard 放行，并在 turn_end 捕获真实 LSP 语法树诊断
+  ```
+- **价值**：把大模型的偶发行为转化为了**纯粹、确定性的状态转移矩阵**，既测到了真实的 Tree-sitter WASM 和 LSP 进程，又彻底规避了大模型的随机性。
 
-### 3. Grammar Provenance & WASM Load Checks
-配置了自动化脚本：
-- `npm run check:grammars`: 验证所有 Tree-Sitter WASM 文件的哈希与来源。
+### 4. Grammar Provenance & WASM Load Checks
+- `npm run check:grammars`: 验证所有 Tree-Sitter WASM 文件的哈希与来源，杜绝二进制投毒；
 - `npm run check:grammar-load`: 无头启动 Node 运行时，在 500ms 内对 Python、Go、TypeScript、Rust 四门核心语言的语法树解析做冷热加载冒烟测试。
 
 ---
@@ -213,23 +234,30 @@ node scripts/with-test-lock.mjs -- vitest run tests/index-integration.test.ts
 
 `pi-lens` 是真正把 Coding Agent 作为**第一等公民用户（First-Class User）**来设计的典范：
 
-### 1. 专门撰写并维护 `docs/agent-guide.md`
-在代码仓库根目录和文档中直接为 AI 编写使用指南，明确告知：
-- 如何通过 `symbol_search` -> `module_report` -> `read_symbol` 漏斗式探索。
-- 为什么会收到 Read-Guard 报错，收到后应该如何优雅自愈（先调用 `read_symbol` 即可解除阻断）。
-- 解释了工具产生 Auto-fix 时的预期表现（磁盘文件微调是正常行为，不需要 panic）。
+### 1. 失效现场还原：LSP 超时引发的“完美重构”幻觉悲剧
+为什么 `pi-lens` 必须强推 `[honesty: partial]`？
+- **故障 Trace**：
+  1. 在一个拥有 10 万行代码的大型 TypeScript 单体工程中，Agent 调用 `edit` 重构了一个核心基类的参数类型；
+  2. 后台的 `vtsls` 进程因为全量类型计算压力过大，在 3000ms 阈值内未能完成全工程分析，抛出超时；
+  3. 早期版本的扩展简单地兜底返回了 `{ errors: [] }`；
+  4. Agent 看到返回结果中 0 个错误，立即向用户大肆汇报：“全局重构完毕，所有类型检查全部通过，毫无破绽！”；
+  5. 用户随后手动运行 `npm run build`，控制台瞬间喷出 47 个未解决的破坏性类型错误！
+- **解法必然性**：`pi-lens` 设立了铁律：只要 LSP 发生超时或未完成全量覆盖，输出顶部必须强制注入显式的**诚实警告**：
+  ```markdown
+  [LENS DIAGNOSTICS: HONESTY=PARTIAL]
+  Language server timed out after 3000ms. Results only include syntactic ast-grep checks. 
+  Do NOT assume 0 type errors.
+  ```
+  这一标识立刻粉碎了模型的虚假安全感，引导 Agent 显式运行完整编译或逐步排查下游影响。
 
-### 2. 绝不伪造「零错误」的透明诚实机制 (Honesty Labels)
-如果 LSP 崩溃或被熔断，`pi-lens` 会在输出中注入显式标识：
-```markdown
-[LENS DIAGNOSTICS: HONESTY=PARTIAL]
-Language server timed out after 3000ms. Results only include syntactic ast-grep checks. 
-Do not assume 0 type errors.
-```
-这防止了 Coding Agent 误以为自己的代码完美无瑕而直接草率交付。
+### 2. 专门撰写并维护 `docs/agent-guide.md`
+在代码仓库根目录直接为 AI 维护专属指引：
+- **精准探索漏斗（Discovery Funnel）**：强力引导 Agent 使用 `symbol_search` -> `module_report` -> `read_symbol`，禁止无脑调用 `read_file` 浪费数万 Token；
+- **Read-Guard 优雅自愈**：明确告知 Agent 收到拦截错误时，先调用 `read_symbol` 即可秒级解除阻断。
 
 ### 3. 可控的降级与自愈命令
 Agent 可以直接在会话中通过工具或指令管理诊断行为，例如当遭遇特殊代码生成场景时，可以调用 `/lens-allow-edit <path>` 自主获取临时豁免权，而无需人工干预。
+
 
 ---
 

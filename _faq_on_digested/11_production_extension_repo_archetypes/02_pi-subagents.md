@@ -166,21 +166,64 @@ pi-subagents/
 
 ## 六、测试资产与自动化测试考量（Testing Assets & Strategy）
 
-1. **多进程并发竞争防御（Concurrency & Race Condition Gates）**：
-   子代理涉及大量子进程衍生与文件状态同步。测试资产核心测试：
-   - 当多个子代理并发写入同一个结果文件时，`result-delivery-ownership.js` 的文件锁抢占逻辑是否原子生效；
-   - 当主进程被 `SIGINT` 杀掉时，`watchdog` 是否能在毫秒级回收所有子进程，不留孤儿进程。
-2. **离线驱动（Offline Mock Harness）**：
-   子代理启动命令（`pi -p ... --no-session`）在测试中被替换为受控的脚本化 CLI 桩程序，模拟子代理的阶段性输出与异常崩溃，测试整个状态机在无需网络与真实大模型的情况下的容灾自愈能力。
+### 1. 深度剖析：为什么多智能体测试绝不能调用真实大模型？
+多代理编排（Multi-Agent Orchestration）是测试非确定性（Flakiness）的重灾区。如果主代理和子代理都使用真实大模型：
+- **随机性指数级叠加（Compounding Stochasticity）**：单个模型调用的成功率是 95%，两个代理协同三次交互的链路成功率就会骤降到 $0.95^6 \approx 73\%$。在 CI 中每跑四次就必挂一次。
+- **Agent 自愈循环被摧毁**：当子代理因大模型偶发截断或网络抖动返回非预期格式时，负责修复 Bug 的 Coding Agent 会产生误判，误以为是自己的进程间 IPC 传输协议或 JSON 反序列化有 Bug，从而反复重写原本正确的调度代码，陷入无限内耗。
+
+### 2. 本案采取的 LLM 伪装思路：剧本化 Faux CLI 桩程序（Scripted Faux CLI & Event Stream Mock）
+子代理在生产环境中是通过调用系统 Shell 派生子进程的：`child_process.spawn("pi", ["-p", task, "--no-session"])`。`pi-subagents` 的 Mock 核心不是在内存里拦截函数，而是**用一个假的可执行文件偷换真实子进程**：
+
+```
+[主测试用例: subagent.test.ts]
+      │
+      ├── 1. 注入环境变量: PATH="./tests/fixtures/bin:$PATH"
+      │      (当主进程执行 spawn("pi") 时，命中伪装的 faux-pi-cli.mjs)
+      │
+      ▼
+[faux-pi-cli.mjs (LLM 伪装桩程序)]
+      │
+      ├─► 2. 解析传入的参数: task="编写 auth 测试", profile="test-writer"
+      ├─► 3. 按照预设的剧本队列 (Script Queue)，模拟大模型的逐步输出:
+      │        - 瞬间向 stdout 打印流式事件 (SSE 模拟帧)
+      │        - 模拟耗时 15ms
+      │        - 将预设的测试产物直接写入 .pi/runs/<jobId>/output.json
+      │        - 以退出码 0 正常退出 (或按测试需求返回 1 模拟异常退出)
+      ▼
+[Watchdog & Result-Watcher]
+      └─► 检测到子进程结束与结果落盘，将数据无缝回传主测试用例
+```
+
+- **剧本桩的优势**：整个子进程派生、跨进程管道通信、状态轮询和文件认领走的是 100% 真实真实的操作系统调用，但背后的大模型被彻底替换为毫秒级的确定性输出，保证测试跑得飞快且绝对不产生 Flaky。
+
+### 3. 多进程并发竞争与文件锁资产
+- **原子交付抢占测试（Race Condition Gates）**：模拟 5 个子代理同时执行完毕并试图写入同一个结果文件，检验 `result-delivery-ownership.js` 的文件互斥锁（Flock/Rename 机制）是否能保证零脏写；
+- **孤儿进程熔断自愈（Orphan Cleanup Verification）**：模拟向主进程强行发送 `SIGKILL`，验证独立的守护进程（Watchdog）能否在 100ms 内感知父进程死亡并级联清理所有分支派生子进程，避免测试在宿主机残留僵尸进程。
 
 ---
 
 ## 七、面向 Coding Agent 的友好度（Coding-Agent Friendliness / DX for AI）
 
-| 考量维度 | 评级 | 真实表现与分析 |
+### 1. 失效现场还原：Fork 炸弹与 Worktree 踩踏
+在 `pi-subagents` 的早期演进中，出现过两次险些瘫痪开发机环境的典型故障：
+- **故障 Trace 1（递归 Fork 炸弹）**：
+  1. 主 Agent 决定将一个大型任务拆分，调用 `subagent({ task: "重构工具类" })`；
+  2. 派生出的子 Agent 进程加载了全局 Pi 配置，插件自动被激活；
+  3. 子 Agent 面对同样的任务，思考后再次决定“拆分子任务”，调用 `subagent`；
+  4. 几秒钟内系统衍生出 50+ 个子进程，内存耗尽，系统直接卡死。
+  - **解法**：`if (process.env.PI_SUBAGENT_CHILD === "1") return;` 这一极简防御线成了铁律。
+- **故障 Trace 2（同目录 Git 踩踏）**：
+  1. 主 Agent 与子 Agent 在同一个工作目录下并发写文件；
+  2. 子 Agent 运行 `git add .`，直接把主 Agent 还没写完的半截草稿暂存并提交，导致主 Agent 后续的 `edit` 工具调用发生行号漂移全部报错。
+  - **解法**：强制推行 Git Worktree 隔离（`git worktree add`），让子代理在独立的物理分支目录中工作，彻底消除写冲突。
+
+### 2. Coding Agent 维护友好度综合评级
+
+| 考量维度 | 评级 | 真实表现与底层机理 |
 |---|---|---|
 | **模块解耦粒度** | 极佳 (A+) | **模范级的清晰分层**。源码划分为 `agents/`、`runs/`、`intercom/`、`watchdog/`、`tui/` 等专职子目录，单个模块控制在 200~400 行以内，Coding Agent 进行局部阅读和修改时几乎不会发生 Context 溢出。 |
 | **防御性边界** | 极高 (A+) | `PI_SUBAGENT_CHILD=1`、`async-retention` 超时释放、`capacity-ceiling` 并发上限，全方位防止失控执行。 |
-| **类型契约** | 高 (A) | 在 `src/api/` 下输出了 15 个细分公共契约（`.d.ts`），方便其他插件与子代理通信。 |
-| **Agent 指引文档** | 良好 (B) | 包含详尽的 `docs/` 架构说明，且结构自解释性极强。 |
+| **类型契约** | 高 (A) | 在 `src/api/` 下输出了 15 个细分公共契约（`.d.ts`），方便其他插件与子代理通信，杜绝类型隐式转换带来的隐藏 Bug。 |
+| **Agent 指引文档** | 良好 (B) | 包含详尽的 `docs/` 架构说明，且结构自解释性极强，代码注释直击不变量。 |
+
 

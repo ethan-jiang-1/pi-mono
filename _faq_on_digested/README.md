@@ -42,6 +42,7 @@ _faq_on_digested/
 - [`08_extension_vs_package/`](08_extension_vs_package/question.md) — Extension 和 Package 到底是什么区别？（两篇并列文档、两套安装路径、settings 里并列的两个键）
 - [`09_package_ecosystem/`](09_package_ecosystem/question.md) — pi 包生态全景：规模、集中度、品类、空位（5412 包快照 + 选装菜单）
 - [`10_getting_started_first_extension/`](10_getting_started_first_extension/question.md) — 如何在 Pi 底下开发第一个插件/扩展？按诉求性质怎么选型与落地最合理？（性质推荐矩阵、三秒调试循环、五类模板、多轴门禁实战与工程避坑）
+- [`11_production_extension_repo_archetypes/`](11_production_extension_repo_archetypes/question.md) — 真实世界头部 Pi 扩展的工程架构与 Repo 组织解剖（866K 标杆逐案深度拆解：前后诉求、影响面、利用能力与代码逻辑结构）
 
 ## 引用规范
 

@@ -4,7 +4,7 @@
 
 简单说：**一子目录 = 一个探究过的问题，答案是自己综合出来的，不是从某一份材料里直接抄的。**
 
-> **当前研究基线**：涉及运行时行为的结论以 pi-mono `v0.86.1`（upstream tag `13cbf77df`，2026-09-21 已 merge 进本仓库）为准；旧版本仅用于变更史解释，不能替代当前源码验证。**注意**：基线声明已随 sync-0006 更新，但本目录各篇结论尚未针对 v0.85.x–0.86.x（durable drive、TranscriptContext、chord/durable 等）重新研究——阅读时先对照 [`_digested/_change_log/0006-v0.84.4-to-v0.86.1.md`](../_digested/_change_log/0006-v0.84.4-to-v0.86.1.md) 的影响评估。
+> **当前研究基线**：涉及运行时行为的结论以 pi-mono `v1.0.0`（upstream tag `a13d35a74`，2026-10-02 随 sync-0007 merge `9e387e653` 进本仓库）为准；旧版本仅用于变更史解释，不能替代当前源码验证。**注意**：基线声明已随 sync-0007 更新，但本目录各篇结论尚未针对 v0.85.x–1.0.0（durable drive、TranscriptContext、chord/durable、pi-agent-core 瘦身、MCP/codemode 落地、fullscreen 默认化等）重新研究——阅读时先对照 [`_digested/_change_log/0007-v0.86.1-to-v1.0.0.md`](../_digested/_change_log/0007-v0.86.1-to-v1.0.0.md) 的影响评估。
 
 ## 和 `_digested/` 的区别
 
@@ -39,6 +39,9 @@ _faq_on_digested/
 - [`05_root_entry_doc_navigation/`](05_root_entry_doc_navigation/question.md) — Pi 跑起来之后根入口文档怎么被**动态消费**？（注入 buildSystemPrompt + read 拉取 + compaction 回收）
 - [`06_pi_vs_dsh/`](06_pi_vs_dsh/question.md) — pi vs DSH：两个"很灵活"的 harness，共性、差异、优缺点？——可扩展性 vs 可组合性
 - [`07_pi_usage_scenarios/`](07_pi_usage_scenarios/question.md) — Pi"只是命令行"是不是能力有限？正常/合理用法有哪些？（三路深挖修订版：CC/Codex 映射、本机审计、包生态、社区实战、2026 跨 harness 新实践、三层组装 starter kit）
+- [`08_extension_vs_package/`](08_extension_vs_package/question.md) — Extension 和 Package 到底是什么区别？（两篇并列文档、两套安装路径、settings 里并列的两个键）
+- [`09_package_ecosystem/`](09_package_ecosystem/question.md) — pi 包生态全景：规模、集中度、品类、空位（5412 包快照 + 选装菜单）
+- [`10_getting_started_first_extension/`](10_getting_started_first_extension/question.md) — 如何在 Pi 底下开发第一个插件/扩展？按诉求性质怎么选型与落地最合理？（性质推荐矩阵、三秒调试循环、五类模板、多轴门禁实战与工程避坑）
 
 ## 引用规范
 

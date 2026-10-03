@@ -1,6 +1,7 @@
 # 07 Chord 与 Facet/Service：第四条 authoring 面
 
 > **基线**：v0.85.1（tag `d981de122`，merge `e3aa42f46`）。本文全部结论来自当前工作树的静态读源码取证，**没有运行 chord 测试**（原因与后果见末节）。
+> **⚠️ v1.0.0 增补（2026-10-02，`_change_log/0007`）**：chord 的依赖关系与 API 已变——① **pi-agent-core 与 chord 脱钩**（agent 包 src 零 chord import，`dependencies` 移除；v1.0.0 起 chord 的运行时依赖方是 client / coding-agent / **durable**（新）/ protocol / server 五个包，`Context`/`JsonValue` 类型的主要消费者是 pi-durable）；② **Replicated state 破坏性改形**：`MutableReplicatedState` 的 `state` 代理 + `publish()` 被 `change(context, mutate)` / `replace(context, value)` 取代（`src/types.ts:59-71`、实现 `src/services/state.ts:184/202/231`），`replicatedState()` 新增 `ReplicatedStateSource` 重载返回 `AttachedReplicatedState`（`src/api.ts:91-106`）；③ **delta 六动词 → 七动词**：新增 `m`（数组 reorder），delta 引擎收敛为唯一不可变 tracker（astra/cow 原型删除，`tracker.ts` 2,205 行，`delta/index.ts` 1,879→694 行）；④ esbuild pin 0.28.1→0.28.2；⑤ §7/§9/§10 引用的 `packages/agent/docs/**`（plugins.md、rpc.md、mobile-handoff 全树）已于 v1.0.0 整树删除——相关"规格 vs 现状"分析转为 git 历史考古。chord 仍无 CHANGELOG；本文正文保留 v0.85.1 取证原貌，以下按节标注 v1.0.0 变化点。
 >
 > **标注约定**：本目录此前没有强制标记法，本文对关键判断显式标注 —— **【硬事实】** 可直接读源码/文档验证；**【解释】** 基于事实的推断；**【未取证/推测】** 没有直接证据。其余沿用本目录的粗体强调与 `>` 提示块。
 
@@ -30,6 +31,8 @@ packages/server/src/types.ts:1                    JsonValue / ServiceCall / Serv
 packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 chord
 ```
 
+> **⚠️ v1.0.0**：上表前三行（`packages/agent/src/harness/**`）已随 pi-agent-core 收缩**整体删除**——agent 包 src 现在零 chord import、`dependencies` 也移除了 chord。chord 的 `Context`/`JsonValue` 消费者换成 **`packages/durable`**（`src/entries.ts:1`、`src/tools/*.ts:1`、`src/storage/sqlite/storage.ts:1` 等）。其余各行（protocol/client/server）仍成立。
+
 **【硬事实】** 五个包把 chord 声明为**运行时 `dependencies`**（不是 dev）：
 
 | 包 | `@earendil-works/chord` 位置 |
@@ -40,7 +43,7 @@ packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 
 | `packages/server` | `dependencies` `^0.85.1` |
 | `packages/coding-agent` | `dependencies` `^0.85.1` |
 
-也就是说：**即使你完全不碰 facet/plugin，只要你用 `pi-agent-core` 的 Harness，`Context` 类型就已经是 chord 的**（`harness/context.ts` 是整段 re-export，`BACKGROUND_CONTEXT`/`withAbortSignal`/`createContextKey` 等函数的实现在 `packages/chord/src/context/index.ts`）。
+> **⚠️ v1.0.0**：依赖方名单变了——**agent 移出、durable 移入**。现役五家：`client` / `coding-agent` / `durable` / `protocol` / `server`（各自 package.json `dependencies`）。也就是说：只要你用 **pi-durable 的 Session/Harness**（或直接用 `Context`/`JsonValue` 类型），它们就已经是 chord 的——chord 的 context 子路径（`src/context/index.ts`）仍是这些通用类型的实现地。
 
 **【硬事实】** chord 自己的边界测试把这一点钉死了 —— `packages/chord/test/boundary.test.ts:11-33` 遍历 `packages/chord/src/**/*.ts`，断言三件事：源码里没有任何 `@earendil-works/pi-*` import、没有逃出 `src/` 的相对 import、`package.json` 的 `dependencies` 里没有 `@earendil-works/pi-*`。
 
@@ -52,7 +55,7 @@ packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 
 
 > Chord is an application-composition runtime for systems assembled from plugins/extensions. … It is developed as a standalone package in the Pi monorepo, but **it is not a Pi package: it does not depend on any other Pi workspace package** and can be used by unrelated applications.
 
-**【硬事实】** 它的**唯一运行时依赖是 `esbuild`**（`packages/chord/package.json:65-67`，pin 在 `0.28.1`），且只给 bundler 用。其余都是标准 JavaScript/Node API。`devDependencies` 只有 `shx` 与 `vitest`。`engines.node >= 22.19.0`。
+**【硬事实】** 它的**唯一运行时依赖是 `esbuild`**（`packages/chord/package.json:66`，v0.85.1 时 pin 在 `0.28.1`，v1.0.0 为 `0.28.2`），且只给 bundler 用。其余都是标准 JavaScript/Node API。`devDependencies` 只有 `shx` 与 `vitest`。`engines.node >= 22.19.0`。
 
 **【硬事实】** 它的五个功能性子路径（`packages/chord/package.json:8-35`，另有 `./package.json` 自身）：
 
@@ -64,7 +67,7 @@ packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 
 | `@earendil-works/chord/bundler` | 基于 esbuild 的 facet 打包（`bundleFacetPackage()` / `bundleFacets()`） |
 | `@earendil-works/chord/node` | Node-only 的加载器（`createFacetBundleLoader()` / `readFacetBundleArtifact()` 等） |
 
-**【硬事实】** 规模：`src/` 24 个 `.ts` 文件、5822 行；`test/` 3553 行。
+**【硬事实】** 规模：v0.85.1 时 `src/` 24 个 `.ts` 文件、5822 行；v1.0.0 为 29 个文件（delta 拆出 `tracker.ts` 2,205 行、`draft.ts`、`diff-revisions` 等；`delta/index.ts` 从 1,879 行缩到 694 行）。
 
 ### 为什么它长在 pi-mono 里（而不是独立仓库）
 
@@ -99,9 +102,9 @@ packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 
 | **Facet** | `Facet { id, setup(env: FacetEnvironment) }`（`src/types.ts:225-228`）；`createFacetHost()`（`src/api.ts:19-27`）、`defineFacet()`（`src/api.ts:66-68`） | 插件的组成单元。**一个 plugin 可拆成多份，分别跑在不同进程/环境**（backend / browser / TUI） |
 | **FacetEnvironment** | `src/types.ts:206-223`，**8 个成员** | `use` / `observe` / `provide` / `provideMany` / `replicatedState` / `own` / `onActivate` / `onDeactivate` |
 | **Service** | `Service<T> { id, local }`（`src/types.ts:63-68`）；`ServiceMode = "singleton" \| "keyed"`（`src/types.ts:60`）；`defineService()`（`src/api.ts:70-82`） | typed + stable token。`{local:true}` 表示**进程本地、不出口**。消费者拿的是**稳定 facade**，provider 断连或被替换时不断连 |
-| **Replicated state** | `ReplicatedState<T>`（`src/types.ts:43-48`）、`MutableReplicatedState<T>`（`src/types.ts:50-56`）；`replicatedState()`（`src/api.ts:88-90`） | 单写者、latest-value 复制。生产者改 tracked `state` 代理 + `publish(context)`，消费者收**完整不可变值** |
+| **Replicated state** | `ReplicatedState<T>`（`src/types.ts:43`）、`MutableReplicatedState<T>`（`src/types.ts:59`，v0.85.1 时 :50-56）；`replicatedState()`（`src/api.ts:91`，v1.0.0 重载分化：入参 `ReplicatedStateSource` 返回 `AttachedReplicatedState`，:105/:119） | 单写者、latest-value 复制。v0.85.1：生产者改 tracked `state` 代理 + `publish(context)`。**v1.0.0 改形**：`state`/`publish()` 移除，改 `change(context, mutate)`（同步 copy-on-write draft，回调返回后失效）与 `replace(context, value)`（整体接管严格 JSON 快照），实现 `src/services/state.ts:184/202/231`；`subscribe()` 支持异步 listener、100 交付缓冲、溢出保留最新、序列可跳过，`ServiceProviderUpdate` 新增 `"reset"` 全量重定基线变体（`src/types.ts:49-57`） |
 | **Remote-service boundary** | `RemoteServiceTransport`（`src/types.ts:184-192`）、`RemoteServiceBinding`（`src/types.ts:202-204`）、`RemoteServiceSource`（`src/types.ts:230-239`）、`createRemoteServiceBinding()`（`src/api.ts:84-86`） | chord **不规定** framing、routing、transport、应用外层 envelope |
-| **Delta**（额外） | `src/delta/index.ts`：`track()` / `apply()` / `applyImmutable()` / `encoder()` / `decoder()` | 六动词 op、数组路径、`WireOp` 路径 interning |
+| **Delta**（额外） | `src/delta/index.ts`：`track()` / `apply()` / `applyImmutable()` / `applyImmutableBatches()` / `encoder()` / `decoder()`（v1.0.0：tracker 拆到 `src/delta/tracker.ts` 2,205 行，`TrackerOptions` 删除；新增 `diffRevisions`（`diff.ts`）与 `Draft`） | v0.85.1 六动词 op；**v1.0.0 七动词**：新增 `m`（数组 reorder，`new[i] = old[permutation[i]]`）；数组路径、`WireOp` 路径 interning 不变 |
 
 ### 几条容易读错的语义
 
@@ -111,7 +114,7 @@ packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 
 
 **【硬事实】** Replicated state 的**显式非目标**（`PLANNING.md:389-396`）：无持久化或重启重建、无事件历史、无 CRDT 多写者、无离线重放、无自动 unchanged-value 抑制、无高频流式传输。每次 publication flush **一个 decoded op batch**；**每个 remote client / state 流拥有独立的 path-codec 状态**（`README.md:37-39`，实现见 `src/services/state-codec.ts` 的 `StateCodecRegistry`）；断连/替换后 replica 变 unready，直到 rehydrate。
 
-**【硬事实】** 六动词 op 的 wire 形式：`r`（整体替换）/ `s`（set）/ `d`（delete）/ `a`（string append）/ `t`（front-truncate）/ `p`（array splice），定义在 `src/delta/index.ts:30-36`（`Op`）与 `:48-60`（`WireOp`）。`WireOp` 只多了两件压缩：`["#", id, path]` 在路径**第二次**出现时定义 id，以及省略路径（复用上一 op 的路径，靠 arity 消歧）。规则写在 `src/delta/README.md:76-141`。
+**【硬事实】** 六动词 op 的 wire 形式：`r`（整体替换）/ `s`（set）/ `d`（delete）/ `a`（string append）/ `t`（front-truncate）/ `p`（array splice），定义在 `src/delta/index.ts:30-36`（`Op`）与 `:48-60`（`WireOp`）。`WireOp` 只多了两件压缩：`["#", id, path]` 在路径**第二次**出现时定义 id，以及省略路径（复用上一 op 的路径，靠 arity 消歧）。规则写在 `src/delta/README.md:76-141`。**v1.0.0：七动词**——新增 `m`（`["m", Path, number[]]`，数组原地 reorder：`new[i] = old[permutation[i]]`，`src/delta/index.ts` 的 `Op` 定义处可见），且 op 定义从 `index.ts` 移入 `tracker.ts` 一带（`TrackerOptions` 类型已全库消失）。
 
 **【硬事实】** chord 的 RPC 边界目前**不对称**：`RemoteServiceTransport`/`RemoteServiceSource` 只覆盖"跨边界调用与订阅服务"，对称 RPC（两个 peer 互相调用）**仍是 planned、未实现**。`PLANNING.md:3` 原文：
 
@@ -195,6 +198,8 @@ tui.ts        export default defineFacet({ id: ".../tui" })      —— use Slas
 
 ## 7. ⚠️ 现状 vs 规格：这一节是本篇的诚实底线
 
+> **⚠️ v1.0.0**：本节引用的 `packages/agent/docs/` 整树（mobile-handoff/**、plugins.md、rpc.md、work-packages 等 ~39k 行）**已在 v1.0.0 删除**（7fd478a2e），两份 `rpc.md` 的同名碰撞也随之一并消失（`coding-agent/docs/rpc.md` 仍在，并被拆分重组）。本节的逐条对照分析**作为 v0.85.1 取证存档保留**——其中"facets.md 规格未落地"的判断后来被印证：v1.0.0 直接删掉了这些未落地规格文档，chord 的事实规范改为 `packages/durable/docs/spec.md`（4,601 行）+ `packages/chord/src/delta/README.md`。引用这些文档时只能标 git 历史（如 `git show 13cbf77df:packages/agent/docs/plugins.md`）。
+
 **【硬事实】** `packages/agent/docs/mobile-handoff/README.md:22` 原文：
 
 > **Three units ship working code. Four are specifications. Do not assume a doc describes something that exists.**
@@ -276,12 +281,12 @@ chord 本体：
 
 Pi 侧：
 
-- 被实现的那份规格：[`packages/agent/docs/plugins.md`](../../packages/agent/docs/plugins.md)（service transport 语义：[`packages/agent/docs/rpc.md`](../../packages/agent/docs/rpc.md)，**注意与 `coding-agent/docs/rpc.md` 同名不同物**）
-- **规格、未实现**：[`packages/agent/docs/mobile-handoff/02-plugins/01-facets/facets.md`](../../packages/agent/docs/mobile-handoff/02-plugins/01-facets/facets.md)、状态表 [`mobile-handoff/README.md`](../../packages/agent/docs/mobile-handoff/README.md)
+- 被实现的那份规格：[`packages/agent/docs/plugins.md`](../../packages/agent/docs/plugins.md)（service transport 语义：[`packages/agent/docs/rpc.md`](../../packages/agent/docs/rpc.md)，**注意与 `coding-agent/docs/rpc.md` 同名不同物**）**⚠️ v1.0.0：两文件已随 `packages/agent/docs/` 整树删除，仅存 git 历史**
+- **规格、未实现**：[`packages/agent/docs/mobile-handoff/02-plugins/01-facets/facets.md`](../../packages/agent/docs/mobile-handoff/02-plugins/01-facets/facets.md)、状态表 [`mobile-handoff/README.md`](../../packages/agent/docs/mobile-handoff/README.md) **⚠️ v1.0.0：同上，已删除**
 - 落地实现：[`packages/coding-agent/src/experimental/services/`](../../packages/coding-agent/src/experimental/services/)（服务清单见同目录 `README.md`）
 - Pi 侧插件 API 与打包/加载适配：[`experimental/plugin.ts`](../../packages/coding-agent/src/experimental/plugin.ts)、[`experimental/plugins/bundled.ts`](../../packages/coding-agent/src/experimental/plugins/bundled.ts)、[`experimental/plugins/package.ts`](../../packages/coding-agent/src/experimental/plugins/package.ts)
 - 示例 plugin 包：[`packages/coding-agent/examples/plugins/pi-example-plugin/`](../../packages/coding-agent/examples/plugins/pi-example-plugin/)（`contract.ts` / `session.ts` / `tui.ts`）
-- 非实验的 chord 接入点：[`packages/agent/src/harness/context.ts`](../../packages/agent/src/harness/context.ts)（整段 re-export）
+- 非实验的 chord 接入点：~~`packages/agent/src/harness/context.ts`~~（v0.86.1 整段 re-export；**v1.0.0 已删除**——agent 与 chord 脱钩，chord Context 的主要消费者是 `packages/durable`）
 
 ## 10. 未取证 / 不确定
 
@@ -296,7 +301,7 @@ Pi 侧：
 - **`PLANNING.md:580-618` 的规划目录树多数不存在**（它列了 `src/errors.ts`、`rpc/`、`plugins/` 等；实际布局是 `facets/` + `services/` + `delta/` + `node/`）。同节 `:578` 自己声明该布局 "is a planning aid, not a requirement to create all files immediately"。**不要把 PLANNING 的目录树当现状。**
 - **`PLANNING.md` 不被发布。** `packages/chord/package.json:37-41` 的 `files` 只含 `dist`、`README.md`、`src/delta/README.md` —— **PLANNING.md 不在 npm tarball 里**。所以关于"chord 不是稳定 API"的这句免责声明，外部消费者**看不到**。
 - **"mobile" 指什么：不确定。** 修正一条更早的口径：**"mobile 全仓零命中"是不准确的**。实际命中分布是 —— `packages/*/src` 里只有 `coding-agent/src/core/export-html/template.{css,js}` 的响应式布局代码（与 facet 无关，5 处）；其余全在文档：`mobile-handoff/**`、`agent/docs/post-wp05-roadmap.md`、`agent/docs/work-packages/05-direct-durable-drive.md:524`（"## 13. Mobile assistant-output handoff"）、`agent/docs/harness.md`（4 处，均指向同一个 handoff）、`coding-agent/docs/sdk.md:8`（"Build a custom UI (web, desktop, mobile)"）。**没有任何 mobile 产品、包或服务**；这个词在 harness 语境里是 "mobile assistant-output handoff" 这个工作项名。只能写"它自称 design handoff，面向跨进程/远端 presentation 场景"。**不要断言存在移动端产品。**
-- **`experimental/mini/` 与 chord 的 `defineService` 是两套不同的东西**（`mini/shared/protocol.ts` 有它自己的 `defineService`），`mini/README.md` 自称 "six frame kinds" 而代码里的 `Frame` union 有七项 —— **以代码为准**。mini 与 `experimental/services/` 那套 chord 栈是**并列**关系，不是其上层。详见 [`06-coverage-and-parity.md`](06-coverage-and-parity.md)。
+- **`experimental/mini/` 与 chord 的 `defineService` 是两套不同的东西**（`mini/shared/protocol.ts` 有它自己的 `defineService`），`mini/README.md` 自称 "six frame kinds" 而代码里的 `Frame` union 有七项 —— **以代码为准**。mini 与 `experimental/services/` 那套 chord 栈是**并列**关系，不是其上层。详见 [`06-coverage-and-parity.md`](06-coverage-and-parity.md)。**⚠️ v1.0.0：`experimental/mini|micro/` 已整体删除（无迁移）**，chord 栈的实验演示由 `experimental/durable/`（pi-durable Harness + SQLite 的 TUI agent）接替。
 - **chord 是否会被 Pi 之外的第三方采用：无法验证。** `README.md:6-7` 说"can be used by unrelated applications"，`boundary.test.ts` 保证了这个**技术前提**，但仓库里没有任何第三方消费者。
 - **chord 无 CHANGELOG、无版本协商。** `PLANNING.md:476` 要求"version negotiation can be a peer handshake or an adapter-guaranteed constructor parameter"，但 chord 侧**没有** `PROTOCOL_VERSION` 之类的版本常量（协议版本 8 在 `packages/protocol/src/protocol.ts:5`，属于 Pi，不属于 chord）。这与 §3 的"对称 RPC 仍未实现"一致。
 - **`plugins.md` / `rpc.md` 里哪些是现状、哪些是规格，本篇只抽查了少数几项**（§7 末）。要做全量对照需要逐符号核对 `experimental/services/`，本轮未做。

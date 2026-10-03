@@ -2,6 +2,8 @@
 
 > **数据快照**：2026-09-21（pi.dev/packages 显示 **5372 个包**）。生态数据时效性极强，数字只代表快照当天；机制与治理结构相对稳定。
 >
+> **v1.0.0（2026-10-02 同步）生态事实修正**：① 官方**一级支持 MCP 客户端**——独立包 `packages/mcp`（零 pi 依赖 + OAuth）+ 内置 `mcp` 扩展（`/mcp`、`pi mcp add|list|login|logout`、`mcp.json`），下文"MCP 桥是核外补位"的论断相应软化，详见 [`_digested/harness/02-Boundaries/2.2_no_interop_protocol.md`](../../harness/02-Boundaries/2.2_no_interop_protocol.md) 的 v1.0.0 再评价；② 官方文档 `docs/providers.md` 更名 "Providers"、Radius 置顶（commit `c2f65d8f1`）。
+>
 > 本篇回答的问题与前三子目录不同：01-Core 讲"核有多小"、02-Expansion 讲"怎么扩"、03-Patterns 讲"套路怎么成立"，本篇讲**按这套思路长出来的生态现在长什么样、upstream 管不管、往哪儿发展**。
 
 ## 子篇
@@ -49,7 +51,7 @@ pi.dev/packages 的 "Recently published" 以**分钟级**刷新（抓取时最�
 
 **核外能力增量**：
 
-- **MCP 桥**：`pi-mcp-adapter`（把 MCP 服务器接进 pi，下载量最大的类别之一）
+- **MCP 桥**：`pi-mcp-adapter`（把 MCP 服务器接进 pi，下载量最大的类别之一）。**v1.0.0 修正**：官方已落地 MCP 客户端（独立包 + 内置扩展），"官方不做 MCP、adapter 是唯一通道"的前提失效——该品类的生态位从"补官方空白"收缩为"增值层"（token 效率、批量管理、跨 harness 通用等）
 - **web 能力**：`pi-web-access`（搜索/抓页/克隆仓库/PDF/YouTube）
 - **context 工程**：`billion-context`（29K/mo，context 压缩代理，"数十亿 token 过一个窗口"）、`context-mode`（宣称省 98% context）
 - **代码智能**：`pi-lens`（LSP/linter/类型检查实时反馈）
@@ -79,7 +81,7 @@ pi.dev/packages 的 "Recently published" 以**分钟级**刷新（抓取时最�
 
 ## 发展方向（可观察的趋势，非预言）
 
-1. **core 留白 → 市场补位 → 竞争收敛**：subagents/todo/plan 都在走"多实现并存 → 靠下载量自然头部化"的路径；upstream 至今没有把任何一个收编回 core 的迹象。
+1. **core 留白 → 市场补位 → 竞争收敛**：subagents/todo/plan 都在走"多实现并存 → 靠下载量自然头部化"的路径；upstream 至今没有把任何一个收编回 core 的迹象。（v1.0.0 的 MCP 是第一个反例信号——官方以"内置扩展 + 独立包"的形式下场吃掉了一个生态品类，虽然仍不在 core 里，但"官方明确说不做"的清单缩短了。）
 2. **pi 自身成为包的运行底座**：feynman 这类"基于 pi 的产品"意味着 library-first（integration/）和 extension 生态正在合流——嵌入者直接复用生态。
 3. **分发渠道分层**：官方 npm 目录 → awesome 列表 → 社区安装器（pi-toolset），出现了二手策展/分发层。
 4. **跨 harness 标准采纳**：skills 遵循 agentskills.io——生态在主动对齐开放标准而非锁死用户。

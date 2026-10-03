@@ -141,3 +141,13 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 - 消化材料：`_digested/agent/05-Infra/5.2_AI_Auth_Subsystem.md`（credential 生命周期、models.json 在 auth 层的位置）
 
 > 基线：以上源码路径以本仓库工作树 v0.85.1 为准（tag `d981de122`，merge `e3aa42f46`）。
+
+---
+
+## 7. v1.0.0 注记（2026-10-02 同步后）
+
+**⚠️ 本文正文的行号锚点仍以 v0.85.1 为准，v1.0.0 下已漂移**（如 `applyModelsJson` 从 provider-composer.ts:177 移至 :281，`modelFromJson` :130 → :192）。机制叙述（身份二元组、upsert by id、魔法探测）未经全面复核前按历史结论对待；以下为已核实的 v1.0.0 关键变化：
+
+- **strict 工具采样默认翻转**（影响走中转的工具调用）：未知 OpenAI 兼容端点（第三方中转基本都命中）现在默认 `supportsStrictMode: false`（`packages/ai/src/api/openai-completions.ts:1667`，890f92088）——依赖 strict JSON schema 的场景需在模型条目显式写 `supportsStrictMode: true`。
+- **`--provider` 必须配 `--model`**（`packages/coding-agent/src/main.ts:470-474`，0c453048b）：孤立 `--provider` 从"静默忽略"变为报错退出；§4 的 CLI 用法两参数成对使用。
+- 模型目录生成 schema 升 v6、新 `typesafe` provider（不影响 models.json 手写流程）。

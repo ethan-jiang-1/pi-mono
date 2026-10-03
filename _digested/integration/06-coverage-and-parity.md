@@ -1,6 +1,7 @@
 # 06 Coverage And Parity：哪些能接，哪些不是 TUI API
 
 > 本文已对照 v0.86.1 复核。
+> v1.0.0（2026-10-02 同步）增补：MCP 客户端成为官方一级能力（原"无"的论断失效，见 OpenCode 对比表）；fullscreen 成为 TUI 默认形态（见"TUI parity 不覆盖"末尾注记）。
 
 ## 这张表解决什么问题
 
@@ -145,7 +146,9 @@ token 定义分别在 `services/agent-controller.ts:54`、`models.ts:35`、`sess
 | 跳到底部指示器（`TuiAltScreen.scrollToEndIndicator`，v0.85.0 新增） | 宿主自己渲染：follow-end 主 scroll view 滚离末端时，在最后一行居中显示一个可点击的"跳到底部"标签（选项 `tui-alt-screen.ts:180`，渲染 `:1618-1634`）。无 SDK/RPC 等价物 |
 | 鼠标区域组件（`MouseRegion`） | pi-tui 已从 `packages/tui/src/index.ts:21` 导出（`components/mouse-region.ts`），可作为宿主自绘 UI 的复用原语；无 SDK/RPC 等价物 |
 
-TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages/coding-agent/src/modes/interactive/)，使用 React Ink 渲染。它不是 SDK 的 UI 层——它是 SDK 的一个 consumer，外部 UI 是另一个 consumer。
+TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages/coding-agent/src/modes/interactive/)，使用自研 pi-tui 渲染器。它不是 SDK 的 UI 层——它是 SDK 的一个 consumer，外部 UI 是另一个 consumer。
+
+> **v1.0.0 注记（嵌入宿主时的 TUI 形态）**：fullscreen 成为默认 TUI 模式（`settings-manager.ts:184` 注释、`:1348-1350` `getTuiMode()` 未设置即 fullscreen）。把 `pi` spawn 进宿主提供的终端面板、又想要"普通滚动回终端"形态的宿主，需显式逃生舱：setting `tuiMode: "regular"` 或 `--tui-mode regular`（`args.ts:326` 帮助文本）。注意 fullscreen 专属设置（`fullscreenExitOutput`/`fullscreenScrollbar`/`fullscreenCopyOnSelect`/`fullscreenWheelScrollLines`）在 regular 模式下无效果（`settings-manager.ts:185-188`）。
 
 ## 部分覆盖或需要谨慎的能力
 
@@ -181,7 +184,7 @@ TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages
 | 交互式问题 API | `/question/:id/reply` | 无等价物 |
 | GitHub Action/Agent | 预置集成 | 无预置集成 |
 | Slack bot | 预置集成 | 无预置集成 |
-| MCP server 能力 | 有 CLI 管理工具 | 无 |
+| MCP server 能力 | 有 CLI 管理工具 | **v1.0.0 起有一级支持**（旧结论"无"失效）：独立客户端包 `packages/mcp`（`@earendil-works/pi-mcp`，零 pi 依赖 + OAuth）+ 内置 `mcp` 扩展；配置在 `~/.pi/agent/mcp.json` 与受信项目 `.pi/mcp.json`（`extensions/mcp/config.ts:117-118`）；CLI `pi mcp add/remove/list/login/logout`（`extensions/mcp/cli.ts:34-39`）；TUI `/mcp`（`extensions/mcp/index.ts:271`）。仍无 ACP |
 | ACP 编辑器协议 | 支持 | 无 |
 | SDK 跨语言方案 | `@opencode-ai/sdk` (JS/TS) | RPC JSONL（任意语言可实现）；另有 CBOR 二进制 protocol，但**已降级为 dev-only/source-only、非 supported**（见上文） |
 | CI JSON stream | `opencode run --format json` | RPC stdout JSONL |

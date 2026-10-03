@@ -76,3 +76,14 @@
 - `packages/agent/src/harness/compaction/`：compaction 回收
 - `_digested/`：[`harness/04-Self-Description/4.1_system_prompt_self.md`](../../_digested/harness/04-Self-Description/4.1_system_prompt_self.md)、[`4.2_tool_prompt_contract.md`](../../_digested/harness/04-Self-Description/4.2_tool_prompt_contract.md)、[`agent/04-Harness/4.2_Skills.md`](../../_digested/agent/04-Harness/4.2_Skills.md)
 - 静态设计（另一半）：[`04_root_entry_doc_design`](../04_root_entry_doc_design/answer.md)
+
+---
+
+## v1.0.0 注记（2026-10-02 同步后）
+
+"地图在运行时"论断**存活**，但机制落点有变：
+
+- `buildSystemPrompt` 已重塑为 `buildSystemPromptSections` / `buildSystemPromptState`（`system-prompt.ts:121`、`:186`）；"When asked about" 文档地图（`system-prompt.ts:158`）新增 `docs/mcp.md` 与 `docs/codemode.md`——MCP/codemode 进入提示词契约。
+- `_rebuildSystemPrompt` 现位于 `agent-session.ts:1652`。
+- **compaction 回收的锚点失效**：`packages/agent/src/harness/compaction/` 已随 pi-agent-core 收缩删除；coding-agent 现役实现在 `packages/coding-agent/src/core/compaction/`（`compaction.ts`、`branch-summarization.ts`），durable 侧另有 `packages/durable/src/harness/compaction.ts`。
+- skills 闸门现役实现在 coding-agent 自带 skills 模块（`packages/coding-agent/src/core/` 下，pi-agent-core 的 skills.ts 已删）。

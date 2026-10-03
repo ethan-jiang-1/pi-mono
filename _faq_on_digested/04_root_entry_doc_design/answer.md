@@ -67,3 +67,9 @@ Pi 静态层**没有**的东西，恰好是 DSH 静态层的核心：
 - `packages/coding-agent/package.json`：`files` 含 `docs`、`examples`
 - `scripts/`（根）：无 verify-md-links / doc-budget
 - 运行时消费（另一半）：[`05_root_entry_doc_navigation`](../05_root_entry_doc_navigation/answer.md)
+
+---
+
+## v1.0.0 注记（2026-10-02 同步后）
+
+核心论断**存活**：根 README/CONTRIBUTING 在 v0.86.1→v1.0.0 范围零改动，AGENTS.md 仅 +1 行（config.ts 资源解析规则），根入口"厚规则不是地图"的静态设计未变。变化的是包内文档体量与组织：`packages/coding-agent/docs/` 30+ → 40 篇（新增 cli.md、codemode.md、mcp.md、virtual-models.md、rpc-commands.md、rpc-extension-ui.md、message-types.md、slash-commands.md、configuration.md、how-pi-works.md、cli-integration.md，删除 development.md，sdk/rpc/extensions/settings 等大瘦身，providers.md 更名并 Radius 置顶）——静态层依然"少画地图"，但包内地图密度显著上升；`packages/agent/README.md` 随包收缩大幅变薄（harness 移除）。

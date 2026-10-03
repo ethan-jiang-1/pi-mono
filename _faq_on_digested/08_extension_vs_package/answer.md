@@ -112,3 +112,10 @@ CLI 的 `--extension` 参数走 `resolveExtensionSources(sources, {temporary: tr
 - `packages/coding-agent/src/core/settings-manager.ts@d981de122`（`PackageSource:82`、`Settings.packages:119`、`Settings.extensions:120`）
 - `packages/coding-agent/docs/packages.md`、`docs/extensions.md`
 - 相关：[`07_pi_usage_scenarios/05_package_ecosystem.md`](../07_pi_usage_scenarios/05_package_ecosystem.md)、[`06_pi_vs_dsh/03_mechanism_table.md`](../06_pi_vs_dsh/03_mechanism_table.md)
+
+## v1.0.0 注记（2026-10-02 同步后）
+
+三层模型（Extension/Package/Source）**继续成立**，v1.0.0 给了两个新样本：
+
+- **官方内置扩展有了机器名 `builtin:<name>`**（v0.99.0 起，取代 `<inline:name>`），出现在错误、诊断、RPC source info 中；`--no-extensions` 现在会**连带关闭内置扩展**（含 MCP/codemode/tool-search/llama.cpp），想留需 `-e builtin:<name>` 显式加载（4259686d9）。
+- **"包 + 内置扩展消费"的新组合样本**：官方 `packages/mcp`（MCP 客户端）与 `packages/codemode`（QuickJS 沙箱）是独立 npm 包，由 coding-agent 内置扩展消费——即"一个 capability 可以拆成独立库 + 内置扩展两层"。详见 `_digested/harness/02-Boundaries/2.2`（v1.0.0 重写版）与 `_digested/extensions/04-Ecosystem/`。

@@ -1,6 +1,6 @@
 # extensions/ — pi 的扩充思路：极简核 + 靠扩展长能力
 
-> **基线**：pi-mono `v0.84.4`（upstream tag `4e58f324f`，merge `6f8312a52`）；工作树已同步至 **v0.86.1**，2026-08 起的新增机制（transcript SystemMessage 持久化、forced prompt 投影、`user_bash` fail-closed、`pi.on()` unsubscribe、cache warming 等）已在各篇以"警示"标注，锚点对应 v0.86.1 工作树。本目录是 2026-08 新增的第三个维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`integration/`](../integration/)（外部嵌入）并列。
+> **基线**：pi-mono `v0.84.4`（upstream tag `4e58f324f`，merge `6f8312a52`）；工作树已同步至 **v1.0.0**（tag `a13d35a74`，merge `9e387e653`，2026-10-02；v0.86.1 期间的 transcript SystemMessage 持久化、forced prompt 投影、`user_bash` fail-closed、`pi.on()` unsubscribe、cache warming 等已在各篇以"警示"标注；v1.0.0 增量见 [`_change_log/0007`](../_change_log/0007-v0.86.1-to-v1.0.0.md)——官方新增内置扩展 mcp/codemode/tool-search，`builtin:<name>` 机器名，pi-agent-core 收缩为最小核）。本目录是 2026-08 新增的第三个维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`integration/`](../integration/)（外部嵌入）并列。
 > v0.84.3 变更：内置工具 7→8（新增 Windows-only 的 powershell，`ToolName` 联合在 `tools/index.ts:95`），本目录"7 个"表述已同步为 8。
 
 ## 这是什么

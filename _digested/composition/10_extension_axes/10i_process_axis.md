@@ -1,6 +1,7 @@
 # 10i. 第八根轴：进程 / 环境轴
 
 > 本篇 2026-09-10 追加（基线 v0.85.1）。前七条轴（10a-10g）切的是"往哪个口子挂能力"；本篇切的是另一个问题——"**这段代码跑在哪个进程 / 环境**"。
+> **⚠️ v1.0.0 增补**：进程轴的现实落点已变——pi-agent-core 的 harness/session 移入 `packages/durable`；experimental 侧 mini/micro 前端删除，现役演示是 `experimental/durable/`（单进程 durable Harness + SQLite + TUI）与 `pi-test.sh server|client`（worker 持 per-session SQLite）。机制叙述仍以 v0.85.1 取证为骨架，具体入口以 [`../architecture-next/README.md`](../../architecture-next/README.md) 与 [`../../integration/07-chord-and-facets.md`](../../integration/07-chord-and-facets.md) 的 v1.0.0 版为准。
 
 ## 用户问题
 

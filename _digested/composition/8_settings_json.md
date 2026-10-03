@@ -20,7 +20,7 @@
   "defaultProvider": "deepseek",
   "defaultModel": "deepseek-v4-flash",
   "thinking": "high",
-  "tools": ["read", "bash", "edit", "write", "grep", "find", "ls"]
+  "defaultTools": ["read", "bash", "edit", "write", "grep", "find", "ls"]
 }
 ```
 
@@ -29,7 +29,7 @@
 | `defaultProvider` | string | 默认 LLM 提供商 | 无（首次启动选） | 可用 `Ctrl+P` 运行时切换 |
 | `defaultModel` | string | 默认模型 ID | 无 | 可以是自定义模型名 |
 | `thinking` | string | 思考模式 | `"normal"` | `"off"`/`"normal"`/`"high"`/`"xhigh"`/`"max"` |
-| `tools` | string[] | 默认工具白名单 | 4 个（read/bash/edit/write） | `--tools` CLI 可重写 |
+| `defaultTools` | string[] | 启动时启用的内置工具 | `["read","bash","edit","write"]`（`settings-manager.ts:215`） | settings.json 的实际键名是 **`defaultTools`**（旧文写的 `tools` 不是有效键；CLI flag 才是 `--tools`）。v1.0.0 起支持 **`+name`/`-name` 增量项**：只含增量项的列表在继承/默认集上增删，含普通工具名的列表整体替换（字段 `settings-manager.ts:168`，合并 `:225-234`，解析 `:236-250`）；`/reload` 会启用新加入的工具（0.99.2），`--tools`/`--no-tools` 仍可覆盖 |
 
 ### 技能与扩展配置
 
@@ -51,15 +51,20 @@
 
 ```json
 {
-  "theme": "catppuccin-mocha",
-  "mode": "interactive"
+  "theme": "system",
+  "tuiMode": "fullscreen",
+  "quietStartup": false,
+  "fullscreenWheelScrollLines": "auto"
 }
 ```
 
 | 键 | 类型 | 作用 | 默认值 | 备注 |
 |---|------|------|--------|------|
-| `theme` | string | TUI 主题 | 内置默认 | 可用主题列表见 `packages/tui/` |
+| `theme` | string | TUI 主题 | **`"system"`**（v1.0.0 翻转：从终端 OSC 10/11/4 取色推导，`theme-controller.ts:174-177`、`system-theme.ts:35`） | 设具体主题名则覆盖 |
 | `mode` | string | 默认运行模式 | `"interactive"` | 可选 `"print"`（`-p`）、`"json"`、`"rpc"` |
+| `tuiMode` | string | TUI 形态 | **`"fullscreen"`**（v1.0.0 翻转，原默认 regular；`settings-manager.ts:184` 注释、`:1348-1350` `getTuiMode()` 未设置即 fullscreen） | 逃生舱：`"regular"` 或 `--tui-mode regular`（`args.ts:326`）恢复普通滚动回终端 |
+| `quietStartup` | boolean \| `"header"` | 安静启动 | `false` | v1.0.0 新增 `"header"` 档（类型 `settings-manager.ts:112`，字段 `:150`，getter `:1089-1092`）：保留 header（logo/版本/按键提示），仅隐藏模型 scope 行与已加载资源列表（`interactive-mode.ts:1394-1402`）；`true` 仍全部隐藏；`--verbose` 始终显示 |
+| `fullscreenWheelScrollLines` | number \| `"auto"` | fullscreen 模式滚轮每次滚动的行数（1-100） | `"auto"`（v1.0.0 新增；按 burst/gesture 加速，上限 6 行/事件；darwin 本地终端视为已被系统加速、不再叠加） | 字段 `settings-manager.ts:188`、getter `:1389-1396`；**仅 fullscreen 模式有效**——fullscreen 系设置（`fullscreenExitOutput`/`fullscreenScrollbar`/`fullscreenCopyOnSelect`/本键）在 regular 模式下无效果（`:185-188`） |
 
 ### Provider 与认证（间接）
 
@@ -106,10 +111,10 @@ Provider 认证不在 `settings.json` 里——它在以下位置：
 
 | 键 | 类型 | 作用 | 默认值 | 备注 |
 |---|------|------|--------|------|
-| `cacheWarming` | string | prompt cache 预热模式 | `"streaming"` | `"off"`/`"streaming"`/`"idle"`（`settings-manager.ts:77`、`:157`）。**global-only**——每次刷新是一次真实付费请求，不提供项目级覆盖 |
+| `cacheWarming` | string | prompt cache 预热模式 | `"streaming"` | `"off"`/`"streaming"`/`"idle"`（`settings-manager.ts:82`、`:182`，v1.0.0 行号）。**global-only**——每次刷新是一次真实付费请求，不提供项目级覆盖 |
 | `compaction.reserveTokens` | number | 压缩预留 token | `16384` | |
 | `compaction.keepRecentTokens` | number | 压缩保留最近消息 token | `20000` | |
-| `compaction.modelOverrides` | Record | 按 `"provider/modelId"` 键覆盖上面两项 | `{}` | `settings-manager.ts:27` 声明、`:872` 读取（按当前 modelKey 查 override，未命中回落全局默认）；不同模型上下文窗口差异大时按模型调预算 |
+| `compaction.modelOverrides` | Record | 按 `"provider/modelId"` 键覆盖上面两项 | `{}` | `settings-manager.ts:32` 声明、`:940` 读取（按当前 modelKey 查 override，未命中回落全局默认，v1.0.0 行号）；不同模型上下文窗口差异大时按模型调预算 |
 | `compat.allowedFallbackModels` | — | Bedrock/Anthropic 兼容层：声明允许的 fallback 模型 | 无 | `packages/ai/src/types.ts:839`（#9294）；为空/缺省时调用方必须省略 `fallbacks` 字段（Anthropic 对无许可 fallback 目标的模型拒绝该字段） |
 
 cache warming 的成本模型（何时值得刷）见 [13_token_budget_audit.md](./13_token_budget_audit.md)。
@@ -156,7 +161,7 @@ pi 不读项目层的 `settings.json`。所有设置项都在全局 `~/.pi/agent
   "defaultProvider": "deepseek",
   "defaultModel": "deepseek-v4-flash",
   "thinking": "high",
-  "tools": ["read", "bash", "edit", "write", "grep", "find", "ls"],
+  "defaultTools": ["read", "bash", "edit", "write", "grep", "find", "ls"],
   "skills": ["~/.claude/skills"]
 }
 ```
@@ -168,7 +173,8 @@ pi 不读项目层的 `settings.json`。所有设置项都在全局 `~/.pi/agent
 - 本机审计的 settings：`~/.pi/agent/settings.json`（只有 `defaultProvider` / `defaultModel` / `thinking` / 主题）
 - `packages/coding-agent/docs/usage.md`（settings 的 CLI 参数对照表）
 - `packages/coding-agent/docs/skills.md`（"Using Skills from Other Harnesses" 的官方做法——`skills` 数组）
-- `packages/coding-agent/src/core/settings-manager.ts`：`CACHE_WARMING_MODES`（L77）、`cacheWarming`（L157）、`CompactionSettings.modelOverrides`（L27）、override 读取（L872）
+- `packages/coding-agent/src/core/settings-manager.ts`：`CACHE_WARMING_MODES`（L82，v1.0.0 行号）、`cacheWarming`（L182）、`CompactionSettings.modelOverrides`（L32）、override 读取（L940）
+- v1.0.0 键锚点（均已对照当前工作树核实）：`QuietStartup` 类型（`settings-manager.ts:112`）、`quietStartup` 字段（`:150`）、`getQuietStartup()`（`:1089-1092`）、`tuiMode` 字段默认注释（`:184`）、`getTuiMode()`（`:1348-1350`）、`fullscreenWheelScrollLines` 字段（`:188`）、`getFullscreenWheelScrollLines()`（`:1389-1396`）、`defaultTools` 字段（`:168`）与 `+name/-name` 合并/解析（`:225-250`）、`DEFAULT_TOOL_NAMES`（`:215`）；`--tui-mode` 帮助文本（`cli/args.ts:326`）
 - `packages/ai/src/types.ts`：`allowedFallbackModels`（L839）
 - `packages/coding-agent/src/core/cache-warmer.ts`：成本模型常量与刷新时机（L20、L26、L29）
 - 官方 docs：`packages/coding-agent/docs/settings.md`（`#cache-warming` 小节）
@@ -177,4 +183,4 @@ pi 不读项目层的 `settings.json`。所有设置项都在全局 `~/.pi/agent
 
 **例证 1（skills 数组的效果）**：在 `settings.json` 加 `"skills": ["~/.claude/skills"]` → 不需要拷贝文件，37 个技能直接出现在 pi 的 `/skill:` 补全中。
 
-**例证 2（tools 白名单的效果）**：设置 `"tools": ["read", "grep", "find", "ls"]` 但不要 `bash` → agent 只能读文件和搜索，不能执行命令。配合 `--tools` CLI 可临时恢复。
+**例证 2（defaultTools 白名单的效果）**：设置 `"defaultTools": ["read", "grep", "find", "ls"]` 但不要 `bash` → agent 只能读文件和搜索，不能执行命令。配合 `--tools` CLI 可临时恢复；v1.0.0 起也可以用增量写法 `"defaultTools": ["+codemode"]` 在默认 4 个之上追加而不整列替换。

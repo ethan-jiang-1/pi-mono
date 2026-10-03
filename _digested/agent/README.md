@@ -4,6 +4,8 @@
 >
 > **⚠️ v0.86.1 基线（sync 0006）**：本仓库代码已同步到 v0.86.1，各篇行号锚点已按需重锚。本轮重点：agent 包 328 commits 的 durable harness runtime / session v4 重构（3.4/3.5 已重写，含 branch/lanes 分离、JSONL format 4、legacy v3 升级、named-branch streaming fork）；ai 包 `Context` → branded `TranscriptContext` 重构（5.1 高影响警示）；Meta Muse OAuth（5.2）；`state.systemPrompt` readonly（#9548，1.1/1.2）。详见 [`../_change_log/0006-v0.84.4-to-v0.86.1.md`](../_change_log/0006-v0.84.4-to-v0.86.1.md)。
 >
+> **⚠️ v1.0.0 基线（sync 0007，2026-10-02）**：本仓库代码已同步到 v1.0.0（tag `a13d35a74`，merge `9e387e653`）。**本手册大部分内容因此轮重构而需要按新现实阅读**：pi-agent-core 断崖收缩——`packages/agent/src/harness/`（Harness/Lane/driveOperation、session、pico3、compaction、skills、prompt templates、harness tools）与 `packages/agent/src/search/`、`benchmark/` 全部删除（7fd478a2e，−97k 行），src 只剩 `agent.ts`/`agent-loop.ts`/`proxy.ts`/`stream-fn.ts`/`types.ts`/`index.ts`；持久会话由 **`packages/durable`** 承接（Harness、records/documents、memory/JSONL/SQLite 三后端）。受影响篇目：3.1/3.2/3.5（现役实现在 coding-agent `core/compaction/` 与 durable）、4.1（已按 durable 重写）、4.2/4.7（pi-agent-core 实现已删）、5.1/5.2（v1.0.0 注记已补）。详见 [`../_change_log/0007-v0.86.1-to-v1.0.0.md`](../_change_log/0007-v0.86.1-to-v1.0.0.md)。
+>
 > **⚠️ v0.83.0 注意**：本文档集基于 v0.75.3 源码编写。v0.75.3→v0.83.0 有重大 API 变更：`AgentEvent`→`AgentSessionEvent`、`ExecutionEnv`→`Models`、AgentHarness 新增泛型 `TContext`、`AgentHarnessTool` 新增 context 参数、新增 `agent/src/harness/tools/` 目录。行号和部分 API 描述可能已过时。参见 [`../_change_log/`](../_change_log/README.md)。
 
 本目录聚焦 pi-mono 的 Agent 内核：`packages/agent`（纯运行时）和 `packages/coding-agent`（应用层扩展）共同构成的 agent 系统。

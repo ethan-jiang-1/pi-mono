@@ -128,6 +128,15 @@ const { session } = await createAgentSession({
 
 ---
 
+---
+
+## v1.0.0 注记（2026-10-02 同步，未逐项重验本篇其余结论）
+
+- **默认模型迁移**：xAI 默认 → Grok 4.7（0.87.1）；OpenAI Codex 默认 → GPT-6.1 Sol（0.99.1，OpenAI/Azure/Codex 可用）；Together / OpenCode Go / Fireworks 默认 → Kimi K3（0.99.0，均为被移除模型 K2.6 的被动迁移，`packages/coding-agent/CHANGELOG.md:172-174`）。依赖"某 provider 默认模型是 X"的脚本需复核。
+- **`--provider` 必须配 `--model`**（0.99.2 Fixed #10236）：CLI 传孤立 `--provider` 不再被静默忽略/不再跑别的 provider 的默认模型，而是推 error diagnostic 退出（`src/main.ts:470-474`）。方向是 `--provider` 需要 `--model`，反之不要求。
+- **Virtual models**（0.99.0，#10035，commit `540e174c7`）：扩展可用 `pi.registerVirtualModel()` 注册"每次请求选物理模型"的虚拟模型，出现在 `/model`、`--model`、scoped models 里，页脚显示实际路由模型（`docs/virtual-models.md`，114 行）。Ctrl+P 轮换列表因此可能含虚拟模型——`/session` 按物理模型计费。
+- **模型目录 schema v6**（0.99.0 模型类型大统一）：image/classifier 并入统一 `Model` 面（`ImagesModels` 删除），生成 schema 升 v6（`packages/ai/scripts/model-data.ts:5` `MODEL_DATA_SCHEMA_VERSION = 6`）；每 provider `.models.ts` 变 chat/image/classifier 三访问器。本篇的 `getModel()` 用法对 chat 模型不变。
+
 ## 引用
 
 - 源码：`packages/coding-agent/src/modes/interactive/interactive-mode.ts` → `cycleModel()` (L4190)、`setModel()` 调用点（L4849/4993）

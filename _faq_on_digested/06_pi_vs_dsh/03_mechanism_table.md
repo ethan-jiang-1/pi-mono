@@ -17,7 +17,7 @@
 | **扩展分发** | 本地目录 → npm 包 / `pi install`，`pi -e` 一次性试跑，manifest 4 字段 | 插件即 npm 包（无人格分裂），组合进 patch 层 |
 | **工作流** | plan-mode / subagent 都是 example（核只给积木） | 工作流即插件组合（preset 等） |
 | **默认值** | 高（8 工具，可再装扩展） | 默认由 bundle/profile 组合提供（`dsh-base` 为每 profile 打底层），不内置单一工具集 |
-| **边界短板** | 无沙箱 / 无 MCP-ACP / AgentLane 半成品 / 无版本契约（四短板） | 元框架 vendor 是硬抵押 / 性能无量化 open question / 外置维护税（1486 notes 等） |
+| **边界短板** | 无沙箱 / ~~无 MCP-ACP~~（v1.0.0 已采纳 MCP 客户端，ACP 仍无）/ ~~AgentLane 半成品~~（v1.0.0 harness 移出 pi-agent-core，durable 承接）/ 无版本契约（四短板，v1.0.0 后两条见 `_change_log/0007`） | 元框架 vendor 是硬抵押 / 性能无量化 open question / 外置维护税（1486 notes 等） |
 
 ## 一句话对比表
 

@@ -140,6 +140,15 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 
 ---
 
+---
+
+## v1.0.0 注记（2026-10-02 同步，未逐项重验本篇其余结论）
+
+- **fullscreen 成为默认 TUI 模式**（1.0.0 头条；`settings-manager.ts:184`、`:1348-1350`）：键位本身不受影响，但部分交互的前提变了——全屏选区复制、`tui.altScreen.*` 键位、跳到底部指示器等现在默认处于 fullscreen 路径。逃生舱：setting `tuiMode: "regular"` 或 `--tui-mode regular`（`args.ts:326`）。
+- **`fullscreenWheelScrollLines` 滚轮加速**（v1.0.0 新增，默认 `"auto"`，1-100；`settings-manager.ts:188`、`:1389-1396`）：fullscreen 下按 burst/gesture 加速滚轮（上限 6 行/事件；darwin 本地终端视为已加速不叠加，tui 侧 `wheel-scroll.ts`）。仅 fullscreen 有效（`settings-manager.ts:185-188`）。
+- **slash 补全去前导空白**（#10218）：以空白开头的输入也会进入 `/` 补全流程（`packages/tui/src/autocomplete.ts:338-380`，`trimStart()` 后判断前缀）；程序化消费者注意返回的 `prefix` 不再含前导空白。
+- **默认主题 system**（0.99.0）：无 `theme` 设置时从终端 OSC 10/11/4 取色推导（`theme-controller.ts:174-177`、`system-theme.ts:35`）；`--use-theme`/settings 覆盖不变。
+
 ## 引用
 
 - 源码：`packages/coding-agent/src/core/keybindings.ts` — 完整快捷键定义

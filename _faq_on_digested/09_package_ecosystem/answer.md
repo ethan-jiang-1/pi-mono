@@ -12,6 +12,8 @@
 - **本质**：官方把核心收得很窄（4 工具 + 运行时），把扩展 API 开得很宽（~30 事件 + 全套注册面），于是"CC 有什么交互原语，pi 生态就长什么品类"。
 - **机会**：信任层（包审计）、发现层（搜索）、标准件（包间依赖、cron、评测）全部空缺——官方明确说"不做"的位置就是生态的位置。
 
+> **v1.0.0 更正（2026-10-02 同步）**：上面对 MCP 品类的判断建立在"官方无 MCP 支持"的前提上，该前提已失效——v1.0.0 官方落地了 MCP 客户端（独立包 `packages/mcp` + 内置 `mcp` 扩展，`/mcp` 与 `pi mcp list|login|logout`、`mcp.json`、OAuth）。`pi-mcp-adapter` 的垄断地位与"MCP 17% 品类是生态补位"的结论需按"官方一级能力落地后的增值层"重新解读；详见 [`_digested/harness/02-Boundaries/2.2_no_interop_protocol.md`](../../_digested/harness/02-Boundaries/2.2_no_interop_protocol.md) 的 v1.0.0 再评价。本篇其余快照数字与结论仍为 0.85.1 时点，未随 1.0.0 重新研究。
+
 ## 阅读顺序
 
 | 篇 | 内容 | 图 |

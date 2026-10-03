@@ -160,6 +160,8 @@ session.dispose()                                  // 取消所有运行 + 断�
 
 （再核对一次：SDK 侧事件用 `session.subscribe()`；模型读取用 `session.state`/`session.model`/`session.thinkingLevel` getter；所有"方法级"列举以上面注释的行号为准。）
 
+**v1.0.0 事件面注记**：`agent_settled` handler 请求的 deferred run 现在推迟到全部 settled handler 完成后才跑（0.87.0 Breaking）——idle 判定观察值不变，但同一轮通知里不会再看到重入的 `agent_start`。扩展侧新增 `provider_stream_event`（pi-ai 归一化前的 provider 原始流事件透传，`extensions/types.ts:890-896`）——扩展专属，不上 SDK/RPC wire，外部 UI 不受影响。详见下节。
+
 ## 2. RPC 路线：subprocess
 
 ### 启动 agent
@@ -266,6 +268,15 @@ const stream2 = ctx.modelRegistry.streamSimple(model, context) // provider 中�
 
 两者直接委托 `ModelRuntime`，走已配置 provider 的认证路径；custom provider 也可注册后从扩展流式（#9272）。
 
+### v1.0.0 边界事件与 session entry（extension 宿主适配点，0.87.0 落地）
+
+自带扩展宿主的集成在 v1.0.0 有四个硬变化：
+
+- **`turn_end` 升格为 actionable 边界**：`TurnEndEvent` 新增必填字段 `messageEntryId` / `toolResultEntryIds`（`extensions/types.ts:1015-1022`），并新增 `agent_before_settle` 事件（`extensions/types.ts:980-982`）。两者携带 `entries`/`continue`/`context` 边界态，handler 可返回 `{ entries: [...event.entries, draft], continue: true }`——按序持久化结构条目并保证一次后续 provider 请求。**`ExtensionRunner.emit()` 不再接受 `turn_end`**：宿主必须改走 `emitBoundary(baseEvent, buildContext)`（`runner.ts:1020-1064`，0.87.0 Breaking）。注意这只改扩展分发路径——`session.subscribe()` 监听者与 RPC wire 上的 `turn_end` 事件形态不变。
+- **`agent_settled` deferred 语义**：handler 请求的 deferred run 推迟到全部 settled handler 完成（0.87.0 Breaking）。
+- **`SessionEntry` union 新增 `context_edit`**（`session-manager.ts:175-179`，入 union `:183-193`）：append-only 上下文编辑（`targetId` + `replacement: { content } | null`；投影在 `buildSessionContext()` `:1497`，省略项不产生消息、替换只改 content，不动 raw history/usage/UI history）。session format version 仍为 3（`session-manager.ts:41`），但对 `SessionEntry` 做穷举 switch 的 TypeScript 消费者必须补 `context_edit` 分支（0.87.0 Breaking）。SDK 侧新方法：`session.sessionManager.appendContextEdit(targetId, replacement)`（`session-manager.ts:1360`）。
+- **`context` handler 不再看到 system 消息**（0.87.0 Fixed 但对扩展作者是语义变更，`runner.ts:278`）：prompt 与工具声明在 handler 之后由 pi 恢复；需要动 system 消息的全量转换改用新事件 `context_with_system`（`extensions/types.ts:862`）。
+
 ### compaction
 
 ```
@@ -303,6 +314,8 @@ const stream2 = ctx.modelRegistry.streamSimple(model, context) // provider 中�
 ```
 
 这两个命令让外部 harness 可以浏览 session 的 entries 树结构。
+
+> v1.0.0：返回的 entries 可能含新类型 `context_edit`（0.87.0 新增，session format 仍 v3）——按 `entry.type` 分支处理的宿主需补这个 case，详见上节。
 
 ### bash 直接执行
 

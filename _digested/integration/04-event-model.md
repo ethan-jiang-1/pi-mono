@@ -9,10 +9,10 @@ pi-mono 的事件通道：
 - **SDK**：`session.subscribe(listener)` — 返回取消函数（`agent-session.ts:893`），不是 EventEmitter 风格。
 - **RPC**：stdout 的 `{"type":"event",...}` JSONL 行。
 
-事件类型定义在两处（v0.86.1 验证）：
+事件类型定义在两处（行号已对照 v1.0.0 工作树；v0.86.1 时分别为 types.ts:448 / agent-session.ts:153，v1.0.0 后漂移到现址）：
 
-- [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts) `AgentEvent`（types.ts:448）——Agent 内核级事件：消息、turn、工具执行
-- [`packages/coding-agent/src/core/agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) `AgentSessionEvent`（agent-session.ts:153）= `AgentEvent`（重定义了带 `willRetry` 的 `agent_end`）+ session 级扩展事件（compaction、retry、queue 等）
+- [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts) `AgentEvent`（types.ts:514）——Agent 内核级事件：消息、turn、工具执行
+- [`packages/coding-agent/src/core/agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) `AgentSessionEvent`（agent-session.ts:190）= `AgentEvent`（重定义了带 `willRetry` 的 `agent_end`）+ session 级扩展事件（compaction、retry、queue 等）
 
 SDK 事件监听拿到的就是 `AgentSessionEvent`；JSON/RPC 输出经 `toJsonEvent()`（[`modes/json-event.ts`](../../packages/coding-agent/src/modes/json-event.ts)）做了一次 wire 级裁剪（见下文 `message_update`）。
 
@@ -34,9 +34,11 @@ Agent 运行时会产生一系列 `AgentSessionEvent`。每个事件有 `type` �
 | **Agent 级** | `agent_start` / `agent_end` / `agent_settled` | run 边界；`agent_end` 带 `willRetry`；`agent_settled`（v0.83.0 新增）表示 agent 完全安静下来，**idle 检测用它** |
 | **队列** | `queue_update` | steering / followUp 排队消息变化 |
 | **Compaction** | `compaction_start` / `compaction_end` + `summarization_retry_*` | 上下文压缩及 summarization 重试（v0.83.0 新增 retry 系列） |
-| **Compaction 失败** | `session_compact_failed`（v0.84.3，**扩展专属，不上 wire**） | compaction 失败/中止（manual/threshold/overflow）时通知扩展（`extensions/types.ts:620`）；外部 UI 无法通过 JSON/RPC 监听，只能走 SDK 的 `AgentSession` 扩展事件 |
-| **扩展 UI 提示** | `ui_prompt_start` / `ui_prompt_end`（v0.84.4，**扩展专属，不上 wire**） | 阻塞式扩展 UI 提示（`ctx.ui.select/confirm/input/editor/custom`）前后通知扩展（`extensions/types.ts:750-762`，runner 包装见 agent/4.4）；`queueMicrotask` 异步发射不阻塞 prompt；外部 UI 若自己实现了扩展宿主可参考此模式 |
-| **Cache warming 决策** | `cache_warming_decision`（v0.86.0，**扩展专属**，定义在 `cache-warmer.ts:114`） | prompt cache warming 在每次刷新前把决策交给扩展：handler 可返回 `"stop"` 取消本次刷新，或强制 refresh（覆盖成本模型判断，`extensions/types.ts:1295`）。warming 本身是后台行为，外部 UI 不直接消费 |
+| **Compaction 失败** | `session_compact_failed`（v0.84.3，**扩展专属，不上 wire**） | compaction 失败/中止（manual/threshold/overflow）时通知扩展（`extensions/types.ts:774-781`，v1.0.0 行号）；外部 UI 无法通过 JSON/RPC 监听，只能走 SDK 的 `AgentSession` 扩展事件 |
+| **扩展 UI 提示** | `ui_prompt_start` / `ui_prompt_end`（v0.84.4，**扩展专属，不上 wire**） | 阻塞式扩展 UI 提示（`ctx.ui.select/confirm/input/editor/custom`）前后通知扩展（`extensions/types.ts:991-1008`，runner 包装见 agent/4.4）；`queueMicrotask` 异步发射不阻塞 prompt；外部 UI 若自己实现了扩展宿主可参考此模式 |
+| **Cache warming 决策** | `cache_warming_decision`（v0.86.0，**扩展专属**，定义在 `cache-warmer.ts:112`） | prompt cache warming 在每次刷新前把决策交给扩展：handler 可返回 `"stop"` 取消本次刷新，或强制 refresh（覆盖成本模型判断，`extensions/types.ts:1576`）。warming 本身是后台行为，外部 UI 不直接消费 |
+| **Provider 流透传** | `provider_stream_event`（v1.0.0，**扩展专属，不上 wire**） | pi-ai 归一化前的 provider 原始流事件（`extensions/types.ts:890-896`；ai 侧 `packages/ai/src/types.ts:198`、agent 侧 `packages/agent/src/agent.ts:122/200`）。外部 UI 继续消费归一化后的 `message_update` delta，不受影响 |
+| **上下文全量转换** | `context_with_system`（0.87.0，**扩展专属，不上 wire**） | 在 `context` handlers 之后对含 system 消息的完整 transcript 运行，结果原样发送（`extensions/types.ts:861-864`）。配套变化：`context` handler 不再看到 system 消息（`runner.ts:276-282`） |
 | **自动重试** | `auto_retry_start` / `auto_retry_end` | provider 错误后的自动重试 |
 | **Bash 更新** | `bash_execution_update` | bash 执行期间的流式 stdout/stderr delta |
 | **杂项** | `entry_appended`、`session_info_changed`、`thinking_level_changed` | session entry 追加、session 改名、thinking level 变化 |
@@ -67,6 +69,8 @@ Agent 运行时会产生一系列 `AgentSessionEvent`。每个事件有 `type` �
 ## 扩展事件订阅：pi.on() 与 unsubscribe（v0.86.0 变化）
 
 > **警示（v0.85.x–0.86.x，#8967）**：`ExtensionAPI.on(event, handler)` 现在对**所有事件**返回 unsubscribe 函数 `() => void`（`packages/coding-agent/src/core/extensions/types.ts:1266-1326`，v0.86.1 实测共 **37 个 `on()` 重载**，旧版 36 个 + 新增 `cache_warming_decision`）。订阅方应保存并在 session 关闭/重载时调用 unsubscribe，避免 handler 泄漏。
+>
+> **v1.0.0 增量**：`on()` 重载实测 **41 个**（`extensions/types.ts:1545-1612`）。新增事件：`context_with_system`（:1574）、`provider_stream_event`（:1585）、`agent_before_settle`（:1593，actionable 边界）。`turn_end` 的 handler 结果类型变为 `TurnEndEventResult = BoundaryResult`（:1395）——可返回 `{ entries, continue }` 参与上下文投影；`ExtensionRunner.emit()` 不再接受 `turn_end`，自带扩展宿主的集成改走 `emitBoundary()`（`runner.ts:1020-1064`）。
 
 dispatch 语义（`runner.ts:239` `snapshotEventHandlers()`）：每次 dispatch 前对 handler 列表做快照，**dispatch 进行中的 add/remove 只影响后续 dispatch**，不会改变当前这一次遍历。这意味着 unsubscribe 在 handler 执行中调用是安全的（当前事件仍会走完），但也意味着"刚移除的 handler 可能还会被调用一次"的窗口不存在——移除立即对下一次 dispatch 生效。
 
@@ -84,6 +88,7 @@ dispatch 语义（`runner.ts:239` `snapshotEventHandlers()`）：每次 dispatch
 
 - `turn_start`：新一轮开始。外部 UI 应该在 timeline 上开始一个新的会话轮次。
 - `turn_end`：当前轮次结束，带完整 `message` 和 `toolResults`——懒加载的 UI 可以只在 turn 边界用 `turn_end` 的权威 payload 渲染，忽略中间 delta。
+- **v1.0.0（0.87.0）扩展侧边界**：扩展收到的 `TurnEndEvent` 追加必填字段 `messageEntryId` / `toolResultEntryIds`（`extensions/types.ts:1015-1022`）和边界态 `entries`/`continue`/`context`，handler 可返回 `{ entries: [...event.entries, draft], continue: true }` 在 turn 边界追加结构条目并保证一次后续请求；同样新增 `agent_before_settle`（`extensions/types.ts:980-982`）。分发走 `emitBoundary()`（`runner.ts:1020-1064`）。**对只订阅 `session.subscribe()` / RPC 事件的外部 UI：`turn_end` 的 wire 形态不变，新增字段只在扩展分发路径上。**
 
 ## `tool_execution_*` 事件
 
@@ -173,7 +178,7 @@ pi-mono 有一个 Extension UI 协议（定义在 AgentSession 和 ExtensionRunn
 v0.84.0 agent 包的 session 存储换代 lane-based v4（详见 `agent/03-Memory/3.5_Session_v4.md`），但 coding-agent 的 `SessionManager`（RPC/SDK 使用的 session 持久化）尚未接入这套新模型。对外部集成者来说：
 
 - SDK/RPC 当前事件的产生和存储不受 session v4 影响——事件仍由 `AgentSession` 管理、`SessionManager` 持久化。
-- 未来 `AgentHarness` / `AgentLane` 骨架填满后，事件模型可能增加 `lane` 相关事件（如 `operation_started`/`operation_finished`、`lane_switch`）及 `SessionSnapshot`（protocol/client/server 路径的权威快照订阅模型）。
+- 未来 `AgentHarness` / `AgentLane` 骨架填满后，事件模型可能增加 `lane` 相关事件（如 `operation_started`/`operation_finished`、`lane_switch`）及 `SessionSnapshot`（protocol/client/server 路径的权威快照订阅模型）。（v1.0.0 注：该骨架已随 experimental harness 从 pi-agent-core 删除，由 `pi-durable` 承接；coding-agent 的 `SessionManager` 仍是本层事件的权威来源。）
 - `message_update` 增量化（v0.84.0，本节已有详述）是向快照模型靠拢的中间步。
 
 当前结论自洽：事件模型本篇描述的是 coding-agent 层事件的真实行为，不受 agent 包 session v4 未接入的影响。跟踪方向是 protocol/client/server 的 `SessionSnapshot` 模型（见 integration/06 的 experimental 路径介绍）。

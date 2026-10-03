@@ -1,6 +1,7 @@
 # 02 进阶：架构、协议和设计原理
 
 > 本文已对照 v0.86.1 复核。
+> v1.0.0（2026-10-02 同步）增补：pi-agent-core 断崖瘦身（experimental harness/session 全删），harness 与持久会话由 `@earendil-works/pi-durable` 承接；`packages/session-backends` 整包删除。相关段落已就地更新。
 
 ## 前提
 
@@ -8,7 +9,7 @@
 
 ## 三层架构（从集成视角看）
 
-pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集成面（外围还有 `pi-tui`、`pi-telemetry`、session 存储后端 `packages/session-backends/`（其 npm 名是 `@earendil-works/pi-session-backend-sqlite-node`）、`pi-evals` 等配套包，以及 v0.84 新增的 experimental `pi-protocol`/`pi-client`/`pi-server` 远程会话三件套，见下文）：
+pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集成面（外围还有 `pi-tui`、`pi-telemetry`、`pi-evals` 等配套包，以及 v0.84 新增的 experimental `pi-protocol`/`pi-client`/`pi-server` 远程会话三件套，见下文。v1.0.0 变化：`packages/session-backends/`（npm `@earendil-works/pi-session-backend-sqlite-node`）整包删除，SQLite 会话存储由 `pi-durable` 的 `src/storage/sqlite/` 承接；新增 `pi-mcp`/`pi-codemode` 两个独立包）：
 
 ```
 ┌──────────────────────────────────────┐
@@ -35,7 +36,7 @@ pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集
 | 层 | 集成入口 | 你会得到什么 | 你不会得到什么 |
 |---|---|---|---|
 | pi-ai | `streamSimple()` | 统一的 LLM provider 抽象、流式响应 | 工具执行、session、权限 |
-| pi-agent-core | `Agent` class（循环内核 `agentLoop`/`runAgentLoop`） | LLM + 工具循环、消息树、compaction hook | 具体工具定义、扩展系统、session 持久化 |
+| pi-agent-core | `Agent` class（循环内核 `agentLoop`/`runAgentLoop`） | LLM + 工具循环、消息（v1.0.0：包收缩为最小核——只剩 Agent/agent-loop/proxy/stream-fn/types，exports 仅 `.` 与 `./package.json`；session、compaction、harness 全部移除） | 具体工具定义、扩展系统、session 持久化（v1.0.0 起 compaction hook 也不在了——compaction 由 coding-agent/durable 承接） |
 | pi-coding-agent | `createAgentSession()` 或 RPC | 完整产品：8 个内置工具（read/bash/edit/write/grep/find/ls/powershell，默认激活前 4 个）、扩展、session 树、bash 安全 | HTTP server、多租户、认证 |
 
 第一版集成建议直接用 `pi-coding-agent`。只有在你已经有一套自己的工具/扩展系统，只想要纯循环逻辑时，才退到 `pi-agent-core`。
@@ -166,7 +167,7 @@ pi-mono 的权限模型和 OpenCode 有根本差异：
 - **OpenCode**：Agent 遇到需要权限的操作时，通过 SSE 发 `permission.asked` 事件，宿主要调用 `/permission/:id/reply` API 回复。
 - **pi-mono**：权限通过 **hook 函数** 实现。`beforeToolCall` hook 可以在工具执行前阻断，外部系统注入自己的阻断逻辑。
 
-钩子定义在 [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts) 的 `AgentLoopConfig`（`AgentOptions`，即 `new Agent(...)` 的参数，原样透出）：`beforeToolCall`（参数校验后、执行前；返回 `{ block: true }` 阻断，循环转而产出 error tool result，还可 `terminate: true` 触发批次早停）和 `afterToolCall`（工具完成之后、`tool_execution_end` 与 tool-result 消息事件发出之前；可覆写 content/details/isError/usage）。循环内核在 [`packages/agent/src/agent-loop.ts`](../../packages/agent/src/agent-loop.ts)。注意 `harness/agent-harness.ts` 是另一层东西——session/lane 编排 harness，不定义工具钩子。extension 通过 coding-agent 的 extension 事件系统注册同类拦截。
+钩子定义在 [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts) 的 `AgentLoopConfig`（`AgentOptions`，即 `new Agent(...)` 的参数，原样透出）：`beforeToolCall`（参数校验后、执行前；返回 `{ block: true }` 阻断，循环转而产出 error tool result，还可 `terminate: true` 触发批次早停）和 `afterToolCall`（工具完成之后、`tool_execution_end` 与 tool-result 消息事件发出之前；可覆写 content/details/isError/usage）。循环内核在 [`packages/agent/src/agent-loop.ts`](../../packages/agent/src/agent-loop.ts)。注意 v1.0.0 起 pi-agent-core 不再有任何 harness 层——原 `harness/agent-harness.ts`（session/lane 编排）已随 experimental harness 删除，由 `@earendil-works/pi-durable` 的 Harness 承接（`packages/durable/src/harness/`）；那层不定义工具钩子。extension 通过 coding-agent 的 extension 事件系统注册同类拦截。
 
 对外部集成来说，这意味着：
 
@@ -181,10 +182,10 @@ pi-mono 的权限模型和 OpenCode 有根本差异：
 
 | | 内部 harness | 外部 harness |
 |---|---|---|
-| **位置** | `packages/agent/src/harness/`、`packages/coding-agent/src/core/extensions/` | 你的产品代码 |
+| **位置** | v1.0.0 起：`packages/durable/src/harness/`（durable 化承接）+ `packages/coding-agent/src/core/extensions/`（原 `packages/agent/src/harness/` 已删除） | 你的产品代码 |
 | **角色** | 让扩展/Skill/工具进入 Agent 循环 | 让宿主系统使用 Agent 能力 |
-| **接口** | `AgentHarness` events、`ExtensionAPI`、`ToolDefinition` | `createAgentSession()`、`RpcClient` |
-| **文档** | `agent/04-Harness/` | 本目录 |
+| **接口** | durable `Harness` events、`ExtensionAPI`、`ToolDefinition` | `createAgentSession()`、`RpcClient` |
+| **文档** | `agent/04-Harness/`（锚点已迁 durable）、本目录 | 本目录 |
 
 外部 harness 不直接操作 ExtensionRunner 或 AgentHarness——它通过 SDK 或 RPC 间接使用这些能力。
 
@@ -198,5 +199,5 @@ pi-mono 的权限模型和 OpenCode 有根本差异：
 4. RPC 客户端 → [`packages/coding-agent/src/modes/rpc/rpc-client.ts`](../../packages/coding-agent/src/modes/rpc/rpc-client.ts)
 5. JSON 事件改写 → [`packages/coding-agent/src/modes/json-event.ts`](../../packages/coding-agent/src/modes/json-event.ts)
 6. 循环内核 → [`packages/agent/src/agent-loop.ts`](../../packages/agent/src/agent-loop.ts)；工具钩子 → [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts)
-7. AgentHarness（session/lane 编排） → [`packages/agent/src/harness/agent-harness.ts`](../../packages/agent/src/harness/agent-harness.ts)
+7. Harness（session/lane 编排，v1.0.0 起在 durable） → [`packages/durable/src/harness/harness.ts`](../../packages/durable/src/harness/harness.ts)（`packages/agent/src/harness/` 已删除）
 8. 远程会话三件套 → [`packages/protocol/src/`](../../packages/protocol/src/)、[`packages/client/src/`](../../packages/client/src/)、[`packages/server/src/`](../../packages/server/src/)

@@ -31,14 +31,19 @@
 
 ## 二、逐级深度解剖
 
-### Tier 1: 静态类型与代码边界门禁（Static Gate）
-- **核心命令**：`npm run check`（由 `tsc --build` 和相关脚本驱动）
-- **执行耗时**：~3 秒
-- **验证范围**：
-  1. **零 Emit 严格类型检查**：基于 Node.js 原生 strip-only 模式，禁止使用 parameter properties、enum、namespace 等非擦除语法；
-  2. **强类型约束**：全仓库禁止 `any`（除非绝对无法避免）；
-  3. **架构边界**：严格禁止 Inline Imports（如 `await import()`、`import("pkg").Type`），必须采用顶层静态 import；
-  4. **资产路径解析**：验证 `packages/coding-agent` 中所有资源必须通过 `src/config.ts` 解析，严禁直接硬编码 `__dirname`。
+### Tier 1: 静态类型与九重工程守卫门禁（Static & Engineering Gate）
+- **核心命令**：`npm run check`
+- **执行耗时**：~3~5 秒
+- **验证范围（九重自动化守卫）**：
+  1. **代码规范与格式化**：`biome check --write --error-on-warnings .`，杜绝任何 warning 或格式分歧；
+  2. **直接依赖强锁定**：`check-pinned-deps.mjs`，强制要求所有直接外部依赖必须固定具体版本号，严禁 `^` 或 `~`；
+  3. **Monorepo 幽灵依赖防御**：`check-runtime-deps.mjs`，通过 TypeScript AST 静态扫描所有非类型 import，强行断言必须显式声明在 `package.json` 的 dependencies 中（防止被 workspace 本地软链接掩盖）；
+  4. **入口模块图预算守卫**：`check-entry-graphs.mjs`，遍历各入口文件的 value-import 依赖图，限定 `maxFiles` 上限并设置黑名单，杜绝 Barrel 文件导致内存暴涨 37MB；
+  5. **TypeScript 相对路径规范**：`check-ts-relative-imports.mjs`；
+  6. **供应链防投毒与 Shrinkwrap**：`generate-coding-agent-shrinkwrap.mjs --check`，严格审核与锁定所有含生命周期执行脚本的 npm 依赖；
+  7. **Coding Agent 安装锁**：`generate-coding-agent-install-lock.mjs --check`；
+  8. **严格类型检查**：`tsc --noEmit`，基于 Node.js 原生 strip-only 模式，禁止使用 parameter properties、enum、namespace 等非擦除语法；全仓库严禁 `any`；
+  9. **跨环境浏览器打包冒烟**：`check-browser-smoke.mjs`，通过 esbuild 模拟 `platform: "browser"` 打包，断言不漏引 Node 专属内置模块并验证 tree-shaking。
 - **纪律**：任何代码提交前**必须全部清空 errors、warnings 与 infos**。
 
 ### Tier 2: 纯逻辑单测与组件网格测试（Unit & Component）

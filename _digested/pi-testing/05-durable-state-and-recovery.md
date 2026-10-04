@@ -2,6 +2,7 @@
 
 > **源码锚点**：
 > - 核心持久化与状态机测试套件：`packages/durable/test/`（50+ 测试文件）
+> - 跨后端通用一致性测试集：`packages/durable/src/testing/storage-conformance.ts`（1584 行参数化套件）
 > - 灾难恢复测试：`harness-generation-recovery.test.ts`、`harness-tools-recovery.test.ts`、`harness-tasks-recovery.test.ts`
 > - 巨型压缩与分叉测试：`harness-compaction.test.ts`（近 10 万字节）、`session-forks.test.ts`
 
@@ -66,12 +67,12 @@
    压缩算法折叠了前 10 轮对话，但如果第 12 轮的代码修改依赖了第 2 轮中声明的路径，压缩后的摘要必须精准保留该路径的语义锚点；
 2. **多分支分叉压缩（Forked Branch Compaction）**：
    当用户在会话树的节点 A 分叉出分支 1 和分支 2 时，分支 1 的压缩**绝对不能污染或影响分支 2 的回放视图**；
-3. **跨存储引擎等价性（Cross-Backend Parity）**：
+3. **跨存储引擎等价性（Cross-Backend Parity 与 storage-conformance.ts）**：
    `packages/durable` 同时支持三种存储后端：
-   - `sqlite-storage`（生产默认，支持 ACID 事务）
-   - `jsonl-storage`（轻量级纯文本追加文件）
-   - `memory-storage`（内存测试专用）
-   测试套件通过同一组抽象规范，对三种后端执行完全相同的压缩与恢复断言，确保开发、测试与生产的行为毫厘不差。
+   - `sqlite-storage`（生产默认，支持 ACID 事务与磁盘恢复）
+   - `jsonl-storage`（轻量级纯文本追加文件，易审计）
+   - `memory-storage`（纯内存，测试专用）
+   系统构建了长达 1584 行的参数化套件 [`packages/durable/src/testing/storage-conformance.ts`](file:///Users/bowhead/pi-mono/packages/durable/src/testing/storage-conformance.ts)，`sqlite-storage.test.ts`、`jsonl-storage.test.ts` 与 `memory-storage.test.ts` 均接入此套件运行完全相同的状态机断言，确保开发、测试与生产的行为毫厘不差。
 
 ---
 

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 410" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">pi 编排原语阶梯:隔离强度逐级上升,持久性在两端</text>
+
+  <!-- col 1: same context -->
+  <rect x="24" y="52" width="176" height="236" rx="12" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+  <text x="38" y="74" font-size="12" font-weight="700" fill="#115e59">同上下文</text>
+  <g font-size="10.5" fill="#134e4a">
+    <rect x="36" y="84" width="152" height="30" rx="7" fill="#ffffff" stroke="#99f6e4"/>
+    <text x="44" y="103">steer / followUp 双队列</text>
+    <rect x="36" y="120" width="152" height="30" rx="7" fill="#ffffff" stroke="#99f6e4"/>
+    <text x="44" y="139">loop 钩子 ×5</text>
+    <rect x="36" y="156" width="152" height="30" rx="7" fill="#ffffff" stroke="#99f6e4"/>
+    <text x="44" y="175">扩展 API(唯一口子)</text>
+    <rect x="36" y="192" width="152" height="30" rx="7" fill="#ffffff" stroke="#99f6e4"/>
+    <text x="44" y="211">todo(状态随 branch)</text>
+    <rect x="36" y="228" width="152" height="30" rx="7" fill="#ffffff" stroke="#99f6e4"/>
+    <text x="44" y="247">plan-mode(工具面收缩)</text>
+  </g>
+  <text x="24" y="308" font-size="10" fill="#0f766e">形态:内核 + 应用 + 范本扩展</text>
+
+  <!-- col 2: VM -->
+  <rect x="220" y="52" width="140" height="236" rx="12" fill="#fefce8" stroke="#a16207" stroke-width="2"/>
+  <text x="234" y="74" font-size="12" font-weight="700" fill="#854d0e">QuickJS 沙箱</text>
+  <rect x="232" y="88" width="116" height="56" rx="7" fill="#ffffff" stroke="#fde047"/>
+  <text x="240" y="110" font-size="10.5" fill="#713f12">codemode</text>
+  <text x="240" y="128" font-size="9.5" fill="#a16207">嵌套调用不进上下文</text>
+  <text x="220" y="308" font-size="10" fill="#a16207">形态:内置工具</text>
+
+  <!-- col 3: process -->
+  <rect x="380" y="52" width="140" height="236" rx="12" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="394" y="74" font-size="12" font-weight="700" fill="#1e3a8a">独立 pi 进程</text>
+  <rect x="392" y="88" width="116" height="56" rx="7" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="400" y="110" font-size="10.5" fill="#1e3a8a">subagent</text>
+  <text x="400" y="128" font-size="9.5" fill="#1d4ed8">single/parallel/chain</text>
+  <text x="380" y="308" font-size="10" fill="#1d4ed8">形态:范本扩展</text>
+
+  <!-- col 4: external -->
+  <rect x="540" y="52" width="130" height="236" rx="12" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+  <text x="554" y="74" font-size="12" font-weight="700" fill="#4c1d95">进程外 server</text>
+  <rect x="552" y="88" width="106" height="56" rx="7" fill="#ffffff" stroke="#c4b5fd"/>
+  <text x="560" y="110" font-size="10.5" fill="#4c1d95">MCP 工具</text>
+  <text x="560" y="128" font-size="9.5" fill="#6d28d9">适配为 AgentTool</text>
+  <text x="540" y="308" font-size="10" fill="#6d28d9">形态:内置扩展(v1.0.0)</text>
+
+  <!-- col 5: durable -->
+  <rect x="690" y="52" width="126" height="236" rx="12" fill="#fdf2f8" stroke="#be185d" stroke-width="2"/>
+  <text x="704" y="74" font-size="12" font-weight="700" fill="#831843">跨重启生命周期</text>
+  <rect x="702" y="88" width="102" height="70" rx="7" fill="#ffffff" stroke="#f9a8d4"/>
+  <text x="710" y="110" font-size="10.5" fill="#831843">durable tasks</text>
+  <text x="710" y="128" font-size="9.5" fill="#be185d">child tasks · join</text>
+  <text x="710" y="144" font-size="9.5" fill="#be185d">owned conversation</text>
+  <text x="690" y="308" font-size="10" fill="#be185d">形态:experimental</text>
+
+  <!-- isolation axis -->
+  <line x1="24" y1="330" x2="816" y2="330" stroke="#0f766e" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="24" y="348" font-size="10.5" fill="#334155">隔离强度:上下文 → VM → 进程 → 进程外 → 生命周期(所有权 + 恢复)</text>
+  <text x="24" y="368" font-size="10.5" fill="#334155">持久性:会话树/内存 → 宿主 store → 无(--no-session) → 无 → 存储 commit 先行</text>
+
+  <!-- honest gap -->
+  <rect x="24" y="380" width="792" height="22" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="1"/>
+  <text x="34" y="395" font-size="10" fill="#991b1b">pi 没有:中心调度器 · goal/ralph 式长目标 · 多代理控制面 · 委派深度预算——缺级是 core-minimal 的投影,不是遗漏(见 08 页空白登记)</text>
+</svg>

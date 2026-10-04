@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 330" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
+    <marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1d4ed8"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="26" font-size="15" font-weight="700" fill="#0f172a">subagent 扩展:一个工具,三种模式,每个 subagent 一个独立 pi 进程</text>
+
+  <!-- parent -->
+  <rect x="20" y="120" width="140" height="86" rx="10" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+  <text x="32" y="144" font-size="11.5" font-weight="700" fill="#115e59">父 pi 会话</text>
+  <text x="32" y="162" font-size="10" fill="#334155">subagent 工具调用</text>
+  <text x="32" y="178" font-size="9.5" fill="#64748b">三模式互斥</text>
+  <text x="32" y="194" font-size="9.5" fill="#64748b">(modeCount !== 1 拒绝)</text>
+
+  <!-- single -->
+  <path d="M 160 140 C 220 100 240 84 290 78" fill="none" stroke="#0f766e" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="294" y="56" width="120" height="44" rx="8" fill="#ffffff" stroke="#0f766e" stroke-width="1.5"/>
+  <text x="306" y="76" font-size="10.5" font-weight="700" fill="#115e59">single</text>
+  <text x="306" y="92" font-size="9.5" fill="#334155">{agent, task}</text>
+
+  <!-- parallel -->
+  <path d="M 160 163 C 210 163 230 163 284 163" fill="none" stroke="#1d4ed8" stroke-width="1.5" marker-end="url(#arrowB)"/>
+  <rect x="288" y="130" width="180" height="66" rx="8" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5"/>
+  <text x="300" y="150" font-size="10.5" font-weight="700" fill="#1e3a8a">parallel</text>
+  <text x="300" y="166" font-size="9.5" fill="#1e3a8a">{tasks:[…]} 并发流式更新</text>
+  <text x="300" y="182" font-size="9.5" fill="#1d4ed8">上限 8 任务 / 4 并发</text>
+  <g>
+    <rect x="480" y="132" width="70" height="22" rx="6" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="492" y="147" font-size="9" fill="#1e3a8a">child 1</text>
+    <rect x="480" y="158" width="70" height="22" rx="6" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="492" y="173" font-size="9" fill="#1e3a8a">child 2…</text>
+  </g>
+
+  <!-- chain -->
+  <path d="M 160 186 C 220 226 240 242 290 248" fill="none" stroke="#6d28d9" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="294" y="226" width="330" height="54" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+  <text x="306" y="246" font-size="10.5" font-weight="700" fill="#4c1d95">chain:child1 → {previous} 替换 → child2 → …</text>
+  <text x="306" y="264" font-size="9.5" fill="#6d28d9">首败即停,报失败步骤(isError 结果)</text>
+
+  <!-- annotations -->
+  <rect x="640" y="56" width="120" height="60" rx="8" fill="#fefce8" stroke="#a16207" stroke-width="1.2"/>
+  <text x="650" y="74" font-size="9" fill="#713f12">子进程参数:</text>
+  <text x="650" y="88" font-size="9" fill="#713f12">--mode json -p</text>
+  <text x="650" y="102" font-size="9" fill="#713f12">--no-session(无会话)</text>
+
+  <rect x="20" y="292" width="740" height="30" rx="7" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+  <text x="32" y="311" font-size="10" fill="#334155">abort → SIGTERM,5s 后 SIGKILL | 单任务模型可见输出 50KB 封顶,全文留 details | 项目级 agent 信任门(ui.confirm) | 完成 = 退出码+stopReason,不是正确性证明</text>
+</svg>

@@ -126,7 +126,8 @@ pi-mono 里需要严格区分两种 harness：
 |------|------|--------|
 | `agent/` | Agent 内核解剖 | 静态结构、运行时、内存管理、harness 机制 |
 | `integration/` | 外部集成 | SDK/RPC 两种接入路径、事件模型、recipes |
-| `harness/` | 平台评价 | 结构优不优秀、好不好扩展、开发纪律、自描述 |
+| `harness/` | 平台评价 | 结构优不优秀、好不好扩展、开发纪律、自描述；[05-Design-Causality/](harness/05-Design-Causality/README.md) 补设计因果层（知识外置分级、形状因果、摩擦差、反馈三环，方法论借鉴 DSH harness-idea） |
+| `orchestration/` | 工作编排 | 驾驶座视角的原语阶梯：双队列/loop 钩子/扩展/todo/plan-mode/subagent/codemode/MCP/durable，选择决策与诚实空白（方法论借鉴 DSH orchestration-ladder） |
 | `extensions/` | 扩充思路 | 极简核 + 靠扩展长能力：核有多小、扩充四轴、扩充套路 |
 | `composition/` | 配置哲学与用户决策 | 从设计哲学到配置决策的完整映射——五层框架、七条轴、AGENTS.md 设计艺术 |
 | `architecture-next/` | 新架构层（v0.85.x–1.0.0 演进） | chord/durable/server：组合运行时、持久化事实层（v1.0.0 接盘 harness/session/storage）、路由交换机（experimental） |

@@ -21,12 +21,14 @@
 | 扩展的边界在哪、哪些能力加不了或没护栏 | [02-Boundaries/](./02-Boundaries/README.md) | 2.1 无沙箱 · 2.2 无 MCP/ACP · 2.3 AgentLane 半成品 · 2.4 无版本契约 |
 | 它开发有没有策略和纪律 | [03-Discipline/](./03-Discipline/README.md) | 3.1 core-minimal · 3.2 一条规则 · 3.3 贡献门 · 3.4 工程规则 |
 | 它有没有把自己说清楚给上面的 coding agent 听 | [04-Self-Description/](./04-Self-Description/README.md) | 4.1 system prompt 自述 · 4.2 工具 prompt 契约 · 4.3 文档随包 · 4.4 上下文分层 |
+| 它为什么长成这个形状(因果、外置、摩擦差、反馈环) | [05-Design-Causality/](./05-Design-Causality/README.md) | 5.1 知识外置分层 · 5.2 形状因果 · 5.3 铺装路摩擦差 · 5.4 反馈三环 |
 
 ## 阅读路径
 
 1. 先读 [01-Architecture/](./01-Architecture/README.md)：建立"三层接缝（真 seam 检验）+ 统一注入点（design-it-twice）+ 分发闭环 + 生命周期护栏"这个骨架
 2. 再读 [02-Boundaries/](./02-Boundaries/README.md)：看清骨架的四条边界，避免高估
 3. 然后读 [03-Discipline/](./03-Discipline/README.md) 和 [04-Self-Description/](./04-Self-Description/README.md)：从"怎么开发"和"怎么自述"两个角度补齐 harness 的评价
+4. 最后读 [05-Design-Causality/](./05-Design-Causality/README.md)：回问一层因果——这些结构被什么逼出来、知识外置到哪层、摩擦差在哪、失败如何回写（方法论借鉴 DSH `harness-idea`，事实全部取自 pi 源码）
 
 ## 写作定调（评价视角，区别于 agent/）
 

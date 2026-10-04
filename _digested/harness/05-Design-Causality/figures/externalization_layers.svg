@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 370" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">pi 的参与知识三层载体:系统层只保资产,参与方式靠范本</text>
+
+  <!-- system layer -->
+  <rect x="20" y="56" width="540" height="82" rx="10" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+  <text x="34" y="80" font-size="12" font-weight="700" fill="#115e59">系统层(可执行,漂移先撞机器)</text>
+  <g font-size="10" fill="#134e4a">
+    <text x="34" y="100">npm run check(lint/format/类型) · ./test.sh(e2e 隔离) · entry-graph 逐入口预算</text>
+    <text x="34" y="116">lockfile + shrinkwrap 门禁 · 贡献门自动拒绝 · AgentTool/AgentLoopConfig 类型合同</text>
+    <text x="34" y="132">覆盖:资产与流程完整性 —— 不覆盖"文档说的是否属实"</text>
+  </g>
+  <rect x="572" y="72" width="164" height="50" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.4"/>
+  <text x="584" y="94" font-size="10.5" font-weight="700" fill="#14532d">机器保真 ✓</text>
+  <text x="584" y="110" font-size="9.5" fill="#166534">改坏当场红</text>
+
+  <!-- doc layer -->
+  <rect x="20" y="152" width="540" height="82" rx="10" fill="#fefce8" stroke="#a16207" stroke-width="2"/>
+  <text x="34" y="176" font-size="12" font-weight="700" fill="#854d0e">文档层(可读不可执行)</text>
+  <g font-size="10" fill="#713f12">
+    <text x="34" y="196">CONTRIBUTING 哲学段 · AGENTS.md standing orders(12 节) · docs 随包 · RFC</text>
+    <text x="34" y="212">★ examples(70+):与源码同生命周期、被 check 强制保真 —— 唯一可靠的"参与文档"</text>
+    <text x="34" y="228">纯散文无任何 freshness 机制;过时文档是错误写法的复制来源(负摩擦)</text>
+  </g>
+  <rect x="572" y="168" width="164" height="50" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.4"/>
+  <text x="584" y="190" font-size="10.5" font-weight="700" fill="#854d0e">漂移靠 review ✗</text>
+  <text x="584" y="206" font-size="9.5" fill="#a16207">范本除外</text>
+
+  <!-- head layer -->
+  <rect x="20" y="248" width="540" height="70" rx="10" fill="#fdf2f8" stroke="#be185d" stroke-width="2"/>
+  <text x="34" y="272" font-size="12" font-weight="700" fill="#831843">人脑层(未字面化)</text>
+  <g font-size="10" fill="#831843">
+    <text x="34" y="292">"该进 core 还是扩展"的手感 · 扩展 API 的组合套路 · 该跑哪些检查的判断</text>
+    <text x="34" y="308">(AGENTS.md 有短规则,但没有 DSH 式的可调用 skill 流程)</text>
+  </g>
+  <rect x="572" y="258" width="164" height="50" rx="8" fill="#ffe4e6" stroke="#be123c" stroke-width="1.4"/>
+  <text x="584" y="280" font-size="10.5" font-weight="700" fill="#9f1239">只有本人 ✗</text>
+  <text x="584" y="296" font-size="9.5" fill="#be123c">新参与者自己付</text>
+
+  <!-- negative knowledge -->
+  <rect x="20" y="330" width="716" height="30" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1"/>
+  <text x="32" y="349" font-size="10" fill="#991b1b">负知识(被否方案、已知限制、为什么没有沙箱)无固定载体 —— 不像 DSH 有 rejected/ 语料库与 Known Limitations 门禁;查证靠 git 历史 + issue 检索。</text>
+</svg>

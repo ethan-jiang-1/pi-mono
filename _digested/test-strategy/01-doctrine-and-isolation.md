@@ -28,6 +28,8 @@
 
 Pi-mono 根目录下的 `test.sh` 仅有 80 行代码，但它实现了一个极其坚固的**进程沙箱运行时**。它的核心技术可以拆解为五个核心防御面：
 
+![test.sh 物理环境清洗与真空沙箱架构](figures/01-hermetic-sandbox.svg)
+
 ```
 [test.sh 启动]
      │

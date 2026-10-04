@@ -79,6 +79,8 @@ export type FauxResponseStep = AssistantMessage | FauxResponseFactory;
 
 有了虚拟模型内核，`harness.ts` 将其无缝缝合进 Pi 的核心应用层（`AgentSession`）。
 
+![Pi-mono 状态机仿真内核：Faux Provider 与 Harness 驱动流](figures/03-faux-provider-state-machine.svg)
+
 ```
 [Harness 测试用例]
        │

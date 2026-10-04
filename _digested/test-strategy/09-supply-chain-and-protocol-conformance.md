@@ -37,6 +37,8 @@ npm run test:mcp-conformance
 ### 2. baseline.json 证据锁的硬核拦截逻辑
 官方套件可能包含一些 Pi 本身设计上不实现、或者当前版本尚在迭代中的特性。Pi 没有选择“跳过这些测试”，而是将全量测试输出固化进版本控制的 [`baseline.json`](file:///Users/bowhead/pi-mono/packages/coding-agent/test/mcp-conformance/baseline.json)：
 
+![Pi-mono 契约证据锁与发布消费验证体系](figures/05-supply-chain-and-evidence-lock.svg)
+
 ```
 [运行 MCP 官方测试]
         │

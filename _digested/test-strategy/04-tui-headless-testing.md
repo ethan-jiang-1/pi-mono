@@ -36,6 +36,8 @@ node --test test/specific.test.ts
 
 为了在没有物理显示器的环境下准确测试终端渲染结果，`packages/tui` 构建了 `VirtualTerminal`（基于 `@xterm/headless`）：
 
+![VirtualTerminal 无头终端字符栅格测试架构](figures/04-virtual-terminal-grid.svg)
+
 ```
 [TUI 组件: Editor / SelectList / Overlay]
        │

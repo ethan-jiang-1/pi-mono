@@ -11,6 +11,8 @@
 
 在 `pi-mono` 中，不同类型的代码变更对应着不同层级的验证成本。整个测试体系被清晰地划分为五级金字塔：
 
+![Pi-mono 五级测试金字塔与九重工程门禁矩阵](figures/02-testing-pyramid-and-gates.svg)
+
 ```
                 ▲
                / \

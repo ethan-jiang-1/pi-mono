@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 700; font-size: 20px; fill: #0f172a; }
+      .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; fill: #64748b; }
+      .box-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 600; font-size: 14px; }
+      .text-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; fill: #334155; }
+      .text-code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; fill: #0f766e; }
+      .step-num { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 700; font-size: 11px; fill: #ffffff; }
+    </style>
+    <filter id="shadow" x="-2%" y="-3%" width="104%" height="108%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.05"/>
+    </filter>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f8fafc" rx="12"/>
+
+  <!-- Header -->
+  <text x="40" y="42" class="title">Pi-mono 状态机仿真内核：Faux Provider 与 Harness 驱动流</text>
+  <text x="40" y="66" class="subtitle">全真宿主骨架 + 剧本队列驱动：0 Token、0 网络开销、10 毫秒穿透真实 Agentic Loop</text>
+
+  <!-- Left Side: Contrast with naive mock -->
+  <g transform="translate(40, 95)" filter="url(#shadow)">
+    <rect width="280" height="385" rx="10" fill="#ffffff" stroke="#fecaca" stroke-width="1.5"/>
+    <rect width="280" height="40" rx="10" fill="#fef2f2"/>
+    <path d="M 0 30 L 280 30 L 280 40 L 0 40 Z" fill="#fef2f2"/>
+    <text x="16" y="25" class="box-title" fill="#991b1b">反模式：粗暴 Mock agent.run()</text>
+
+    <g transform="translate(16, 56)">
+      <rect width="248" height="60" rx="6" fill="#fff5f5" stroke="#fee2e2"/>
+      <text x="12" y="22" class="text-body" font-weight="600" fill="#b91c1c">丢失工具权限拦截门</text>
+      <text x="12" y="42" class="text-code" fill="#7f1d1d">绕过 tool_call 钩子与策略审查</text>
+    </g>
+
+    <g transform="translate(16, 128)">
+      <rect width="248" height="60" rx="6" fill="#fff5f5" stroke="#fee2e2"/>
+      <text x="12" y="22" class="text-body" font-weight="600" fill="#b91c1c">丢失会话持久化与 DAG 状态</text>
+      <text x="12" y="42" class="text-code" fill="#7f1d1d">无法验证 SessionManager 事务与恢复</text>
+    </g>
+
+    <g transform="translate(16, 200)">
+      <rect width="248" height="60" rx="6" fill="#fff5f5" stroke="#fee2e2"/>
+      <text x="12" y="22" class="text-body" font-weight="600" fill="#b91c1c">无法测试扩展生态协同</text>
+      <text x="12" y="42" class="text-code" fill="#7f1d1d">ExtensionRunner 插件生命周期被跳过</text>
+    </g>
+
+    <g transform="translate(16, 272)">
+      <rect width="248" height="90" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+      <text x="12" y="22" class="text-body" font-weight="600" fill="#475569">本质缺陷</text>
+      <text x="12" y="42" class="text-body" font-size="11px">“把要测的代码直接替换成了假值”</text>
+      <text x="12" y="60" class="text-body" font-size="11px">测试通过但生产逻辑从未被执行过</text>
+      <text x="12" y="78" class="text-body" font-size="11px">极易掩盖真正的状态转移 Bug</text>
+    </g>
+  </g>
+
+  <!-- Right Side: The Pi Way (Harness + Faux Provider) -->
+  <g transform="translate(350, 95)" filter="url(#shadow)">
+    <rect width="570" height="385" rx="10" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5"/>
+    <rect width="570" height="40" rx="10" fill="#f0fdf4"/>
+    <path d="M 0 30 L 570 30 L 570 40 L 0 40 Z" fill="#f0fdf4"/>
+    <text x="20" y="25" class="box-title" fill="#166534">Pi 工业级解法：全真内存宿主 + 确定性剧本队列 (Harness.ts)</text>
+
+    <!-- Step 1 -->
+    <g transform="translate(20, 52)">
+      <circle cx="12" cy="14" r="10" fill="#16a34a"/>
+      <text x="9" y="18" class="step-num">1</text>
+      <text x="32" y="16" class="text-body" font-weight="600">启动全真 AgentSession (真实内存组件)</text>
+      <text x="32" y="32" class="text-code">const harness = await createHarness(); // 挂载真实 SessionManager, Settings, ExtensionRunner</text>
+    </g>
+
+    <!-- Step 2 -->
+    <g transform="translate(20, 98)">
+      <circle cx="12" cy="14" r="10" fill="#16a34a"/>
+      <text x="9" y="18" class="step-num">2</text>
+      <text x="32" y="16" class="text-body" font-weight="600">注入确定性剧本队列 (FauxResponseStep)</text>
+      <text x="32" y="32" class="text-code">harness.setResponses([ fauxAssistantMessage([fauxToolCall("read", {path})]), ... ])</text>
+    </g>
+
+    <!-- Step 3 -->
+    <g transform="translate(20, 144)">
+      <circle cx="12" cy="14" r="10" fill="#16a34a"/>
+      <text x="9" y="18" class="step-num">3</text>
+      <text x="32" y="16" class="text-body" font-weight="600">触发真实 Agentic Loop (Prompt 注入)</text>
+      <text x="32" y="32" class="text-code">await harness.session.prompt("查看并修改代码"); // 驱动底层完整状态机跃迁</text>
+    </g>
+
+    <!-- Inside the loop: interactive flowchart -->
+    <g transform="translate(32, 190)">
+      <rect width="506" height="110" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+      
+      <!-- sub-node A -->
+      <rect x="12" y="12" width="135" height="36" rx="4" fill="#ffffff" stroke="#bbf7d0"/>
+      <text x="20" y="26" class="text-body" font-size="11px" font-weight="600">插件生命周期钩子</text>
+      <text x="20" y="40" class="text-code" font-size="10px">before_provider_req</text>
+
+      <!-- sub-node B -->
+      <rect x="175" y="12" width="155" height="36" rx="4" fill="#ffffff" stroke="#bbf7d0"/>
+      <text x="183" y="26" class="text-body" font-size="11px" font-weight="600">Faux 吐出 ToolCall</text>
+      <text x="183" y="40" class="text-code" font-size="10px">faux.ts 协议流事件</text>
+
+      <!-- sub-node C -->
+      <rect x="358" y="12" width="135" height="36" rx="4" fill="#ffffff" stroke="#bbf7d0"/>
+      <text x="366" y="26" class="text-body" font-size="11px" font-weight="600">真实工具物理执行</text>
+      <text x="366" y="40" class="text-code" font-size="10px">写入临时测试沙箱</text>
+
+      <!-- sub-node D (Bottom loop back) -->
+      <rect x="12" y="60" width="481" height="38" rx="4" fill="#ffffff" stroke="#bbf7d0"/>
+      <text x="20" y="76" class="text-body" font-size="11px" font-weight="600">结果回填 Transcript -> 模型二次思考总结 -> 触发 turn_end 与 agent_settled</text>
+      <text x="20" y="90" class="text-code" font-size="10px">完整穿越: tool_result 拦截门 -> 会话树持久化事件记录 -> 终态收敛</text>
+    </g>
+
+    <!-- Step 4: Assertion & Cleanup -->
+    <g transform="translate(20, 318)">
+      <circle cx="12" cy="14" r="10" fill="#16a34a"/>
+      <text x="9" y="18" class="step-num">4</text>
+      <text x="32" y="16" class="text-body" font-weight="600">全状态语义断言与沙箱自毁</text>
+      <text x="32" y="32" class="text-code">expect(getAssistantTexts(harness)).toContain("修改完成"); harness.cleanup();</text>
+    </g>
+  </g>
+</svg>

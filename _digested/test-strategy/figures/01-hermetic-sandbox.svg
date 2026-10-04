@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 700; font-size: 20px; fill: #1e293b; }
+      .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; fill: #64748b; }
+      .box-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 600; font-size: 15px; }
+      .text-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; fill: #334155; }
+      .text-code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; }
+      .badge { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    </style>
+    <filter id="shadow" x="-3%" y="-3%" width="106%" height="108%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0284c7"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f8fafc" rx="12"/>
+
+  <!-- Header -->
+  <text x="40" y="42" class="title">Pi-mono 操作系统级物理隔离沙箱 (test.sh 架构)</text>
+  <text x="40" y="66" class="subtitle">通过进程白名单清洗、物理所有权自毁守卫与 env -i 根绝环境泄漏与脏残留</text>
+
+  <!-- Column 1: Host Dirty Environment -->
+  <g transform="translate(40, 95)" filter="url(#shadow)">
+    <rect width="260" height="385" rx="10" fill="#ffffff" stroke="#fecaca" stroke-width="1.5"/>
+    <rect width="260" height="42" rx="10" fill="#fef2f2"/>
+    <path d="M 0 32 L 260 32 L 260 42 L 0 42 Z" fill="#fef2f2"/>
+    <text x="16" y="26" class="box-title" fill="#991b1b">宿主机潜在污染源 (Host Leakage)</text>
+
+    <!-- Items -->
+    <g transform="translate(16, 56)">
+      <rect width="228" height="52" rx="6" fill="#fff5f5" stroke="#fee2e2"/>
+      <text x="10" y="20" class="text-body" font-weight="600">30+ 付费模型 API 凭据</text>
+      <text x="10" y="38" class="text-code" fill="#dc2626">ANTHROPIC, OPENAI, GEMINI...</text>
+    </g>
+
+    <g transform="translate(16, 118)">
+      <rect width="228" height="52" rx="6" fill="#fff5f5" stroke="#fee2e2"/>
+      <text x="10" y="20" class="text-body" font-weight="600">全局 Git 配置与 GPG 签名</text>
+      <text x="10" y="38" class="text-code" fill="#dc2626">~/.gitconfig, SSH agent, GPG</text>
+    </g>
+
+    <g transform="translate(16, 180)">
+      <rect width="228" height="52" rx="6" fill="#fff5f5" stroke="#fee2e2"/>
+      <text x="10" y="20" class="text-body" font-weight="600">用户真实配置目录</text>
+      <text x="10" y="38" class="text-code" fill="#dc2626">~/.config, ~/Library, 钥匙串</text>
+    </g>
+
+    <g transform="translate(16, 242)">
+      <rect width="228" height="52" rx="6" fill="#fff5f5" stroke="#fee2e2"/>
+      <text x="10" y="20" class="text-body" font-weight="600">全局 NPM 缓存与并发锁</text>
+      <text x="10" y="38" class="text-code" fill="#dc2626">~/.npmrc, ~/.npm/cache</text>
+    </g>
+
+    <g transform="translate(16, 304)">
+      <rect width="228" height="52" rx="6" fill="#fff5f5" stroke="#fee2e2"/>
+      <text x="10" y="20" class="text-body" font-weight="600">本地模型与云端探测</text>
+      <text x="10" y="38" class="text-code" fill="#dc2626">Ollama (11434), AWS EC2 Meta</text>
+    </g>
+  </g>
+
+  <!-- Flow Arrows from Col 1 to Col 2 -->
+  <line x1="300" y1="210" x2="350" y2="210" stroke="#ef4444" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow-red)"/>
+  <rect x="306" y="196" width="38" height="18" rx="3" fill="#ef4444"/>
+  <text x="313" y="209" class="badge" fill="#ffffff">拦截</text>
+
+  <!-- Column 2: test.sh Pipeline -->
+  <g transform="translate(355, 95)" filter="url(#shadow)">
+    <rect width="260" height="385" rx="10" fill="#ffffff" stroke="#bae6fd" stroke-width="1.5"/>
+    <rect width="260" height="42" rx="10" fill="#f0f9ff"/>
+    <path d="M 0 32 L 260 32 L 260 42 L 0 42 Z" fill="#f0f9ff"/>
+    <text x="16" y="26" class="box-title" fill="#0369a1">test.sh 物理清洗管道</text>
+
+    <g transform="translate(16, 56)">
+      <rect width="228" height="52" rx="6" fill="#f0fdf4" stroke="#dcfce7"/>
+      <text x="10" y="20" class="text-body" font-weight="600">1. 随机生成隔离临时根</text>
+      <text x="10" y="38" class="text-code" fill="#15803d">mktemp -d /tmp/pi-test.XXXXXX</text>
+    </g>
+
+    <g transform="translate(16, 118)">
+      <rect width="228" height="52" rx="6" fill="#f0fdf4" stroke="#dcfce7"/>
+      <text x="10" y="20" class="text-body" font-weight="600">2. 注入自毁标记保护锁</text>
+      <text x="10" y="38" class="text-code" fill="#15803d">touch .pi-test-owned (防误删)</text>
+    </g>
+
+    <g transform="translate(16, 180)">
+      <rect width="228" height="52" rx="6" fill="#f0fdf4" stroke="#dcfce7"/>
+      <text x="10" y="20" class="text-body" font-weight="600">3. Git 全局配置重定向</text>
+      <text x="10" y="38" class="text-code" fill="#15803d">GIT_CONFIG_GLOBAL=/dev/null</text>
+    </g>
+
+    <g transform="translate(16, 242)">
+      <rect width="228" height="52" rx="6" fill="#f0fdf4" stroke="#dcfce7"/>
+      <text x="10" y="20" class="text-body" font-weight="600">4. 组装白名单 test_env 数组</text>
+      <text x="10" y="38" class="text-code" fill="#15803d">HOME=$test_root/home, TZ=UTC</text>
+    </g>
+
+    <g transform="translate(16, 304)">
+      <rect width="228" height="52" rx="6" fill="#eff6ff" stroke="#bfdbfe"/>
+      <text x="10" y="20" class="text-body" font-weight="600">5. env -i 真空派生命令</text>
+      <text x="10" y="38" class="text-code" fill="#1d4ed8">env -i "${test_env[@]}" npm test</text>
+    </g>
+  </g>
+
+  <!-- Flow Arrows from Col 2 to Col 3 -->
+  <line x1="615" y1="285" x2="665" y2="285" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="622" y="271" width="38" height="18" rx="3" fill="#0284c7"/>
+  <text x="629" y="284" class="badge" fill="#ffffff">启动</text>
+
+  <!-- Column 3: Controlled Execution Sandbox -->
+  <g transform="translate(670, 95)" filter="url(#shadow)">
+    <rect width="250" height="385" rx="10" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5"/>
+    <rect width="250" height="42" rx="10" fill="#f0fdf4"/>
+    <path d="M 0 32 L 250 32 L 250 42 L 0 42 Z" fill="#f0fdf4"/>
+    <text x="16" y="26" class="box-title" fill="#166534">受控运行态与退出自毁</text>
+
+    <g transform="translate(16, 56)">
+      <rect width="218" height="66" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+      <text x="10" y="20" class="text-body" font-weight="600">零 Token 离线纯真沙箱</text>
+      <text x="10" y="38" class="text-code" fill="#475569">无 API Key 干扰</text>
+      <text x="10" y="54" class="text-code" fill="#475569">Faux Provider 确定性驱动</text>
+    </g>
+
+    <g transform="translate(16, 136)">
+      <rect width="218" height="66" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+      <text x="10" y="20" class="text-body" font-weight="600">文件与包缓存完全隔离</text>
+      <text x="10" y="38" class="text-code" fill="#475569">独立 npm-userconfig</text>
+      <text x="10" y="54" class="text-code" fill="#475569">独立的临时 tempdir/tmp</text>
+    </g>
+
+    <g transform="translate(16, 216)">
+      <rect width="218" height="140" rx="6" fill="#fef2f2" stroke="#fecaca"/>
+      <text x="10" y="22" class="text-body" font-weight="600" fill="#991b1b">退出即自毁 (trap cleanup EXIT)</text>
+      <text x="10" y="44" class="text-code" fill="#b91c1c">case "$test_root" in</text>
+      <text x="14" y="60" class="text-code" fill="#b91c1c">  /tmp/pi-test.*)</text>
+      <text x="22" y="76" class="text-code" fill="#b91c1c">    if [ -f .pi-test-owned ];</text>
+      <text x="26" y="92" class="text-code" fill="#b91c1c">      rm -rf "$test_root"</text>
+      <text x="10" y="112" class="text-body" font-size="11px" fill="#7f1d1d">严格校验标记，绝不误伤根目录</text>
+      <text x="10" y="128" class="text-body" font-size="11px" fill="#7f1d1d">磁盘 0 残留，不膨胀占用</text>
+    </g>
+  </g>
+</svg>

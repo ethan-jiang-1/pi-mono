@@ -61,3 +61,18 @@ Pi-mono 是一个以极简、高执行速度与强嵌入性著称的 AI Coding A
   研读 [04-tui-headless-testing.md](04-tui-headless-testing.md) 与 [06-smoke-and-interactive-tmux.md](06-smoke-and-interactive-tmux.md)，掌握终端应用与单体发布二进制的自动化验收技巧。
 - **工程基建与架构师（深潜，40 分钟）**：
   研读 [05-durable-state-and-recovery.md](05-durable-state-and-recovery.md) 与 [09-supply-chain-and-protocol-conformance.md](09-supply-chain-and-protocol-conformance.md)，学习如何在 Monorepo 下构建幽灵依赖审计、模块图预算、打包消费验证、跨存储一致性与标准协议证据锁。
+
+---
+
+## 五、矢量架构图谱集（figures/）
+
+为了帮助初学者建立直观的视觉心智模型，本专题在 `figures/` 子目录下配备了 5 张高信息密度的矢量架构图：
+
+| 图解文件 | 对应章节 | 核心传达的视觉心智模型 |
+|---|---|---|
+| [**01-hermetic-sandbox.svg**](figures/01-hermetic-sandbox.svg) | [01 篇](01-doctrine-and-isolation.md) | `test.sh` 物理清洗管道：宿主污染拦截、`.pi-test-owned` 自毁与 `env -i` 真空派生 |
+| [**02-testing-pyramid-and-gates.svg**](figures/02-testing-pyramid-and-gates.svg) | [02 篇](02-testing-tiers.md) | 五级测试金字塔与 Tier 1 九重自动化工程守卫流水线全景 |
+| [**03-faux-provider-state-machine.svg**](figures/03-faux-provider-state-machine.svg) | [03 篇](03-faux-provider-and-harness.md) | 粗暴 Mock 反模式 vs 全真宿主 + Faux 剧本驱动 Agentic Loop 零 Token 时序 |
+| [**04-virtual-terminal-grid.svg**](figures/04-virtual-terminal-grid.svg) | [04 篇](04-tui-headless-testing.md) | `VirtualTerminal` 无头架构：ANSI 逃逸序列流映射为纯净二维字符矩阵与语义断言 |
+| [**05-supply-chain-and-evidence-lock.svg**](figures/05-supply-chain-and-evidence-lock.svg) | [09 篇](09-supply-chain-and-protocol-conformance.md) | MCP `baseline.json` 四维判定证据锁与本地 Tarball 隔离消费验证流程 |
+

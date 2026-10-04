@@ -35,7 +35,7 @@ Pi-mono 是一个以极简、高执行速度与强嵌入性著称的 AI Coding A
 
 ---
 
-## 三、文档结构（9 篇深度专题 + 1 篇导航）
+## 三、文档结构（10 篇深度专题 + 1 篇导航）
 
 | 序号 | 专题文档 | 核心解决的问题与解剖对象 |
 |---|---|---|
@@ -48,6 +48,7 @@ Pi-mono 是一个以极简、高执行速度与强嵌入性著称的 AI Coding A
 | **07** | [**07-evals-separation.md**](07-evals-separation.md) | **确定性回归与模型评测的分轨工程学**：CI 快速严格测试（布尔断言）与 Evals 系统（概率统计）的物理隔离与防干扰设计。 |
 | **08** | [**08-extension-testing-playbook.md**](08-extension-testing-playbook.md) | **Pi 扩展测试实战指南**：如何用 Pi 的测试哲学检验你的 Extension；从契约 Mock 到基于 Harness 的会话状态机全真仿真。 |
 | **09** | [**09-supply-chain-and-protocol-conformance.md**](09-supply-chain-and-protocol-conformance.md) | **协议合规证据锁与工程守卫**：MCP Conformance、baseline.json 证据锁、AST 幽灵依赖防御与打包消费仿真。 |
+| **10** | [**10-extension-repo-test-strategy.md**](10-extension-repo-test-strategy.md) | **Extension Repo 测试策略搭建指南**：把 DSH 插件测试政策（证据阶梯/承诺组合/自足检查单）移植到 pi 生态的构思方法、机制映射、反转要点与 repo 蓝图。 |
 
 ---
 
@@ -56,7 +57,7 @@ Pi-mono 是一个以极简、高执行速度与强嵌入性著称的 AI Coding A
 - **快速掌握核心理念（10 分钟）**：
   先读本文件与 [01-doctrine-and-isolation.md](01-doctrine-and-isolation.md)。理解为什么 Pi 能够做到毫秒级测试、以及为什么绝不能在自动化测试中触碰真实网络与大模型。
 - **扩展与插件开发者（强烈推荐，30 分钟）**：
-  精读 [03-faux-provider-and-harness.md](03-faux-provider-and-harness.md) 与 [08-extension-testing-playbook.md](08-extension-testing-playbook.md)。掌握如何利用 Pi 官方提供的 `harness.ts`、`faux.ts` 与 UI 替身对自身扩展进行零 Token、高确定性的自动化测试覆盖。
+  精读 [03-faux-provider-and-harness.md](03-faux-provider-and-harness.md)、[08-extension-testing-playbook.md](08-extension-testing-playbook.md) 与 [10-extension-repo-test-strategy.md](10-extension-repo-test-strategy.md)。掌握如何利用 Pi 官方提供的 `harness.ts`、`faux.ts` 与 UI 替身对自身扩展进行零 Token、高确定性的自动化测试覆盖；要为 extension repo 定测试策略时，从 10 篇的四问构思框架与 repo 蓝图入手。
 - **端到端与界面发布人员（深潜）**：
   研读 [04-tui-headless-testing.md](04-tui-headless-testing.md) 与 [06-smoke-and-interactive-tmux.md](06-smoke-and-interactive-tmux.md)，掌握终端应用与单体发布二进制的自动化验收技巧。
 - **工程基建与架构师（深潜，40 分钟）**：

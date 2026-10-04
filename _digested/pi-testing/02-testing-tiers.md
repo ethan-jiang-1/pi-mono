@@ -67,7 +67,7 @@
 
 ### Tier 5: 真实 E2E 与独立模型评测（Live E2E & Evals）
 - **核心载体**：
-  - `packages/coding-agent/test/e2e/`：真实云端 API 全链路测试；
+  - `packages/ai/test/*-e2e.test.ts` 与 `packages/agent/test/e2e.test.ts`：真实云端 API 全链路测试（如思维链绑定、缓存亲和性验证）；
   - `packages/evals/`：模型编程能力基准打分。
 - **触发机制**：
   - **默认休眠**：日常 `test.sh` 绝对不执行这一层；

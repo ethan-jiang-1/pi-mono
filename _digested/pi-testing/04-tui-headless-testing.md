@@ -49,22 +49,29 @@ node --test test/specific.test.ts
        ├─► 3. 模拟重绘与缩放 (resize): 动态调整 columns/rows 并触发 onResize
        │
        ▼
-[测试断言: getLines() / getCursor()]
+[测试断言: getViewport() / getCursorPosition()]
        └─► 提取纯净字符文本进行语义断言 (彻底剥离 ANSI 杂质)
 ```
 
-### 1. 纯净字符矩阵提取
+### 1. 纯净字符矩阵提取（getViewport 与 flushAndGetViewport）
 `VirtualTerminal` 内部维护了由 xterm 引擎驱动的二维字符网格。测试无需关心中间发射了多少次光标移动，只需断言**屏幕上第 N 行的最终显示文本**：
 
 ```typescript
 // 选自 packages/tui/test/virtual-terminal.ts
-getLines(): string[] {
+getViewport(): string[] {
   const lines: string[] = [];
   const buffer = this.xterm.buffer.active;
-  for (let i = 0; i < this._rows; i++) {
-    const line = buffer.getLine(i);
-    lines.push(line ? line.translateToString(true) : "");
+
+  // Get only the visible lines (viewport)
+  for (let i = 0; i < this.xterm.rows; i++) {
+    const line = buffer.getLine(buffer.viewportY + i);
+    if (line) {
+      lines.push(line.translateToString(true));
+    } else {
+      lines.push("");
+    }
   }
+
   return lines;
 }
 ```

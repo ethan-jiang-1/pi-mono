@@ -13,7 +13,7 @@ AI Agent 软件的核心复杂度不在于单次调用大模型，而在于**多
 `接收指令 -> 组装上下文 -> 模型决策 -> 触发插件拦截 -> 物理执行工具 -> 结果格式化 -> 塞回上下文 -> 二次思考 -> 结束或重试`。
 
 如果调用真实大模型：测试极其缓慢、偶发 Flaky、浪费巨额 Token。
-如果是粗暴地使用 `jest.fn()` 把 `agent.run()` 这一层整个 Mock 掉：测试虽然快，但**根本没有测到真实的 Agent 循环逻辑**（中间的钩子、权限门、会话持久化和状态机全被绕过了）。
+如果是粗暴地使用 `vi.fn()` 把 `agent.run()` 这一层整个 Mock 掉：测试虽然快，但**根本没有测到真实的 Agent 循环逻辑**（中间的钩子、权限门、会话持久化和状态机全被绕过了）。
 
 Pi-mono 给出了一套工业级解法：**全真宿主骨架 + 确定性虚拟模型内核（Faux Provider）+ 内存会话线缆（Harness）**。
 
@@ -112,18 +112,20 @@ export type FauxResponseStep = AssistantMessage | FauxResponseFactory;
 来看一个典型的 Harness 测试实战代码（选自 `test/test-harness.test.ts`）：
 
 ```typescript
+// 典型用法（基于 packages/coding-agent/test/suite/harness.ts）
 test("harness runs multi-turn tool calling deterministically", async () => {
-  const harness = await createTestHarness({
-    responses: [
-      // 第 1 轮：模型决定调用 read 工具
-      fauxAssistantMessage([fauxToolCall("read", { path: "test.txt" })]),
-      // 第 2 轮：模型根据读到的内容给出总结
-      fauxAssistantMessage("文件内容已确认，测试通过。"),
-    ],
-  });
+  const harness = await createHarness();
+  
+  // 注入两轮剧本
+  harness.setResponses([
+    // 第 1 轮：模型决定调用 read 工具
+    fauxAssistantMessage([fauxToolCall("read", { path: "test.txt" })], { stopReason: "toolUse" }),
+    // 第 2 轮：模型根据读到的内容给出总结
+    fauxAssistantMessage("文件内容已确认，测试通过。"),
+  ]);
 
-  // 写入测试夹具文件
-  await harness.writeFile("test.txt", "hello pi");
+  // 在测试沙箱中写入夹具文件
+  writeFileSync(join(harness.tempDir, "test.txt"), "hello pi");
 
   // 发起指令，驱动全真循环
   await harness.session.prompt("查看 test.txt 的内容");
@@ -131,6 +133,8 @@ test("harness runs multi-turn tool calling deterministically", async () => {
   // 断言宿主和插件的状态流
   expect(getAssistantTexts(harness)).toContain("文件内容已确认，测试通过。");
   expect(harness.session.messages.length).toBe(4); // user, assistant(call), toolResult, assistant(summary)
+  
+  harness.cleanup();
 });
 ```
 

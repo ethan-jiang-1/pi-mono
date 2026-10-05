@@ -29,7 +29,7 @@
 | `defaultProvider` | string | 默认 LLM 提供商 | 无（首次启动选） | 可用 `Ctrl+P` 运行时切换 |
 | `defaultModel` | string | 默认模型 ID | 无 | 可以是自定义模型名 |
 | `thinking` | string | 思考模式 | `"normal"` | `"off"`/`"normal"`/`"high"`/`"xhigh"`/`"max"` |
-| `defaultTools` | string[] | 启动时启用的内置工具 | `["read","bash","edit","write"]`（`settings-manager.ts:215`） | settings.json 的实际键名是 **`defaultTools`**（旧文写的 `tools` 不是有效键；CLI flag 才是 `--tools`）。v1.0.0 起支持 **`+name`/`-name` 增量项**：只含增量项的列表在继承/默认集上增删，含普通工具名的列表整体替换（字段 `settings-manager.ts:168`，合并 `:225-234`，解析 `:236-250`）；`/reload` 会启用新加入的工具（0.99.2），`--tools`/`--no-tools` 仍可覆盖 |
+| `defaultTools` | string[] | 启动时启用的内置工具 | `["read","bash","edit","write"]`（`settings-manager.ts:215`） | settings.json 的实际键名是 **`defaultTools`**（旧文写的 `tools` 不是有效键；CLI flag 才是 `--tools`）。v1.0.0 起支持 **`+name`/`-name` 增量项**：只含增量项的列表在继承/默认集上增删，含普通工具名的列表整体替换（字段 `settings-manager.ts:168`，合并 `:225-234`，解析 `:236-250`）；`/reload` 会启用新加入的工具（0.99.2），`--tools`/`--no-tools` 仍可覆盖。v1.0.3+ 口径同步：CLI `--tools`/`--exclude-tools` 现支持 `*` pattern，且 `--tools` 不再移除 MCP 工具（除非条目以 `mcp__` 开头） |
 
 ### 技能与扩展配置
 

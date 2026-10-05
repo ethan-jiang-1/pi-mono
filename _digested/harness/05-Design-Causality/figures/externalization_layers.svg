@@ -12,7 +12,7 @@
   <text x="34" y="80" font-size="12" font-weight="700" fill="#115e59">系统层(可执行,漂移先撞机器)</text>
   <g font-size="10" fill="#134e4a">
     <text x="34" y="100">npm run check(lint/format/类型) · ./test.sh(e2e 隔离) · entry-graph 逐入口预算</text>
-    <text x="34" y="116">lockfile + shrinkwrap 门禁 · 贡献门自动拒绝 · AgentTool/AgentLoopConfig 类型合同</text>
+    <text x="34" y="116">lockfile + install-lock 门禁 · 贡献门自动拒绝 · AgentTool/AgentLoopConfig 类型合同</text>
     <text x="34" y="132">覆盖:资产与流程完整性 —— 不覆盖"文档说的是否属实"</text>
   </g>
   <rect x="572" y="72" width="164" height="50" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.4"/>

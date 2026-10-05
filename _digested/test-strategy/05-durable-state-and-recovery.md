@@ -3,6 +3,7 @@
 > **源码锚点**：
 > - 核心持久化与状态机测试套件：`packages/durable/test/`（50+ 测试文件）
 > - 跨后端通用一致性测试集：`packages/durable/src/testing/storage-conformance.ts`（1584 行参数化套件）
+> - 跨环境一致性测试集：`packages/durable/src/testing/env-conformance.ts`（511 行参数化套件）
 > - 灾难恢复测试：`harness-generation-recovery.test.ts`、`harness-tools-recovery.test.ts`、`harness-tasks-recovery.test.ts`
 > - 巨型压缩与分叉测试：`harness-compaction.test.ts`（近 10 万字节）、`session-forks.test.ts`
 
@@ -73,6 +74,12 @@
    - `jsonl-storage`（轻量级纯文本追加文件，易审计）
    - `memory-storage`（纯内存，测试专用）
    系统构建了长达 1584 行的参数化套件 [`packages/durable/src/testing/storage-conformance.ts`](file:///Users/bowhead/pi-mono/packages/durable/src/testing/storage-conformance.ts)，`sqlite-storage.test.ts`、`jsonl-storage.test.ts` 与 `memory-storage.test.ts` 均接入此套件运行完全相同的状态机断言，确保开发、测试与生产的行为毫厘不差。
+
+### 第二条 conformance 线：执行环境（env-conformance.ts，v1.0.3 起）
+
+v1.0.3 把同一套"参数化一致性套件"模式从存储层复制到了**执行环境层**：[`packages/durable/src/testing/env-conformance.ts`](file:///Users/bowhead/pi-mono/packages/durable/src/testing/env-conformance.ts)（511 行）经 `registerEnvConformance`（`src/testing/runner.ts:28`）把任意 `ExecutionEnv` 实现接入同一套断言，覆盖面正是本轮接口扩张的能力：argv exec（数组命令直接 spawn、不经 shell）、输出窗口（`window`/`skipped` 的省略量语义）、以及体量最大的 watch 双模式案例（native/polling，缺失文件创建/替换/删除、父目录改名重建、exclude、close 幂等；watch 案例超时放宽到 30 秒以覆盖轮询延迟，`env-conformance.ts:108`）。
+
+这条线的第一个外部消费者是新包 `pi-env`（SSH 远程执行环境，post-v1.0.3、Unreleased）：其 `RemoteExecutionEnv` 与本机 `NodeExecutionEnv` 跑**同一套** env-conformance 断言（`packages/env/test/conformance.test.ts:16` 直接调用 `registerEnvConformance`），配合 differential 测试（随机操作序列逐结果对比两个环境）锁定"远程结果 == 本机直跑"的语义等价合同。CI 上由 `.github/workflows/env.yml` 跨 5 OS 矩阵驱动——一致性套件从"跨存储后端"扩展到了"跨机器、跨操作系统"。
 
 ---
 

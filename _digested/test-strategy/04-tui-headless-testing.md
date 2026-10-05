@@ -97,7 +97,9 @@ terminal.sendInput("\x1b[A");       // 模拟按下上方向键 (Up Arrow)
 2. **Alt-Screen 全屏缓冲切换（`tui-alt-screen.test.ts`）**：
    Pi v1.0.0 默认开启 fullscreen 模式。测试断言进入交互时是否正确发送 `\x1b[?1049h` 切换到备用屏幕缓冲区，并在进程退出或抛异常时 100% 保证发送 `\x1b[?1049l` 恢复主屏幕，绝不把用户的终端弄花；
 3. **大数据量流式吞吐压力测试（`alt-screen-large-transcript-bench.ts`）**：
-   断言当模型流式吐出上万行代码时，虚拟视口滚动计算（Viewport Scroll Churn）的 CPU 与内存占用是否保持恒定。
+   断言当模型流式吐出上万行代码时，虚拟视口滚动计算（Viewport Scroll Churn）的 CPU 与内存占用是否保持恒定；
+4. **按键路由测试矩阵（`tui-alt-screen.test.ts:901` 起，v1.0.3 键位修复 #10314 的配套回归）**：
+   同一个逻辑按键在不同终端里是不同的字节序列。该用例向虚拟终端注入一整组 Home/End 逃逸序列（`\x1bOH`、`\x1b[F`、`\x1b[57423u` 等），断言**全部**路由给聚焦组件（编辑器）——"unmodified Home/End belong to the editor in every UI mode"；再注入 `\x1b[1;5H`/`\x1b[1;5F`（Ctrl+Home/End），断言其路由给 transcript 滚动（跳顶/跳底）。这是"最终状态断言"方法论在**输入侧**的镜像：不关心终端发了什么字节序列，只断言路由结果——多终端兼容问题被压缩成一张可穷举的序列表。
 
 ---
 

@@ -57,3 +57,7 @@ pi 默认工具集的源码核对(v0.85.1):`packages/coding-agent/docs/quickstar
 ## 2026-09 增补
 
 本篇写于深挖之前,三处结论已被 [07_cross_harness.md](07_cross_harness.md) 修正/加固:① CC 现在也官方读取 AGENTS.md,"换文件名"升级为"AGENTS.md 是唯一跨 harness 标准";② CC 新增的验证阶梯(/goal→Stop hook→验证 subagent)在 pi 无内置,但包生态四级全有货(05 篇);③ CC 的 plan 最终也落成 markdown 文件,与 PLAN.md 同构——"模式 → 文件"的形态差正在消失。本篇映射表其余结论经 05/06/07 三篇证据复核后维持。
+
+## v1.0.3 后注记(2026-10-06 sync-0008 同步)
+
+**"远程执行"一条的定位升级**:此前它在 pi 侧只有社区扩展形态——`packages/coding-agent/examples/extensions/ssh.ts` 示例、operations 替换那条线。v1.0.3 发布当天下午,main 上一次性落成官方库包 `@earendil-works/pi-env`(`packages/env`,Unreleased,尚未随任何 release 发布):Durable 宿主可把 agent 工具的文件操作与命令执行**整体**搬到远端机器(SSH 部署小型 Rust daemon,支持 Windows/Android/Termux),worker、存储与凭据留本地,且有语义等价测试合同(conformance/differential)保护。终端 TUI 用户侧不变,仍走 ssh 扩展。这不改变本篇映射表——"远程执行"本就不在"映射不上的真差距"清单里——反而是"能力有限是默认值差异"总论断的**再印证**:能力上限又向官方侧收拢一格,而普通用户的默认体验一点没变。

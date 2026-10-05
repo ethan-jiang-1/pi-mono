@@ -1,8 +1,8 @@
 # _digested
 
-> **当前源码基线**：pi-mono `v1.0.0`（tag `a13d35a74`，工作树锚点 `7fbbd5f4a`，**已 merge 进本仓库**——merge `9e387e653`，源码锚点对应工作树）。2026-10-02 完成第六轮同步（v0.86.1→v1.0.0，219 commits，+115,438/−129,148——**删除量首次超过新增量**）：① 1.0.0 大收缩：pi-agent-core 只剩 Agent/loop/proxy/types（−105k 行），harness/session/pico3/compaction/skills 全部移出，**durable 接盘**成为持久会话事实层（SQLite/JSONL/Memory 后端内置），`session-backends` 整包删除；② **两个新包**：`mcp`（独立 MCP 客户端，pi 首次采纳 MCP 生态）、`codemode`（QuickJS 沙箱）；③ TUI 默认 fullscreen + system 主题；④ v0.87.0 canonical session context（ContextEditEntry）。详细影响评估见 [`_change_log/0007-v0.86.1-to-v1.0.0.md`](./_change_log/0007-v0.86.1-to-v1.0.0.md)。行号复核以 0007 影响表为准。
+> **当前源码基线**：pi-mono `v1.0.3`（tag `d78dc83d6`，工作树锚点 `98d2e1947`（= v1.0.3+23），**已 merge 进本仓库**——merge `fad4b11bd`）。2026-10-06 完成第七轮同步（v1.0.0→v1.0.3，79 commits，+17,127/−4,908——1.0.0 大收缩后的第一个纯建设周期）：① **pi-env 单日成包**（post-v1.0.3，Unreleased）：`@earendil-works/pi-env` SSH 远程执行环境——durable `ExecutionEnv` 的跨机器实现（TS 客户端 + Rust daemon，语义等价 conformance/differential 合同），monorepo 内暂零消费者；② **durable ExecutionEnv 大扩**（v1.0.3，4 条接口 Breaking）：argv exec、输出窗口 window/skipped、scanLines、FileSystem.watch；③ `--tools` 语义重做（allowlist 选声明面、exposure 管可达面、`--no-mcp`）；④ **azure provider 改名**（`azure-openai-responses`→`azure`，双 API dispatch，本轮唯一 release Breaking）；⑤ **npm-shrinkwrap 删除**（0007 预测兑现，钉依赖改由 install-lock 承接）+ Nix flake/stable 分支。详细影响评估见 [`_change_log/0008-v1.0.0-to-v1.0.3.md`](./_change_log/0008-v1.0.0-to-v1.0.3.md)。行号复核以 0008 影响表为准。
 >
-> 历轮记录：v0.75.3→v0.83.0 见 [`_change_log/0002`](./_change_log/0002-v0.75.3-to-v0.83.0.md) 与 [`_plan-1`](./_change_log/_plan-1-v0.83.0.md)；v0.83→v0.84.2 见 [`_change_log/0003`](./_change_log/0003-v0.83.0-to-v0.84.2.md) 与 [`_plan-2`](./_change_log/_plan-2-v0.84.2.md)；v0.84.2→v0.84.3 见 [`_change_log/0004`](./_change_log/0004-v0.84.2-to-v0.84.3.md)；v0.84.3→v0.84.4 见 [`_change_log/0005`](./_change_log/0005-v0.84.3-to-v0.84.4.md)；v0.84.4→v0.86.1 见 [`_change_log/0006`](./_change_log/0006-v0.84.4-to-v0.86.1.md) 与 [`_summary-v0.86.1.md`](./_change_log/_summary-v0.86.1.md)；本轮 v0.86.1→v1.0.0 见 [`_change_log/0007-v0.86.1-to-v1.0.0.md`](./_change_log/0007-v0.86.1-to-v1.0.0.md)。
+> 历轮记录：v0.75.3→v0.83.0 见 [`_change_log/0002`](./_change_log/0002-v0.75.3-to-v0.83.0.md) 与 [`_plan-1`](./_change_log/_plan-1-v0.83.0.md)；v0.83→v0.84.2 见 [`_change_log/0003`](./_change_log/0003-v0.83.0-to-v0.84.2.md) 与 [`_plan-2`](./_change_log/_plan-2-v0.84.2.md)；v0.84.2→v0.84.3 见 [`_change_log/0004`](./_change_log/0004-v0.84.2-to-v0.84.3.md)；v0.84.3→v0.84.4 见 [`_change_log/0005`](./_change_log/0005-v0.84.3-to-v0.84.4.md)；v0.84.4→v0.86.1 见 [`_change_log/0006`](./_change_log/0006-v0.84.4-to-v0.86.1.md) 与 [`_summary-v0.86.1.md`](./_change_log/_summary-v0.86.1.md)；v0.86.1→v1.0.0 见 [`_change_log/0007`](./_change_log/0007-v0.86.1-to-v1.0.0.md) 与 [`_summary-v1.0.0.md`](./_change_log/_summary-v1.0.0.md)；本轮 v1.0.0→v1.0.3 见 [`_change_log/0008`](./_change_log/0008-v1.0.0-to-v1.0.3.md) 与 [`_summary-v1.0.3.md`](./_change_log/_summary-v1.0.3.md)。
 
 ## 这是什么
 
@@ -20,18 +20,19 @@ Agent 内核入口：[`agent/`](agent/)
 
 pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不仅是一个可以在终端使用的 coding agent，更是一个可以被其他产品嵌入的 agent 引擎。library-first 的承诺分两层：**SDK**（`createAgentSession()` 进程内嵌入）当前可用、成熟；**持久会话运行时直接嵌入**（v0.86.x 在 pi-agent-core 内的 durable drive 实现）于 v1.0.0 **整体迁出**——`packages/agent` 收缩为最小核（Agent + loop + proxy stream + types），持久化运行时由 **`packages/durable`** 承接（Harness、durable session、task graph、SQLite/JSONL/Memory 存储后端）。
 
-当前基线（v1.0.0）它由 13 个包组成一个 monorepo（v0.86.1 的 12 包基础上 +`mcp` +`codemode` −`session-backends`；更早的 `web-ui`/`mom`/`pods` 已移除，`storage` 于 v0.84 并入 session-backends，`chord`/`durable` 于 v0.85.x–0.86.x 新增）：
+当前基线（v1.0.3）它由 14 个包组成一个 monorepo（v1.0.0 的 13 包基础上 +`env`——**Unreleased，post-v1.0.3 单日成包**；更早的 `web-ui`/`mom`/`pods` 已移除，`storage` 于 v0.84 并入 session-backends（该包于 v1.0.0 删除），`chord`/`durable` 于 v0.85.x–0.86.x 新增，`mcp`/`codemode` 于 v1.0.0 新增）：
 
 | 包 | 职责 | 层级 |
 |---|---|---|
-| `packages/ai` | LLM 抽象层：模型定义、多 provider 适配、流式协议、消息类型（TranscriptContext）；v1.0.0 起 image/classifier 模型统一进 `Model`/`Provider` 面 | 基础设施 |
+| `packages/ai` | LLM 抽象层：模型定义、多 provider 适配、流式协议、消息类型（TranscriptContext）；v1.0.0 起 image/classifier 模型统一进 `Model`/`Provider` 面；v1.0.3 起 provider 名为 `azure`（双 API：Responses + Chat Completions） | 基础设施 |
 | `packages/agent` | **最小核**（v1.0.0 收缩）：Agent、agent loop、proxy stream、类型——不含 session/harness/工具 | Agent 内核 |
 | `packages/coding-agent` | 完整应用层：CLI/TUI/RPC/SDK、扩展系统、会话管理、内置工具、MCP/codemode/tool_search 内置扩展、experimental services | 应用外壳 |
 | `packages/tui` | 终端 UI 库：组件系统、渲染引擎、输入处理、fullscreen 模式（v1.0.0 默认） | UI 框架 |
-| `packages/durable` | **持久会话事实层**（v1.0.0 接盘）：Pico record contracts + Harness 运行时 + task graph + SQLite/JSONL/Memory 存储后端 | 新架构层 |
+| `packages/durable` | **持久会话事实层**（v1.0.0 接盘）：Pico record contracts + Harness 运行时 + task graph + SQLite/JSONL/Memory 存储后端；v1.0.3 起 `ExecutionEnv` 扩为跨平台契约（argv exec/watch/输出窗口 + env-conformance），成为 pi-env 的契约上游 | 新架构层 |
 | `packages/chord` | 应用组合运行时：facets、services、replicated state（事务性 change/replace）、remote-service wire（**非 Pi 包**，零 Pi 依赖） | 新架构层 |
-| `packages/mcp` | **独立 MCP 客户端**（v1.0.0 新增）：传输中立核心 + stdio/Streamable HTTP + OAuth（零 pi 依赖） | 集成 |
-| `packages/codemode` | **QuickJS-WASM 沙箱**（v1.0.0 新增）：worker 线程跑模型写的 JS，注入工具暴露为 `tools.<name>(args)` | 集成 |
+| `packages/mcp` | **独立 MCP 客户端**（v1.0.0 新增）：传输中立核心 + stdio/Streamable HTTP + OAuth（零 pi 依赖）；v1.0.1+ 补 CIMD 与 DCR application_type | 集成 |
+| `packages/codemode` | **QuickJS-WASM 沙箱**（v1.0.0 新增）：worker 线程跑模型写的 JS，注入工具暴露为 `tools.<name>(args)`；v1.0.1+ 输出封顶 + built-ins lockdown | 集成 |
+| `packages/env` | **SSH 远程执行环境**（**Unreleased**，post-v1.0.3 单日成包）：durable `ExecutionEnv` 的跨机器实现——TS 客户端（Connection/RemoteExecutionEnv/ssh bootstrap）+ Rust daemon，语义等价有 conformance/differential 合同；monorepo 内暂零消费者 | 集成 |
 | `packages/protocol` | CBOR 二进制协议 + framing（experimental，chord/durable 线；PROTOCOL_VERSION=8） | 集成 |
 | `packages/client` | 传输无关的远程 session 客户端（experimental，chord/durable 线） | 集成 |
 | `packages/server` | 实验性路由层：SessionRouter 把 client 连接路由到 session 服务（业务语义在 coding-agent/src/experimental/services/） | 集成 |

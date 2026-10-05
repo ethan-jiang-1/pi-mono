@@ -39,6 +39,8 @@ pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集
 | pi-agent-core | `Agent` class（循环内核 `agentLoop`/`runAgentLoop`） | LLM + 工具循环、消息（v1.0.0：包收缩为最小核——只剩 Agent/agent-loop/proxy/stream-fn/types，exports 仅 `.` 与 `./package.json`；session、compaction、harness 全部移除） | 具体工具定义、扩展系统、session 持久化（v1.0.0 起 compaction hook 也不在了——compaction 由 coding-agent/durable 承接） |
 | pi-coding-agent | `createAgentSession()` 或 RPC | 完整产品：8 个内置工具（read/bash/edit/write/grep/find/ls/powershell，默认激活前 4 个）、扩展、session 树、bash 安全 | HTTP server、多租户、认证 |
 
+> **同名工厂警示（v1.0.3+ Unreleased，sync 0008）**：上表的 powershell 是 coding-agent 侧 Windows-only 工具（SDK `createPowerShellTool()`，自带 UTF-8 输出 shim）。durable 侧另有**同名**工厂 `createPowerShellTool()`（`packages/durable/src/tools/bash.ts:148`）——跨平台、以 argv exec 形式直接启动 pwsh（缺席则 Windows PowerShell）而不经 shell 解析，属 Unreleased。两者不是一回事，混用两套 SDK 时注意区分。
+
 第一版集成建议直接用 `pi-coding-agent`。只有在你已经有一套自己的工具/扩展系统，只想要纯循环逻辑时，才退到 `pi-agent-core`。
 
 ## 为什么是 library-first 而不是 server-first

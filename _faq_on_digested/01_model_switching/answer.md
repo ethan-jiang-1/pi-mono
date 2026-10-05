@@ -132,10 +132,15 @@ const { session } = await createAgentSession({
 
 ## v1.0.0 注记（2026-10-02 同步，未逐项重验本篇其余结论）
 
-- **默认模型迁移**：xAI 默认 → Grok 4.7（0.87.1）；OpenAI Codex 默认 → GPT-6.1 Sol（0.99.1，OpenAI/Azure/Codex 可用）；Together / OpenCode Go / Fireworks 默认 → Kimi K3（0.99.0，均为被移除模型 K2.6 的被动迁移，`packages/coding-agent/CHANGELOG.md:172-174`）。依赖"某 provider 默认模型是 X"的脚本需复核。
+- **默认模型迁移**：xAI 默认 → Grok 4.7（0.87.1）；OpenAI Codex 默认 → GPT-6.1 Sol（0.99.1，OpenAI/Azure/Codex 可用）；Together / OpenCode Go / Fireworks 默认 → Kimi K3（0.99.0，均为被移除模型 K2.6 的被动迁移，`packages/coding-agent/CHANGELOG.md:172-174`）。依赖"某 provider 默认模型是 X"的脚本需复核。后续补入本清单：NVIDIA 默认 → Nemotron 3 Ultra（v1.0.1，`49b9df489`，`packages/coding-agent/src/core/model-resolver.ts:28`，旧 NVIDIA 默认模型已下线）。
 - **`--provider` 必须配 `--model`**（0.99.2 Fixed #10236）：CLI 传孤立 `--provider` 不再被静默忽略/不再跑别的 provider 的默认模型，而是推 error diagnostic 退出（`src/main.ts:470-474`）。方向是 `--provider` 需要 `--model`，反之不要求。
 - **Virtual models**（0.99.0，#10035，commit `540e174c7`）：扩展可用 `pi.registerVirtualModel()` 注册"每次请求选物理模型"的虚拟模型，出现在 `/model`、`--model`、scoped models 里，页脚显示实际路由模型（`docs/virtual-models.md`，114 行）。Ctrl+P 轮换列表因此可能含虚拟模型——`/session` 按物理模型计费。
 - **模型目录 schema v6**（0.99.0 模型类型大统一）：image/classifier 并入统一 `Model` 面（`ImagesModels` 删除），生成 schema 升 v6（`packages/ai/scripts/model-data.ts:5` `MODEL_DATA_SCHEMA_VERSION = 6`）；每 provider `.models.ts` 变 chat/image/classifier 三访问器。本篇的 `getModel()` 用法对 chat 模型不变。
+
+## v1.0.3 注记（2026-10-06 sync-0008 同步，未逐项重验本篇其余结论）
+
+- **azure provider 改名（v1.0.3 唯一 Breaking，`a37306d43`）**：KnownProvider 的 `azure-openai-responses` 改名为 `azure`（`packages/ai/src/types.ts:46`；coding-agent 侧 `packages/coding-agent/src/core/model-resolver.ts:25`）。**用户侧迁移**：models.json / auth.json / settings.json 里以 `azure-openai-responses` 为键的条目必须改名 `azure`；SDK 用户改 `getModel("azure", ...)` 与 `providers/azure` 导入；依赖 provider id 字符串的脚本/配置同受影响；存量会话下一轮会看到不同的 provider 名。api id `azure-openai-responses` 未变，`AZURE_OPENAI_*` 环境变量名不变。
+- **Together 模型 ID 改名（`28eaccb8e`，#10336）**：`deepseek-ai/DeepSeek-V4-Pro` → `deepseek-ai/DeepSeek-V4-Pro-0813`（toggle-reasoning 集合同步改名，`packages/ai/scripts/generate-models.ts:201`），否则该模型丢失 thinking level 控制。按模型 id 字符串引用 Together 该模型的配置/脚本是一处小迁移。
 
 ## 引用
 

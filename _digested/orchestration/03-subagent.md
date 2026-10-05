@@ -18,7 +18,7 @@ subagent 的身份定义是 markdown + YAML frontmatter(`name`/`description`/`to
 
 - `["--mode", "json", "-p", "--no-session"]`(`:300`)——JSON 输出、print 模式、不留会话;
 - 未指定 `model` 时继承派发会话的 model/thinking(`:301-306`;README `:140`);
-- `--tools` 按 agent 定义收缩工具面(`:307`);
+- `--tools` 按 agent 定义收缩工具面(`:307`)——**警示(Unreleased,04b97ef00)**:`--tools` 不再隐式移除 MCP 工具。agent 定义若指望 `--tools` 顺带把 MCP server 挡在子代理外,现在会落空——未命中的 MCP 工具保持注册,codemode 脚本与 tool_search 仍可达;要彻底排除须显式 `--exclude-tools 'mcp__*'`,或用 `--no-mcp` 直接不加载内置 MCP 扩展;
 - 自定义 system prompt 写临时文件走 `--append-system-prompt`(`:334-339`);
 - `spawn` 独立进程(`:344-350`),父侧逐行解析 JSON 事件流累计 usage/turns/stopReason(`:353-395`)。
 

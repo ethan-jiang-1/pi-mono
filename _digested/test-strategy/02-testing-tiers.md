@@ -42,8 +42,8 @@
   3. **Monorepo 幽灵依赖防御**：`check-runtime-deps.mjs`，通过 TypeScript AST 静态扫描所有非类型 import，强行断言必须显式声明在 `package.json` 的 dependencies 中（防止被 workspace 本地软链接掩盖）；
   4. **入口模块图预算守卫**：`check-entry-graphs.mjs`，遍历各入口文件的 value-import 依赖图，限定 `maxFiles` 上限并设置黑名单，杜绝 Barrel 文件导致内存暴涨 37MB；
   5. **TypeScript 相对路径规范**：`check-ts-relative-imports.mjs`；
-  6. **供应链防投毒与 Shrinkwrap**：`generate-coding-agent-shrinkwrap.mjs --check`，严格审核与锁定所有含生命周期执行脚本的 npm 依赖；
-  7. **Coding Agent 安装锁**：`generate-coding-agent-install-lock.mjs --check`；
+  6. **供应链防投毒与安装锁**：`generate-coding-agent-install-lock.mjs --check`（`check:install-lock:coding-agent`），严格审核与锁定所有含生命周期执行脚本的 npm 依赖——新增此类依赖必须显式登记 allowlist，"never add one silently"；v1.0.1 删除 npm-shrinkwrap 后，钉依赖安装与生命周期脚本审计统一由 install-lock 承接；
+  7. **npm 审计显式豁免**：`scripts/npm-audit.mjs`（CI 独立 workflow `npm-audit.yml` 驱动，不在本地 `npm run check` 链内），对 `npm audit --omit=dev` 的失败不压制、只能走带理由的逐条豁免登记，已修复版本装上后条目必须移除（现存案例：node-forge）；
   8. **严格类型检查**：`tsc --noEmit`，基于 Node.js 原生 strip-only 模式，禁止使用 parameter properties、enum、namespace 等非擦除语法；全仓库严禁 `any`；
   9. **跨环境浏览器打包冒烟**：`check-browser-smoke.mjs`，通过 esbuild 模拟 `platform: "browser"` 打包，断言不漏引 Node 专属内置模块并验证 tree-shaking。
 - **纪律**：任何代码提交前**必须全部清空 errors、warnings 与 infos**。

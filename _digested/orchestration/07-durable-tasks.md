@@ -36,6 +36,10 @@ subagent 工具在 `api.commit()` 里以 `ownership: { kind: "task", taskId }` �
 
 `harness.taskGraph()` 返回全部活跃任务的单一 Chord 状态,`watchTaskGraph()` 提供推送;节点带 owner 边、状态、background/abort 标记与拥有的 conversations(README Task Graph 节)。投影由 commit publications 增量推进(`task-graph.ts:151-190`:terminal 即删节点、conversation 归属在任务变更之后补),**图是派生视图,不是第二个权威**——被丢弃就由存储重建(`#build`,`:131-148`),这与 todo 随 branch 重建是同一条纪律的重装版。
 
+### 能力面延伸:工具跑远端,事实留本地(post-v1.0.3,Unreleased)
+
+v1.0.3 之后 durable 的执行环境抽象(`ExecutionEnv`,`src/env/`)长出了第二个官方实现:新包 `@earendil-works/pi-env` 把"agent 的工具在另一台机器上执行"做成包级能力——pi-env README 的定位原文:"an agent's tools run on another machine, usually over SSH, while the Durable worker, its storage and credentials stay local"(`packages/env/README.md:3-4`)。即**工具的文件操作与命令执行整体上远端,而 Durable worker、存储与凭据留本地**——持久事实层与执行层可以拆到两台机器上。依赖方向是 env → durable(pi-env 实现 durable 的接口,反向不成立),且该包 Unreleased、monorepo 内暂无消费者。这是 durable 线的能力延伸证据,但不改变下面的 experimental 定位结论。
+
 ## 边界与上限
 
 - **experimental**:无稳定性合同(`README.md:3`);不在默认组合里,当前 pi CLI 会话不跑在 durable 上。

@@ -5,9 +5,12 @@
 > - CI 工作流配置：`.github/workflows/ci.yml`（`mcp-conformance` 独立 Job）
 > - 幽灵依赖防御脚本：`scripts/check-runtime-deps.mjs`、`scripts/check-runtime-deps.test.mjs`
 > - 入口模块图预算守卫：`scripts/check-entry-graphs.mjs`
+> - npm 审计显式豁免：`scripts/npm-audit.mjs`
+> - 安装锁生成与生命周期脚本 allowlist：`scripts/generate-coding-agent-install-lock.mjs`
 > - 消费者真实打包冒烟：`scripts/coding-agent-consumer.mjs`、`scripts/coding-agent-consumer.test.mjs`
 > - 跨平台同构打包冒烟：`scripts/check-browser-smoke.mjs`
 > - 跨后端等价性测试套件：`packages/durable/src/testing/storage-conformance.ts`（1584 行）
+> - 跨环境等价性测试套件：`packages/durable/src/testing/env-conformance.ts`（511 行）
 
 ---
 
@@ -99,6 +102,14 @@ const BUDGETS = {
 ```
 当开发者引入了一个新的模块依赖，使得 `./models` 遍历到的文件数突破了 15 个上限，或者触碰了 `providers/` 黑名单，门禁立即熔断，强制开发者重构解耦。
 
+### 3. npm audit 的显式豁免机制（`scripts/npm-audit.mjs` + node-forge 案例）
+
+`npm audit --omit=dev` 的失败并非"要么修、要么压 warning"的二选一，而是走**带理由的显式豁免**：脚本内置 `acceptedAdvisories` 表，每个被接受的 advisory 必须写明受影响包名与"为什么不适用"的完整解释，并在固定版本装上后移除条目——脚本会对不再匹配任何 advisory 的陈旧豁免条目发出警告。现存的 node-forge 案例是这套机制的样本：该 advisory 无已修复版本，但受影响的代码路径只在私有、未发布的 gondolin 示例扩展里用于对本地自建 CA 做叶证书校验（公开指数 65537），低指数签名伪造不适用（`scripts/npm-audit.mjs:15-20`）。豁免是**逐条带证据的知情决策**，不是压制噪音的开关。
+
+### 4. install-lock：取代 npm-shrinkwrap 的安装锁定口径
+
+v1.0.1 起（`581e7ba78`，closes #5653）仓库删除了 `npm-shrinkwrap.json`，钉依赖安装改由 `packages/coding-agent/install-lock/` 承接：由 `scripts/generate-coding-agent-install-lock.mjs` 生成、`--check`（并入 `npm run check`）校验，核心守卫是**生命周期脚本 allowlist**——任何带 install/postinstall 等生命周期脚本的新依赖都必须经人工审查并显式加入 allowlist 条目才能通过，"never add one silently"（`AGENTS.md` Dependency and Install Security 节）。机制与旧 shrinkwrap 门禁同形（pre-commit 门禁 + 生命周期脚本审核），但从"锁文件快照"升级为"安装锁 + 脚本 allowlist"双口径。
+
 ---
 
 ## 四、真实消费者打包冒烟（Consumer Smoke Testing）
@@ -119,6 +130,14 @@ const BUDGETS = {
    严格断言发布的 tarball 中**绝不能残留任何开发期/实验性模块**；
 5. **消费端 SDK 与 CLI 校验**：以纯外部第三方的视角执行一段 `smoke-sdk.mjs`，验证能否成功导入 `{ createAgentSession, SessionManager, ModelRuntime }`，并执行编译后的 CLI 二进制（`pi --version`），断言其输出与版本号完全吻合。
 
+### pi-env daemon：随 npm 包分发的二进制供应链案例
+
+新包 `@earendil-works/pi-env`（post-v1.0.3，Unreleased）把供应链纪律延伸到了**随 npm 包发布的原生二进制**（8 目标交叉构建的 Rust daemon），三道守卫环环相扣：
+
+1. **SHA-256 命名部署 + 每次启动前验证**：daemon 部署到远端 `~/.pi/mobile/tools/pi-env-<sha256前32位>`，按内容哈希命名、版本永不冲突；上传走临时文件、校验哈希匹配后才 rename 到位，且 `connectSsh` 的 `beforeStart` 钩子保证**每次重启 daemon 前重新校验/部署**——二进制在任何一次执行前都经过哈希验证（`packages/env/src/ssh.ts:396-452`）。升级无需显式机制：包版本变、哈希变、远端路径即变。
+2. **npm pack 清单 CI 校验**：`env.yml` 的 `check` job 用 `npm pack --dry-run --json` 校验包文件清单——必须含全部 8 个 `bin/pi-env-*/pi-env` 二进制 + `dist/` + `docs/protocol.md`，不得混入 `src/`/`daemon/`/`test/`（`.github/workflows/env.yml:59-72`），与第四节"包内脏资产审查"同一纪律的 CI 化。
+3. **release 构建逐 OS 实测（"as shipped" 原则）**：`release-daemons` job 在 6 种 OS runner（含 windows-11-arm、Rosetta 下的 darwin-x64）用**发布的 release 构建**跑全部 pi-env 测试（`PI_ENV_DAEMON` 指向 artifact，`env.yml:75-126`）——测试的不是本机构建的 debug 二进制，而是用户实际收到的那份。
+
 ---
 
 ## 五、跨后端等价性测试套件（Storage Conformance Suite）
@@ -138,6 +157,10 @@ Pi 的解法是将全量的状态机行为抽象为参数化的 `runStorageConfo
 1. **统一生命周期**：测试套件统一覆盖根会话创建、多分支分叉、任务拓扑挂载、游标回放、快照压缩与脏读防御；
 2. **多包复用**：`test/sqlite-storage.test.ts`、`test/jsonl-storage.test.ts` 与 `test/memory-storage.test.ts` 仅仅负责提供各自的数据库实例工厂，随后直接挂入这套 1584 行的断言套件；
 3. **行为完全等价**：保证任何第三方或者未来新增的存储驱动，只要能跑通这套 Conformance Suite，就能 100% 无缝替换生产环境的底层存储。
+
+### 第二条线：env-conformance（执行环境契约，v1.0.3 起）
+
+v1.0.3 起 durable 有了第二条同构套件：`packages/durable/src/testing/env-conformance.ts`（511 行，`registerEnvConformance`），把"参数化一致性"从存储后端复制到执行环境——argv exec、输出窗口省略量语义、watch 双模式（native/polling）案例跑同一套断言（详见 [05](./05-durable-state-and-recovery.md)）。它的第一个消费者是 `pi-env`：`RemoteExecutionEnv`（SSH 远端）与本机 `NodeExecutionEnv` 通过同一套断言 + differential 随机操作序列逐结果对比，锁定语义等价合同。**"标准契约证据锁"的适用域从跨存储后端扩展到了跨机器、跨操作系统**。
 
 ---
 
@@ -165,5 +188,5 @@ Pi 的解法是将全量的状态机行为抽象为参数化的 `runStorageConfo
 |---|---|---|
 | **物理环境真空** | `test.sh`（`env -i`、`.pi-test-owned`） | 消除宿主配置泄漏与磁盘脏残留 |
 | **全真状态机仿真** | `faux.ts`（710 行）+ `harness.ts` | 0 Token、毫秒级驱动 Agentic Loop 闭环 |
-| **发布与供应链守卫** | `check-runtime-deps` + `coding-agent-consumer` | 消除 Monorepo 幽灵依赖与发包不可用 |
-| **标准契约证据锁** | MCP `baseline.json` + `storage-conformance.ts` | 跨外部协议、跨后端存储的长周期防退化 |
+| **发布与供应链守卫** | `check-runtime-deps` + `coding-agent-consumer` + `npm-audit.mjs` 豁免 + install-lock allowlist + pi-env daemon（SHA-256 部署/npm pack 校验/release 实测） | 消除 Monorepo 幽灵依赖与发包不可用 |
+| **标准契约证据锁** | MCP `baseline.json` + `storage-conformance.ts` + `env-conformance.ts` | 跨外部协议、跨后端存储、跨执行环境的长周期防退化 |

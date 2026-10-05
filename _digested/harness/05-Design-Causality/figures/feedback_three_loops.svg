@@ -30,7 +30,7 @@
   <text x="36" y="288" font-size="12" font-weight="700" fill="#854d0e">元环 — 学习发生在仓库文本与检查脚本里</text>
   <g font-size="10" fill="#713f12">
     <text x="36" y="308">无会话记忆回注;事故 → AGENTS.md 规则 / check 脚本回写。例:全量 vitest 禁令的成因写在规则里("e2e tests that activate when</text>
-    <text x="36" y="324">endpoint/auth env vars are present") · lockfile/shrinkwrap 门禁是供应链教训的制度化</text>
+    <text x="36" y="324">endpoint/auth env vars are present") · lockfile/install-lock 门禁是供应链教训的制度化</text>
     <text x="36" y="340">回写无机器封印(靠 review 与自觉)—— 与 5.1 系统层边界一致:DSH 有 doc-sync 把关,pi 没有</text>
   </g>
 

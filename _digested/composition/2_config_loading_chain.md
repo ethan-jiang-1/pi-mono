@@ -12,7 +12,7 @@
 |---|------|--------|-------------|------------------|
 | **全局层** | `~/.pi/agent/` | 个人纪律、全局技能、全局扩展、全局 prompt 模板 | 所有项目自动 | 否（全信任） |
 | **项目层** | `<cwd>/.pi/` 及父目录 `.pi/` | 项目特定 prompts、skills、extensions | 首次交互问信任，`/trust` 保存 | 是 |
-| **CLI 层** | 启动参数 | `--skill`、`--prompt-template`、`-e`、`--tools` | 仅本次启动 | 否（一次性覆盖） |
+| **CLI 层** | 启动参数 | `--skill`、`--prompt-template`、`-e`、`--tools`、`--no-mcp` | 仅本次启动 | 否（一次性覆盖） |
 
 ## 全局层：`~/.pi/agent/`
 
@@ -62,9 +62,12 @@ pi --skill ./custom-skill.md         # 加一个 skill（仅本次）
 pi --prompt-template ./tmpl.md       # 加一个 prompt template（仅本次）
 pi --models claude-sonnet-4-20250514 # 显式指定模型
 pi --no-tools                        # 纯对话，无工具
+pi --no-mcp                          # 不加载内置 MCP 扩展（不连 server，无 MCP 工具）
 ```
 
 **CLI 层覆盖全局层 + 项目层**，但只对本次启动有效。下次启动回到全局层 + 项目层的叠加。
+
+> v1.0.3+ 注：`--tools`/`--exclude-tools` 的条目现支持 `*` pattern，且 `--tools` **不再隐式移除 MCP 工具**——未命中的 MCP 工具保持注册、只经 tool_search/codemode 间接可达，除非条目以 `mcp__` 开头（如 `'mcp__radius__*'`）或显式 `--exclude-tools 'mcp__*'`。详见 [10d_toolset_switching.md](./10_extension_axes/10d_toolset_switching.md)。
 
 ## 三层叠加的全景
 
@@ -132,4 +135,4 @@ pi --no-tools                        # 纯对话，无工具
 
 **例证 2（父目录继承）**：在 repo 的子目录启动 pi，看 system prompt 的 `<project_context>` 块——根部的 AGENTS.md 出现在里面。证明向上遍历继承真实存在。
 
-**例证 3（CLI 覆盖）**：全局 settings.json 里设了 `tools: ["read","bash","edit","write","grep","find","ls"]`，启动时加 `--tools read,grep,find` → agent 只有 3 个工具。证明 CLI 覆盖全局。
+**例证 3（CLI 覆盖）**：全局 settings.json 里设了 `tools: ["read","bash","edit","write","grep","find","ls"]`，启动时加 `--tools read,grep,find` → agent 只有 3 个工具。证明 CLI 覆盖全局。（v1.0.3+ 旁注：此例只覆盖内置工具的"只有 3 个"结论；MCP 工具在 `--tools` 下不再被移除——未命中的保持注册、只经 tool_search/codemode 间接可达，条目支持 `*` pattern。）

@@ -50,11 +50,17 @@ Pi 没有内置沙箱。你只有 YOLO 全权和工具白名单两个内置机�
 pi --tools read,grep,find,ls   # 只读模式
 pi --tools bash                 # 只能跑命令不能写文件
 pi --no-tools                   # 纯对话，无工具
+pi --no-mcp                     # 不加载内置 MCP 扩展（v1.0.3+）
 ```
 
 **工具白名单可以做到的事**：
 - 只读模式：agent 只能读文件（不能改、不能执行）
 - 执行模式：agent 只能跑 bash（不能读项目文件？不能——`bash cat` 不算"bash 工具"吗？这是 pi 工具系统的一个粗糙边界：白名单管的是"是否允许调用 bash 工具"，不是"bash 允许跑什么命令"）
+
+**两个 v1.0.3+ 的补充**：
+
+- `--no-mcp` 是"临时收窄攻击面"的现成旋钮：直接不加载内置 `builtin:mcp` 扩展——不连任何 MCP server、无 MCP 工具、无 `/mcp` 命令，即使 settings 或 `-e` 显式启用也压掉（`main.ts:785` → `resource-loader.ts:578`）。对不信任 `.pi/mcp.json` 所指 server 的会话，这是一行启动参数就能闭合的通道。
+- **输出文件统一 0o600 + `wx` flag**（d677d0ee7，v1.0.3）：所有 pi 写出的"模型要用的输出文件"——bash 截断输出、output-accumulator、codemode spill、MCP 二进制资源、图片——统一经 `packages/coding-agent/src/utils/output-files.ts` 创建（存 OS temp 目录），权限 **0o600**（"Output can carry private data, so only the user may read the files"）、`wx` flag 保证不跟随他人预置在路径上的符号链接（防符号链接抢占/防泄露）。这是硬事实级别的文件系统边界，不是可配置项。
 
 ### 档位 2：bwrap / 容器
 
@@ -128,6 +134,8 @@ docker run -v $(pwd):/workspace pi "deploy to staging"
 - `_faq_on_digested/07/06_field_usage.md` C5（YOLO + 隔离是共识）
 - `@trim21/personal-pi-extensions`：bwrap 扩展源码
 - `packages/coding-agent/docs/containerization.md`
+- `--no-mcp`（v1.0.3+）：`packages/coding-agent/src/cli/args.ts:185` → `main.ts:785` → `core/resource-loader.ts:578`
+- 输出文件 0o600/`wx`（v1.0.3）：`packages/coding-agent/src/utils/output-files.ts`（`OUTPUT_FILE_MODE`、`writeOutputFile`）
 - facet 沙箱（**规格 + PoC，非产品**）：`packages/agent/docs/mobile-handoff/02-plugins/02-sandbox/`、`packages/agent/docs/mobile-handoff/README.md:22`、[`10_extension_axes/10i_process_axis.md`](10_extension_axes/10i_process_axis.md)
 
 ## 最小例证

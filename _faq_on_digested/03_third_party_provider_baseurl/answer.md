@@ -151,3 +151,9 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 - **strict 工具采样默认翻转**（影响走中转的工具调用）：未知 OpenAI 兼容端点（第三方中转基本都命中）现在默认 `supportsStrictMode: false`（`packages/ai/src/api/openai-completions.ts:1667`，890f92088）——依赖 strict JSON schema 的场景需在模型条目显式写 `supportsStrictMode: true`。
 - **`--provider` 必须配 `--model`**（`packages/coding-agent/src/main.ts:470-474`，0c453048b）：孤立 `--provider` 从"静默忽略"变为报错退出；§4 的 CLI 用法两参数成对使用。
 - 模型目录生成 schema 升 v6、新 `typesafe` provider（不影响 models.json 手写流程）。
+
+### v1.0.3 增量（2026-10-06 sync-0008 同步后）
+
+- **自定义 provider 的新官方范例**：Azure Foundry 上只讲 Chat Completions 的部署（代表：deepseek/deepseek-v4-pro）现在可用 `provider: "azure"` + `api: "openai-completions"` 挂进 models.json——azure provider 从单一 Responses API 扩为双 API dispatch（`packages/ai/src/providers/azure.ts:44-53`，`azureStreams` 在 dispatch 前解析 endpoint 并把请求里的 `model` 换成部署名、`model.id` 保持 catalog id）。`AZURE_OPENAI_DEPLOYMENT_NAME_MAP` / `azureDeploymentName`（`packages/ai/src/api/azure-openai-config.ts:27-33`）对两种 API 都生效（此前部署名映射只作用于 Responses 路径，Chat Completions 发的是 catalog model id，任何部署名≠模型名的部署 404）。本篇 §2 的"新 provider 名 + 手动补 compat"流程因此多了一个官方范本。
+- **provider id 集合已变**：`azure-openai-responses` 已改名 `azure`（`a37306d43`，v1.0.3 唯一 Breaking）——models.json/auth.json/settings.json 里键为 `azure-openai-responses` 的条目必须改 `azure`（SDK 侧 `getModel("azure", ...)`）。本篇正文以自定义 provider（micuapi）为例不直接命中，但通用流程叙述里凡涉及官方 provider id 集合的地方均以此为准。
+- **锚点漂移声明（本轮追加）**：`generate-models.ts` 本轮 +100 行左右（`DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP` 已不在 L286，现 :289；Together 改名集 `:201`）、`provider-composer.ts` +21（`applyModelsJson` :281 → :300、`modelFromJson` :192 → :210）、`openai-completions.ts` +14（deepseek 魔法探测 :1598 → :1611）。§7 开头"锚点仍以 v0.85.1 为准"的声明继续适用，本段追加 v1.0.3（`76dfb88f6` 等）这轮漂移。

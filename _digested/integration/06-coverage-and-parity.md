@@ -58,7 +58,7 @@
 | 扩展终止整批工具调用 | 扩展 `tool_call` hook 返回 `terminate`（v0.84.1） | [`extensions/types.ts`](../../packages/coding-agent/src/core/extensions/types.ts) |
 | auth 预检 | CLI：`pi auth check`（provider/model 级，可输出解析后的 credential）（v0.84.1） | `packages/coding-agent/src/main.ts` |
 | 默认工具集配置 | `defaultTools` setting（全局或按项目，v0.84.2；v0.84.3 起可选值含 `powershell`） | [`docs/settings.md`](../../packages/coding-agent/docs/settings.md) |
-| PowerShell 执行 | SDK：`createPowerShellTool()`（内置工具，v0.84.3；基于 bash 工具定义，自带 UTF-8 输出 shim） | [`tools/powershell.ts`](../../packages/coding-agent/src/core/tools/powershell.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
+| PowerShell 执行 | SDK：`createPowerShellTool()`（内置工具，v0.84.3；基于 bash 工具定义，自带 UTF-8 输出 shim）。注意（v1.0.3+ Unreleased，sync 0008）：durable 侧另有**同名**工厂 `createPowerShellTool()`（`packages/durable/src/tools/bash.ts:148`）——跨平台、argv exec 形式直接启动 pwsh 不经 shell 解析，与本行 coding-agent 的 Windows-only 实现是两回事 | [`tools/powershell.ts`](../../packages/coding-agent/src/core/tools/powershell.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | 每模型思考深度 | `modelThinkingLevels` setting（v0.84.3，per-model 覆盖全局默认） | [`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
 | 终端能力覆盖 | `terminal.hyperlinks/images/trueColor` setting + env `PI_HYPERLINKS`/`PI_TRUE_COLOR`/`PI_IMAGE_PROTOCOL`（v0.84.4；优先级 settings > env > 自动检测） | [`terminal-image.ts`](../../packages/tui/src/terminal-image.ts)、[`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
 | 模型目录 | v0.84.4：DeepSeek 新增 `deepseek-v4-flash-vision-exp`（vision，1M ctx）；Cloudflare gateway 补 `workers-ai/*` passthrough；OpenRouter 图像模型刷新 | [`scripts/generate-models.ts`](../../packages/ai/scripts/generate-models.ts) |
@@ -184,7 +184,7 @@ TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages
 | 交互式问题 API | `/question/:id/reply` | 无等价物 |
 | GitHub Action/Agent | 预置集成 | 无预置集成 |
 | Slack bot | 预置集成 | 无预置集成 |
-| MCP server 能力 | 有 CLI 管理工具 | **v1.0.0 起有一级支持**（旧结论"无"失效）：独立客户端包 `packages/mcp`（`@earendil-works/pi-mcp`，零 pi 依赖 + OAuth）+ 内置 `mcp` 扩展；配置在 `~/.pi/agent/mcp.json` 与受信项目 `.pi/mcp.json`（`extensions/mcp/config.ts:117-118`）；CLI `pi mcp add/remove/list/login/logout`（`extensions/mcp/cli.ts:34-39`）；TUI `/mcp`（`extensions/mcp/index.ts:271`）。仍无 ACP |
+| MCP server 能力 | 有 CLI 管理工具 | **v1.0.0 起有一级支持**（旧结论"无"失效）：独立客户端包 `packages/mcp`（`@earendil-works/pi-mcp`，零 pi 依赖 + OAuth）+ 内置 `mcp` 扩展；配置在 `~/.pi/agent/mcp.json` 与受信项目 `.pi/mcp.json`（sync 0008 重锚：项目 override 逻辑现 `extensions/mcp/config.ts:74-154`，旧 `:117-118` 已失效；v1.0.1 起项目条目没有 `command`/`url`/`type` 即为 override，只改 `enabled`/`exposure`/`toolExposure`，其余继承全局定义，#10277）；CLI `pi mcp add/remove/list/login/logout`（`extensions/mcp/cli.ts:34-39`）、`--no-mcp`（Unreleased）整体禁用内置 MCP 扩展；TUI `/mcp`（`extensions/mcp/index.ts:271`）。仍无 ACP |
 | ACP 编辑器协议 | 支持 | 无 |
 | SDK 跨语言方案 | `@opencode-ai/sdk` (JS/TS) | RPC JSONL（任意语言可实现）；另有 CBOR 二进制 protocol，但**已降级为 dev-only/source-only、非 supported**（见上文） |
 | CI JSON stream | `opencode run --format json` | RPC stdout JSONL |

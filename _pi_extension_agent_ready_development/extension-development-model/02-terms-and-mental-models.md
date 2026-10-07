@@ -1,0 +1,65 @@
+# 术语与心智模型
+
+本页解释卷内使用的 Pi 词汇，全部依据 `v1.0.3` 的文档与源码。按主题分组；跨卷链接供深入，不构成前置顺序。
+
+## 一、运行时的三个层次
+
+| 词 | 含义 | 边界 |
+|---|---|---|
+| agent core（`pi-agent-core`） | Agent 循环、工具调用、状态管理的最小运行时 | 不含 CLI、资源发现、UI |
+| coding-agent（`pi-coding-agent`） | 交互 CLI 与 SDK：`AgentSession`、`SessionManager`、`ResourceLoader`、内置工具 | 扩展运行在这一层，不在 agent core |
+| 扩展运行时 | 加载扩展 factory、派发事件、管理注册表 | reload 会替换整个扩展运行时，旧运行时的状态不可复用 |
+
+`createAgentSession()` 创建的会话拥有一段对话、模型与工具、排队消息、压缩状态和扩展运行时；`dispose()` 中止工作并使扩展上下文失效（运行时事实，见 [SDK 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sdk.md#L26-L60)）。
+
+## 二、载体：扩展、skill、prompt template、package
+
+- **扩展**：TypeScript 模块，默认导出接收 `ExtensionAPI` 的 factory。承载需要执行代码的能力：工具、命令、事件处理器、provider、MCP server、虚拟模型、渲染。运行在 Pi 进程内，拥有与用户相同的操作系统权限——只加载信任来源（运行时事实）。
+- **skill**：含 `SKILL.md` 的目录。启动时只把 name 与 description 加进系统提示；任务匹配时模型才读完整指令。可捆绑 scripts/references/assets。`description` 决定路由，要同时写「做什么」和「何时用」。`/skill:name` 强制加载；`disable-model-invocation` 关闭自动选择（运行时事实，见 [Skills 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md)）。
+- **prompt template**：Markdown 文件变成 `/` 命令；文件名即命令名。支持位置参数与默认值展开。没有执行行为（运行时事实，见 [Prompt Templates 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md)）。
+- **package**：把上述资源（加 themes）作为一个单位经 npm/git/本地路径分发。约定目录或 `pi` manifest；经 `pi install` 写入 settings；npm 包用 `pi-package` keyword 进 gallery（运行时事实，见 [Packages 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md)）。
+
+判别口径：需要可执行行为 → 扩展；需要领域方法+配套文件 → skill；固定提示命令 → template；多资源一体分发 → package。
+
+## 三、发现、位置与信任
+
+- **agent dir**：个人资源在 `~/.pi/agent/`（extensions/skills/prompts/themes 子目录）；项目资源在仓库 `.pi/` 下，project trust 授予后才加载。
+- **ResourceLoader**：负责发现与加载资源。SDK 允许整体替换（host 完全自持资源存储时）。
+- **project trust**：项目扩展、skills、templates、packages 可以指示模型运行程序或改文件，所以信任授予前不加载。评审第三方 package 源码与项目 package 声明是使用者的责任（运行时事实）。
+- **host 提供包**：`pi-ai`、`pi-agent-core`、`pi-coding-agent`、`pi-tui`、`typebox` 由 Pi 提供给扩展和 skills，声明在 `peerDependencies` 用 `"*"`。
+
+## 四、事件与生命周期
+
+一次 run 的顺序：输入 → `before_agent_start` → 模型/消息/工具事件 → `agent_end`。自动重试、恢复、压缩、排队工作可在 `agent_end` 后继续；`agent_before_settle` 是最后的可行动边界（可追加条目并请求一次继续）；`agent_settled` 最终且仅通知。宿主要知道「不会自动继续了」应等 `agent_settled`（运行时事实，见 [Extensions 的生命周期节](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L52-L67)）。
+
+handler 按扩展加载与注册顺序运行；不同事件的能力不同（通知、变换、替换、取消），用声明类型而不是猜测返回值的作用。
+
+## 五、工具词汇
+
+- **exposure**：模型触达工具的方式。`direct`（默认，声明且可调用）、`model-only`（声明不可调用）、`codemode`（注册即可被 codemode 脚本调用，不声明）、`deferred`（可被 tool_search 找到激活）、`hidden`（注册但不可达，用于收回）。
+- **active set**：声明给模型的工具集合；`pi.setActiveTools()` 动态切换，名字必须已注册。
+- **annotations**：MCP 语义的工具提示（readOnly/destructive/idempotent/openWorld），未被验证，供权限类扩展决策。
+- **嵌套执行**：`ctx.executeTool()` 经过与模型调用相同的校验与事件，id 由 Pi 派生，不进 transcript；调用方工具自行上报结果与 usage。
+
+## 六、会话词汇
+
+- **SessionManager**：拥有持久化或内存中的条目树与活动叶子。分支改变叶子而不删除废弃分支——废弃分支代表替代历史，重建分支敏感状态用 `getBranch()`，不要重放全部文件条目（运行时事实，见 [SDK 的会话存储节](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sdk.md#L34-L54)）。
+- **session JSONL**：持久化合同，记录消息、prompt/工具声明变化、压缩等事实。账本可检查，但不等于逐字节网络记录或重放保证。
+- **steer / followUp**：会话流式中发送消息必须显式选择插入当前 run（steer）或跟随其后（followUp）；不选择会被拒绝而不是猜测。
+
+## 七、模式与 UI
+
+扩展在 interactive、RPC、JSON、print 四种模式加载。interactive 提供完整终端 UI；RPC 可转发对话框与通知但不能转发自定义终端组件；JSON 与 print 无 UI。`ctx.mode === "tui"` 守卫终端专属行为，`ctx.hasUI` 判断交互能力；工具与事件行为应独立于渲染（运行时事实）。
+
+## 八、验证词汇
+
+- **faux provider**：`@earendil-works/pi-ai/compat` 导出的脚本化 provider，为断言事件顺序与状态合同提供确定响应，不碰真实 API、key、网络。
+- **真实交互验证**：启动 Pi、提交真实 prompt、收到真实回复。仅启动不构成验证。
+- **干净安装验证**：在干净 agent dir 安装 package 后复验可观察行为。
+- **MCP conformance**：pi-mono 对 MCP 客户端按 pinned 官方套件做的回归检查，属于主仓机制。
+
+## 九、本语料自己的词
+
+- **完成度阶梯**：本语料对 Pi 机制归纳的七级交付区分（见[总览](./00-index.md#pi-native-完成度阶梯)），不是 Pi 文档中的术语。
+- **载体路由**：把每类变化放进其权威载体（扩展/skill/template/package）的做法，是本语料的综合。
+- **四类陈述**：运行时事实／主仓要求／扩展仓建议／仓库自定，见根 [README](../README.md)。

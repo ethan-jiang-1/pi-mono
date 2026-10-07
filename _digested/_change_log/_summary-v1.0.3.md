@@ -17,7 +17,7 @@ v1.0.0 定形后官方用四天补齐了执行环境这层：durable 的 Executi
 
 ### 明示（Breaking Changes 段）
 
-1. **ai v1.0.3**：provider `azure-openai-responses` → `azure` + 双 API dispatch（Foundry Chat Completions 可用）；auth.json/models.json/settings.json 键迁移
+1. **ai v1.0.3**：provider `azure-openai-responses` → `azure` + 双 API dispatch（Foundry Chat Completions 可用）；auth.json/models.json/settings.json 键迁移（coding-agent 1.0.3 的 Breaking 段记录同一改名的用户侧迁移）
 2. **durable v1.0.3**：FileSystem +openBinaryReader/openDirReader、BinaryReader +scanLines、FileSystem +watch、exec argv + onOutput info（四条接口义务，自定义环境实现者必须跟进）
 3. **mcp v1.0.1**：`clientMetadataUrl` → `clientMetadataDocument` 回调（CIMD 选择性启用）
 

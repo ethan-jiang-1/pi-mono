@@ -26,7 +26,7 @@ git show v1.0.3:<path>
 | [Prompts 即程序性合同](./02-prompts-as-procedural-contracts.md) | `.pi/prompts/` 六个 prompt 各自划定的行为边界是什么？ | `.pi/prompts/is/pr/wr/deslop/sa/cl.md` |
 | [仓库 skills](./03-repo-skills.md) | 三个 skill 怎样封装跨多文件、跨阶段的专家程序？ | `.pi/skills/add-llm-provider/interactive-testing/release.md` |
 | [扩展点地图](./04-extension-points-map.md) | Pi 的可变性面有哪些，何时选哪种资源？ | `docs/extensions.md` 等九篇文档 |
-| [会话可检视性](./05-session-inspectability.md) | 会话文件合同与 `/ir` 如何让工作可复查、可续接？ | `docs/session-format.md`、`.pi/extensions/import-repro.ts` |
+| [会话可检视性](./05-session-inspectability.md) | 会话文件合同、原生接续命令与 `/ir` 如何让工作可复查、可续接？ | `docs/session-format.md`、`docs/sessions.md`、`docs/slash-commands.md`、`.pi/extensions/import-repro.ts` |
 | [范围纪律与成本合同](./06-scope-discipline-and-cost-contracts.md) | 仓库怎样把模糊的约束转写为会失败的检查？ | `CONTRIBUTING.md`、`scripts/check-entry-graphs.mjs` |
 | [Monorepo 分类](./07-monorepo-taxonomy.md) | `packages/` 下各包扮演什么角色，与扩展作者何干？ | 根 `README.md` 包表、各包 `README.md` |
 | [`figures/`](./figures/README.md) | 本卷正文使用的 SVG 图示清单（会话接续、成本合同） | — |

@@ -8,9 +8,9 @@
 |---|---|---|
 | agent core（`pi-agent-core`） | Agent 循环、工具调用、状态管理的最小运行时 | 不含 CLI、资源发现、UI |
 | coding-agent（`pi-coding-agent`） | 交互 CLI 与 SDK：`AgentSession`、`SessionManager`、`ResourceLoader`、内置工具 | 扩展运行在这一层，不在 agent core |
-| 扩展运行时 | 加载扩展 factory、派发事件、管理注册表 | reload 会替换整个扩展运行时，旧运行时的状态不可复用 |
+| 扩展运行时 | 加载扩展 factory、派发事件、管理注册表（`/reload` 命令触发重载，[slash-commands.md L49](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/slash-commands.md#L49)） | reload 会替换整个扩展运行时，旧运行时的状态不可复用 |
 
-`createAgentSession()` 创建的会话拥有一段对话、模型与工具、排队消息、压缩状态和扩展运行时；`dispose()` 中止工作并使扩展上下文失效（运行时事实，见 [SDK 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sdk.md#L26-L60)）。
+`createAgentSession()` 创建的会话拥有一段对话、模型与工具、排队消息、压缩状态和扩展运行时；`dispose()` 中止工作并使扩展上下文失效（运行时事实，见 [SDK 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sdk.md#L26-L60)）。Pi 官方的架构总览见 [How Pi Works](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/how-pi-works.md#L3)：会话协调模型请求、工具执行、上下文组装与会话存储；interactive、print、JSON、RPC 与 SDK 各界面共用同一套 agent 与会话机制（[L33-L39](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/how-pi-works.md#L33-L39)）。
 
 ## 二、资源类型：扩展、skill、prompt template、package
 
@@ -32,7 +32,7 @@
 
 一次 run 的顺序：输入 → `before_agent_start` → 模型/消息/工具事件 → `agent_end`。自动重试、恢复、压缩、排队工作可在 `agent_end` 后继续；`agent_before_settle` 是最后的可行动边界（可追加条目并请求一次继续）；`agent_settled` 最终且仅通知。宿主要知道「不会自动继续了」应等 `agent_settled`（运行时事实，见 [Extensions 的生命周期节](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L52-L67)）。
 
-handler 按扩展加载与注册顺序运行；不同事件的能力不同（通知、变换、替换、取消），用声明类型而不是猜测返回值的作用。
+handler 按扩展加载与注册顺序运行；不同事件的能力不同（通知、变换、替换、取消），用声明类型而不是猜测返回值的作用。压缩前另有 `session_before_compact` 钩子：扩展可提供自定义摘要（条目记 `fromHook: true`）并把生成摘要的 LLM `usage` 计入会话统计（运行时事实，见 [Compaction 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/compaction.md#L296)）。
 
 ## 五、工具词汇
 
@@ -45,11 +45,12 @@ handler 按扩展加载与注册顺序运行；不同事件的能力不同（通
 
 - **SessionManager**：拥有持久化或内存中的条目树与活动叶子。分支改变叶子而不删除废弃分支——废弃分支代表替代历史，重建分支敏感状态用 `getBranch()`，不要重放全部文件条目（运行时事实，见 [SDK 的会话存储节](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sdk.md#L34-L54)与 [Extensions 的状态节](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L233-L234)）。
 - **session JSONL**：持久化合同，记录消息、prompt/工具声明变化、压缩等事实。账本可检查，但不等于逐字节网络记录或重放保证。
+- **内建接续命令**：`--continue`/`--resume` 与 `/resume`/`/new` 选择会话；`/tree` 在会话内移动、`/fork` 从早先消息开出新会话、`/clone` 复制当前分支为新会话；`/import <path>` 导入并续接一个 JSONL 会话文件；`/export`/`/share` 导出 HTML/JSONL 或上传取回查看链接（运行时事实，见 [Sessions 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sessions.md)与 [Slash Commands 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/slash-commands.md#L23-L31)；完整命令表见卷三 05 页）。
 - **steer / followUp**：会话流式中发送消息必须显式选择插入当前 run（steer）或跟随其后（followUp）；不选择会被拒绝而不是猜测。
 
 ## 七、模式与 UI
 
-扩展在 interactive、RPC、JSON、print 四种模式加载。interactive 提供完整终端 UI；RPC 可转发对话框与通知但不能转发自定义终端组件；JSON 与 print 无 UI。`ctx.mode === "tui"` 守卫终端专属行为，`ctx.hasUI` 判断交互能力；工具与事件行为应独立于渲染（运行时事实）。
+扩展在 interactive、RPC、JSON、print 四种模式加载。interactive 提供完整终端 UI；RPC 可转发对话框与通知但不能转发自定义终端组件；JSON 与 print 无 UI。`ctx.mode === "tui"` 守卫终端专属行为，`ctx.hasUI` 判断交互能力；工具与事件行为应独立于渲染（运行时事实）。RPC 模式下对话框与通知经 extension UI 子协议请求/应答（此时 `ctx.mode === "rpc"`、`ctx.hasUI` 为 true），`custom()` 等终端专属方法不可用（[RPC Extension UI 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/rpc-extension-ui.md#L12-L25)）。
 
 ## 八、验证词汇
 
@@ -61,5 +62,10 @@ handler 按扩展加载与注册顺序运行；不同事件的能力不同（通
 ## 九、本语料自己的词
 
 - **完成度阶梯**：本语料对 Pi 机制归纳的七级交付区分（见[总览](./00-index.md#pi-native-完成度阶梯)），不是 Pi 文档中的术语。
-- **资源判别**：按 Pi 文档首段的判别口径选择资源类型，是本语料的综合。
+- **资源判别**：按 Pi 文档开头的判别句选择资源类型，是本语料的综合。
 - **四类陈述**：运行时事实／主仓要求／扩展仓建议／仓库自定，见根 [README](../README.md)。
+- **交付判断**：本语料对「外部结果、影响面、验证结果与未验证项的交付记录」的命名（阶梯第 7 级、变更路径第 7 步）；Pi 文档无此术语，最近的原生锚点是 release skill 的 smoke 通过标准与主仓验证义务。
+- **Pi-native**：本语料的组织用词，意为「从 Pi 一手机制归纳」，用于区分语料综合与 Pi 官方定义，不是 Pi 术语。
+- **验证分层**：本语料对验证方式按观察对象分工的归纳（[总览](./00-index.md)第 5 步）；Pi 原生的对应物是主仓的四层测试（卷二 05 页）。
+- **会话账本**：本语料对 session JSONL「可读、可分支、可续接的工作记录」属性的比喻；Pi 的正式词是 session/session file。
+- **程序性合同 / 会话可检视性**：卷三两页的标题视角命名（prompts 作为可版本化的工作合同、会话作为可检视的工作记录），是分析透镜而非 Pi 术语。

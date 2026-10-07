@@ -21,14 +21,14 @@
 
 ## Pi-native 完成度阶梯
 
-Pi 的扩展机制把「工作」分成多个可分别观察的等级。评估一次交付时，逐级问「这级被观察过吗」：
+一次扩展交付会产生多个可分别观察的结果——文件是否被加载、能力是否注册、行为是否真实发生，这些边界来自 Pi 机制本身；下表把它们组织为七级阶梯，**七级划分与各级名称是本语料的归纳**，不是 Pi 文档中的官方分级。评估一次交付时，逐级问「这级被观察过吗」：
 
 ![Pi 扩展的完成度阶梯](./figures/completion-ladder.svg)
 
 | 等级 | 观察什么 | 常见误判 |
 |---|---|---|
 | 1. 文件被加载 | factory 被执行、无扩展错误报告 | 加载成功不等于任何能力注册成功 |
-| 2. 能力已注册 | 工具/命令/provider 出现在注册表；命令进入 `/` 补全，扩展资源可在 `pi config` 启停 | 注册不等于模型会调用、命令会执行 |
+| 2. 能力已注册 | 工具/命令/provider 出现在注册表；命令进入 `/` 补全，包资源的加载可经 `pi config` 配置 | 注册不等于模型会调用、命令会执行 |
 | 3. 行为真实发生 | 真实会话中工具 `execute` 运行、命令 handler 运行、事件 handler 被派发 | 手工组装的 session 对象不经过发现与加载路径 |
 | 4. 生命周期合同正确 | factory 不启动长命资源、`session_shutdown` 幂等、继续条件有守卫 | 一次性手动验证测不出并发、取消、reload 的边界 |
 | 5. 多模式可用 | interactive、RPC、JSON、print 模式行为完整 | 只在 TUI 测过的 UI 调用在无 UI 模式会失败 |
@@ -64,7 +64,7 @@ Pi 用不同的资源类型承载不同种类的变化，`ResourceLoader` 统一
 | 固定的可复用提示命令 | prompt template | 同一 prompt 反复使用，无需执行行为 |
 | 多个资源作为整体分发 | package | 经 npm/git 共享，或多个资源属于一体 |
 
-资源判别来自 Pi 的 [Extensions](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L3)、[Skills](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md#L3-L5) 与 [Prompt Templates](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L3) 文档首段；错配资源类型（例如把一堆指令写成扩展）不违反任何检查，但会付出维护与上下文成本。
+资源判别来自 Pi 的 [Extensions](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L3)、[Skills](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md#L3-L5) 与 [Prompt Templates](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L3) 文档开头的判别句（Skills 的判别句在第二段）；错配资源类型（例如把一堆指令写成扩展）不违反任何检查，但会付出维护与上下文成本。
 
 ### 3. 遵守运行时生命周期合同
 
@@ -72,6 +72,7 @@ Pi 用不同的资源类型承载不同种类的变化，`ResourceLoader` 统一
 
 - factory 里不要启动进程、socket、watcher 或计时器——有些调用只加载扩展不开会话；长命资源从 `session_start` 或需要的命令/工具里启动。
 - 一次 run 从 `before_agent_start` 经模型、消息、工具事件到 `agent_end`；自动重试、恢复、压缩或排队工作可以在其后继续。
+- 压缩可由扩展参与：`session_before_compact` 事件在压缩前触发，扩展提供的自定义摘要记为 `fromHook: true`，其 LLM `usage` 计入会话统计（运行时事实，见 [Compaction 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/compaction.md#L150-L165)、[钩子事件](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/compaction.md#L296)）。
 - `agent_before_settle` 是最后一个可行动边界；`agent_settled` 是最终且仅通知的。
 - 清理放进幂等的 `session_shutdown`，因为取消、reload、会话替换和进程退出会汇聚到同一路径。
 
@@ -118,7 +119,7 @@ Pi 主仓库的测试套件是这套分层的参考实现：它用发布的 `@ea
 
 ### 不要假设 UI 存在
 
-JSON、print 模式没有 UI；RPC 模式不能转发自定义终端组件。用 `ctx.mode === "tui"` 与 `ctx.hasUI` 守卫，并让工具与事件行为独立于渲染。
+JSON、print 模式没有 UI；RPC 模式不能转发自定义终端组件。用 `ctx.mode === "tui"` 与 `ctx.hasUI` 守卫，并让工具与事件行为独立于渲染。RPC 模式下 `ctx.ui` 的对话框与通知方法经 extension UI 子协议请求/应答转发（此时 `ctx.mode === "rpc"` 且 `ctx.hasUI` 为 true），`custom()` 等终端专属方法不可用（运行时事实，见 [RPC Extension UI 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/rpc-extension-ui.md#L12-L25)）。
 
 ### 不要误解注销与终止
 

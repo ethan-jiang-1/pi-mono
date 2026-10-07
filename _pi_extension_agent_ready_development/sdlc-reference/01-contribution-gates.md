@@ -54,15 +54,22 @@ PR 的前置条件（**主仓要求**）：
 
 在 `issue_comment: created` 触发（[approve-contributor.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/approve-contributor.yml#L3-L5)）。生效条件：评论以 `lgtmi`/`lgtm` 开头或结尾（[L33-L35](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/approve-contributor.yml#L33-L35)），**且**评论者具有 `admin`/`maintain`/`write` 权限（[L45-L61](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/approve-contributor.yml#L45-L61)）。批准对象默认是 issue 作者；评论中 `@` 提及的用户优先（[L133-L136](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/approve-contributor.yml#L133-L136)）。写入时 `lgtmi`→capability `issue`、`lgtm`→`pr`，已有 `pr` 不降级（[L140-L162](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/approve-contributor.yml#L140-L162)）；随后以 `github-actions[bot]` 身份 commit 并 push 批准文件（[L176-L183](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/approve-contributor.yml#L176-L183)）。普通用户评论 `lgtm` 不会改变任何资格。
 
-## bug 模板的前置过滤
+## issue 模板的前置过滤
 
-issue 模板在 gate 之前就把两类噪音挡在模板层（**主仓要求**）：
+`v1.0.3` 的 `.github/ISSUE_TEMPLATE/` 有四份文件，在 gate 之前就把不同类别的输入分流（**主仓要求**）：
 
-> **Important:** before reporting an issue in core, please validate first with `pi -ne` that this is not caused by an extension you loaded.
+- **bug.yml**：核心 bug 报告。模板要求先用 `pi -ne` 验证问题不是用户加载的扩展引起：
 
-—— [bug.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/bug.yml#L14)
+  > **Important:** before reporting an issue in core, please validate first with `pi -ne` that this is not caused by an extension you loaded.
 
-`pi -ne` 即 no-extensions 启动（**运行时事实**）：禁用扩展发现与内建扩展地启动 pi（显式 `-e` 路径仍可用），用于区分「核心 bug」与「用户扩展引发的问题」。复现步骤字段要求 "Minimal steps to trigger the bug."（[bug.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/bug.yml#L26-L30)）——最小复现是模板必填项，不是可选项。
+  —— [bug.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/bug.yml#L14)
+
+  `pi -ne` 即 no-extensions 启动（**运行时事实**）：禁用扩展发现与内建扩展地启动 pi（显式 `-e` 路径仍可用），用于区分「核心 bug」与「用户扩展引发的问题」。复现步骤字段要求 "Minimal steps to trigger the bug."（[bug.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/bug.yml#L26-L30)）——最小复现是模板必填项，不是可选项。
+- **contribution.yml**：变更/功能提案模板，自我定位为「新贡献者提交 PR 前的必经步骤」（"Propose a change or feature (required for new contributors before submitting a PR)"，[contribution.yml L2](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/contribution.yml#L2)）——提案在 issue 区发生、先于开 PR。
+- **package-report.yml**：报告 pi.dev 上列出的有问题 package（"Report a problematic Pi package listed on pi.dev"，[package-report.yml L2-L3](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/package-report.yml#L2-L3)），打 `package-report` 标签并要求给出 npm 包名与版本——第三方 package 生态的问题走独立入口，不与核心 bug 混流。
+- **config.yml**：禁用空白 issue，把使用问题引去 Discord（[config.yml L1-L5](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/config.yml#L1-L5)）。
+
+模板层与 gate 的分工互补：gate 管「谁有资格发」，模板管「发的内容进入哪条通道」。
 
 ## 触发边界与反例
 

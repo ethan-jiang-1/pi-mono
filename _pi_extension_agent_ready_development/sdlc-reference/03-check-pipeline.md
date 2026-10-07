@@ -57,7 +57,7 @@
 > If this lockfile change is intentional, commit with:
 >   PI_ALLOW_LOCKFILE_CHANGE=1 git commit ...
 
-—— [check-lockfile-commit.mjs](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/check-lockfile-commit.mjs#L99-L120)
+—— [check-lockfile-commit.mjs](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/check-lockfile-commit.mjs#L99-L120)（引文省略了清单与结尾提示之间条件性打印的包版本变化摘要）
 
 ## 边界与反例
 

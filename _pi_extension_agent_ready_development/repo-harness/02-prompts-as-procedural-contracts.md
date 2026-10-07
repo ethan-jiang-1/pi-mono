@@ -2,7 +2,7 @@
 
 `v1.0.3` 的 `.pi/prompts/` 下有六个 prompt template：`is`、`pr`、`wr`、`deslop`、`sa`、`cl`。它们把六类高频工作流写成文件，任何会话以 `/is`、`/pr` 等命令调用。本页先给总表，再逐个检视每个 prompt 划定的合同边界。**这些是主仓为自己定的工作流（主仓要求/仓库自定范畴）**：对 pi-mono 的贡献工作适用；独立扩展仓可以把它们当作自己工作流模板的参考（扩展仓建议）。
 
-prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` 命令、文件名即命令名（[prompt-templates.md L16](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L16)），参数经 `$ARGUMENTS`/`$@` 等替换进入提示（[替换表 L38-L47](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L38-L47)）。资源类型的判别见 [04](./04-extension-points-map.md)。
+prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` 命令、文件名即命令名（[prompt-templates.md L19](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L19)），参数经 `$ARGUMENTS`/`$@` 等替换进入提示（[替换表 L38-L47](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L38-L47)）。资源类型的判别见 [04](./04-extension-points-map.md)。
 
 ## 总表：六个合同
 
@@ -79,7 +79,7 @@ prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` �
 >
 > — [`.pi/prompts/cl.md` L31](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/prompts/cl.md#L31)
 
-它还负责在 `coding-agent` 的 `[Unreleased]` 起始处插入 `### New Features` 段，内容先向用户确认再写入（[cl.md L34](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/prompts/cl.md#L34)）。`/cl` 是 release skill 的前置步骤（见 [03](./03-repo-skills.md)）。
+它还负责在 `coding-agent` 的 `[Unreleased]` 起始处插入 `### New Features` 段，内容先向用户确认再写入（[cl.md L34-L35](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/prompts/cl.md#L34-L35)）。`/cl` 是 release skill 的前置步骤（见 [03](./03-repo-skills.md)）。
 
 ## 观点与限制
 

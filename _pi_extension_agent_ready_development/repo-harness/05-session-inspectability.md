@@ -33,11 +33,27 @@ pi-mono 把「工作过程」当作可机读的一等对象：会话持久化为
 
 每个非根条目经 `parentId` 指向父条目；从任意早先条目长出新子树即原地分支，不必新建文件（运行时事实）。`/tree` 切换分支时可生成被弃路径的 LLM 摘要（`branch_summary`）。上下文构建沿「当前叶到根」的路径走，遇 compaction 按保留区间折叠，再应用最新的 `context_edit`——**原始条目永不被改写**，一切变化以追加条目表达。这意味着「探索了什么、放弃了什么、为什么」都留在账本里。
 
+## Pi 原生的会话接续命令面
+
+会话树之上，Pi 自带一整层接续命令（运行时事实，权威在 [Sessions 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sessions.md)与 [Slash Commands 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/slash-commands.md)，逐条锚点见下表）：
+
+| 动作 | 命令 |
+|---|---|
+| 选择会话 | `--continue`/`--resume` 启动参数；交互内 `/resume`、`/new`（[sessions.md L10-L14](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sessions.md#L10-L14)） |
+| 会话内分支 | `/tree` 在会话文件内移动；`/fork` 从早先用户消息开出新会话；`/clone` 复制当前分支为新会话（[sessions.md L26-L28](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sessions.md#L26-L28)） |
+| 压缩上下文 | `/compact [instructions]` 手动压缩（[slash-commands.md L30](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/slash-commands.md#L30)） |
+| 导入导出 | `/import <path>` 导入并续接一个 JSONL 会话文件（[slash-commands.md L31](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/slash-commands.md#L31)）；`/export` 写出 HTML 或 JSONL（[sessions.md L58](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sessions.md#L58)） |
+| 分享 | `/share` 上传会话并返回查看链接——Radius 认证时用 Radius artifact，否则用私有 GitHub gist（[sessions.md L58](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sessions.md#L58)） |
+
+`--no-session` 用于一次性运行，退出后不可续接；会话存储位置由 `--session-dir`、环境变量与 `sessionDir` 设置决定（[sessions.md L50-L54](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sessions.md#L50-L54)）。文档同时明示导出前的审查义务：会话可能含 prompt、模型回复、工具参数、命令输出、文件内容与暴露过的凭据（[L58-L60](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sessions.md#L58-L60)）。
+
+这一层是 `/ir` 的地基：CI 的 secret gist 与 `pi.dev/session` 分享 URL 走的正是 `/share` 同一条通道，`/ir` 在其上做引用解析与 cwd 重写（主仓自定义层）。
+
 ## `/ir`：把 CI 分析会话导入本地续接
 
 ![会话接续：CI 分析到本地续接](./figures/session-import.svg)
 
-pi-mono 的 issue 分析 CI 会把分析会话分享为 gist；`.pi/extensions/import-repro.ts` 注册的 `/ir` 命令把它取回本地（主仓自定实践）：
+pi-mono 的 issue 分析 CI 会把分析会话分享为 gist；`.pi/extensions/import-repro.ts` 注册的 `/ir` 命令把它取回本地（主仓自定实践；`.pi/extensions/` 在 `v1.0.3` 共有四个主仓自用扩展——`import-repro`、`prompt-url-widget`、`redraws`、`tps`——本页只检视与会话续接相关的 `import-repro`）：
 
 > The CI job runs in a high-entropy checkout directory; this command rewrites the recorded cwd to the local checkout, installs the session file into the current session directory, and switches to it.
 >

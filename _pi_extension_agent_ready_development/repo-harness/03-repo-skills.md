@@ -16,7 +16,7 @@ skill 的加载分两级（运行时事实）：启动时只有名字、描述�
 >
 > — [skills.md L37](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md#L37)
 
-三个 skill 的描述都同时写了「做什么」与「何时用」：`add-llm-provider` 点明覆盖类型、实现、懒注册、模型生成、测试矩阵、coding-agent 接线与文档；`interactive-testing` 点明 tmux 受控终端与 release smoke；`release` 点明准备、本地 smoke、发布与「失败 CI 或公告」的恢复场景——恢复场景入描述意味着失败时的续接也是该 skill 的路由目标。
+三个 skill 的描述都写了「做什么」；`interactive-testing` 与 `release` 还带显式的「何时用」（Use for …）从句，`add-llm-provider` 的适用时机则隐含在首句「Checklist for adding a new LLM provider」的覆盖面里：`add-llm-provider` 点明覆盖类型、实现、懒注册、模型生成、测试矩阵、coding-agent 接线与文档；`interactive-testing` 点明 tmux 受控终端与 release smoke；`release` 点明准备、本地 smoke、发布与「失败 CI 或公告」的恢复场景——恢复场景入描述意味着失败时的续接也是该 skill 的路由目标。
 
 ## `add-llm-provider`：跨层有序检查单
 

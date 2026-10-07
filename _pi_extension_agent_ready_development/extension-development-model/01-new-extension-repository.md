@@ -25,17 +25,17 @@ export default function (pi: ExtensionAPI) {
 pi --extension ./hello.ts
 ```
 
-Pi 用 `jiti` 加载本地 TypeScript 扩展，不需要单独编译步骤（运行时事实）。跑 `/hello` 有输出，覆盖阶梯 1：文件被加载、factory 执行、命令注册。
+Pi 用 `jiti` 加载本地 TypeScript 扩展，不需要单独编译步骤（运行时事实）。`-e`/`--extension` 也可加载内建扩展（如 `builtin:mcp`）；`-ne` 禁用发现、配置与内建扩展，但显式 `-e` 路径仍生效（见 [CLI 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/cli.md#L184-L187)）。跑 `/hello` 有输出，覆盖阶梯 1：文件被加载、factory 执行、命令注册。
 
 ## 2. 落位与信任边界
 
-固定使用时放入 agent dir：个人的放 `~/.pi/agent/extensions/`，项目的放仓库内 `.pi/extensions/`。项目资源在 project trust 授予前不加载——这是安全边界，不是缺陷；交付验证时确认你的包在两种位置的行为预期（运行时事实，见 [Extensions 的加载位置](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L40-L50)与 [Configuration 的路径表](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/configuration.md#L3)）。
+固定使用时放入 agent dir：个人的放 `~/.pi/agent/extensions/`，项目的放仓库内 `.pi/extensions/`。项目资源在 project trust 授予前不加载——这是安全边界，不是缺陷；信任决定可经 `/trust` 命令保存供后续 Pi 进程使用（[slash-commands.md L48](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/slash-commands.md#L48)）。交付验证时确认你的包在两种位置的行为预期（运行时事实，见 [Extensions 的加载位置](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L40-L50)与 [Configuration 的位置与信任说明](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/configuration.md#L3)）。
 
-小扩展用单文件，多文件实现用含 `index.ts` 的目录；npm 依赖放旁边的 `package.json`。
+小扩展用单文件，多文件实现用含 `index.ts`（或 `index.js`）的目录；npm 依赖放旁边的 `package.json`。
 
 ## 3. 加一个工具（阶梯 2-3）
 
-工具定义 name、model-facing description、TypeBox 参数 schema 和 `execute()`；结果必须有模型可见的 `content` 和用于渲染/状态重建的 `details`（没有结构化数据时 `details: undefined`）。三个容易做错的合同（运行时事实，见 [Extensions 的工具节](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L129-L150)）：
+工具定义 name、model-facing description、TypeBox 参数 schema 和 `execute()`；结果必须有模型可见的 `content` 和用于渲染/状态重建的 `details`（没有结构化数据时 `details: undefined`）。三个容易做错的合同（运行时事实，见 [Extensions 的工具节](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L129-L150)；底层消息与 content 块的类型权威在 [Message Types 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/message-types.md#L3)）：
 
 - 抛出 `execute()` 产生失败的工具结果；返回对象不会自动标记为错误。要让模型看到错误而程序调用者仍收到数据，用 `isError: true`。
 - 嵌套模型调用的 `usage` 要并入结果，会话统计才准确。
@@ -81,7 +81,7 @@ pi install ./my-pi-package     # 或 npm:/git: 源
 pi list
 ```
 
-然后用一个真实 prompt 复验第 3 级行为，`pi config` 确认资源被发现与启用。开发目录能跑不证明声明完整：漏掉的 manifest 条目、错误的依赖位置、依赖 undeclared import 的模块，都只在干净安装时暴露。settings 的对象形式可以按资源类型过滤包内容，用户会这样裁剪你的包——交付前至少试一次「只留 extensions、关掉 skills」的组合。
+然后用一个真实 prompt 复验第 3 级行为，用 `pi config` 确认包资源的加载配置符合预期。开发目录能跑不证明声明完整：漏掉的 manifest 条目、错误的依赖位置、依赖 undeclared import 的模块，都只在干净安装时暴露。settings 的对象形式可以按资源类型过滤包内容——项目设置覆盖 agent 目录设置、资源列表合并（运行时事实，见 [Settings 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/settings.md#L3)）——用户会这样裁剪你的包，交付前至少试一次「只留 extensions、关掉 skills」的组合。
 
 ## 7. 交付判断（阶梯 7）
 

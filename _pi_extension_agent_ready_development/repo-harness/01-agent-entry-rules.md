@@ -50,6 +50,12 @@ pi-mono 对没来过的 coding agent 的全部入口合同由两个文件承担�
 
 ## Git 多会话规则
 
+提交本身是须用户显式请求的动作（主仓要求）：
+
+> Never commit unless the user asks.
+>
+> — [AGENTS.md L41](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L41)
+
 主仓直接假设多个 pi 会话在同一工作树并发工作，因此 git 操作被限制在「只碰自己的文件」：
 
 > Only commit files YOU changed in THIS session.

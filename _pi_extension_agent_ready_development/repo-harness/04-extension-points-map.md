@@ -2,7 +2,7 @@
 
 Pi 把「可以改什么」集中定义在 `v1.0.3` 的 `packages/coding-agent/docs/` 下：`extensions.md`、`skills.md`、`prompt-templates.md`、`themes.md`、`mcp.md`、`codemode.md`、`custom-provider.md`、`virtual-models.md`、`packages.md`。本页给出这张地图的全貌与资源类型判别。**除特别标注外均为运行时事实**——它们对所有 Pi 用户与扩展作者同等有效，与 pi-mono 自身的贡献制度无关。
 
-注意：`extensions.md`、`mcp.md`、`codemode.md` 三个文件在 `v1.0.3` 之后的工作树中已有修改（见文末漂移注记）；本页一律引用 tag 版本。
+注意：`extensions.md`、`mcp.md`、`codemode.md`、`cli.md` 四个文件在 `v1.0.3` 之后的工作树中已有修改（见文末漂移注记）；本页一律引用 tag 版本。
 
 ## 首要判别：需要什么就用什么
 
@@ -43,6 +43,8 @@ Pi 把「可以改什么」集中定义在 `v1.0.3` 的 `packages/coding-agent/d
 
 工具带 exposure 机制（`direct`/`model-only`/`codemode`/`deferred`/`hidden`）与 MCP 语义的 annotations；扩展与 Pi 同进程、同 OS 权限运行，「只加载你信任的来源」是文档的明文前提。
 
+表中未展开的机制面还有：工具 `namespace` 分组（[extensions.md L162](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L162)）、编排工具调整模型可见工具集的 `prepareLoadout()`（[L180](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L180)）与跨工具渲染器 `pi.registerToolRenderer()`（[L190](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L190)）；快捷键的用户侧配置面是 named actions（如 `app.session.new`），可在用户配置中重绑、`/hotkeys` 查看当前绑定（[keybindings.md L3-L5](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/keybindings.md#L3-L5)）。签名与示例以 extensions.md 为权威，本页不复制。
+
 ## 四个专题扩展面
 
 - **MCP**：Pi 以 stdio 或 streamable HTTP 连接 Model Context Protocol server 并把其工具与资源交给模型（[mcp.md L3](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/mcp.md#L3)）；扩展也可用 `pi.registerMcpServer()` 注册会话级 server。
@@ -68,8 +70,8 @@ Pi 的可变性面有意不含的一块是权限系统（运行时事实）：
 >
 > — [README.md L90](https://github.com/earendil-works/pi/blob/v1.0.3/README.md#L90)
 
-OS 级隔离属于运行环境而非扩展 API：需要强边界时对 Pi 做容器化或沙箱（README 的 Permissions & Containerization 节给出三种模式）。权限**确认**可以由扩展实现——`extensions.md` 给出用 `tool_call` 事件加 annotations 判断哪些调用要人工确认的示例——但那是扩展提供的行为，不是核心内建承诺。
+OS 级隔离属于运行环境而非扩展 API。配套的专文有三篇：[Run Pi safely](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/security.md#L3) 把模型生成的命令与代码按不可信对待，并明说 project trust 控制资源加载、但不使内容或其后果变安全（[L5-L7](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/security.md#L5-L7)）；[Run Pi in an isolated environment](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/containerization.md#L3-L5) 给出隔离模式——可整体隔离 Pi 进程，或只把选定工具路由进隔离环境（README 的 Permissions & Containerization 节给出三种模式）；仓库根的 [SECURITY.md](https://github.com/earendil-works/pi/blob/v1.0.3/SECURITY.md#L11-L17) 定义安全边界口径——本地用户账户与 Pi 进程同信任域，依赖该前提已有写入能力的报告不算漏洞——并要求用户只安装可信扩展、加载可信 skills、只在可信仓库里用 pi（[L19-L20](https://github.com/earendil-works/pi/blob/v1.0.3/SECURITY.md#L19-L20)）。权限**确认**可以由扩展实现——`extensions.md` 给出用 `tool_call` 事件加 annotations 判断哪些调用要人工确认的示例——但那是扩展提供的行为，不是核心内建承诺。
 
 ## 漂移注记
 
-以下三个文件在 `v1.0.3` 之后的工作树中有改动，本页引用以 tag 为准：`extensions.md`（`prepareLoadout` 段补充 prompt guidelines 表述）、`mcp.md`（新增 `--tools`/`--exclude-tools` 对 `mcp__` 模式与 `--no-mcp` 的说明）、`codemode.md`（`read` 工具在 codemode 中解析为图片块的说明）。引用上述文件的最新内容时应重新核对。
+以下文件在 `v1.0.3` 之后的工作树中有改动，本页引用以 tag 为准：`extensions.md`（`prepareLoadout` 段补充 prompt guidelines 表述）、`mcp.md`（新增 `--tools`/`--exclude-tools` 对 `mcp__` 模式与 `--no-mcp` 的说明）、`codemode.md`（`read` 工具在 codemode 中解析为图片块的说明与一处 prompt guidelines 表述）、`cli.md`（工具选择一节新增 `mcp__` 模式说明与 `--no-mcp`，行号有位移）。引用上述文件的最新内容时应重新核对。

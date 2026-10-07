@@ -6,7 +6,7 @@
 
 skill 的加载分两级（运行时事实）：启动时只有名字、描述与路径进入系统提示，完整指令按需读取：
 
-> At startup, Pi scans configured skill locations and adds each skill's name, description, and path to the system prompt. It does not add the full instructions.
+> At startup, Pi scans configured skill locations and adds each skill’s name, description, and path to the system prompt. It does not add the full instructions.
 >
 > — [skills.md L43](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md#L43)
 

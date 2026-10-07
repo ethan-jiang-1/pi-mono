@@ -28,7 +28,7 @@ Pi 的扩展机制把「工作」分成多个可分别观察的等级。评估�
 | 等级 | 观察什么 | 常见误判 |
 |---|---|---|
 | 1. 文件被加载 | factory 被执行、无扩展错误报告 | 加载成功不等于任何能力注册成功 |
-| 2. 能力已注册 | 工具/命令/provider 出现在注册表，`pi config` 可见 | 注册不等于模型会调用、命令会执行 |
+| 2. 能力已注册 | 工具/命令/provider 出现在注册表；命令进入 `/` 补全，扩展资源可在 `pi config` 启停 | 注册不等于模型会调用、命令会执行 |
 | 3. 行为真实发生 | 真实会话中工具 `execute` 运行、命令 handler 运行、事件 handler 被派发 | 手工组装的 session 对象不经过发现与加载路径 |
 | 4. 生命周期合同正确 | factory 不启动长命资源、`session_shutdown` 幂等、继续条件有守卫 | 一次性手动验证测不出并发、取消、reload 的边界 |
 | 5. 多模式可用 | interactive、RPC、JSON、print 模式行为完整 | 只在 TUI 测过的 UI 调用在无 UI 模式会失败 |
@@ -79,7 +79,7 @@ Pi 用不同的资源类型承载不同种类的变化，`ResourceLoader` 统一
 
 ### 4. 形成完整的一笔交付
 
-完整的一笔交付不是「代码加一个绿测试」，而是把这笔变更影响到的实现、package 声明、用户文档、行为证据一起交付。交付边界由用户行为决定，不由文件数量决定：一个新工具如果改变了 `/help` 可见的行为，它的 README 段落、package manifest 条目和验证证据都属于同一笔交付。
+完整的一笔交付不是「代码加一个绿测试」，而是把这笔变更影响到的实现、package 声明、用户文档、行为证据一起交付。交付边界由用户行为决定，不由文件数量决定：一个新命令进入 `/` 命令补全、或一个新工具改变模型可见的工具清单时，它的 README 段落、package manifest 条目和验证证据都属于同一笔交付。
 
 ### 5. 按观察对象选择验证方式
 
@@ -96,7 +96,7 @@ Pi 主仓库的测试套件是这套分层的参考实现：它用发布的 `@ea
 
 ### 6. 验证用户实际安装的形态
 
-源码目录能加载，不代表 package 声明完整。只要扩展经 package 分发，就应在干净 agent dir 中安装并复验至少一个可观察行为；并遵守 Pi 的依赖合同：host 提供的包（`pi-ai`、`pi-agent-core`、`pi-coding-agent`、`pi-tui`、`typebox`）声明在 `peerDependencies` 用 `"*"`，绝不放进 `dependencies`——物理拷贝会绕过 Pi 的扩展模块映射，制造重复类和注册表（运行时事实，见 [Packages 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md#L88-L92)）。
+源码目录能加载，不代表 package 声明完整。只要扩展经 package 分发，就应在干净 agent dir 中安装并复验至少一个可观察行为；并遵守 Pi 的依赖合同：host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）声明在 `peerDependencies` 用 `"*"`，绝不放进 `dependencies`——物理拷贝会绕过 Pi 的扩展模块映射，制造重复类和注册表（运行时事实，见 [Packages 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md#L80-L92)）。
 
 ### 7. 用交付判断收尾
 

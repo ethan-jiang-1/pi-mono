@@ -12,9 +12,9 @@ pi-mono 把「工作过程」当作可机读的一等对象：会话持久化为
 
 要点分列：
 
-- **header**：文件首行是 `session` 类型的元数据行（版本、id、时间戳、`cwd`），不属于树；`v1.0.3` 的当前版本为 3（`hookMessage` 角色更名为 `custom`），旧版本加载时自动迁移（[session-format.md L24-L30](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md#L24-L30)）。fork/clone 出的会话在 header 里带 `parentSession` 指向母会话文件。
+- **header**：文件首行是 `session` 类型的元数据行（版本、id、时间戳、`cwd`），不属于树（[session-format.md L64-L75](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md#L64-L75)）；`v1.0.3` 的当前版本为 3（`hookMessage` 角色更名为 `custom`），旧版本加载时自动迁移（[L24-L30](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md#L24-L30)）。fork/clone 出的会话在 header 里带 `parentSession` 指向母会话文件。
 - **消息**：`message` 条目存 `AgentMessage`；assistant 消息记录产出它的 `provider`/`api`/`model`（及较新消息的 `thinkingLevel`）。**prompt 与工具声明的变化也走消息**：首个请求把全部 prompt 段落与工具声明存为一条 system 消息，后续变化存为按名 patch `sections` 并列出 `toolsAdded`/`toolsRemoved` 的 system 消息——按序重放即得当前 prompt 与工具集，没有独立的 prompt 状态条目（[session-format.md L80](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md#L80)）。
-- **compaction 记录**：上下文压缩生成 `compaction` 条目，存摘要、`firstKeptEntryId`（压缩后保留区间的起点，必填）与可选的完整 system 检查点；重建上下文时，起点之前的条目被摘要替换（[session-format.md L131](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md#L131)）。
+- **compaction 记录**：上下文压缩生成 `compaction` 条目，存摘要、`firstKeptEntryId`（压缩后保留区间的起点，必填）与可选的完整 system 检查点；重建上下文时，起点之前的条目被摘要替换（[session-format.md L123-L137](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md#L123-L137)）。
 - 其它条目类型覆盖完整的工作面：`model_change`/`thinking_level_change`、`usage`（如 cache warming 的 token 归账）、`context_edit`（对早先上下文条目的 append-only 改写，原始历史不变）、`branch_summary`、`custom`（扩展状态，不进 LLM 上下文）、`custom_message`（扩展注入、进上下文）、`label`、`session_info`。
 
 条目类型速查：

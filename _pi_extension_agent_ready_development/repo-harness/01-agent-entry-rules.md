@@ -60,7 +60,7 @@ pi-mono 对没来过的 coding agent 的全部入口合同由两个文件承担�
 >
 > — [AGENTS.md L59](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L59)
 
-一批命令被绝对禁止，因为它们会毁掉其它会话的工作或绕过检查（[AGENTS.md L66](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L66)）：`git reset --hard`、`git checkout .`、`git clean -fd`、`git stash`、`git add -A`、`git add .`、`git commit --no-verify`；此外永不禁 force push（[AGENTS.md L72](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L72)）。rebase 冲突只允许解决自己改过的文件，否则中止并询问用户。commit message 格式固定为 `{feat,fix,docs}[(ai,tui,agent,coding-agent)]: <message>`（[AGENTS.md L62](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L62)）。
+一批命令被绝对禁止，因为它们会毁掉其它会话的工作或绕过检查（[AGENTS.md L66](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L66)）：`git reset --hard`、`git checkout .`、`git clean -fd`、`git stash`、`git add -A`、`git add .`、`git commit --no-verify`；此外永不 force push（[AGENTS.md L72](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L72)）。rebase 冲突只允许解决自己改过的文件，否则中止并询问用户。commit message 格式固定为 `{feat,fix,docs}[(ai,tui,agent,coding-agent)]: <message>`（[AGENTS.md L62](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L62)）。
 
 **扩展仓建议**：即使只有单会话，显式路径暂存与禁用 stash/reset 仍值得保留——它们防的是「agent 顺手清掉了用户未保存的工作」这类不可逆事故；多 agent 并发则让这些规则从谨慎变为必需。
 
@@ -86,6 +86,6 @@ The One Rule 把理解义务放在提交者身上：
 >
 > — [CONTRIBUTING.md L17](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L17)
 
-贡献门槛是缓冲式的：新贡献者的 issue 与 PR 默认自动关闭（[CONTRIBUTING.md L23](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L23)）；维护者在 issue 上回复 `lgtmi`（解锁后续 issue）或 `lgtm`（解锁 issue 与 PR），命令必须在回复开头或结尾（[CONTRIBUTING.md L31-L34](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L31-L34)）。开 PR 前必须已获 `lgtm`；提交前 `npm run check` 与 `./test.sh` 都必须通过（[CONTRIBUTING.md L63-L67](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L63-L67)）；贡献者不得改 `CHANGELOG.md`，条目由维护者合并时添加（[CONTRIBUTING.md L69](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L69)）。这些是 pi-mono 应对 issue 量的自保制度（其 FAQ 明说 auto-close 是给维护者评审缓冲），不是对贡献者的通用要求。
+贡献门槛是缓冲式的：新贡献者的 issue 与 PR 默认自动关闭（[CONTRIBUTING.md L23](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L23)）；维护者在 issue 上回复 `lgtmi`（解锁后续 issue）或 `lgtm`（解锁 issue 与 PR），命令必须在回复开头或结尾（[CONTRIBUTING.md L31-L34](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L31-L34)）。开 PR 前必须已获 `lgtm`；提交前 `npm run check` 与 `./test.sh` 都必须通过（[CONTRIBUTING.md L58-L67](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L58-L67)）；贡献者不得改 `CHANGELOG.md`，条目由维护者合并时添加（[CONTRIBUTING.md L69](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L69)）。这些是 pi-mono 应对 issue 量的自保制度（其 FAQ 明说 auto-close 是给维护者评审缓冲），不是对贡献者的通用要求。
 
 **扩展仓建议**：扩展仓通常没有同样的流量压力，可自定更轻的门槛；但「理解义务 + 自动检查全过再提交」这一组合是任何仓都可直接沿用的最小内核（仓库自定范围）。

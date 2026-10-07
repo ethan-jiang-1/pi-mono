@@ -40,7 +40,7 @@ tag 版本的工作流名是 `Durable env`，**触发器是 push 到 `durable-en
 
 模型目录（pi.dev 运行时可见的模型元数据）是独立于 npm 代码发布的数据链，generate 与 publish 分离：
 
-- 触发：CI 成功后（workflow_run，限 main）、命中相关路径的 PR（只 generate）、工作日每小时 schedule、手动（[L3-L33](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/publish-model-catalog.yml#L3-L33)）。
+- 触发：CI 成功后（workflow_run，限 main）、命中相关路径的 PR（只 generate）、工作日 UTC 8–13 点每小时的 schedule、手动（[L3-L33](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/publish-model-catalog.yml#L3-L33)）。
 - **generate** job：`npm ci --ignore-scripts`、生成 JSON、`check:model-catalog` 校验、上传 artifact（[L38-L72](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/publish-model-catalog.yml#L38-L72)）——PR 上只到这一步。
 - **publish** job：需要 schedule/workflow_run 或手动且 `inputs.publish=true`（[L74-L75](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/publish-model-catalog.yml#L74-L75)）；另有 Europe/Vienna 工作日 10:00–15:00 的发布窗口限制（手动 publish 可越过，[L110-L138](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/publish-model-catalog.yml#L110-L138)）。发布脚本（`scripts/publish-model-catalog.mjs`）拒绝：缺 `anthropic`/`openai`/`openrouter` 任一必需 provider、provider shard 与全量目录不一致、重复 model identity、legacy 目录不是 chat 投影、chat 模型数少于 500（[L28-L34](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-model-catalog.mjs#L28-L34)、[L88-L157](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-model-catalog.mjs#L88-L157)）；以全量目录的 SHA-256 作为 revision（[L159-L175](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-model-catalog.mjs#L159-L175)）；revision 已是当前时不重复上传，先传 immutable revision 对象、最后传 no-store index（[L290-L321](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-model-catalog.mjs#L290-L321)）。
 

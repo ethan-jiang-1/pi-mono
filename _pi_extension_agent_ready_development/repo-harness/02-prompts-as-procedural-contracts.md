@@ -2,7 +2,7 @@
 
 `v1.0.3` 的 `.pi/prompts/` 下有六个 prompt template：`is`、`pr`、`wr`、`deslop`、`sa`、`cl`。它们把六类高频工作流写成文件，任何会话以 `/is`、`/pr` 等命令调用。本页先给总表，再逐个检视每个 prompt 划定的合同边界。**这些是主仓为自己定的工作流（主仓要求/仓库自定范畴）**：对 pi-mono 的贡献工作适用；独立扩展仓可以把它们当作自己工作流模板的参考（扩展仓建议）。
 
-prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` 命令，参数经 `$ARGUMENTS`/`$@` 等替换进入提示（[prompt-templates.md L3](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L3)）。资源类型的判别见 [04](./04-extension-points-map.md)。
+prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` 命令、文件名即命令名（[prompt-templates.md L16](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L16)），参数经 `$ARGUMENTS`/`$@` 等替换进入提示（[替换表 L38-L47](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L38-L47)）。资源类型的判别见 [04](./04-extension-points-map.md)。
 
 ## 总表：六个合同
 
@@ -12,8 +12,8 @@ prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` �
 | `/pr <PR-URL>` | 审查 PR | 不切 worktree、不换分支，审 diff 与相关代码 |
 | `/wr [instructions]` | 完成当前工作 | changelog → 披露评论 → 只提交自己的文件 → push → issue 完成事件 |
 | `/deslop` | 简化已完成的 workpackage | 反推测性抽象；重大删除须逐项获批 |
-| `/sa <advisory>` | 更新安全公告供发布 | 不发布、不改状态、不请求 CVE，除非用户同意 |
-| `/cl` | 发布前审计 changelog | 逐 commit 对账，跨包去重规则固定 |
+| `/sa <advisory>` | 更新安全公告供发布 | 不发布、不改状态、不请求 CVE，除非用户同意或草稿明示 `request_cve: true` |
+| `/cl` | 发布前审计 changelog | 逐 commit 对账，跨包复制规则固定 |
 
 ## `/is`：独立诊断，只提议
 

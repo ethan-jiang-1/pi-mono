@@ -42,7 +42,9 @@ PR 的前置条件（**主仓要求**）：
 
 ### issue-gate.yml
 
-只在 `issues: opened` 触发（[issue-gate.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L3-L5)）。判定顺序：受信 bot（`dependabot[bot]`、`sentry[bot]`、`claude[bot]`）直接放行（[L25-L28](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L25-L28)）；协作者权限为 `admin`/`maintain`/`write` 放行（[L84-L88](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L84-L88)）；否则从**默认分支**读取 `.github/APPROVED_CONTRIBUTORS`，capability 为 `issue` 或 `pr` 的用户放行（[L90-L97](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L90-L97)）；其余评论说明、加 `untriaged` 标签、以 `not_planned` 关闭（[L99-L129](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L99-L129)）。
+只在 `issues: opened` 触发（[issue-gate.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L3-L5)）。判定顺序：受信 bot（`dependabot[bot]`、`sentry[bot]`、`claude[bot]`）直接放行（[L20-L28](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L20-L28)）；协作者权限为 `admin`/`maintain`/`write` 放行（[L84-L88](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L84-L88)）；否则从**默认分支**读取 `.github/APPROVED_CONTRIBUTORS`，capability 为 `issue` 或 `pr` 的用户放行（[L90-L97](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L90-L97)）；其余评论说明、加 `untriaged` 标签、以 `not_planned` 关闭（[L99-L129](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-gate.yml#L99-L129)）。
+
+`untriaged` 标签的生命周期由 [issue-triage-labels.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-triage-labels.yml#L3-L142) 在 `issues` 的 `reopened`/`labeled` 事件上维护：issue 被重开时自动移除 `untriaged` 与 `no-action`；被标 `no-action` 时移除 `untriaged`；维护者把 `last-read` 前移到新 issue 时，其间仍未处理的 `untriaged` issue（带 `to-discuss` 的除外）被自动补 `no-action`、以 `not_planned` 关闭并摘除标签。
 
 ### pr-gate.yml
 
@@ -60,7 +62,7 @@ issue 模板在 gate 之前就把两类噪音挡在模板层（**主仓要求**�
 
 —— [bug.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/bug.yml#L14)
 
-`pi -ne` 即 no-extensions 启动（**运行时事实**）：不加载任何扩展地启动 pi，用于区分「核心 bug」与「用户扩展引发的问题」。复现步骤字段要求 "Minimal steps to trigger the bug."（[bug.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/bug.yml#L26-L30)）——最小复现是模板必填项，不是可选项。
+`pi -ne` 即 no-extensions 启动（**运行时事实**）：禁用扩展发现与内建扩展地启动 pi（显式 `-e` 路径仍可用），用于区分「核心 bug」与「用户扩展引发的问题」。复现步骤字段要求 "Minimal steps to trigger the bug."（[bug.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/ISSUE_TEMPLATE/bug.yml#L26-L30)）——最小复现是模板必填项，不是可选项。
 
 ## 触发边界与反例
 

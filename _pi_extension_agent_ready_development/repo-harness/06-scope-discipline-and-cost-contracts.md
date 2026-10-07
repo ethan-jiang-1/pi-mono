@@ -26,7 +26,7 @@ pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」
 >
 > — [check-entry-graphs.mjs L3](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/check-entry-graphs.mjs#L3)
 
-文件头注释给出了动机：一个多余的 `export *` 能让一个 1 文件的纯函数入口拖动整个 barrel——经 barrel 导入要付出约 37 MB 的模块求值图，而且直到有人测量之前什么都不失败。脚本遍历每个声明入口的值导入图（`import type` 被擦除、不计入），对列出的入口强制 `maxFiles` 与 `forbid` 预算：`v1.0.3` 中 `packages/ai` 的 `./models` 入口限 15 文件且禁触 `providers/`、`models.generated.ts`；`./utils/*` 限 3 文件；`packages/durable` 的根入口限 62 文件且禁触 `packages/ai/src/index.ts`（[check-entry-graphs.mjs L38-L48](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/check-entry-graphs.mjs#L38-L48)）。
+文件头注释给出了动机：一个多余的 `export *` 能让一个 1 文件的纯函数入口拖动整个 barrel——经 barrel 导入要付出约 37 MB 的模块求值图，而且直到有人测量之前什么都不失败。脚本遍历每个声明入口的值导入图（`import type` 被擦除、不计入），对列出的入口强制 `maxFiles` 与 `forbid` 预算：`v1.0.3` 中 `packages/ai` 的 `./models` 入口限 15 文件且禁触 `providers/`、`models.generated.ts` 等（完整清单见下表）；`./utils/*` 限 3 文件；`packages/durable` 的根入口限 62 文件且禁触 `packages/ai/src/index.ts`（[check-entry-graphs.mjs L38-L48](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/check-entry-graphs.mjs#L38-L48)）。
 
 `v1.0.3` 的预算全景：
 
@@ -60,7 +60,7 @@ pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」
 
 - **组装成本**：第三方 package 可以执行扩展代码、其 skills 可以指示模型运行程序，因此安装前须审阅源码——「Review third-party package source before installing it. Review project package declarations before granting project trust.」（[packages.md L21](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md#L21)）。信任不是假设，是用户动作。
 - **升级成本**：lockstep 版本纪律（全包同版本、一起升级，见 [03](./03-repo-skills.md)）把「多包版本矩阵」这个升级成本源直接消除。
-- **上下文成本**：skills 只把名字与描述放进系统提示、完整指令按需加载（见 [03](./03-repo-skills.md)）；会话 compaction 与 `context_edit` 控制历史进入模型上下文的体积（见 [05](./05-session-inspectability.md)）。宿主提供的包（`pi-ai`、`pi-agent-core`、`pi-coding-agent`、`pi-tui`、`typebox`）声明为 `peerDependencies` 且禁止打包，否则在编译 ESM 下会绕过 Pi 的模块映射、制造重复类与注册表（[packages.md L88](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md#L88)）。
+- **上下文成本**：skills 只把名字、描述与路径放进系统提示、完整指令按需加载（见 [03](./03-repo-skills.md)）；会话 compaction 与 `context_edit` 控制历史进入模型上下文的体积（见 [05](./05-session-inspectability.md)）。宿主提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）声明为 `peerDependencies` 且禁止打包，否则在编译 ESM 下会绕过 Pi 的模块映射、制造重复类与注册表（[packages.md L88-L92](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md#L88-L92)）。
 
 ## 观点：约束从提醒变成检查
 

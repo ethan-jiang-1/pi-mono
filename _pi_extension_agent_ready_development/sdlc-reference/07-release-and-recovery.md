@@ -1,6 +1,6 @@
 # 07 发布与恢复：lockstep 版本、tag 管线与幂等性
 
-pi-mono 的发布不是「一条命令把包推到 npm」，而是一条跨本地脚本与 CI、分阶段顺序执行的管线：本地准备并推 tag，CI 构建并 smoke 产物，再按顺序 stage GitHub Release → 发布 npm → 公告 pi.dev → 公开 GitHub Release（CI 侧分段见[发布后一节](#发布后ci-的六个阶段)），任一步失败则删除草稿 Release。恢复能力来自每一步的幂等设计，而不是来自回滚。以下全部对照 tag `v1.0.3` 核对。
+pi-mono 的发布不是「一条命令把包推到 npm」，而是一条跨本地脚本与 CI、分阶段顺序执行的管线：本地准备并推 tag，CI 构建并 smoke 产物，再按顺序 stage GitHub Release → 发布 npm → 公告 pi.dev → 公开 GitHub Release（CI 侧分段见[发布后一节](#发布后ci-的六个阶段)），草稿创建之后的任一步失败则删除草稿 Release。恢复能力来自每一步的幂等设计，而不是来自回滚。以下全部对照 tag `v1.0.3` 核对。
 
 ## lockstep 版本与两类发布入口
 
@@ -36,7 +36,7 @@ pi-mono 的发布不是「一条命令把包推到 npm」，而是一条跨本�
 1. 检查工作树干净，有未提交改动即退出（[L215-L221](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L215-L221)）。
 2. **先验证所有公开 workspace 包已在 npm 注册**，再动工作树；缺注册的包直接列出并失败（[L56-L86](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L56-L86)）。
 3. 刷新 Nix 模型目录 pin（`--if-stale`）。时序有明确理由：tag 不可改，所以 pin 必须在 tag 之前、且趁 pi.dev 还认识当前版本时落到 release commit 里（[L228-L233](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L228-L233)）。
-4. bump 或设置显式版本，并清理 npm version 留下的陈旧 workspace lock 条目、刷新 lockfile、`npm ci --ignore-scripts` 重新水合（[L131-L172](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L131-L172)）。
+4. bump 或设置显式版本，并清理 npm version 留下的陈旧 workspace lock 条目、刷新 lockfile、`npm ci --ignore-scripts` 重新水合（[L106-L166](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L106-L166)）。
 5. 把各包 `[Unreleased]` 替换为 `## [version] - date`（[L174-L193](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L174-L193)）。
 6. 重生成发布产物：`generate:models`、`check:model-data`、`install-lock:coding-agent`（[L245-L249](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L245-L249)）。
 7. 跑 `npm run check`、`npm run build:offline`、`./test.sh`、`npm run check:package-install`（[L252-L266](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L252-L266)）——即发布前把 CI 的主要检查在本地再走一遍，并额外验证 packed consumer 安装。
@@ -44,7 +44,7 @@ pi-mono 的发布不是「一条命令把包推到 npm」，而是一条跨本�
 9. 在每个 changelog 顶部插入新的 `[Unreleased]` 段并单独提交 `Add [Unreleased] section for next cycle`（[L195-L210](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L195-L210)、[L276-L284](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L276-L284)）。
 10. `git push origin main` 与 `git push origin vX.Y.Z`（[L287-L289](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/release.mjs#L287-L289)）。
 
-注意第 8 步是「两次提交 + 一个 tag」的形状：release commit 携带版本与产物，第二个提交只加下个周期的 `[Unreleased]` 段。release skill 同时给出禁令：**tag 推出去后不要重跑 release 脚本**（[release.md](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/skills/release.md#L44)）。
+注意第 8–9 步合起来是「两次提交 + 一个 tag」的形状：release commit 携带版本与产物，第二个提交只加下个周期的 `[Unreleased]` 段。release skill 同时给出禁令：**tag 推出去后不要重跑 release 脚本**（[release.md](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/skills/release.md#L44)）。
 
 ## 发布后：CI 的六个阶段
 
@@ -56,24 +56,24 @@ pi-mono 的发布不是「一条命令把包推到 npm」，而是一条跨本�
 
 | 阶段 | 做什么 | 关键约束 |
 |---|---|---|
-| 1. build | 用 `create-source-archive.sh` 生成源码归档，从归档（而非工作树）构建六个平台二进制，抽取 release notes，校验 install-lock，组装资产与 `SHA256SUMS` | 从源码归档构建，避免构建输入与 tag 内容不一致（[L27-L126](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L27-L126)） |
+| 1. build | 用 `create-source-archive.sh` 生成源码归档，从归档（而非工作树）构建六个平台二进制，抽取 release notes，校验 install-lock，组装资产与 `SHA256SUMS` | 构建输入来自归档内容（[L27-L126](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L27-L126)） |
 | 2. smoke-test-binaries | Linux/macOS/Windows 三平台各自解包并跑 `--help`、`--version`、codemode binary smoke | 每个平台只测自己那份产物（[L131-L208](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L131-L208)） |
 | 3. stage-github-release | 先 `sha256sum -c` 校验，创建 **draft** GitHub Release 并上传资产，再断言实际资产集合与预期逐名一致 | 若 Release 已公开则拒绝改动（`Refusing to mutate a public release`）（[L210-L302](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L210-L302)） |
 | 4. publish-npm | 完整 `npm ci --ignore-scripts`、build、check、test、`check:package-install`，升级到 npm 11.16.0 后跑 `node scripts/publish.mjs` | 走 npm trusted publishing（OIDC + `npm-publish` environment），无本地 `npm publish`/OTP（[L304-L355](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L304-L355)） |
 | 5. announce-pi-dev-release | 核对每个包在 npm 上的确切版本与 tarball 可用后，把 release record 与 `latest.json` 写入 R2 | 公告只在此 job 成功后成立（[L357-L396](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L357-L396)） |
-| 6. publish-github-release | 最后把 draft 改为公开（`gh release edit --draft=false`） | 依赖前四个 job 全部成功（[L398-L426](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L398-L426)） |
+| 6. publish-github-release | 最后把 draft 改为公开（`gh release edit --draft=false`） | 直接依赖 stage/publish-npm/announce 三个 job（传递依赖全部前序 job）（[L398-L426](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L398-L426)） |
 
-第 5 阶段的行为细节值得单列（**主仓要求**）：`publish-release-announcement.mjs` 会遍历所有公开包要求版本恰为发布版本（[L272-L275](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L272-L275)），带重试地校验 npm 元数据与 tarball 可访问（[L70-L118](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L70-L118)），再写 immutable 的 `releases/v1/releases/<version>.json` 与 installer 产物（均带 `if-none-match: *`，已存在即跳过），最后推进 `latest.json` 指针。指针推进用乐观锁：读当前 ETag，以 `--if-match` 写入，最多 5 次（[L254-L267](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L254-L267)），并且**只在目标版本高于当前版本时前进**（`compareReleaseVersions(...) <= 0` 即返回未推进，[L256-L259](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L256-L259)）。immutable 对象用 `max-age=31536000`（[L297](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L297)），`latest.json` 用 `no-store`（[L346](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L346)、[L371](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L371)）。
+第 5 阶段的行为细节值得单列（**主仓要求**）：`publish-release-announcement.mjs` 会遍历所有公开包要求版本恰为发布版本（[L272-L275](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L272-L275)），带重试地校验 npm 元数据与 tarball 可访问（[L70-L127](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L70-L127)），再写 immutable 的 `releases/v1/releases/<version>.json` 与 installer 产物（均带 `if-none-match: *`，已存在时 release record 打印一行、installer 对象静默跳过），最后推进 `latest.json` 指针。指针推进用乐观锁：读当前 ETag，以 `--if-match` 写入，最多 5 次（[L254-L267](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L254-L267)），并且**只在目标版本高于当前版本时前进**（`compareReleaseVersions(...) <= 0` 即返回未推进，[L256-L259](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L256-L259)）。immutable 对象用 `max-age=31536000`（[L297](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L297)），`latest.json` 用 `no-store`（[L346](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L346)、[L371](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish-release-announcement.mjs#L371)）。
 
-并行还有一条 Nix 发布线：tag 触发 `nix.yml` 在三系统 `nix build`，tag 构建要求 `pi --version` 输出恰等于 tag 版本号；全系统成功后 `update-stable` 把 `stable` 分支**非强制 fast-forward** 到 release commit，注释明确「没有 `--force` 时 push 失败，因此 stable 永不回退到更旧的 release」（[nix.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/nix.yml#L131-L151)）。
+并行还有一条 Nix 发布线：tag 触发 `nix.yml` 在三系统 `nix build`，tag 构建要求 `pi --version` 输出恰等于 tag 版本号；全系统成功后 `update-stable` 把 `stable` 分支**非强制 fast-forward** 到 release commit，注释明确「没有 `--force` 时 push 失败，因此 stable 永不回退到更旧的 release」（[nix.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/nix.yml#L86-L151)）。
 
 ## 幂等与恢复：为什么不需要回滚
 
 发布管线的恢复策略是「修好再重跑失败的 job」，而不是回滚已推的 tag 或已发布的包。支撑这一点的是三处显式幂等：
 
 1. **npm 发布可重跑**。`publish.mjs` 对每个包先查 `npm view <name>@<version>`，已发布则只做 `npm pack --dry-run` 内容校验并跳过 `npm publish`（[publish.mjs](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish.mjs#L50-L68)、[L85-L108](https://github.com/earendil-works/pi/blob/v1.0.3/scripts/publish.mjs#L85-L108)）。
-2. **公告可重跑**。release record 与 installer 对象都用 `if-none-match: *` 写入，已存在只打印一行；`latest.json` 指针用 ETag 条件写并有「不降级」判断（见上节）。
-3. **GitHub Release 有草稿中间态**。draft 先建、公开最后做；资产集合不符即失败；失败路径由 `cleanup-draft-github-release` 兜底——该 job 用 `always()` 且只在 stage 成功而后续有 job 未成功时运行，删除仍是 draft 的 Release（[L428-L452](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L428-L452)）。
+2. **公告可重跑**。release record 与 installer 对象都用 `if-none-match: *` 写入，已存在时 release record 打印一行、installer 对象静默跳过；`latest.json` 指针用 ETag 条件写并有「不降级」判断（见上节）。
+3. **GitHub Release 有草稿中间态**。draft 先建、公开最后做；资产集合不符即失败；失败路径由 `cleanup-draft-github-release` 兜底——该 job 用 `always()` 且仅在 stage-github-release 实际运行过（非 `skipped`）而它自身或任一后续 job 未成功时运行，删除仍是 draft 的 Release——包括 stage 在草稿已创建后失败的情况；构建/smoke 等更早失败使 stage 被跳过（无草稿）时不运行（[L428-L452](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/build-binaries.yml#L428-L452)）。
 
 恢复动作与禁令（**主仓要求**）：
 
@@ -104,6 +104,6 @@ Nix 线的同类规则不同：**tag 不能修**。若 Nix 构建失败，`stabl
 - **公告顺序有硬保证，不是惯例**：npm 侧的可用性在写 R2 之前被逐包核验，因此 `latest.json` 不会指向 npm 上还拿不到的版本。
 - **`latest.json` 只前进**：低版本发布不会把指针拉回去，尝试这样做只会得到"already the latest"一行日志。
 - **不要用 `release:local` 代替发布验证**：它在隔离目录安装 tarball，但不推 tag、不触发任何 CI 阶段，也不产生公告。
-- **本地 hook 与发布无关**：`npm run check` 里的 lockfile gate 是本地 hook 行为（[03 页](03-check-pipeline.md)），CI 发布 job 不执行它。
+- **本地 hook 与发布无关**：lockfile commit gate 是 pre-commit hook 的独立步骤、不在 `npm run check` 里（[03 页](03-check-pipeline.md)），CI 发布 job 不执行它。
 
 **扩展仓建议**：可移用四条——(a) 发布前把 CI 主要检查在本地走一遍并额外做一次仓外安装验证；(b) 把「不可变的产物记录」与「可变的 latest 指针」分开，指针只前进并用条件写做并发保护；(c) 让发布步骤幂等（已存在的版本跳过而非报错），从而用重跑代替回滚；(d) 把「产物先草稿、公开放最后」作为默认顺序。lockstep 与是否发布六个平台二进制属**仓库自定**；单包扩展仓通常不需要锁步版本。

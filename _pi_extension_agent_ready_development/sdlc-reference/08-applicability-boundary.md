@@ -27,10 +27,10 @@
 |---|---|---|
 | 扩展生命周期 | factory 只做注册；长命资源从 `session_start` 或按需启动；清理放幂等 `session_shutdown` | Extensions 文档 |
 | 事件边界 | run 从 `before_agent_start` 到 `agent_end`；`agent_before_settle` 是最后可行动边界；`agent_settled` 只通知 | Extensions 文档 |
-| package 依赖划分 | host 提供的包（`pi-ai`、`pi-agent-core`、`pi-coding-agent`、`pi-tui`、`typebox`）放 `peerDependencies` 用 `"*"`，不得放 `dependencies` | [Packages 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md#L88-L92) |
+| package 依赖划分 | host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）放 `peerDependencies` 用 `"*"`，不得放 `dependencies` | [Packages 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md#L80-L92) |
 | 工具不可注销 | 只能以 `exposure: "hidden"` 重注册收回；`terminate: true` 需要同批已完成工具一致同意 | Extensions 文档 |
 | 模式差异 | JSON/print 无 UI；RPC 不转发自定义终端组件；用 `ctx.mode`/`ctx.hasUI` 守卫 | Extensions 文档 |
-| 会话文件格式 | 带树结构的 JSONL；导出/导入是搬运历史，不是重放 | [Session 格式文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md) |
+| 会话文件格式 | 带树结构的 JSONL；导出/导入是搬运历史，不是重放（见[02 页](02-issue-diagnosis-and-session-handoff.md)的 `/ir` 边界） | [Session 格式文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md) |
 
 区别判据很简单：**换成任何 Pi 用户都成立的是运行时合同；只有在这个仓库工作才成立的是主仓要求。**正文中的「主仓要求」标注就是给这条判据用的。
 

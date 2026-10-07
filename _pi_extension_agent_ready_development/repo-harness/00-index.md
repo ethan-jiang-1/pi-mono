@@ -45,8 +45,8 @@ pi-mono 把「谁能进来、进什么、成本多少」全部显式化：新贡
 | `AGENTS.md`、`CONTRIBUTING.md` | agent 入口合同与贡献门槛 | [01](./01-agent-entry-rules.md) |
 | `.pi/prompts/`（is/pr/wr/deslop/sa/cl） | 六类工作流的行为边界 | [02](./02-prompts-as-procedural-contracts.md) |
 | `.pi/skills/`（add-llm-provider/interactive-testing/release） | 三项专家程序 | [03](./03-repo-skills.md) |
-| `packages/coding-agent/docs/`（九篇机制文档） | 可变性面的官方定义 | [04](./04-extension-points-map.md) |
-| `docs/session-format.md`、`.pi/extensions/import-repro.ts` | 会话账本与续接 | [05](./05-session-inspectability.md) |
+| `packages/coding-agent/docs/`（其中九篇可变性面文档） | 可变性面的官方定义 | [04](./04-extension-points-map.md) |
+| `packages/coding-agent/docs/session-format.md`、`.pi/extensions/import-repro.ts` | 会话账本与续接 | [05](./05-session-inspectability.md) |
 | `scripts/check-entry-graphs.mjs`、贡献门槛 | 范围纪律与成本合同 | [06](./06-scope-discipline-and-cost-contracts.md) |
 | `packages/`（13 个包） | 依赖面与发布面 | [07](./07-monorepo-taxonomy.md) |
 

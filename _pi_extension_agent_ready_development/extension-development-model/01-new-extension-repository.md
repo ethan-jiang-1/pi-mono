@@ -29,7 +29,7 @@ Pi 用 `jiti` 加载本地 TypeScript 扩展，不需要单独编译步骤（运
 
 ## 2. 落位与信任边界
 
-固定使用时放入 agent dir：个人的放 `~/.pi/agent/extensions/`，项目的放仓库内 `.pi/extensions/`。项目资源在 project trust 授予前不加载——这是安全边界，不是缺陷；交付验证时确认你的包在两种位置的行为预期（运行时事实，见 [Extensions 的加载位置](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L40-L50)）。
+固定使用时放入 agent dir：个人的放 `~/.pi/agent/extensions/`，项目的放仓库内 `.pi/extensions/`。项目资源在 project trust 授予前不加载——这是安全边界，不是缺陷；交付验证时确认你的包在两种位置的行为预期（运行时事实，见 [Extensions 的加载位置](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L40-L50)与 [Configuration 的路径表](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/configuration.md#L3)）。
 
 小扩展用单文件，多文件实现用含 `index.ts` 的目录；npm 依赖放旁边的 `package.json`。
 
@@ -49,7 +49,7 @@ Pi 用 `jiti` 加载本地 TypeScript 扩展，不需要单独编译步骤（运
 
 为扩展写不依赖真实 API 的语义测试。Pi 的发布包提供了所需的部件：`@earendil-works/pi-ai/compat` 导出 faux provider（`registerFauxProvider`、`streamSimple`），SDK 的 `createAgentSession` 允许注入 `modelRuntime`、`resourceLoader` 与 in-memory `SessionManager`（运行时事实，见 [SDK 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sdk.md#L96-L118)）。
 
-pi-mono 的测试套件是参考实现：真实 `AgentSession` + 真实 ResourceLoader 发现路径 + 脚本化 provider 响应，断言公开事件序列（例如自动重试后恰好一次 `agent_settled` 且 `isIdle()` 为 true）。在 [test/suite/harness.ts](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/test/suite/harness.ts) 读它的组装方式，在自己的仓库用发布的包复刻同样的分层。
+pi-mono 的测试套件是参考实现：真实 `AgentSession`、经真实 factory 加载的扩展与脚本化 provider 响应，断言公开事件序列（例如自动重试后恰好一次 `agent_settled` 且 `isIdle()` 为 true）。注意 `harness.ts` 的 ResourceLoader 默认是轻量测试替身（不做文件系统发现）；需要真实发现路径的测试（如 skill 优先级回归）另行使用 `DefaultResourceLoader`。在 [test/suite/harness.ts](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/test/suite/harness.ts) 读它的组装方式，在自己的仓库用发布的包复刻同样的分层。
 
 扩展仓建议：每个行为变化配一条「回归时会失败」的最小断言。断言目标选公开事件与工具结果形状，不选内部私有状态。
 
@@ -68,7 +68,7 @@ my-pi-package/
 
 资源放在别处或需要过滤时用 `pi` manifest 显式声明。三条声明合同：
 
-- host 提供的包（`@earendil-works/pi-ai`、`pi-agent-core`、`pi-coding-agent`、`pi-tui`、`typebox`）放 `peerDependencies` 用 `"*"`，不要打包进产物。
+- host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）放 `peerDependencies` 用 `"*"`，不要打包进产物。
 - 扩展 import 的其它运行时包放 `dependencies`；Pi 安装 npm/git 源时会一并安装。
 - npm 包加 `pi-package` keyword 才能被 package gallery 发现。
 

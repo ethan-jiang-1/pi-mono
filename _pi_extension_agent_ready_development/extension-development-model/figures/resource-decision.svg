@@ -28,7 +28,7 @@
   <text x="480" y="228" text-anchor="middle" font-size="14" font-weight="700" fill="#513b85">skill</text>
   <text x="480" y="252" text-anchor="middle" font-size="11" fill="#526175">领域工作方法 + 配套资产</text>
   <text x="480" y="274" text-anchor="middle" font-size="11" fill="#526175">scripts · references · assets</text>
-  <text x="480" y="296" text-anchor="middle" font-size="11" fill="#526175">启动只入名字与描述</text>
+  <text x="480" y="296" text-anchor="middle" font-size="11" fill="#526175">启动只入名字·描述·路径</text>
   <text x="480" y="318" text-anchor="middle" font-size="11" fill="#675293">description 决定按需加载</text>
 
   <rect x="620" y="200" width="300" height="128" rx="8" fill="#eaf7f6" stroke="#3b9a91"/>

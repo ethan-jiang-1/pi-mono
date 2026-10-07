@@ -52,7 +52,7 @@ FAQ 里同一立场有更直接的一次表述（**主仓要求**）：
 
 —— [deslop.md](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/prompts/deslop.md#L54-L55)
 
-`AGENTS.md` 的对应条款更短，直接给出三条**代码质量**硬规则（[AGENTS.md](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L15-L20)）：读完整文件再做广泛改动、非必要不用 `any`、只有一个调用点的单行 helper 要内联。**Inline single-line helpers that have only one call site** 与 deslop 的「内联仅一层转发的 wrapper」是同一判据的两种表述。
+`AGENTS.md` 的对应条款更短，直接给出三条**代码质量**硬规则（[AGENTS.md](https://github.com/earendil-works/pi/blob/v1.0.3/AGENTS.md#L15-L20)）：读完整文件再做广泛改动、非必要不用 `any`、只有一个调用点的单行 helper 要内联。**Inline single-line helpers that have only one call site** 与 deslop 的「内联遮蔽行为的 trivial helper、wrapper 与直通层」（[deslop.md L17](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/prompts/deslop.md#L17)）是相近判据的两种表述：前者限定单行且仅一个调用点，后者按「是否遮蔽行为」判断。
 
 ## 覆盖与额外的边界约定
 
@@ -83,9 +83,11 @@ FAQ 里同一立场有更直接的一次表述（**主仓要求**）：
 
 比「我将改哪些文件」更大的设计讨论不放在 issue 区，而是指向 RFC（**主仓要求**）：
 
-> Earendil uses RFCs to discuss larger changes. Not all of them are public, but quite a few are. They can be found at rfc.earendil.com/keyword/pi/.
+> Earendil uses RFCs to discuss larger changes. Not all of them are public, but quite a few are.
 
 —— [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L99-L102)
+
+RFC 索引位于 `rfc.earendil.com/keyword/pi/`。
 
 同时 `CONTRIBUTING.md` 的 Philosophy 段规定核心保持最小、不属于核心的能力应做成扩展、膨胀核心的 PR 大概率被拒；扩展 hook 点也要先讨论，避免不可维护的膨胀与复杂交互（[L5-L11](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L5-L11)）。即：**方案层面的人判断发生在 RFC 与哲学条款，而不是在 PR 评审里首次出现**。
 

@@ -1,6 +1,6 @@
 # 07 发布与恢复：lockstep 版本、tag 管线与幂等性
 
-pi-mono 的发布不是「一条命令把包推到 npm」，而是一条分六个阶段、跨本地脚本与 CI 的管线：本地准备并推 tag，CI 构建并 smoke 产物，再按顺序 stage GitHub Release → 发布 npm → 公告 pi.dev → 公开 GitHub Release，任一步失败则删除草稿 Release。恢复能力来自每一步的幂等设计，而不是来自回滚。以下全部对照 tag `v1.0.3` 核对。
+pi-mono 的发布不是「一条命令把包推到 npm」，而是一条跨本地脚本与 CI、分阶段顺序执行的管线：本地准备并推 tag，CI 构建并 smoke 产物，再按顺序 stage GitHub Release → 发布 npm → 公告 pi.dev → 公开 GitHub Release（CI 侧分段见[发布后一节](#发布后ci-的六个阶段)），任一步失败则删除草稿 Release。恢复能力来自每一步的幂等设计，而不是来自回滚。以下全部对照 tag `v1.0.3` 核对。
 
 ## lockstep 版本与两类发布入口
 

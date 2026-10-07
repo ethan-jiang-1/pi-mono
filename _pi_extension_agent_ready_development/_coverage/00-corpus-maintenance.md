@@ -18,7 +18,7 @@
 | `packages/` @ v1.0.3 | 13 个包的清单与角色 |
 | `scripts/` @ v1.0.3 | check 管线脚本的存在性（check-entry-graphs、check-runtime-deps、check-pinned-deps、check-lockfile-commit、generate-coding-agent-install-lock、coding-agent-consumer 等） |
 | `packages/ai` 导出面 | exports map 含 `./compat`；`registerFauxProvider`、`streamSimple` 从 compat 导出（独立扩展仓可复用确定性测试的关键事实） |
-| `packages/coding-agent/test/suite/` @ v1.0.3 | faux harness 与回归测试的组装方式，作为证据分层的参考实现 |
+| `packages/coding-agent/test/suite/` @ v1.0.3 | faux harness 与回归测试的组装方式，作为验证分层的参考实现 |
 
 ## 已知基线漂移（HEAD 相对 v1.0.3）
 
@@ -45,7 +45,7 @@
 ## 结构约束
 
 - 正文结构规则由 [`verify.mjs`](../verify.mjs) 强制：严格 UTF-8、恰好一个结尾换行、语料内相对链接与锚点有效、外链只指向 `v1.0.3` 的 Pi 仓库路径、每个目录有 README、SVG 图示的固有尺寸与无障碍元数据、图示与正文引用双向完整。
-- 每卷的图示由该卷自己的 `figures/README.md` 清单管理（文件与正文 owner 对应），不跨卷共享图。
+- 每卷的图示由该卷自己的 `figures/README.md` 清单管理（文件与对应正文页），不跨卷共享图。
 - 陈述四分类（运行时事实／主仓要求／扩展仓建议／仓库自定）由正文维护，机器不可校验。
 
 ## 验证要求

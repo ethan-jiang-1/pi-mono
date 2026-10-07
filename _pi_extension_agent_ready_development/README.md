@@ -38,11 +38,11 @@
 
 | 路径 | 为什么要有它 | 什么时候需要改它 |
 |---|---|---|
-| [`extension-development-model/`](./extension-development-model/README.md) | 独立扩展仓怎样组合 Pi 的扩展点、证据与交付判断 | Pi 扩展运行时合同、资源发现或 package 规则变化时复核 |
+| [`extension-development-model/`](./extension-development-model/README.md) | 独立扩展仓怎样组合 Pi 的扩展点、验证与交付判断 | Pi 扩展运行时合同、资源发现或 package 规则变化时复核 |
 | [`sdlc-reference/`](./sdlc-reference/README.md) | 查阅 pi-mono 的精确条件与例外，判断哪些适用于扩展仓 | 任何一手事实变化（workflows、check、CI、发布）都按 `_coverage` 的重审触发路径改对应页 |
 | [`repo-harness/`](./repo-harness/README.md) | 查找 pi-mono 的 agent 入口规则、prompts、skills 与扩展点地图 | 仓库机制清单变化时改（AGENTS 规则、`.pi/` 内容、扩展点面） |
 | [`_coverage/`](./_coverage/README.md) | 钉了哪个版本、哪些来源核过、上游什么变化要触发重审 | 每轮挖取/re-pin/改名都留一条带日期的记录 |
-| [`verify.mjs`](./verify.mjs) | 语料的结构规则（严格 UTF-8、结尾换行、相对链接与锚点、钉版外链、目录 README）用可执行脚本强制 | 只在结构规则本身变化时改；同步检查负例 |
+| [`verify.mjs`](./verify.mjs) | 语料的结构规则（严格 UTF-8、结尾换行、相对链接与锚点、钉版外链、目录 README、SVG 图示元数据与引用完整性）用可执行脚本强制 | 只在结构规则本身变化时改；同步检查负例 |
 | [`verify.test.mjs`](./verify.test.mjs) | 在临时复制的语料副本中测试接受和拒绝条件 | 修改链接或结构约束时更新对应负例 |
 
 ## 验证

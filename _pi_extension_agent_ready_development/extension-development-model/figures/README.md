@@ -8,7 +8,7 @@
 
 ## 直接内容
 
-| 文件 | 正文 owner（拥有者） |
+| 文件 | 拥有它的正文页 |
 |---|---|
 | `resource-decision.svg` | [`../00-index.md`](../00-index.md)（资源判别一节） |
 | `completion-ladder.svg` | [`../00-index.md`](../00-index.md)（完成度阶梯一节） |

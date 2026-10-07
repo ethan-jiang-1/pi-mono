@@ -8,7 +8,7 @@
 
 ## 直接内容
 
-| 文件 | 正文 owner（拥有者） |
+| 文件 | 拥有它的正文页 |
 |---|---|
 | `session-handoff.svg` | [`../05-session-inspectability.md`](../05-session-inspectability.md)（/ir 一节） |
 | `cost-contracts.svg` | [`../06-scope-discipline-and-cost-contracts.md`](../06-scope-discipline-and-cost-contracts.md)（三层机制） |

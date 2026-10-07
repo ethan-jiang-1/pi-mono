@@ -8,6 +8,6 @@
 
 ## 直接内容
 
-| 文件 | 正文 owner（拥有者） |
+| 文件 | 拥有它的正文页 |
 |---|---|
 | `trigger-routing.svg` | [`../04-ci-matrix.md`](../04-ci-matrix.md)（检查分流一节） |

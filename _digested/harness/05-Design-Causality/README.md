@@ -1,8 +1,8 @@
 # 05-Design-Causality — pi 为什么长成这个形状(设计因果层)
 
-> **基线**:pi-mono `v1.0.0`(tag `a13d35a74`)。本目录引用的文件均在 HEAD `f0e079560` 复核,与 `v1.0.0` 一致。
+> **历史起点**：本专题最初按 `v1.0.0`（tag `a13d35a74`，当时复核锚点 `f0e079560`）写作。本轮四篇正文与配图局部复核到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`；引用的其它专题保留各自基线，不再声称当前源码与旧 tag 逐字一致。
 >
-> 方法声明:本目录的分析框架——**参与知识外置程度分级、正确路径的摩擦差、反馈三环**——借鉴 DSH `_digested/harness-idea/` 的消化纪律(该专题自称"以判断为主",并要求判断与证据分离);全部**事实与结论取自 pi-mono 自己的源码与文档**,且不预先假设 pi 应当与 DSH 同形。对照性结论只引用 [`_faq_on_digested/06_pi_vs_dsh/`](../../../_faq_on_digested/06_pi_vs_dsh/answer.md),不重做。
+> 方法声明：参与知识外置分级、正确路径摩擦差、反馈三环的组织视角，历史上受 DSH `harness-idea` 启发。保留这一出处，不将研究框架伪装成 Pi 作者原生术语。**Pi 行为事实只用 Pi 源码/docs 核对，因果解释另行标明限制**。Pi 原生动机的独立论证见 [理念 FAQ](../../../_faq_on_digested/12_pi_philosophy/answer.md)。
 
 ## 这是什么
 
@@ -31,8 +31,8 @@
 
 | 子目录 | 本目录的关系 |
 |--------|--------------|
-| [01-Architecture](../01-Architecture/README.md) | 5.2 解释其因果(纪律↔接缝互为因果),不重复其结构分析 |
-| [02-Boundaries](../02-Boundaries/README.md) | 5.3/5.4 的"空缺"引用其边界结论,不重判 |
+| [01-Architecture](../01-Architecture/README.md) | 5.2 讨论纪律与接缝相互支持，不声称证明全部历史因果 |
+| [02-Boundaries](../02-Boundaries/README.md) | 相关边界作为研究入口；本轮用当前一手合同核对并收窄旧绝对判断 |
 | [03-Discipline](../03-Discipline/README.md) | 5.2/5.3 的直接上游;本目录补"为什么是这条纪律"与"摩擦差"视角 |
 | [04-Self-Description](../04-Self-Description/README.md) | 5.1 是其延伸:从"自述够不够"推广到"知识外置分级" |
 | [`../../orchestration/`](../../orchestration/README.md) | 编排面的机制事实归它;本目录不重复 |

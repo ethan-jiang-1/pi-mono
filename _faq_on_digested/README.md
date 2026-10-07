@@ -6,6 +6,8 @@
 
 > **当前研究基线**：涉及运行时行为的结论以 pi-mono `v1.0.3`（upstream tag `d78dc83d6`，工作树锚点 `98d2e1947`，2026-10-06 随 sync-0008 merge `fad4b11bd` 进本仓库）为准；旧版本仅用于变更史解释，不能替代当前源码验证。**注意**：v0.85.x–1.0.0 的研究债务已在 sync-0007 执行轮清偿（06/09 等篇含 v1.0.0 更正）；sync-0008 增量（azure 改名、Home/End 键位、`--tools` MCP 语义、pi-env 成包等）已更新 01/02/03 并给 07/08 补注，其余各篇经 0008 取证逐条核对未受影响——变更明细见 [`_digested/_change_log/0008-v1.0.0-to-v1.0.3.md`](../_digested/_change_log/0008-v1.0.0-to-v1.0.3.md) 的影响评估。
 
+> **新增研究的独立锚点**：第 12 篇理念 FAQ 核对到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`，与上述全库研究基线区分；其它篇不因此被视为已全量同步。
+
 ## 和 `_digested/` 的区别
 
 | | `_digested/` | `_faq_on_digested/` |
@@ -22,7 +24,8 @@ _faq_on_digested/
 ├── README.md
 ├── <NN_question-slug>/
 │   ├── question.md        # 问题描述 + 背景
-│   └── answer.md          # 答案 / 分析 / 结论
+│   ├── answer.md          # 答案 / 分析 / 结论
+│   └── research.md        # 可选：一手证据账本与复核边界
 ```
 
 ## 命名约定
@@ -43,6 +46,7 @@ _faq_on_digested/
 - [`09_package_ecosystem/`](09_package_ecosystem/question.md) — pi 包生态全景：规模、集中度、品类、空位（5412 包快照 + 选装菜单）
 - [`10_getting_started_first_extension/`](10_getting_started_first_extension/question.md) — 如何在 Pi 底下开发第一个插件/扩展？按诉求性质怎么选型与落地最合理？（性质推荐矩阵、三秒调试循环、五类模板、多轴门禁实战与工程避坑）
 - [`11_production_extension_repo_archetypes/`](11_production_extension_repo_archetypes/question.md) — 真实世界头部 Pi 扩展的工程架构与 Repo 组织解剖（866K 标杆逐案深度拆解：前后诉求、影响面、利用能力与代码逻辑结构）
+- [`12_pi_philosophy/`](12_pi_philosophy/question.md) — Pi 自己的理念是什么？（作者原生动机、核心纪律、上下文/会话/宿主选择、人的理解责任与自动恢复边界）
 
 ## 引用规范
 

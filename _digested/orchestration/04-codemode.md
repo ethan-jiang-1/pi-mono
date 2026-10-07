@@ -1,23 +1,25 @@
 # 04 · codemode:模型写代码编排工具调用
 
-codemode 是 pi 在 v1.0.0 转正的内置工具(`packages/codemode/README.md:5`:"The coding agent uses it for its built-in `codemode` tool"):模型写一段 JS,脚本在 QuickJS-WASM 沙箱里运行,**唯一的能力是调用注入的工具**。它是 pi 阶梯上"代码持有控制流"的那一级——最接近 DSH workflow 的东西,但编排对象是**工具调用**,不是子代理。
+codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模型写 JS，在 QuickJS-WASM 中调用宿主注入能力；它编排的是工具调用，不是专用子代理原语。
+
+> **应用合同局部复核**：`cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`。下文部分细节属于独立 `CodemodeSandbox` 包，不能直接当 coding-agent 默认值：应用 `codemode` 工具默认 inactive，需显式启用；成功的 `store` 写会话 custom entry，失败写入不保留；应用还注入 `models`、工具搜索等能力，脚本未指定超时则无默认期限。见 [应用 codemode 文档](../../packages/coding-agent/docs/codemode.md)、[启用设置](../../packages/coding-agent/docs/settings.md#tools)。
 
 ## 为什么是这个形状:设计考量
 
-README 开篇第一句就是全部合同:"Runs model-written JavaScript in a QuickJS VM (compiled to WebAssembly) where the only capability is calling injected tools. **Nested tool calls never enter the LLM context; only the script's output and return value do.**"(`packages/codemode/README.md:3`)。
+独立包 README 开篇概括基础能力边界，不是全部应用合同："Runs model-written JavaScript in a QuickJS VM (compiled to WebAssembly) where the only capability is calling injected tools. **Nested tool calls never enter the LLM context; only the script's output and return value do.**"(`packages/codemode/README.md:3`)。
 
 这条合同回答的是扇出型工具工作(批量读文件、聚合多个来源、多步数据变换)的上下文经济学:逐轮委派时,每个中间工具结果都要付一次 LLM 上下文的钱;把循环搬进代码,中间结果留在 VM 里,**只有脚本吐出的 output 和返回值进上下文**。与 DSH workflow 的对照:`agent()` 钩子让脚本扇出子代理(隔离的是整个 agent 上下文);codemode 让脚本扇出工具调用(隔离的是工具结果的上下文)——**同一思想("脚本而不是对话持有循环、分支与中间结果"),作用在更轻的一级**。
 
 ## 机制
 
-### 脚本能用什么(封闭清单)
+### 独立包的基础能力（应用层另有注入）
 
 - `tools.<name>(args)`:调用注入工具,参数与结果做 JSON 往返;非法标识符字符转 `_`(`README.md:40`);
 - `ALL_TOOLS`:列出全部注入工具的 `{ name, description }`(`:41`);脚本可以**先发现再调用**——这是沙箱内的自省面;
 - `text(value)` / `image(...)` / `console.*`:向 `result.output` 追加内容(`:42-44`);
 - `store(key, value)` / `load(key)`:跨次执行的 JSON 状态,单值上限 256 Ki、总量 1 Mi(`:65`);
 - `exit()`:立即成功结束,保留 output 与 store 写入(`:44`);
-- **没有别的**:no timers、`fetch`、`process`、`require`、modules、`WebAssembly`;`eval`/`Function` 只能在同一 VM 里产生更多代码(`:47`)。
+- **可注入 globals**：独立包支持宿主 globals，应用用它提供 `models`、工具搜索/声明等，见 [包合同](../../packages/codemode/README.md#usage)与[应用 Globals](../../packages/coding-agent/docs/codemode.md#globals)。没有原生 timers、`fetch`、`process`、`require`、modules、`WebAssembly`；可通过宿主提供的工具触及外部世界。
 
 ### 资源与终止
 
@@ -27,7 +29,7 @@ README 开篇第一句就是全部合同:"Runs model-written JavaScript in a Qui
 
 ### 状态语义
 
-`store`/`load` 的持久性由宿主决定:沙箱自己不存,宿主把当前值作为 `options.store` 传入,成功结果报告 `result.storeWrites`(`{ set, delete }`),失败执行报告**无写入**(`:55`)——"失败的脚本不产生状态副作用"是显式合同。这给了宿主(比如未来的会话层)决定把脚本状态记在哪的自由。
+独立沙箱自己不持久化：宿主传入 `options.store`，成功结果返回 `storeWrites`，失败结果不报告写入，见 [独立包 Store 合同](../../packages/codemode/README.md#store)。coding-agent 已实现宿主持久化：成功 store 写 `codemode-store` custom entry，恢复和分支按会话路径重建，见 [应用 Store values](../../packages/coding-agent/docs/codemode.md#store-values)。**不提交 store 不等于撤销脚本已调用工具的副作用**；工具操作真实发生，失败前的文件/网络操作不会自动回滚。
 
 ### lockdown:built-ins 冻结与桥校验(Unreleased,b223082bb)
 

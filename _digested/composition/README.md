@@ -4,6 +4,8 @@
 >
 > 它的主题不是"怎么运转"，而是"运转起来之后，作为用户应该怎么理解和配置它"。
 
+> **理念局部复核**：[1_core_philosophy](1_core_philosophy.md)与[15_pi_philosophy_evidence_map](15_pi_philosophy_evidence_map.md)核对到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`。其它配置篇目仍按各自基线和 [同步记录](../_change_log/)阅读；不将本次理念复核称为全部配置同步。
+
 ## 这是什么
 
 已有的四个分析维度说明 pi **作为项目** 的内在质量：
@@ -30,6 +32,7 @@
 | 文件 | 回答的问题 | 对应已有维度 |
 |------|-----------|-------------|
 | [1_core_philosophy.md](1_core_philosophy.md) | Pi 的核心设计哲学是什么？少掉的功能是被动缺失还是主动跳过？ | harness/03, extensions/01 |
+| [15_pi_philosophy_evidence_map.md](15_pi_philosophy_evidence_map.md) | Pi 的原生理念主张分别由哪些一手来源和消化材料支撑？哪些是事实、解释或推测？ | README、harness/01/03/04/05、integration、orchestration |
 
 ### 第二部分：配置加载链（pi 发现配置的机制）
 

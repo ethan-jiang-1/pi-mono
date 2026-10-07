@@ -16,9 +16,13 @@ Agent 内核入口：[`agent/`](agent/)
 
 扩充思路入口：[`extensions/`](extensions/)
 
+理念证据入口：[`composition/15_pi_philosophy_evidence_map.md`](composition/15_pi_philosophy_evidence_map.md)
+
+> **本轮局部复核范围**：理念 FAQ、配置哲学、设计因果正文/配图及相关导览核对到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`。这是局部事实与推理修正，不改变上方全库同步基线，也不保证其它专题所有锚点已更新。
+
 ## pi-mono 是什么
 
-pi-mono 是一个 **library-first 的 AI coding agent 平台**，设计目标不仅是一个可以在终端使用的 coding agent，更是一个可以被其他产品嵌入的 agent 引擎。library-first 的承诺分两层：**SDK**（`createAgentSession()` 进程内嵌入）当前可用、成熟；**持久会话运行时直接嵌入**（v0.86.x 在 pi-agent-core 内的 durable drive 实现）于 v1.0.0 **整体迁出**——`packages/agent` 收缩为最小核（Agent + loop + proxy stream + types），持久化运行时由 **`packages/durable`** 承接（Harness、durable session、task graph、SQLite/JSONL/Memory 存储后端）。
+pi-mono 可以作为终端 coding agent 使用，也能通过 SDK/RPC 被其它产品驱动；本消化层将这一结构概括为 **library-first**，不将其当作官方逐字产品优先级或跨版本 API 稳定性承诺。这里要分开三个责任层：Agent 基础运行核；coding-agent 的 `AgentSession` 与 [`SessionManager` 会话树](../packages/coding-agent/docs/sdk.md#sessionmanager-api)；独立 experimental [`durable` 运行时](../packages/durable/README.md)。v1.0.0 迁出 agent 包的是内层 durable/harness 能力，**不是 coding-agent JSONL 会话持久化整体迁走**。
 
 当前基线（v1.0.3）它由 14 个包组成一个 monorepo（v1.0.0 的 13 包基础上 +`env`——**Unreleased，post-v1.0.3 单日成包**；更早的 `web-ui`/`mom`/`pods` 已移除，`storage` 于 v0.84 并入 session-backends（该包于 v1.0.0 删除），`chord`/`durable` 于 v0.85.x–0.86.x 新增，`mcp`/`codemode` 于 v1.0.0 新增）：
 
@@ -127,8 +131,8 @@ pi-mono 里需要严格区分两种 harness：
 |------|------|--------|
 | `agent/` | Agent 内核解剖 | 静态结构、运行时、内存管理、harness 机制 |
 | `integration/` | 外部集成 | SDK/RPC 两种接入路径、事件模型、recipes |
-| `harness/` | 平台评价 | 结构优不优秀、好不好扩展、开发纪律、自描述；[05-Design-Causality/](harness/05-Design-Causality/README.md) 补设计因果层（知识外置分级、形状因果、摩擦差、反馈三环，方法论借鉴 DSH harness-idea） |
-| `orchestration/` | 工作编排 | 驾驶座视角的原语阶梯：双队列/loop 钩子/扩展/todo/plan-mode/subagent/codemode/MCP/durable，选择决策与诚实空白（方法论借鉴 DSH orchestration-ladder） |
+| `harness/` | 平台评价 | 结构优不优秀、好不好扩展、开发纪律、自描述；[05-Design-Causality/](harness/05-Design-Causality/README.md) 补设计因果层（知识外置分级、形状因果、摩擦差、反馈三环） |
+| `orchestration/` | 工作编排 | 驾驶座视角的原语阶梯：双队列/loop 钩子/扩展/todo/plan-mode/subagent/codemode/MCP/durable，选择决策与诚实空白 |
 | `extensions/` | 扩充思路 | 极简核 + 靠扩展长能力：核有多小、扩充四轴、扩充套路 |
 | `composition/` | 配置哲学与用户决策 | 从设计哲学到配置决策的完整映射——五层框架、七条轴、AGENTS.md 设计艺术 |
 | `architecture-next/` | 新架构层（v0.85.x–1.0.0 演进） | chord/durable/server：组合运行时、持久化事实层（v1.0.0 接盘 harness/session/storage）、路由交换机（experimental） |

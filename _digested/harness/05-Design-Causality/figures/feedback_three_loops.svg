@@ -1,38 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 400" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
-    </marker>
-  </defs>
-
-  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">反馈三环的 pi 形态:机械权在 loop,裁决在人/模型</text>
-
-  <!-- loop 1 -->
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#0f172a">Pi 反馈的三个分析层次：业务选择、程序恢复与规则维护</text>
   <rect x="20" y="52" width="740" height="94" rx="10" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
-  <text x="36" y="76" font-size="12" font-weight="700" fill="#115e59">轮内环 — 失败是带旗标的普通结果</text>
-  <g font-size="10" fill="#134e4a">
-    <text x="36" y="96">工具 throw / block / 校验失败 → isError 结果,循环不断(重试是模型的动作) · stopReason error/aborted 由 StreamFn 合同强制(不得 throw)</text>
-    <text x="36" y="112">截断响应的全部 tool call 判失败(参数可能看似合法实则不完整) · beforeToolCall 只在宿主权限处拦截(block/terminate)</text>
-    <text x="36" y="128">无 harness 侧重试、无熔断 —— 与 DSH 同立场,形状不同(DSH 标记文本,pi isError 旗标)</text>
+  <text x="36" y="76" font-size="12" font-weight="700" fill="#115e59">轮内环 — 工具错误与请求恢复不是同一责任层</text>
+  <g font-size="11" fill="#134e4a">
+    <text x="36" y="96">工具校验 / 执行失败 → isError；模型可换参数或方案，hook / abort 也能终止循环。</text>
+    <text x="36" y="114">低层模型 error / aborted 结束一轮；AgentSession 按配置自动重试、压缩与续跑。</text>
+    <text x="36" y="132">agent_end 不等于应用最终完成；宿主等待 agent_settled，再核对业务结果。</text>
   </g>
-
-  <!-- loop 2 -->
   <rect x="20" y="158" width="740" height="94" rx="10" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
-  <text x="36" y="182" font-size="12" font-weight="700" fill="#1e3a8a">会话环 — 事实先行,派生状态重放重建</text>
-  <g font-size="10" fill="#1e3a8a">
-    <text x="36" y="202">账本 = append-only JSONL 树(分支 = 移动 leaf 指针,不改历史) · todo/plan 状态存 toolResult details 与 custom entry</text>
-    <text x="36" y="218">恢复 = 从账本重放重建(重扫执行标记后的 [DONE:n]);进行中的 run 不复活、内存队列不还原 —— 不伪装连续性</text>
-    <text x="36" y="234">分支、恢复、批准(plan-mode ui.select)由人裁决;compaction 在路径解析层工作,不改写历史</text>
+  <text x="36" y="182" font-size="12" font-weight="700" fill="#1e3a8a">会话环 — 账本与上下文重建，不是执行副作用重放</text>
+  <g font-size="11" fill="#1e3a8a">
+    <text x="36" y="202">SessionManager 管理 JSONL entry tree 与 active leaf；分支保留历史，compaction 生成上下文投影。</text>
+    <text x="36" y="220">扩展状态按自身合同恢复；请求局部 context 变换不保证全部写入账本。</text>
+    <text x="36" y="238">coding-agent 会话恢复与独立 durable 持久任务续跑是不同合同。</text>
   </g>
-
-  <!-- loop 3 -->
   <rect x="20" y="264" width="740" height="94" rx="10" fill="#fefce8" stroke="#a16207" stroke-width="2"/>
-  <text x="36" y="288" font-size="12" font-weight="700" fill="#854d0e">元环 — 学习发生在仓库文本与检查脚本里</text>
-  <g font-size="10" fill="#713f12">
-    <text x="36" y="308">无会话记忆回注;事故 → AGENTS.md 规则 / check 脚本回写。例:全量 vitest 禁令的成因写在规则里("e2e tests that activate when</text>
-    <text x="36" y="324">endpoint/auth env vars are present") · lockfile/install-lock 门禁是供应链教训的制度化</text>
-    <text x="36" y="340">回写无机器封印(靠 review 与自觉)—— 与 5.1 系统层边界一致:DSH 有 doc-sync 把关,pi 没有</text>
+  <text x="36" y="288" font-size="12" font-weight="700" fill="#854d0e">元环 — 文本、检查与 review 可以承载反馈</text>
+  <g font-size="11" fill="#713f12">
+    <text x="36" y="308">AGENTS 与检查脚本记录风险和规则；不能仅由规则文本推断真实事故历史。</text>
+    <text x="36" y="326">部分检查已有拒绝负例测试；覆盖范围与规则合理性需要分别审计。</text>
+    <text x="36" y="344">维护者最终人审，与运行时执行配置内的自动恢复并不矛盾。</text>
   </g>
-
-  <text x="20" y="384" font-size="10.5" fill="#64748b">三环共用一条分权线:pi 内核没有任何一处自动"替你决定怎么办" —— 连长目标生命周期都不提供(DSH 在 goal/基础设施处收权,pi 更彻底)。</text>
+  <text x="20" y="384" font-size="11" fill="#64748b">三环是研究框架，不是 Pi 作者原生术语；不能由此推出“harness 从不自动决定”。</text>
 </svg>

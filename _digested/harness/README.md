@@ -3,6 +3,8 @@
 > **基线**：pi-mono `v1.0.0`（upstream tag `a13d35a74`，merge `9e387e653`，2026-10-02 更新），源码锚点对应工作树。本目录是 2026-08-24 新增的评价维度，与 [`agent/`](../agent/)（机制解剖）和 [`integration/`](../integration/)（外部嵌入）并列。
 > v0.84.3 变更：内置工具 7→8（`ToolName` 联合 `tools/index.ts:95`）；`ExtensionAPI` `on()` 重载 34→36（v0.84.4 新增 `ui_prompt_start`/`ui_prompt_end`；注意重载列表含 3 个多行格式——`session_before_switch`/`session_before_compact`/`before_provider_request`——单行 grep 口径会少计 3）；1.4 新增"失败 factory 状态丢弃"护栏（#8424）。v0.84.4 变更：扩展事件新增 `ui_prompt_start`/`ui_prompt_end`（#8355）、runner.ts +52 行（相关锚点已重锚）；本目录相关篇目已同步。v0.86.1 变更（[`_change_log/0006`](../_change_log/0006-v0.84.4-to-v0.86.1.md)）：`on()` 36→37（`cache_warming_decision`）且全部返回 unsubscribe（#8967）；`AgentHarness` stub 世界被 durable drive 运行时取代（2.3 与 4.1 相关评价已加警示）。v1.0.0 变更（[`_change_log/0007`](../_change_log/0007-v0.86.1-to-v1.0.0.md)）：**2.2 整篇重写**——MCP 于 v1.0.0 被采纳（独立包 + 内置扩展，"无互操作"论断失效），ACP 仍缺席；**2.3 整篇改写**——内层 harness 已移出 pi-agent-core 由 durable 事实承接；`on()` 37→41（`provider_stream_event`/`context_with_system` 等）。
 
+> **本轮局部复核**：理念关联的 [05-Design-Causality](05-Design-Causality/README.md)正文与图示核对到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`；其它专题保留各自基线，本次不是全目录同步。
+
 ## 这是什么
 
 `agent/` 回答"扩展系统怎么运转、system prompt 怎么拼、agent loop 怎么跑"；`integration/` 回答"别的宿主怎么把 pi 接进去"。
@@ -11,14 +13,14 @@
 
 它不替代 `agent/` 的机制细节，而是在机制之上做评价：哪些接缝设计得好、为什么好，哪些边界是短板、对"开源吸纳新东西"意味着什么。
 
-## 结构（四个子目录，每篇一个子议题）
+## 结构（五个子目录，每篇一个子议题）
 
 每个大主题一个子目录，每个子议题一篇 MD，统一用 `codebase-design` 词汇 + 真 seam 检验 / deletion test / design-it-twice 写深。硬事实 / 解释 / 推测分开标。
 
 | 问题 | 阅读入口 | 篇章 |
 |---|---|---|
 | 结构优秀不优秀、第三方好不好加能力 | [01-Architecture/](./01-Architecture/README.md) | 1.1 三层接缝 · 1.2 统一注入点 · 1.3 分发闭环 · 1.4 生命周期护栏 |
-| 扩展的边界在哪、哪些能力加不了或没护栏 | [02-Boundaries/](./02-Boundaries/README.md) | 2.1 无沙箱 · 2.2 无 MCP/ACP · 2.3 AgentLane 半成品 · 2.4 无版本契约 |
+| 扩展的边界在哪、哪些能力加不了或没护栏 | [02-Boundaries/](./02-Boundaries/README.md) | 2.1 无内置沙箱 · 2.2 MCP 消费已接入、ACP 仍缺席 · 2.3 内层运行时迁至 durable · 2.4 无版本契约 |
 | 它开发有没有策略和纪律 | [03-Discipline/](./03-Discipline/README.md) | 3.1 core-minimal · 3.2 一条规则 · 3.3 贡献门 · 3.4 工程规则 |
 | 它有没有把自己说清楚给上面的 coding agent 听 | [04-Self-Description/](./04-Self-Description/README.md) | 4.1 system prompt 自述 · 4.2 工具 prompt 契约 · 4.3 文档随包 · 4.4 上下文分层 |
 | 它为什么长成这个形状(因果、外置、摩擦差、反馈环) | [05-Design-Causality/](./05-Design-Causality/README.md) | 5.1 知识外置分层 · 5.2 形状因果 · 5.3 铺装路摩擦差 · 5.4 反馈三环 |
@@ -28,7 +30,7 @@
 1. 先读 [01-Architecture/](./01-Architecture/README.md)：建立"三层接缝（真 seam 检验）+ 统一注入点（design-it-twice）+ 分发闭环 + 生命周期护栏"这个骨架
 2. 再读 [02-Boundaries/](./02-Boundaries/README.md)：看清骨架的四条边界，避免高估
 3. 然后读 [03-Discipline/](./03-Discipline/README.md) 和 [04-Self-Description/](./04-Self-Description/README.md)：从"怎么开发"和"怎么自述"两个角度补齐 harness 的评价
-4. 最后读 [05-Design-Causality/](./05-Design-Causality/README.md)：回问一层因果——这些结构被什么逼出来、知识外置到哪层、摩擦差在哪、失败如何回写（方法论借鉴 DSH `harness-idea`，事实全部取自 pi 源码）
+4. 最后读 [05-Design-Causality/](./05-Design-Causality/README.md)：回问一层因果——这些结构被什么逼出来、知识外置到哪层、摩擦差在哪、失败如何回写（事实全部取自 pi 源码）
 
 ## 写作定调（评价视角，区别于 agent/）
 

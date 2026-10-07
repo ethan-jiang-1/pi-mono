@@ -1,93 +1,65 @@
-# 1. Pi 的核心哲学：一条约束链
+# 1. Pi 的核心哲学：从设计取舍到配置决策
+
+> **局部复核锚点**：`cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`。本篇把理念转成配置选择；完整原生论证见 [理念 FAQ](../../_faq_on_digested/12_pi_philosophy/answer.md)，证据入口见 [理念地图](15_pi_philosophy_evidence_map.md)。
 
 ## 用户问题
 
-Pi 被描述为"最小终端 coding harness"。但"最小"是结果还是选择？它少掉的功能（没有审批弹窗、没有 plan mode、没有 subagent、没有 MCP）是被动缺失还是主动跳过？
+Pi 的“最小”是被动缺失，还是主动控制范围？当我需要计划、委派、任务跟踪或安全限制时，应该扩大核心，还是选择其它层？
 
-如果答案是"主动跳过"，那推导出这些跳过的决策逻辑是什么？
+[README](../../README.md#pi)说 Pi 有 powerful defaults，但跳过内置 sub-agent、plan mode，用户可构建或安装自己的能力。[CONTRIBUTING](../../CONTRIBUTING.md#philosophy)要求不属于 core 的功能成为 extension，新增 hook 也要控制复杂交互。**最小是范围纪律，不是功能数量竞赛。**
 
-## 设计约束链
+## 设计取舍：相互支持，不是单因证明
 
-Pi 的所有设计选择——从极简工具集到 YOLO 默认到无内置工作流到约 500 token 的 system prompt——不是一堆独立判断，而是一条从同一个根推导出的约束链。
+[作者自述](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/)给出多种动机：简单可预测、精确控制上下文、检查交互过程、处理会话和构建替代 UI。它们支持一组取舍，但不能证明所有结构必然由一个口号导出。
 
-```
-根："你做决定，机器无条件执行"
- │
- ├→ 不需要内置审批弹窗（你已经在机器面前了）
- │   ├→ YOLO 默认全权，不弹窗问"可以吗"
- │   ├→ 安全靠隔离（VM/容器/bwrap），不是靠弹窗
- │   └→ 对应源码事实：sandbox 不是默认内置的，containerization.md 是文档方案
- │
- ├→ 不替你决定工作流长什么样
- │   ├→ 不内置 plan mode、subagent、todo、MCP
- │   ├→ plan mode 和 subagent 做成了 examples/extensions/ 示例（故意跳过）
- │   ├→ 用扩展长出来，你自己选、自己拼、自己改
- │   └→ 对应源码事实：CONTRIBUTING.md 第一句 "pi's core is minimal"
- │
- ├→ 不替你锁定模型/提供商
- │   ├→ 无默认模型锁定，跨 provider 运行时换
- │   ├→ 包生态 5600+ 包自由组合
- │   └→ 对应源码事实：--models flag、Ctrl+P 切换、provider 注册系统
- │
- ├→ 不替你管理状态（文件就是 UI）
- │   ├→ AGENTS.md、PLAN.md、TODO.md、PROGRESS.md 都是文件
- │   ├→ 人和 agent 读同一个文件，人在文件里编辑就是改 agent 的认知
- │   ├→ 会话是树（/fork /clone /tree），人肉导航而不是 agent 自动管理
- │   └→ 对应源码事实：packages/agent/src/agent.ts 的 session tree 结构
- │
- └→ 不替你记住"正确用法"
-     ├→ 极简 system prompt（约 500 token）
-     ├→ 你的 AGENTS.md 真正有约束力（不与 ~20k 内置产品逻辑竞争）
-     └→ 对应源码事实：packages/coding-agent/src/core/system-prompt.ts 的拼接结构
-```
+| 取舍 | 用户拿到的选择 | 边界 |
+|---|---|---|
+| 工作流不全预装 | 文件、prompt template、extension/package、宿主编排 | 不是每种组合都合理；先理解状态和生命周期 |
+| 模型/provider 可替换 | 按任务与约束选择模型 | 跨 provider context 转换不是完全等价 |
+| 上下文分层/按需 | 项目指令、skills、工具声明、会话分支可调整 | 文件修改须重新读入；短 prompt 不保证更强遵从 |
+| 会话格式可检查 | 查消息、prompt/tool 变化、branch 和 compaction | 不等于原始网络记录或副作用重放 |
+| 可被嵌入 | SDK、RPC、print/JSON、默认 TUI | 能嵌入不等于 API 永久兼容 |
+| 不内置 OS 访问隔离 | 按风险选择整个进程或工具级隔离 | 项目信任/工具拦截不能替代 OS 边界 |
 
-每个"不"后面都有实际源码事实支撑。这不是"PI 应该做什么"的宣言——这是从源码读出的设计判断。
+来源：[SDK](../../packages/coding-agent/docs/sdk.md)、[skills](../../packages/coding-agent/docs/skills.md)、[会话格式](../../packages/coding-agent/docs/session-format.md)、[扩展](../../packages/coding-agent/docs/extensions.md)、[隔离方案](../../packages/coding-agent/docs/containerization.md)。
 
-## 根的证据：`CONTRIBUTING.md` 的 core-minimal 纪律
+## 你的决策空间
 
-这条约束链最硬的机械式证据不是哲学宣言，是 `CONTRIBUTING.md` 的 PR 路线：
+### 1. 先找责任层，不先扩大 core
 
-> "If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected."
+- 项目事实与约束：项目指令文件或配置。
+- 重复提示：prompt template；领域操作说明：按需 skill。
+- 工具、事件、命令、UI 与运行时状态：extension/package。
+- 自己的 UI、组织策略、外层任务系统：SDK/RPC 宿主。
+- 独立持久任务运行时：[experimental durable](../../packages/durable/README.md)。它不是 coding-agent `SessionManager` 会话树的替代名称。
 
-这不是对用户说的——这是对贡献者说的。它把"你决定"这个哲学翻译成了项目治理规则。如果一条功能不通过扩展面在核心外实现，PR 会被拒。
+当前 MCP、codemode、tool_search 已由官方包/内置扩展提供，不能沿用“Pi 没有 MCP”的旧描述。选装或缩小暴露面应按 [MCP](../../packages/coding-agent/docs/mcp.md)与[codemode](../../packages/coding-agent/docs/codemode.md)的当前规则检查。
 
-`_digested/harness/03-Discipline/3.1_core_minimal.md` 已经完整分析了这条纪律。结论是：**可扩展性不是架构天赋，是被纪律逼出来的。**
+### 2. 上下文由你调整，状态仍由程序管理
 
-## 链的补偿：你放弃的东西不等于净损失
+计划文件便于人和 agent 共读，但不是 Pi 唯一的状态载体。`SessionManager` 自动持久化会话，程序也负责请求重试和自动压缩。用户选择资料与会话路径，程序维护合同内的状态；两者不是对立关系。
 
-| 你放弃的 | 你拿到的 |
-|---------|---------|
-| 开箱全家桶 | 只装你需要的——token 预算由你控制，不被迫为 20 个 skill 付 token |
-| 产品化审批弹窗 | 自己决定安全边界——从 YOLO 到 bwrap 到容器四档 |
-| 官方托管的编排 | 自选编排层——tmux、worktree、pi-subagents 自己编排 |
-| 内置 plan mode | 按自己的方式计划——`.scratch/` + `n2c:` 人审、或 PLAN.md、或 pi-subagents、或计划 preset |
-| 内置 subagent | 自选代理粒度——简单双会话、或 pi-subagents、或 JS Workflow 编排 |
-| 一个"标准用法" | 你的用法就是对你合理的用法——没有预设正确答案 |
+具体例子：修改计划文件后，先让 agent 重新读取，再讨论下一步。不要认为“磁盘已经改了”就等于模型上下文已经刷新。换分支时，核对 active branch 和 compaction 后的上下文，而不是把全树都当作当前输入。见 [sessions](../../packages/coding-agent/docs/sessions.md)。
 
-**最关键的交易是你拿回了上下文控制权。** 在一个 ~20k token 内置产品逻辑的 harness 里，你的规则是跟 20k token 竞争 agent 注意力的失败者。在一个 ~500 token 的极简 harness 里，你的 20 行 AGENTS.md 就是 agent 前半段读到的最有约束力的指令。
+### 3. 安全按覆盖范围选，不按审批弹窗数量选
 
-## 这条链不是 pi 独有的——它是 library-first 设计的一般形式
+[权限声明](../../README.md#permissions--containerization)说明默认启动权限。需要隔离时，先问：只隔离内置工具，还是整个 Pi 进程、扩展代码、网络和凭据？[containerization](../../packages/coding-agent/docs/containerization.md)列出的方案覆盖面不同。工具 allowlist 是收窄能力，不是完整 sandbox。
 
-Pi 验证了一件事：**如果你把"用户决定"推到极致，整个设计就可以从一条根推导出来。** 它不是"缺功能的 Claude Code"——它是一个不同类的东西，缺点和优点是同一条链的两面。
+### 4. 控制权需要理解与维护
 
-## 锚点
+[The One Rule](../../CONTRIBUTING.md#the-one-rule)要求理解代码。扩展也一样：能加载、类型正确，不证明事件组合、权限或失败降级正确。
 
-- 核心纪律：`CONTRIBUTING.md` 开篇 "pi's core is minimal"
-- 故意跳过：`packages/coding-agent/README.md` "skips features like sub agents and plan mode"
-- 极简工具集：`packages/coding-agent/src/core/tools/index.ts` 的 `ToolName` 联合（8 个内置工具）
-- 极简 system prompt：`packages/coding-agent/src/core/system-prompt.ts`（~500 token 的 harness 自述）
-- 会话树：`packages/agent/src/agent.ts`
-- 扩展系统：`packages/coding-agent/src/core/extensions/types.ts` 的 `ExtensionAPI`（统一注入点）
-- 已有分析回指：`harness/03-Discipline/3.1_core_minimal.md`、`extensions/01-Core/1.2_skipped_features.md`、`harness/01-Architecture/1.2_single_injection.md`
+核心职责克制能减少必须继承的产品决定；它不能消灭 token、维护、升级和安全成本。评价配置时看实际输入和行为，不拿包数量、示例数量或历史 token 数当理念证明。
 
 ## 最小例证
 
-**例证 1（core-minimal 不是宣言是纪律）：** 读 `CONTRIBUTING.md` 第一句话——"PRs that bloat the core will likely be rejected." 这不是说明文，是对贡献者的闸门。如果你提一个加内置 new feature 的 PR，它会被拒。这是"你做决定"在项目治理层的落点。
-
-**例证 2（链的传染性）：** 看 8 个内置工具 vs 70+ 示例扩展的比例（8:70+）。`"你做决定"` → `"不替你决定工作流"` → `"不内置 plan mode/subagent"` → `"它们必须是扩展"` → `"70+ 扩展示例，8 个内置工具"`。比例本身就是从根到叶的物证。
-
-**例证 3（补偿真实存在）：** 把裸 pi 的 system prompt token 数和 Claude Code 对比。pi 的 ~500 token harness 自述 vs CC 的 ~20k 内置产品逻辑。你写进 AGENTS.md 的规则在 pi 上更有约束力——这是"你拿回上下文控制权"的可测量证据。见 `_faq_on_digested/07_pi_usage_scenarios/06_field_usage.md` 的 esc.sh 对照（同模型 Opus 4.6，prompt 约束力差异）。
+1. **核心纪律**：贡献规则说膨胀 core 的 PR “will likely be rejected”，不是说任何核心新功能都必拒。先说明能力为什么属于 core，再讨论实现。
+2. **过程可检查**：会话记录中能看到 prompt/tool 声明变化与消息；扩展仍可能做请求级 context 变换，因此不把账本称为完整网络抓包。
+3. **完成边界**：模型一轮结束后，程序可能自动重试或压缩续跑。外部宿主需要 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#respect-the-runtime-lifecycle)，而非仅 `agent_end`。
 
 ## 与已有维度的关系
 
-本篇不是对 `harness/03-Discipline/3.1_core_minimal.md` 的替代——那篇分析"core-minimal 作为纪律"的结构意义。本篇是补充：**为什么**要有这条纪律（从"你做决定"推导），以及它如何约束整个配置决策空间。
+- [核心纪律](../harness/03-Discipline/3.1_core_minimal.md)分析项目治理，本篇只提配置上的责任分层。
+- [扩展轴](10_extension_axes/README.md)解释能力入口，本篇不重复 API 清单。
+- [文件/会话 UI](9_session_and_file_ui.md)展开状态操作，本篇纠正“Pi 不管理状态”的误解。
+- [证据地图](15_pi_philosophy_evidence_map.md)与[研究账本](../../_faq_on_digested/12_pi_philosophy/research.md)负责核对依据，不让这些分析互相循环自证。

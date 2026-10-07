@@ -1,12 +1,12 @@
 # Pi 扩展 Agent-ready 开发
 
-本语料面向独立开发 Pi 扩展与 Pi package 的仓库，说明怎样沿用 Pi 的原生机制组织意图、实现、验证证据与交付判断。目标不是复制 pi-mono 主仓库的内部治理，而是让扩展作者复用 Pi 可验证的扩展点、组合方式和测试形态。
+本语料面向独立开发 Pi 扩展与 Pi package 的仓库，说明怎样沿用 Pi 的原生机制组织意图、实现、验证与交付判断。目标不是复制 pi-mono 主仓库的内部治理，而是让扩展作者复用 Pi 可验证的扩展点、组合方式和测试形态。
 
 本目录是一套可独立使用的语料。三卷分别解释扩展开发模型、pi-mono 的精确流程机制和仓库自身作为开发 harness 的组织方式；每卷均以 Pi 仓库 `earendil-works/pi` 固定 release tag `v1.0.3` 的源码、文档、规则、prompts、skills、workflows 为一手来源，不依赖其它研究材料。Pi 没有声明采用一套统一开发方法，本语料不把综合模型写成官方方法。
 
 ## 目标读者与适用边界
 
-目标读者是在独立仓库中开发 Pi 扩展、skills、prompt templates、themes 或 package 的 owner 与 coding agent。读者应能从最小扩展入口开始，逐步建立自己的源码、package 声明、测试证据、安装验证和交付记录。
+目标读者是在独立仓库中开发 Pi 扩展、skills、prompt templates、themes 或 package 的 owner 与 coding agent。读者应能从最小扩展入口开始，逐步建立自己的源码、package 声明、测试结果、安装验证和交付记录。
 
 **适用边界**：独立扩展仓可以使用 Pi 的扩展运行时、`ExtensionAPI` 合同、skills/prompts/packages 组合、faux provider 测试模式与安装验证方式。pi-mono 主仓库的贡献准入（`lgtm`/`lgtmi`）、CI 矩阵、发布管线与维护者评审属于主仓治理，不会因为使用 Pi 就自动适用于扩展仓；扩展仓应为自己的公开接口、用户可见行为、版本兼容和发布方式指定权威维护位置与验证路径。
 

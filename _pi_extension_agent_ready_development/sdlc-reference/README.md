@@ -28,12 +28,12 @@
 | 页 | 内容 |
 |---|---|
 | [00-index.md](00-index.md) | 按问题选页的导航表；从 v1.0.3 归纳的三条组织立场 |
-| [01-contribution-gates.md](01-contribution-gates.md) | issue/PR 准入工作流、`lgtmi`/`lgtm` 语义、issue 模板前置、触发边界 |
-| [02-issue-diagnosis-and-session-handoff.md](02-issue-diagnosis-and-session-handoff.md) | `/is` 诊断合同、issue-analysis CI 授权链、session gist 导出与 `/ir` 本地接续 |
+| [01-contribution-gates.md](01-contribution-gates.md) | issue/PR 准入工作流、`lgtmi`/`lgtm` 语义、issue 模板前置、triage 标签生命周期、触发边界 |
+| [02-issue-diagnosis-and-session-import.md](02-issue-diagnosis-and-session-import.md) | `/is` 诊断合同、issue-analysis CI 授权链、session gist 导出与 `/ir` 本地接续 |
 | [03-check-pipeline.md](03-check-pipeline.md) | `npm run check` 的逐项组成、pre-commit 条件触发、lockfile 人工豁免面 |
 | [04-ci-matrix.md](04-ci-matrix.md) | 主 CI、环境/Nix/audit/模型目录工作流的触发与内容；「不在普通 PR CI」清单 |
 | [05-testing-layers.md](05-testing-layers.md) | test.sh 隔离、faux provider 测试层、交互 smoke 标准、evals 配对评估；各层能证明/不能证明 |
-| [06-review-and-human-role.md](06-review-and-human-role.md) | One Rule、评审缓冲、反推测性抽象原则、RFC 索引、AI 辅助与人的最终判断 |
+| [06-review-and-human-role.md](06-review-and-human-role.md) | One Rule、审阅缓冲、反推测性抽象原则、RFC 索引、AI 辅助与人的最终判断 |
 | [07-release-and-recovery.md](07-release-and-recovery.md) | lockstep 版本、release 脚本实际步骤、tag 发布管线、幂等发布与恢复 |
 | [08-applicability-boundary.md](08-applicability-boundary.md) | 哪些主仓治理不随使用 Pi 继承；扩展仓必须自定什么；可借的原则 |
 | [figures/](figures/README.md) | 本卷正文使用的 SVG 图示清单（检查分流图） |

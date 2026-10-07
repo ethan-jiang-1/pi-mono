@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="600" viewBox="0 0 1120 600" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif">
   <title id="title">一次扩展变更的完整路径：从外部结果到交付判断</title>
-  <desc id="desc">七个步骤组成一次扩展变更的路径：定义外部结果、放进正确的资源类型、遵守生命周期合同、形成完整交付、按观察对象分层验证、干净安装验证、交付判断；一笔完整交付把实现、package 声明、README 与行为证据保持一致。</desc>
+  <desc id="desc">七个步骤组成一次扩展变更的路径：定义外部结果、放进正确的资源类型、遵守生命周期合同、形成完整交付、按观察对象分层验证、干净安装验证、交付判断；一笔完整交付把实现、package 声明、README 与行为验证保持一致。</desc>
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#475569"/></marker>
     <marker id="arrow-loop" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#64748b"/></marker>
@@ -32,7 +32,7 @@
     <circle cx="870" cy="124" r="15" fill="#237a72"/><text x="870" y="129" font-size="13" font-weight="700" fill="#ffffff">4</text>
     <text x="965" y="128" font-size="13" font-weight="700" fill="#1d5f59">完整交付</text>
     <text x="965" y="152" font-size="10.5" fill="#526175">实现 + package 声明</text>
-    <text x="965" y="170" font-size="10.5" fill="#526175">+ README + 行为证据</text>
+    <text x="965" y="170" font-size="10.5" fill="#526175">+ README + 行为验证</text>
 
     <rect x="840" y="260" width="250" height="104" rx="8" fill="#edf8f1" stroke="#55a36f"/>
     <circle cx="870" cy="288" r="15" fill="#2f8550"/><text x="870" y="293" font-size="13" font-weight="700" fill="#ffffff">5</text>
@@ -67,7 +67,7 @@
   <rect x="100" y="466" width="216" height="38" rx="7" fill="#edf5ff" stroke="#8bb3d7"/><text x="208" y="490" text-anchor="middle" font-size="11" fill="#244e73">实现：源码与类型</text>
   <rect x="336" y="466" width="216" height="38" rx="7" fill="#fff5e6" stroke="#d99939"/><text x="444" y="490" text-anchor="middle" font-size="11" fill="#744408">package 声明：manifest 与依赖</text>
   <rect x="572" y="466" width="216" height="38" rx="7" fill="#edf8f1" stroke="#55a36f"/><text x="680" y="490" text-anchor="middle" font-size="11" fill="#1f6139">用户文档：当前用法</text>
-  <rect x="808" y="466" width="216" height="38" rx="7" fill="#f3efff" stroke="#8269bd"/><text x="916" y="490" text-anchor="middle" font-size="11" fill="#513b85">行为证据：回归会失败</text>
+  <rect x="808" y="466" width="216" height="38" rx="7" fill="#f3efff" stroke="#8269bd"/><text x="916" y="490" text-anchor="middle" font-size="11" fill="#513b85">行为验证：回归会失败</text>
 
   <text x="560" y="556" text-anchor="middle" font-size="11" fill="#5f6b7a">来源：综合自 earendil-works/pi v1.0.3 · extensions.md 生命周期与工具合同 · packages.md 安装合同</text>
 </svg>

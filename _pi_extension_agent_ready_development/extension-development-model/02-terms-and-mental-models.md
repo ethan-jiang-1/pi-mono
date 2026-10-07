@@ -1,6 +1,6 @@
 # 术语与心智模型
 
-本页解释卷内使用的 Pi 词汇，全部依据 `v1.0.3` 的文档与源码。按主题分组；跨卷链接供深入，不构成前置顺序。
+本页解释卷内使用的 Pi 词汇，全部依据 `v1.0.3` 的文档与源码；标注（本语料命名）的条目是本语料自己的命名。按主题分组；跨卷链接供深入，不构成前置顺序。
 
 ## 一、运行时的三个层次
 
@@ -15,7 +15,7 @@
 ## 二、资源类型：扩展、skill、prompt template、package
 
 - **扩展**：TypeScript 模块，默认导出接收 `ExtensionAPI` 的 factory。承载需要执行代码的能力：工具、命令、事件处理器、provider、MCP server、虚拟模型、渲染。运行在 Pi 进程内，拥有与用户相同的操作系统权限——只加载信任来源（运行时事实）。
-- **skill**：含 `SKILL.md` 的目录（可移植形态）；skills 目录根下的单个 Markdown 文件也被接受，pi-mono 自用的三个 skill 就是单文件形态。启动时只把 name、description 与路径加进系统提示；任务匹配时模型才读完整指令。可捆绑 scripts/references/assets。`description` 决定路由，要同时写「做什么」和「何时用」。`/skill:name` 强制加载；`disable-model-invocation` 关闭自动选择（运行时事实，见 [Skills 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md)）。
+- **skill**：含 `SKILL.md` 的目录（可移植形态）；skills 目录根下的单个 Markdown 文件也被接受（[skills.md L63](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md#L63)），pi-mono 自用的三个 skill 就是单文件形态。启动时只把 name、description 与路径加进系统提示；任务匹配时模型才读完整指令。可捆绑 scripts/references/assets。`description` 决定路由，要同时写「做什么」和「何时用」。`/skill:name` 强制加载；`disable-model-invocation` 关闭自动选择（运行时事实，见 [Skills 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md)）。
 - **prompt template**：Markdown 文件变成 `/` 命令；文件名即命令名。支持位置参数与默认值展开。没有执行行为（运行时事实，见 [Prompt Templates 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md)）。
 - **package**：把上述资源（加 themes）作为一个单位经 npm/git/本地路径分发。约定目录或 `pi` manifest；经 `pi install` 写入 settings；npm 包用 `pi-package` keyword 进 gallery（运行时事实，见 [Packages 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md)）。
 

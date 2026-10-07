@@ -86,6 +86,6 @@ The One Rule 把理解义务放在提交者身上：
 >
 > — [CONTRIBUTING.md L17](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L17)
 
-贡献门槛是缓冲式的：新贡献者的 issue 与 PR 默认自动关闭（[CONTRIBUTING.md L23](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L23)）；维护者在 issue 上回复 `lgtmi`（解锁后续 issue）或 `lgtm`（解锁 issue 与 PR），命令必须在回复开头或结尾（[CONTRIBUTING.md L31-L34](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L31-L34)）。开 PR 前必须已获 `lgtm`；提交前 `npm run check` 与 `./test.sh` 都必须通过（[CONTRIBUTING.md L58-L67](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L58-L67)）；贡献者不得改 `CHANGELOG.md`，条目由维护者合并时添加（[CONTRIBUTING.md L69](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L69)）。这些是 pi-mono 应对 issue 量的自保制度（其 FAQ 明说 auto-close 是给维护者评审缓冲），不是对贡献者的通用要求。
+贡献门槛是缓冲式的：新贡献者的 issue 与 PR 默认自动关闭（[CONTRIBUTING.md L23](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L23)）；维护者在 issue 上回复 `lgtmi`（解锁后续 issue）或 `lgtm`（解锁 issue 与 PR），命令必须在回复开头或结尾（[CONTRIBUTING.md L31-L34](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L31-L34)）。开 PR 前必须已获 `lgtm`；提交前 `npm run check` 与 `./test.sh` 都必须通过（[CONTRIBUTING.md L58-L67](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L58-L67)）；贡献者不得改 `CHANGELOG.md`，条目由维护者合并时添加（[CONTRIBUTING.md L69](https://github.com/earendil-works/pi/blob/v1.0.3/CONTRIBUTING.md#L69)）。这些是 pi-mono 应对 issue 量的自保制度（其 FAQ 明说 auto-close 是给维护者审阅缓冲），不是对贡献者的通用要求。
 
 **扩展仓建议**：扩展仓通常没有同样的流量压力，可自定更轻的门槛；但「理解义务 + 自动检查全过再提交」这一组合是任何仓都可直接沿用的最小内核（仓库自定范围）。

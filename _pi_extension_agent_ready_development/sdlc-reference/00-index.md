@@ -7,7 +7,7 @@
 | 页 | 适用问题 | 新手可暂忽略 |
 |---|---|---|
 | [01-contribution-gates.md](01-contribution-gates.md) | 我想给 pi-mono 报 issue/提 PR，准入条件是什么？gate 工作流实际检查什么？`lgtmi`/`lgtm` 差别？ | 只开发自己扩展仓、不参与 pi-mono 时可整页暂缓 |
-| [02-issue-diagnosis-and-session-handoff.md](02-issue-diagnosis-and-session-handoff.md) | `/is` 诊断合同是什么？CI 里怎么跑 pi？session 怎么导出并本地接续？ | issue-analysis 的授权链细节；先掌握 `/is` 与 `/ir` 的行为即可 |
+| [02-issue-diagnosis-and-session-import.md](02-issue-diagnosis-and-session-import.md) | `/is` 诊断合同是什么？CI 里怎么跑 pi？session 怎么导出并本地接续？ | issue-analysis 的授权链细节；先掌握 `/is` 与 `/ir` 的行为即可 |
 | [03-check-pipeline.md](03-check-pipeline.md) | `npm run check` 每项检查什么、不检查什么？pre-commit 何时跑 browser smoke？ | entry graph 预算、runtime-deps 的解析细节 |
 | [04-ci-matrix.md](04-ci-matrix.md) | 普通 PR CI 跑什么？哪些检查被分流到别的触发器？ | Nix、模型目录发布窗口等专门工作流细节 |
 | [05-testing-layers.md](05-testing-layers.md) | 每层测试能证明/不能证明什么？独立仓怎么复用 faux provider 模式？ | evals 的 Docker 配对细节 |
@@ -23,7 +23,7 @@
 
 ### (a) agent 是一等参与者
 
-主仓不只允许 agent 参与，还为其定义了可执行的角色合同：`.pi/prompts/is.md` 规定诊断 agent 的行为边界（不信 issue 内分析、完整读代码、只提议不实现、CI 下不加 `inprogress` 标签）；`.github/workflows/issue-analysis.yml` 在 CI 中以真实模型运行 `pi /is`、导出 session 到 secret gist，并给出 `/ir` 本地接续指令；`.pi/extensions/import-repro.ts` 把跨机器接续实现为 cwd 重写；`.github/workflows/remove-inprogress-on-close.yml` 保证 issue 关闭时清理 `inprogress` 标签。关键证据：[is.md](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/prompts/is.md#L9-L28)、issue-analysis.yml 的[运行步](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-analysis.yml#L355-L416)、[导出与 gist 上传](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-analysis.yml#L487-L569)与[接续评论](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-analysis.yml#L571-L648)、[import-repro.ts](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/extensions/import-repro.ts#L1-L16)。详见 [02 页](02-issue-diagnosis-and-session-handoff.md)。
+主仓不只允许 agent 参与，还为其定义了可执行的角色合同：`.pi/prompts/is.md` 规定诊断 agent 的行为边界（不信 issue 内分析、完整读代码、只提议不实现、CI 下不加 `inprogress` 标签）；`.github/workflows/issue-analysis.yml` 在 CI 中以真实模型运行 `pi /is`、导出 session 到 secret gist，并给出 `/ir` 本地接续指令；`.pi/extensions/import-repro.ts` 把跨机器接续实现为 cwd 重写；`.github/workflows/remove-inprogress-on-close.yml` 保证 issue 关闭时清理 `inprogress` 标签。关键证据：[is.md](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/prompts/is.md#L9-L28)、issue-analysis.yml 的[运行步](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-analysis.yml#L355-L416)、[导出与 gist 上传](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-analysis.yml#L487-L569)与[接续评论](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/issue-analysis.yml#L571-L648)、[import-repro.ts](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/extensions/import-repro.ts#L1-L16)。详见 [02 页](02-issue-diagnosis-and-session-import.md)。
 
 ### (b) 可机械判断的规则接入可执行检查
 

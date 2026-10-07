@@ -35,7 +35,7 @@ pi-mono 把「工作过程」当作可机读的一等对象：会话持久化为
 
 ## `/ir`：把 CI 分析会话导入本地续接
 
-![会话接续：CI 分析到本地续接](./figures/session-handoff.svg)
+![会话接续：CI 分析到本地续接](./figures/session-import.svg)
 
 pi-mono 的 issue 分析 CI 会把分析会话分享为 gist；`.pi/extensions/import-repro.ts` 注册的 `/ir` 命令把它取回本地（主仓自定实践）：
 

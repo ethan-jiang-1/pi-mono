@@ -9,7 +9,7 @@
 | 机制 | 为什么不继承 | 详见 |
 |---|---|---|
 | issue/PR 默认自动关闭、`lgtmi`/`lgtm` 解锁、`.github/APPROVED_CONTRIBUTORS` | 这是维护者带宽下的流量策略；扩展仓的贡献者规模与风险面不同 | [01](01-contribution-gates.md) |
-| `@issuron analyze` 的 CI 诊断链（org 成员 + 仓库写权限双重授权、专用 auth.json、secret gist） | 依赖 pi-mono 自己的组织成员、environment secret 与专用登录 | [02](02-issue-diagnosis-and-session-handoff.md) |
+| `@issuron analyze` 的 CI 诊断链（org 成员 + 仓库写权限双重授权、专用 auth.json、secret gist） | 依赖 pi-mono 自己的组织成员、environment secret 与专用登录 | [02](02-issue-diagnosis-and-session-import.md) |
 | `npm run check` 的具体条目（pinned-deps、entry-graphs 预算、browser-smoke、install-lock 等） | 每条都针对 pi-mono 的包结构、浏览器目标与发布形态 | [03](03-check-pipeline.md) |
 | 主 CI 的 `build-check-test` 与 `mcp-conformance` 两个 job、durable-env 五 OS 矩阵、Nix/audit/模型目录工作流 | 触发器与检查范围由主仓的事件与路径设计决定 | [04](04-ci-matrix.md) |
 | `test/suite/` 的 CI-safe 规则、bash 隔离环境、evals 的 Docker 配对 | 规则本身写给主仓测试；扩展仓要用需自建同等约束 | [05](05-testing-layers.md) |
@@ -30,7 +30,7 @@
 | package 依赖划分 | host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）放 `peerDependencies` 用 `"*"`，不得放 `dependencies` | [Packages 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md#L80-L92) |
 | 工具不可注销 | 只能以 `exposure: "hidden"` 重注册收回；`terminate: true` 需要同批已完成工具一致同意 | Extensions 文档 |
 | 模式差异 | JSON/print 无 UI；RPC 不转发自定义终端组件；用 `ctx.mode`/`ctx.hasUI` 守卫 | Extensions 文档 |
-| 会话文件格式 | 带树结构的 JSONL；导出/导入是搬运历史，不是重放（见[02 页](02-issue-diagnosis-and-session-handoff.md)的 `/ir` 边界） | [Session 格式文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md) |
+| 会话文件格式 | 带树结构的 JSONL；导出/导入是搬运历史，不是重放（见[02 页](02-issue-diagnosis-and-session-import.md)的 `/ir` 边界） | [Session 格式文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md) |
 
 区别判据很简单：**换成任何 Pi 用户都成立的是运行时合同；只有在这个仓库工作才成立的是主仓要求。**正文中的「主仓要求」标注就是给这条判据用的。
 
@@ -53,7 +53,7 @@
 - **每个行为变化配一条能在其回归时失败的最小检查**（[03 页](03-check-pipeline.md)）：不必复制八项 check，先做到「这条新行为若被改坏，有一条命令会红」。
 - **按变更路径分流重检查**（[04 页](04-ci-matrix.md)）：普通提交跑快检查，涉及发布面/平台面的路径才触发重检查。
 - **分层测试按观察对象分工**（[05 页](05-testing-layers.md)）：用 `@earendil-works/pi-ai/compat` 的 faux provider 测扩展逻辑，把真实模型留给交互 smoke——这是本卷里最直接可移用的一层。
-- **把注意力与体积当预算管理**（[06 页](06-review-and-human-role.md)）：默认关闭低质量输入、允许无回复、把封禁/关闭条件写清楚而不是靠提醒。
+- **审阅用缓冲、体积用预算**（[06 页](06-review-and-human-role.md)）：默认关闭低质量输入、允许无回复、把封禁/关闭条件写清楚而不是靠提醒。
 - **幂等代替回滚**（[07 页](07-release-and-recovery.md)）：不可变产物 + 只前进的 latest 指针 + 已存在即跳过，让失败后的动作是「重跑」。
 - **理解义务显式化**（[06 页](06-review-and-human-role.md)）：把「提交者必须能解释改动」写进仓库文件。
 

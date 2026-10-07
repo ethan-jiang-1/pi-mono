@@ -46,7 +46,7 @@ pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」
 
 ## 审阅缓冲：维护者时间是稀缺资源
 
-第三层成本是人的注意力。pi-mono 收到的 issue 超出维护者能实时评审的量，因此贡献门槛把审阅节奏的决定权交给维护者（主仓要求，见 [01](./01-agent-entry-rules.md)）：新贡献者的 issue 与 PR 默认自动关闭、维护者每日复审并 reopen 达标者；issue 有质量门槛（短、具体、值得读、自己的语气）；大量自动化提交会被封号。FAQ 给出的理由（主仓原话）：
+第三层成本是维护者的审阅时间。pi-mono 收到的 issue 超出维护者能实时评审的量，因此贡献门槛把审阅节奏的决定权交给维护者（主仓要求，见 [01](./01-agent-entry-rules.md)）：新贡献者的 issue 与 PR 默认自动关闭、维护者每日复审并 reopen 达标者；issue 有质量门槛（短、具体、值得读、自己的语气）；大量自动化提交会被封号。FAQ 给出的理由（主仓原话）：
 
 > Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.
 >

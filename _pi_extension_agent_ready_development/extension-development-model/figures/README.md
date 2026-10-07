@@ -13,6 +13,6 @@
 | `resource-decision.svg` | [`../00-index.md`](../00-index.md)（资源判别一节） |
 | `completion-ladder.svg` | [`../00-index.md`](../00-index.md)（完成度阶梯一节） |
 | `extension-change-path.svg` | [`../00-index.md`](../00-index.md)（变更路径一节） |
-| `verification-layers.svg` | [`../01-new-extension-repository.md`](../01-new-extension-repository.md)（确定性证据与安装验证步骤） |
+| `verification-layers.svg` | [`../01-new-extension-repository.md`](../01-new-extension-repository.md)（确定性验证与安装验证步骤） |
 
 图内标注「语料综合框架」的组织图（如完成度阶梯）不是 Pi 官方分级；判别与合同类图示的内容均来自 `v1.0.3` 文档与机制。

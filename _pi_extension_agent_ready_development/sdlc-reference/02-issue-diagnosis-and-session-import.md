@@ -1,4 +1,4 @@
-# 02 issue 诊断与 session 交接
+# 02 issue 诊断与 session 接续
 
 pi-mono 把「诊断一个 issue」定义成两份合同：agent 侧行为合同（`.pi/prompts/is.md`）与执行环境合同（`.github/workflows/issue-analysis.yml`），中间用 session 导出/导入打通「CI 里跑过、本地接着干」。以下全部对照 tag `v1.0.3` 核对。
 

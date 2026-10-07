@@ -66,7 +66,7 @@ pi-mono 对没来过的 coding agent 的全部入口合同由两个文件承担�
 
 ## 贡献哲学与门槛
 
-`CONTRIBUTING.md` 的哲学段定义了核心范围纪律（主仓要求，详见 [06](./06-paved-road-and-costs.md)）：
+`CONTRIBUTING.md` 的哲学段定义了核心范围纪律（主仓要求，详见 [06](./06-scope-discipline-and-cost-contracts.md)）：
 
 > First things first: **pi's core is minimal**.
 >

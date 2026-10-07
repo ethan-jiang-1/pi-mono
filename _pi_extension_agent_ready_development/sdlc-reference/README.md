@@ -2,13 +2,15 @@
 
 本卷是面向「独立 Pi 扩展/package 仓作者与 coding agent」语料中的**精确参考层**。读者的问题不是「我该怎样开发」，而是：pi-mono 主仓的准入、检查、CI、测试、评审、发布各环节的精确条件、状态与例外是什么；哪些机制可以移用到独立扩展仓，哪些不随使用 Pi 自动继承。
 
-本卷只回答「在 pi-mono 中事实是什么」。结论如何移用由 [08-applicability-boundary.md](08-applicability-boundary.md) 统一划界；扩展仓自身的开发组织方式见语料卷一（[extension-development-model](../extension-development-model/README.md)），主仓作为 harness 的组织方式见卷三（[repo-harness](../repo-harness/README.md)）。
+本卷只回答「在 pi-mono 中事实是什么」。结论如何移用由 [08-applicability-boundary.md](08-applicability-boundary.md) 统一划界；扩展仓自身的开发组织方式见语料卷一（[extension-development-model](../extension-development-model/README.md)），主仓作为 harness 的组织方式见卷三（[repo-harness](../repo-harness/README.md)）。三卷彼此不构成前置阅读顺序。
 
 ## 证据基线
 
-一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.0.3) git tag `v1.0.3`（commit `d78dc83d6`）核对。引用任何 workflow、脚本或 `package.json` 行为时，均以该 tag 的文件版本与行号为准；正文链接钉在 `v1.0.3` 的 blob 路径上。当前 pi-mono 工作树在更晚的 HEAD，与 tag 存在机制漂移（例：tag 上环境工作流叫 `.github/workflows/durable-env.yml`，HEAD 已改名 `env.yml` 并拆出 `env-daemons.yml`）。本卷不使用 HEAD 内容描述机制；读工作树源码时以本卷的 tag 链接为准，不要把 HEAD 现状当作 v1.0.3 的事实。
+一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.0.3) git tag `v1.0.3`（commit `d78dc83d6`）核对。引用任何 workflow、脚本或 `package.json` 行为时，均以该 tag 的文件版本与行号为准；正文链接钉在 `v1.0.3` 的 blob 路径上。
 
-本卷不运行任何 build、test 或发布命令；全部结论来自对 tag 版本配置与代码的静态核对。
+当前 pi-mono 工作树在更晚的 HEAD，与 tag 存在机制漂移。已知例：tag 上环境工作流叫 `.github/workflows/durable-env.yml`（触发器是 `durable-env-*` 分支 push 与手动 dispatch），HEAD 已改名 `env.yml`（改为路径触发）并拆出可复用的 `env-daemons.yml`；tag 的 `ci.yml` 没有 pi-env daemon 构建步骤，HEAD 增加了；tag 的 `build-binaries.yml` 没有 env-daemons job，HEAD 增加了。本卷不使用 HEAD 内容描述机制；读工作树源码时以本卷的 tag 链接为准，不要把 HEAD 现状当作 v1.0.3 的事实。
+
+本卷不运行任何 build、test 或发布命令；全部结论来自对 tag 版本配置与代码的静态核对。需要自行核对时，用 `git show v1.0.3:<路径>` 读取 tag 版本（行号与正文锚点一致），不要直接读工作树文件。
 
 ## 阅读纪律
 
@@ -19,7 +21,7 @@
 - **扩展仓建议**：本语料归纳、供独立扩展仓选用的做法，不是 Pi 官方方法。
 - **仓库自定**：扩展仓自己的选择，Pi 与主仓均不代为决定。
 
-每页都写足「不能证明什么」：gate 通过不代表技术评审通过、CI 绿不代表全部质量面覆盖、发布脚本跑完不代表公告已生效。Pi 没有声明采用任何统一开发方法；本卷不把跨页综合写成 Pi 官方方法名。
+每页都写足「不能证明什么」：gate 通过不代表技术评审通过、CI 绿不代表全部质量面覆盖、发布脚本跑完不代表公告已生效。Pi 没有声明采用任何统一开发方法；本卷不把跨页综合写成 Pi 官方方法名，也不把语料的归纳当成主仓制度。
 
 ## 直接内容表
 
@@ -34,5 +36,6 @@
 | [06-review-and-human-role.md](06-review-and-human-role.md) | One Rule、评审缓冲、反推测性抽象原则、RFC 索引、AI 辅助与人的最终判断 |
 | [07-release-and-recovery.md](07-release-and-recovery.md) | lockstep 版本、release 脚本实际步骤、tag 发布管线、幂等发布与恢复 |
 | [08-applicability-boundary.md](08-applicability-boundary.md) | 哪些主仓治理不随使用 Pi 继承；扩展仓必须自定什么；可借的原则 |
+| [figures/](figures/README.md) | 本卷正文使用的 SVG 图示清单（检查分流图） |
 
-主入口是 [00-index.md](00-index.md)；不确定从哪页读起时先看它的导航表。
+主入口是 [00-index.md](00-index.md)；不确定从哪页读起时先看它的导航表，再按问题跳页。查一个精确条件时也可直接翻对应页，每页自成一体并给出回到机制出处的链接。

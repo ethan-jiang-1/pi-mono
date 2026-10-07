@@ -13,7 +13,7 @@
  * Prints the temporary directory location at exit.
  */
 
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -75,6 +75,25 @@ function mutate(name, fn) {
 	});
 	const { errors } = verifyCorpus(dir);
 	assert.ok(errors.some((e) => e.includes("_coverage: directory has no README.md")), `expected README rejection, got: ${errors.join("; ")}`);
+}
+
+// 6. SVG missing accessibility metadata is rejected.
+{
+	const dir = mutate("bad-svg", (d) => {
+		const file = join(d, "extension-development-model", "figures", "completion-ladder.svg");
+		writeFileSync(file, readFileSync(file, "utf8").replace('role="img"', ""));
+	});
+	const { errors } = verifyCorpus(dir);
+	assert.ok(errors.some((e) => e.includes('missing role="img"')), `expected SVG metadata rejection, got: ${errors.join("; ")}`);
+}
+
+// 7. Unreferenced figure is rejected.
+{
+	const dir = mutate("orphan-figure", (d) => {
+		writeFileSync(join(d, "extension-development-model", "figures", "orphan.svg"), "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" role=\"img\"><title>x</title><desc>x</desc></svg>\n");
+	});
+	const { errors } = verifyCorpus(dir);
+	assert.ok(errors.some((e) => e.includes("orphan.svg: figure is not referenced")), `expected orphan-figure rejection, got: ${errors.join("; ")}`);
 }
 
 console.log("All verify.mjs acceptance and rejection tests pass.");

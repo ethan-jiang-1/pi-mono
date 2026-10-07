@@ -12,7 +12,7 @@
 
 `createAgentSession()` 创建的会话拥有一段对话、模型与工具、排队消息、压缩状态和扩展运行时；`dispose()` 中止工作并使扩展上下文失效（运行时事实，见 [SDK 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sdk.md#L26-L60)）。
 
-## 二、载体：扩展、skill、prompt template、package
+## 二、资源类型：扩展、skill、prompt template、package
 
 - **扩展**：TypeScript 模块，默认导出接收 `ExtensionAPI` 的 factory。承载需要执行代码的能力：工具、命令、事件处理器、provider、MCP server、虚拟模型、渲染。运行在 Pi 进程内，拥有与用户相同的操作系统权限——只加载信任来源（运行时事实）。
 - **skill**：含 `SKILL.md` 的目录。启动时只把 name 与 description 加进系统提示；任务匹配时模型才读完整指令。可捆绑 scripts/references/assets。`description` 决定路由，要同时写「做什么」和「何时用」。`/skill:name` 强制加载；`disable-model-invocation` 关闭自动选择（运行时事实，见 [Skills 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md)）。
@@ -61,5 +61,5 @@ handler 按扩展加载与注册顺序运行；不同事件的能力不同（通
 ## 九、本语料自己的词
 
 - **完成度阶梯**：本语料对 Pi 机制归纳的七级交付区分（见[总览](./00-index.md#pi-native-完成度阶梯)），不是 Pi 文档中的术语。
-- **载体路由**：把每类变化放进其权威载体（扩展/skill/template/package）的做法，是本语料的综合。
+- **资源判别**：按 Pi 文档首段的判别口径选择资源类型，是本语料的综合。
 - **四类陈述**：运行时事实／主仓要求／扩展仓建议／仓库自定，见根 [README](../README.md)。

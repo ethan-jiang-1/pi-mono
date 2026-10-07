@@ -2,7 +2,7 @@
 
 `v1.0.3` 的 `.pi/prompts/` 下有六个 prompt template：`is`、`pr`、`wr`、`deslop`、`sa`、`cl`。它们把六类高频工作流写成文件，任何会话以 `/is`、`/pr` 等命令调用。本页先给总表，再逐个检视每个 prompt 划定的合同边界。**这些是主仓为自己定的工作流（主仓要求/仓库自定范畴）**：对 pi-mono 的贡献工作适用；独立扩展仓可以把它们当作自己工作流模板的参考（扩展仓建议）。
 
-prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` 命令，参数经 `$ARGUMENTS`/`$@` 等替换进入提示（[prompt-templates.md L3](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L3)）。载体的判别见 [04](./04-extension-points-map.md)。
+prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` 命令，参数经 `$ARGUMENTS`/`$@` 等替换进入提示（[prompt-templates.md L3](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L3)）。资源类型的判别见 [04](./04-extension-points-map.md)。
 
 ## 总表：六个合同
 

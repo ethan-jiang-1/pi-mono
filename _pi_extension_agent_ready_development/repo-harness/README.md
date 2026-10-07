@@ -25,10 +25,11 @@ git show v1.0.3:<path>
 | [Agent 入口规则](./01-agent-entry-rules.md) | 一个没来过的 agent 进入 pi-mono 后受哪些规则约束？ | `AGENTS.md`、`CONTRIBUTING.md` |
 | [Prompts 即程序性合同](./02-prompts-as-procedural-contracts.md) | `.pi/prompts/` 六个 prompt 各自划定的行为边界是什么？ | `.pi/prompts/is/pr/wr/deslop/sa/cl.md` |
 | [仓库 skills](./03-repo-skills.md) | 三个 skill 怎样封装跨多文件、跨阶段的专家程序？ | `.pi/skills/add-llm-provider/interactive-testing/release.md` |
-| [扩展点地图](./04-extension-points-map.md) | Pi 的可变性面有哪些，何时选哪种载体？ | `docs/extensions.md` 等九篇文档 |
+| [扩展点地图](./04-extension-points-map.md) | Pi 的可变性面有哪些，何时选哪种资源？ | `docs/extensions.md` 等九篇文档 |
 | [会话可检视性](./05-session-inspectability.md) | 会话文件合同与 `/ir` 如何让工作可复查、可续接？ | `docs/session-format.md`、`.pi/extensions/import-repro.ts` |
-| [铺装路与成本](./06-paved-road-and-costs.md) | 仓库怎样把正确路径做便宜、把偏离做显式？ | `CONTRIBUTING.md`、`scripts/check-entry-graphs.mjs` |
+| [范围纪律与成本合同](./06-scope-discipline-and-cost-contracts.md) | 仓库怎样把模糊的约束转写为会失败的检查？ | `CONTRIBUTING.md`、`scripts/check-entry-graphs.mjs` |
 | [Monorepo 分类](./07-monorepo-taxonomy.md) | `packages/` 下各包扮演什么角色，与扩展作者何干？ | 根 `README.md` 包表、各包 `README.md` |
+| [`figures/`](./figures/README.md) | 本卷正文使用的 SVG 图示清单（会话接续、成本合同） | — |
 
 ## 陈述类别
 
@@ -48,4 +49,4 @@ git show v1.0.3:<path> | sed -n '<N>p'
 
 ## 与其它卷的关系
 
-本卷只依赖 `v1.0.3` 一手来源，不依赖语料其它卷。扩展开发的概念载体与完整开发闭环见[扩展开发模型](../extension-development-model/README.md)；语料整体定位见[语料根 README](../README.md)。
+本卷只依赖 `v1.0.3` 一手来源，不依赖语料其它卷。扩展开发的概念与完整变更路径见[扩展开发模型](../extension-development-model/README.md)；语料整体定位见[语料根 README](../README.md)。

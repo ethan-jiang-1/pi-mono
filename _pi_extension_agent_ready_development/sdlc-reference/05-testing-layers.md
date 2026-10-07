@@ -34,7 +34,7 @@ pi-mono 的测试不是一个套件而是四层机制：运行隔离（test.sh�
 
 > For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.
 
-—— [interactive-testing.md](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/skills/interactive-testing.md#L18)
+—— [interactive-testing.md](https://github.com/earendil-works/pi/blob/v1.0.3/.pi/skills/interactive-testing.md#L19)
 
 即交互层 smoke 必须包含一次真实 prompt 与真实模型回复；只验证进程能启动、能渲染不算通过。这一层**要用**真实 provider（与第二层互补），因此有费用与非确定性，被放到发布前人工/半自动环节（[07 页](07-release-and-recovery.md)）而不是普通 CI。
 

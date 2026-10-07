@@ -8,14 +8,18 @@
  * - Markdown links: in-corpus relative targets must exist; fragments must match
  *   a heading slug in the target file; external links may only point to the
  *   pinned Pi baseline tag v1.0.3.
- * - Every directory in the corpus has a README.md.
+ * - Markdown image references must point to an existing .svg in a figures dir.
+ * - SVG figures: intrinsic size (width/height/viewBox), accessibility metadata
+ *   (role="img", <title>, <desc>), root <svg> element.
+ * - Every figure is referenced by at least one Markdown page; every directory
+ *   in the corpus has a README.md.
  *
- * Not checked: remote content, semantic accuracy, prose quality.
+ * Not checked: remote content, semantic accuracy, prose quality, visual layout.
  * Node built-ins only; locates the corpus from this file's own location.
  */
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const CORPUS_ROOT = resolve(dirname(fileURLToPath(import.meta.url)));
@@ -89,6 +93,21 @@ function stripCodeFences(markdown) {
 		.lines.join("\n");
 }
 
+function checkSvg(path, errors) {
+	const rel = relative(CORPUS_ROOT, path);
+	const text = readFileSync(path, "utf8");
+	const trimmed = text.trim();
+	if (!trimmed.startsWith("<svg ") || !trimmed.endsWith("</svg>")) {
+		errors.push(`${rel}: SVG must be a single root <svg> element`);
+		return;
+	}
+	for (const attr of ["xmlns=", "width=", "height=", "viewBox=", 'role="img"']) {
+		if (!text.includes(attr)) errors.push(`${rel}: SVG missing ${attr}`);
+	}
+	if (!text.includes("<title")) errors.push(`${rel}: SVG missing <title> (accessibility metadata)`);
+	if (!text.includes("<desc")) errors.push(`${rel}: SVG missing <desc> (accessibility metadata)`);
+}
+
 function checkFile(path, errors) {
 	const rel = relative(CORPUS_ROOT, path);
 	let bytes;
@@ -109,7 +128,27 @@ function checkFile(path, errors) {
 	if (!text.endsWith("\n")) errors.push(`${rel}: missing trailing newline`);
 	else if (text.endsWith("\n\n")) errors.push(`${rel}: more than one trailing newline`);
 
+	if (path.endsWith(".svg")) {
+		checkSvg(path, errors);
+		return;
+	}
 	if (!path.endsWith(".md")) return;
+
+	for (const match of stripCodeFences(text).matchAll(/!\[[^\]]*\]\(([^)\s]+)\)/g)) {
+		const target = match[1];
+		const resolved = resolve(dirname(path), target);
+		if (!target.endsWith(".svg")) {
+			errors.push(`${rel}: image reference must point to a .svg file: ${target}`);
+			continue;
+		}
+		if (!existsSync(resolved)) {
+			errors.push(`${rel}: image reference target does not exist: ${target}`);
+			continue;
+		}
+		if (!resolved.includes(`${sep}figures${sep}`)) {
+			errors.push(`${rel}: image reference must live in a figures directory: ${target}`);
+		}
+	}
 
 	const links = stripCodeFences(text).matchAll(/(?<!\!)\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g);
 	for (const match of links) {
@@ -154,8 +193,22 @@ export function verifyCorpus(root = CORPUS_ROOT) {
 			errors.push(`${relative(root, dir) || "."}: directory has no README.md`);
 		}
 	}
-	for (const file of listFiles(root)) {
+	const files = listFiles(root);
+	for (const file of files) {
 		checkFile(file, errors);
+	}
+	const referenced = new Set();
+	for (const file of files) {
+		if (!file.endsWith(".md")) continue;
+		const text = stripCodeFences(readFileSync(file, "utf8"));
+		for (const match of text.matchAll(/!\[[^\]]*\]\(([^)\s]+)\)/g)) {
+			referenced.add(resolve(dirname(file), match[1]));
+		}
+	}
+	for (const file of files) {
+		if (file.endsWith(".svg") && !referenced.has(file)) {
+			errors.push(`${relative(root, file)}: figure is not referenced by any Markdown page`);
+		}
 	}
 	return { ok: errors.length === 0, errors };
 }

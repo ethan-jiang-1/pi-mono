@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="640" viewBox="0 0 1000 640" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif">
+  <title id="title">Pi 扩展的完成度阶梯：七级必须分别观察</title>
+  <desc id="desc">七级阶梯从文件被加载、能力注册、行为真实发生、生命周期合同、多模式可用、干净安装到交付判断记录逐级上升；每一级右侧标注常见误判，任何一级缺失都不应被 CI 绿掩盖。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#2f8550"/></marker>
+  </defs>
+  <rect width="1000" height="640" fill="#ffffff"/>
+  <text x="500" y="38" text-anchor="middle" font-size="21" font-weight="700" fill="#172033">完成度阶梯：七级必须分别观察</text>
+  <text x="500" y="62" text-anchor="middle" font-size="12" fill="#5f6b7a">「扩展能用」不是一个结果；跳级声明（用第 1 级冒充第 3/6 级）是最常见的交付误判</text>
+
+  <g font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">
+    <rect x="30"  y="500" width="126" height="70" rx="7" fill="#6b7c93"/><text x="93"  y="524">1 · 文件被加载</text><text x="93"  y="544" font-weight="400" font-size="10" fill="#e7edf4">factory 执行</text><text x="93"  y="560" font-weight="400" font-size="10" fill="#e7edf4">无扩展错误</text>
+    <rect x="166" y="450" width="126" height="120" rx="7" fill="#5791c9"/><text x="229" y="474">2 · 能力已注册</text><text x="229" y="494" font-weight="400" font-size="10" fill="#e7edf4">pi config 可见</text><text x="229" y="510" font-weight="400" font-size="10" fill="#e7edf4">注册≠被调用</text>
+    <rect x="302" y="400" width="126" height="170" rx="7" fill="#3b9a91"/><text x="365" y="424">3 · 行为真实发生</text><text x="365" y="444" font-weight="400" font-size="10" fill="#e2f2f0">工具真实执行</text><text x="365" y="460" font-weight="400" font-size="10" fill="#e2f2f0">事件被派发</text><text x="365" y="476" font-weight="400" font-size="10" fill="#e2f2f0">经发现路径加载</text>
+    <rect x="438" y="350" width="126" height="220" rx="7" fill="#55a36f"/><text x="501" y="374">4 · 生命周期合同</text><text x="501" y="394" font-weight="400" font-size="10" fill="#e8f4ec">factory 不建长命资源</text><text x="501" y="410" font-weight="400" font-size="10" fill="#e8f4ec">清理幂等</text><text x="501" y="426" font-weight="400" font-size="10" fill="#e8f4ec">settled 边界正确</text><text x="501" y="442" font-weight="400" font-size="10" fill="#e8f4ec">faux 断言锁定</text>
+    <rect x="574" y="300" width="126" height="270" rx="7" fill="#8269bd"/><text x="637" y="324">5 · 多模式可用</text><text x="637" y="344" font-weight="400" font-size="10" fill="#efeaf8">tui · rpc · json · print</text><text x="637" y="360" font-weight="400" font-size="10" fill="#efeaf8">ctx.mode 守卫 UI</text><text x="637" y="376" font-weight="400" font-size="10" fill="#efeaf8">行为独立于渲染</text>
+    <rect x="710" y="250" width="126" height="320" rx="7" fill="#d99939"/><text x="773" y="274">6 · 干净环境可安装</text><text x="773" y="294" font-weight="400" font-size="10" fill="#fdf3e0">pi install 后复验</text><text x="773" y="310" font-weight="400" font-size="10" fill="#fdf3e0">peerDeps 正确</text><text x="773" y="326" font-weight="400" font-size="10" fill="#fdf3e0">声明无遗漏</text>
+    <rect x="846" y="200" width="126" height="370" rx="7" fill="#2f8550"/><text x="909" y="224">7 · 交付判断记录</text><text x="909" y="244" font-weight="400" font-size="10" fill="#e8f4ec">外部结果</text><text x="909" y="260" font-weight="400" font-size="10" fill="#e8f4ec">影响面</text><text x="909" y="276" font-weight="400" font-size="10" fill="#e8f4ec">验证与未验证项</text>
+  </g>
+  <path d="M60 570 L880 170" stroke="#2f8550" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="430" y="560" font-size="11" fill="#2f8550" transform="rotate(-19 430 560)">交付可信度逐级上升</text>
+
+  <rect x="30" y="596" width="940" height="30" rx="6" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="500" y="616" text-anchor="middle" font-size="11" fill="#526175">验证方式：1-2 启动诊断 · 3-4 faux provider 断言 · 5 真实交互 · 6 干净安装 · 7 交付记录｜来源：综合自 earendil-works/pi v1.0.3 扩展运行时合同</text>
+</svg>

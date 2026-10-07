@@ -30,9 +30,9 @@ pi-mono 的规则假设读者是零上下文到达的 agent：规则集中在仓
 
 这立场的可借鉴内核是：把反复执行的工作流程写成 prompt/skill 文件、把工作记录写成可机读格式，让程序性知识随仓库版本化，而不是随人员流失（扩展仓建议）。
 
-### 立场三：参与成本与边界显式化
+### 立场三：门槛与成本显式化
 
-pi-mono 把「谁可以参与、参与什么、贵不贵」全部显式化：新贡献者的 issue 与 PR 默认自动关闭，须经维护者 `lgtm` 解锁（[01](./01-agent-entry-rules.md)）；不属于核心的能力应做成扩展，膨胀核心的 PR 可能被拒（[06](./06-paved-road-and-costs.md)）；连「这个入口会拖进多大的模块图」都被脚本定义为预算（[06](./06-paved-road-and-costs.md)）。模糊的社会性约束（「请保持核心精简」）被转写为可检查、可拒绝的边界。
+pi-mono 把「谁能进来、进什么、成本多少」全部显式化：新贡献者的 issue 与 PR 默认自动关闭，须经维护者 `lgtm` 解锁（[01](./01-agent-entry-rules.md)）；不属于核心的能力应做成扩展，膨胀核心的 PR 可能被拒（[06](./06-scope-discipline-and-cost-contracts.md)）；连「这个入口会拖进多大的模块图」都被脚本定义为预算（[06](./06-scope-discipline-and-cost-contracts.md)）。模糊的社会性约束（「请保持核心精简」）被转写为可检查、可拒绝的边界。
 
 这立场的可借鉴内核是：把维护带宽、代码体积与上下文开销当作真实成本，用制度而不是提醒来控制（扩展仓建议）。
 
@@ -47,7 +47,7 @@ pi-mono 把「谁可以参与、参与什么、贵不贵」全部显式化：新
 | `.pi/skills/`（add-llm-provider/interactive-testing/release） | 三项专家程序 | [03](./03-repo-skills.md) |
 | `packages/coding-agent/docs/`（九篇机制文档） | 可变性面的官方定义 | [04](./04-extension-points-map.md) |
 | `docs/session-format.md`、`.pi/extensions/import-repro.ts` | 会话账本与续接 | [05](./05-session-inspectability.md) |
-| `scripts/check-entry-graphs.mjs`、贡献门槛 | 范围纪律与成本预算 | [06](./06-paved-road-and-costs.md) |
+| `scripts/check-entry-graphs.mjs`、贡献门槛 | 范围纪律与成本预算 | [06](./06-scope-discipline-and-cost-contracts.md) |
 | `packages/`（13 个包） | 依赖面与发布面 | [07](./07-monorepo-taxonomy.md) |
 
 仓库还有第四类 `.pi/` 资产——`.pi/extensions/` 下的运行时扩展（如 `import-repro.ts` 注册的 `/ir`）——它们不在本卷单独立页，在 [05](./05-session-inspectability.md) 中作为会话续接机制检视。
@@ -56,12 +56,12 @@ pi-mono 把「谁可以参与、参与什么、贵不贵」全部显式化：新
 
 | 你要做的事 | 先看 | 补充 |
 |---|---|---|
-| 让 agent 进入我的仓库干活 | [Agent 入口规则](./01-agent-entry-rules.md) | [06](./06-paved-road-and-costs.md) 的成本视角 |
+| 让 agent 进入我的仓库干活 | [Agent 入口规则](./01-agent-entry-rules.md) | [06](./06-scope-discipline-and-cost-contracts.md) 的成本视角 |
 | 组织 issue 分析 / PR 审查 / 收尾提交 | [Prompts 即程序性合同](./02-prompts-as-procedural-contracts.md) | [01](./01-agent-entry-rules.md) 的命令与 git 纪律 |
-| 封装一项多步骤专家流程 | [仓库 skills](./03-repo-skills.md) | [04](./04-extension-points-map.md) 的载体判别 |
-| 决定一个能力做成扩展还是 skill | [扩展点地图](./04-extension-points-map.md) | [06](./06-paved-road-and-costs.md) 的范围纪律 |
+| 封装一项多步骤专家流程 | [仓库 skills](./03-repo-skills.md) | [04](./04-extension-points-map.md) 的资源判别 |
+| 决定一个能力做成扩展还是 skill | [扩展点地图](./04-extension-points-map.md) | [06](./06-scope-discipline-and-cost-contracts.md) 的范围纪律 |
 | 让工作过程可复查、可移交 | [会话可检视性](./05-session-inspectability.md) | [02](./02-prompts-as-procedural-contracts.md) 的 `/is`、`/pr` |
-| 控制仓库膨胀与维护负担 | [铺装路与成本](./06-paved-road-and-costs.md) | [01](./01-agent-entry-rules.md) 的贡献门槛 |
+| 控制仓库膨胀与维护负担 | [范围纪律与成本合同](./06-scope-discipline-and-cost-contracts.md) | [01](./01-agent-entry-rules.md) 的贡献门槛 |
 | 理解依赖面与宿主提供的包 | [Monorepo 分类](./07-monorepo-taxonomy.md) | [04](./04-extension-points-map.md) 的 package 分发 |
 
 ## 不能证明什么

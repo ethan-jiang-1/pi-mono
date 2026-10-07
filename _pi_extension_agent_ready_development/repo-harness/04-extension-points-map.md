@@ -1,12 +1,12 @@
 # 扩展点地图：Pi 的可变性面
 
-Pi 把「可以改什么」集中定义在 `v1.0.3` 的 `packages/coding-agent/docs/` 下：`extensions.md`、`skills.md`、`prompt-templates.md`、`themes.md`、`mcp.md`、`codemode.md`、`custom-provider.md`、`virtual-models.md`、`packages.md`。本页给出这张地图的全貌与载体判别。**除特别标注外均为运行时事实**——它们对所有 Pi 用户与扩展作者同等有效，与 pi-mono 自身的贡献制度无关。
+Pi 把「可以改什么」集中定义在 `v1.0.3` 的 `packages/coding-agent/docs/` 下：`extensions.md`、`skills.md`、`prompt-templates.md`、`themes.md`、`mcp.md`、`codemode.md`、`custom-provider.md`、`virtual-models.md`、`packages.md`。本页给出这张地图的全貌与资源类型判别。**除特别标注外均为运行时事实**——它们对所有 Pi 用户与扩展作者同等有效，与 pi-mono 自身的贡献制度无关。
 
 注意：`extensions.md`、`mcp.md`、`codemode.md` 三个文件在 `v1.0.3` 之后的工作树中已有修改（见文末漂移注记）；本页一律引用 tag 版本。
 
 ## 首要判别：需要什么就用什么
 
-三个主要载体的判别写在各自文档首段：
+三种主要资源类型的判别写在各自文档首段：
 
 > Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.
 >

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif">
+  <title id="title">会话接续：CI 分析到本地续接</title>
+  <desc id="desc">pi-mono 的 issue 分析链：CI 在高熵目录运行 pi /is 真实模型诊断，session JSONL 导出为 secret gist 与 pi.dev 分享链接，/ir 命令导入本地并重写 cwd 后切换会话续接；导入搬运历史，不是确定性重放或环境恢复。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#475569"/></marker>
+  </defs>
+  <rect width="1120" height="520" fill="#ffffff"/>
+  <text x="560" y="38" text-anchor="middle" font-size="21" font-weight="700" fill="#172033">会话接续：CI 分析到本地续接</text>
+  <text x="560" y="62" text-anchor="middle" font-size="12" fill="#5f6b7a">分析的全部推理与工具调用可被本地接续，而不必复述结论（v1.0.3 机制）</text>
+
+  <rect x="30" y="120" width="180" height="120" rx="8" fill="#edf5ff" stroke="#5791c9" stroke-width="1.5"/>
+  <text x="120" y="152" text-anchor="middle" font-size="13.5" font-weight="700" fill="#173f67">GitHub issue</text>
+  <text x="120" y="180" text-anchor="middle" font-size="10.5" fill="#526175">加 pi-analyze 标签</text>
+  <text x="120" y="200" text-anchor="middle" font-size="10.5" fill="#526175">或 staff 评论</text>
+  <text x="120" y="220" text-anchor="middle" font-size="10.5" fill="#39709f">@issuron analyze</text>
+
+  <rect x="250" y="120" width="200" height="120" rx="8" fill="#f3efff" stroke="#8269bd" stroke-width="1.5"/>
+  <text x="350" y="146" text-anchor="middle" font-size="13.5" font-weight="700" fill="#513b85">CI：pi /is</text>
+  <text x="350" y="170" text-anchor="middle" font-size="10.5" fill="#526175">高熵目录 pi-ci-&lt;32hex&gt;</text>
+  <text x="350" y="190" text-anchor="middle" font-size="10.5" fill="#526175">真实模型 · --approve</text>
+  <text x="350" y="210" text-anchor="middle" font-size="10.5" fill="#675293">独立诊断 · 只提议不实现</text>
+
+  <rect x="490" y="120" width="200" height="120" rx="8" fill="#eaf7f6" stroke="#3b9a91" stroke-width="1.5"/>
+  <text x="590" y="146" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1d5f59">session JSONL</text>
+  <text x="590" y="170" text-anchor="middle" font-size="10.5" fill="#526175">树结构 · append-only</text>
+  <text x="590" y="190" text-anchor="middle" font-size="10.5" fill="#526175">消息 · 工具调用 · 声明变化</text>
+  <text x="590" y="210" text-anchor="middle" font-size="10.5" fill="#2f7770">转 HTML 一并导出</text>
+
+  <rect x="730" y="120" width="200" height="120" rx="8" fill="#fff5e6" stroke="#d99939" stroke-width="1.5"/>
+  <text x="830" y="146" text-anchor="middle" font-size="13.5" font-weight="700" fill="#744408">secret gist</text>
+  <text x="830" y="170" text-anchor="middle" font-size="10.5" fill="#805915">pi.dev/session 分享链接</text>
+  <text x="830" y="190" text-anchor="middle" font-size="10.5" fill="#805915">issue 评论附接续指令</text>
+  <text x="830" y="210" text-anchor="middle" font-size="10.5" fill="#b3662a">pi "/ir &lt;gist-id&gt;"</text>
+
+  <rect x="970" y="120" width="120" height="120" rx="8" fill="#edf8f1" stroke="#55a36f" stroke-width="1.5"/>
+  <text x="1030" y="146" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1f6139">本地</text>
+  <text x="1030" y="170" text-anchor="middle" font-size="10.5" fill="#526175">/ir 导入</text>
+  <text x="1030" y="190" text-anchor="middle" font-size="10.5" fill="#526175">cwd 重写</text>
+  <text x="1030" y="210" text-anchor="middle" font-size="10.5" fill="#1f6139">切换续接</text>
+
+  <path d="M210 180 H246" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M450 180 H486" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M690 180 H726" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M930 180 H966" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="250" y="286" width="840" height="76" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="670" y="312" text-anchor="middle" font-size="12.5" font-weight="700" fill="#27364a">/ir 的导入动作（import-repro.ts）</text>
+  <text x="670" y="336" text-anchor="middle" font-size="10.5" fill="#526175">gist id / URL / pi.dev 链接 / issue URL / 本地 .jsonl 或 .html 都可作输入 · 已存在时先确认覆盖</text>
+  <text x="670" y="352" text-anchor="middle" font-size="10.5" fill="#526175">CI 目录名与 Windows 路径变体被字符串级替换为本地路径 · 跨平台接续注入披露消息</text>
+  <path d="M1030 240 V286" stroke="#475569" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="30" y="396" width="1060" height="60" rx="8" fill="#fdf0ef" stroke="#c25550"/>
+  <text x="560" y="420" text-anchor="middle" font-size="12" font-weight="700" fill="#7a2a26">边界：导入 ≠ 重放 ≠ 环境恢复</text>
+  <text x="560" y="442" text-anchor="middle" font-size="10.5" fill="#7a2a26">只搬运对话历史与 cwd 字符串；文件内容、命令结果、凭据与环境状态不随之而来，历史结论须重新验证</text>
+
+  <text x="560" y="496" text-anchor="middle" font-size="11" fill="#5f6b7a">来源：earendil-works/pi v1.0.3 · .github/workflows/issue-analysis.yml · .pi/prompts/is.md · .pi/extensions/import-repro.ts · docs/session-format.md</text>
+</svg>

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif">
+  <title id="title">资源判别：Pi 的四种可变性资源</title>
+  <desc id="desc">从用户可观察的外部结果出发，按 Pi 文档首段的判别口径，把变化分别放进扩展、skill 或 prompt template；package 是把多种资源一体分发的运输容器。ResourceLoader 统一发现并加载这些资源。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#475569"/></marker>
+  </defs>
+  <rect width="960" height="560" fill="#ffffff"/>
+  <text x="480" y="38" text-anchor="middle" font-size="21" font-weight="700" fill="#172033">资源判别：Pi 的四种可变性资源</text>
+  <text x="480" y="62" text-anchor="middle" font-size="12" fill="#5f6b7a">判别依据 v1.0.3 各文档首段；错配资源类型不违反任何检查，但付出维护与上下文成本</text>
+
+  <rect x="330" y="86" width="300" height="56" rx="8" fill="#fff5e6" stroke="#d99939" stroke-width="1.5"/>
+  <text x="480" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#744408">外部结果：用户能观察到的变化</text>
+  <text x="480" y="130" text-anchor="middle" font-size="11" fill="#805915">触发条件 · 看到什么 · 失败行为 · 完成条件</text>
+  <path d="M480 142 V172" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M190 172 H770" stroke="#475569" stroke-width="1.5" fill="none"/>
+  <path d="M190 172 V196" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M480 172 V196" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M770 172 V196" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="40" y="200" width="300" height="128" rx="8" fill="#edf5ff" stroke="#5791c9"/>
+  <text x="190" y="228" text-anchor="middle" font-size="14" font-weight="700" fill="#173f67">扩展 Extension</text>
+  <text x="190" y="252" text-anchor="middle" font-size="11" fill="#526175">需要可执行行为，而不是指令</text>
+  <text x="190" y="274" text-anchor="middle" font-size="11" fill="#526175">工具 · 命令 · 事件 · provider · MCP</text>
+  <text x="190" y="296" text-anchor="middle" font-size="11" fill="#526175">虚拟模型 · 终端渲染</text>
+  <text x="190" y="318" text-anchor="middle" font-size="11" fill="#39709f">同进程同权限运行，只加载信任来源</text>
+
+  <rect x="380" y="200" width="200" height="128" rx="8" fill="#f3efff" stroke="#8269bd"/>
+  <text x="480" y="228" text-anchor="middle" font-size="14" font-weight="700" fill="#513b85">skill</text>
+  <text x="480" y="252" text-anchor="middle" font-size="11" fill="#526175">领域工作方法 + 配套资产</text>
+  <text x="480" y="274" text-anchor="middle" font-size="11" fill="#526175">scripts · references · assets</text>
+  <text x="480" y="296" text-anchor="middle" font-size="11" fill="#526175">启动只入名字与描述</text>
+  <text x="480" y="318" text-anchor="middle" font-size="11" fill="#675293">description 决定按需加载</text>
+
+  <rect x="620" y="200" width="300" height="128" rx="8" fill="#eaf7f6" stroke="#3b9a91"/>
+  <text x="770" y="228" text-anchor="middle" font-size="14" font-weight="700" fill="#1d5f59">prompt template</text>
+  <text x="770" y="252" text-anchor="middle" font-size="11" fill="#526175">固定的 / 提示命令，无执行行为</text>
+  <text x="770" y="274" text-anchor="middle" font-size="11" fill="#526175">文件名即命令名 · 参数展开</text>
+  <text x="770" y="296" text-anchor="middle" font-size="11" fill="#526175">$1 · $@ · 默认值</text>
+  <text x="770" y="318" text-anchor="middle" font-size="11" fill="#2f7770">最小、最轻的可变性面</text>
+
+  <path d="M190 328 V372" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M480 328 V372" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M770 328 V372" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="40" y="376" width="880" height="104" rx="10" fill="#edf8f1" stroke="#55a36f" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="480" y="404" text-anchor="middle" font-size="14" font-weight="700" fill="#1f6139">Pi package：运输容器，不是第五种能力</text>
+  <text x="480" y="428" text-anchor="middle" font-size="11" fill="#526175">把 extensions + skills + prompt templates + themes 作为整体，经 npm / git / 本地路径分发</text>
+  <text x="480" y="450" text-anchor="middle" font-size="11" fill="#526175">约定目录或 pi manifest 声明；pi-package keyword 进入 gallery</text>
+  <text x="480" y="472" text-anchor="middle" font-size="11" fill="#1f6139">host 提供的五个包放 peerDependencies，绝不打包</text>
+
+  <text x="480" y="516" text-anchor="middle" font-size="11" fill="#5f6b7a">ResourceLoader 统一发现并加载资源 · 来源：earendil-works/pi v1.0.3 · extensions.md / skills.md / prompt-templates.md / packages.md</text>
+</svg>

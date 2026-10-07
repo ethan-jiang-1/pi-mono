@@ -2,6 +2,8 @@
 
 pi-mono 的质量检查不是单一「全仓检查」按钮，而是按事件与路径分流的一组工作流。回答「CI 是否通过」之前先问「哪个 CI、哪个 job、什么触发」。以下全部对照 tag `v1.0.3` 核对（工作树 HEAD 已有改名/增步漂移，见 [README](README.md) 证据基线）。
 
+![检查分流：哪个触发器跑哪些检查](./figures/trigger-routing.svg)
+
 ## 主 CI：ci.yml
 
 触发：push 到 `main`、面向 `main` 的 PR（[ci.yml](https://github.com/earendil-works/pi/blob/v1.0.3/.github/workflows/ci.yml#L3-L7)）。两个 job：

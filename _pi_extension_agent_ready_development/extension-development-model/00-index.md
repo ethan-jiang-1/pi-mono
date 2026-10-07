@@ -1,14 +1,14 @@
-# Pi 扩展开发模型：载体、证据与交付判断
+# Pi 扩展开发模型：资源、验证与交付判断
 
 ## 这卷解决什么问题
 
-新建独立 Pi 扩展仓后，最容易出现的不是不会写 `pi.registerCommand()`，而是不知道怎样把用户意图、扩展实现、package 声明、测试证据和交付判断连成一条可复查的链。本卷给出一张 Pi-native 的总地图：变更落在哪个载体，哪种验证能证明什么，以及为什么「扩展能加载」「工具能执行」「干净环境能安装」是三个必须分别观察的结果。
+新建独立 Pi 扩展仓后，最容易出现的不是不会写 `pi.registerCommand()`，而是不知道怎样把用户意图、扩展实现、package 声明、测试证据和交付判断连成一条可复查的链。本卷给出一张 Pi-native 的总地图：变更落在哪种资源类型，哪种验证能证明什么，以及为什么「扩展能加载」「工具能执行」「干净环境能安装」是三个必须分别观察的结果。
 
 这是依据 Pi `v1.0.3` 源码、文档与示例归纳出的开发模型，不是 Pi 官方宣布的方法名，也不是扩展仓必须复制的主仓库制度。正文区分运行时事实、主仓要求、扩展仓建议与仓库自定；扩展仓自行决定治理规则与验证适配。
 
 ## 一页总览：四个层次不要混成一件事
 
-独立扩展开发同时面对四个层次。运行时接口回答「扩展怎样被加载、事件怎样流动」；仓库结构回答「源码、依赖和文档怎样组织」；发布形态回答「用户安装什么」；治理规则回答「谁评审、哪些检查必须通过」。Pi 的文档定义了运行时接口和组合机制，独立扩展仓需要为自己的仓库结构、发布形态和治理规则指定 owner。
+独立扩展开发同时面对四个层次。运行时接口回答「扩展怎样被加载、事件怎样流动」；仓库结构回答「源码、依赖和文档怎样组织」；发布形态回答「用户安装什么」；治理规则回答「谁评审、哪些检查必须通过」。Pi 的文档定义了运行时接口和组合机制，独立扩展仓需要为自己的仓库结构、发布形态和治理规则指定权威维护位置。
 
 | 层次 | 主要问题 | Pi 能直接提供什么 | 扩展仓仍需自己决定什么 |
 |---|---|---|---|
@@ -23,6 +23,8 @@
 
 Pi 的扩展机制把「工作」分成多个可分别观察的等级。评估一次交付时，逐级问「这级被观察过吗」：
 
+![Pi 扩展的完成度阶梯](./figures/completion-ladder.svg)
+
 | 等级 | 观察什么 | 常见误判 |
 |---|---|---|
 | 1. 文件被加载 | factory 被执行、无扩展错误报告 | 加载成功不等于任何能力注册成功 |
@@ -33,9 +35,11 @@ Pi 的扩展机制把「工作」分成多个可分别观察的等级。评估�
 | 6. 干净环境可安装 | `pi install` 到干净 agent dir 后同等可用，host 包走 `peerDependencies` | 开发目录能跑不代表 package 声明完整、依赖未漏 |
 | 7. 交付判断记录 | 外部结果、影响面、验证命令、未验证项写进交付说明 | 任何一级的缺失都不应被「CI 绿了」掩盖 |
 
-阶梯上每级都有 Pi 自己的验证载体：faux provider 断言事件与状态合同（第 3、4 级）、真实交互验证（第 3、5 级）、干净安装验证（第 6 级）。见[新仓起步](./01-new-extension-repository.md)的具体做法。
+阶梯上每级都有 Pi 自己的验证方式：faux provider 断言事件与状态合同（第 3、4 级）、真实交互验证（第 3、5 级）、干净安装验证（第 6 级）。见[新仓起步](./01-new-extension-repository.md)的具体做法。
 
-## Pi-native 闭环
+## Pi-native 变更路径
+
+![一次扩展变更的完整路径](./figures/extension-change-path.svg)
 
 ### 1. 先定义外部结果
 
@@ -47,18 +51,20 @@ Pi 的扩展机制把「工作」分成多个可分别观察的等级。评估�
 
 意图可以放在 issue、任务说明或 commit 说明里；它回答「为什么改、怎样算完成」，不拥有当前 API 或长期设计理由。扩展仓不必复制 pi-mono 的 issue 制度，只需让自己的任务入口能表达可观察结果。
 
-### 2. 把变更路由到正确的载体
+### 2. 把变更放进正确的资源类型
 
-Pi 用不同载体承载不同种类的变化，这是它的「一个事实一个家」在扩展层的形态：
+Pi 用不同的资源类型承载不同种类的变化，`ResourceLoader` 统一发现并加载它们：
 
-| 变化种类 | 首选载体 | 判别 |
+![资源判别：Pi 的四种可变性资源](./figures/resource-decision.svg)
+
+| 变化种类 | Pi 原生资源 | 判别 |
 |---|---|---|
 | 需要执行代码的行为 | 扩展（工具、命令、事件、provider、MCP、渲染） | 「needs … rather than instructions alone」 |
 | 领域工作方法 + 配套脚本/参考文件 | skill | 比 prompt template 需要更多上下文，但不需要新执行点 |
 | 固定的可复用提示命令 | prompt template | 同一 prompt 反复使用，无需执行行为 |
 | 多个资源作为整体分发 | package | 经 npm/git 共享，或多个资源属于一体 |
 
-载体判别来自 Pi 的 [Extensions](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L3)、[Skills](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md#L3-L5) 与 [Prompt Templates](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L3) 文档首段；错配载体（例如把一堆指令写成扩展）不违反任何检查，但会付出维护与上下文成本。
+资源判别来自 Pi 的 [Extensions](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/extensions.md#L3)、[Skills](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/skills.md#L3-L5) 与 [Prompt Templates](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/prompt-templates.md#L3) 文档首段；错配资源类型（例如把一堆指令写成扩展）不违反任何检查，但会付出维护与上下文成本。
 
 ### 3. 遵守运行时生命周期合同
 
@@ -71,11 +77,11 @@ Pi 用不同载体承载不同种类的变化，这是它的「一个事实一�
 
 违反这些合同的扩展往往在「手动跑一次」时看起来正常，在并发、取消或无头模式下失败。
 
-### 4. 形成完整的垂直切片
+### 4. 形成完整的一笔交付
 
 完整切片不是「代码加一个绿测试」，而是把这笔变更影响到的实现、package 声明、用户文档、行为证据一起交付。切片边界由用户行为决定，不由文件数量决定：一个新工具如果改变了 `/help` 可见的行为，它的 README 段落、package manifest 条目和验证证据都属于同一笔交付。
 
-### 5. 让证据观察真实对象
+### 5. 按观察对象选择验证方式
 
 测试层按观察对象分工，不是固定的 test-first 顺序（扩展仓建议，依据 Pi 的可复用机制）：
 
@@ -94,7 +100,7 @@ Pi 主仓库的测试套件是这套分层的参考实现：它用发布的 `@ea
 
 ### 7. 用交付判断收尾
 
-交付记录列出：外部结果、影响面（哪些载体变了）、实际运行的验证与结果、明确未执行的检查。机器断言通过只说明它执行的断言通过；「扩展在某次会话里看起来能用」不构成第 3 级以上的证据。评审者（人或 agent）重新读取当前 diff、当前声明和当前文档，不沿用旧结论。
+交付记录列出：外部结果、影响面（哪些资源变了）、实际运行的验证与结果、明确未执行的检查。机器断言通过只说明它执行的断言通过；「扩展在某次会话里看起来能用」不构成第 3 级以上的证据。评审者（人或 agent）重新读取当前 diff、当前声明和当前文档，不沿用旧结论。
 
 ## 最重要的注意事项
 
@@ -120,15 +126,15 @@ JSON、print 模式没有 UI；RPC 模式不能转发自定义终端组件。用
 
 ### 不要把主仓治理当默认答案
 
-pi-mono 的准入 gate、CI 矩阵与发布管线服务于它自己的仓库规模与风险。扩展仓借鉴其原则（例如「每个行为变化要有能在其回归时失败的最小检查」），但必须为自己的规模定义 owner 与门槛。适用边界见 [SDLC Reference 的边界页](../sdlc-reference/README.md)。
+pi-mono 的准入 gate、CI 矩阵与发布管线服务于它自己的仓库规模与风险。扩展仓借鉴其原则（例如「每个行为变化要有能在其回归时失败的最小检查」），但必须为自己的规模定义权威位置与门槛。适用边界见 [SDLC Reference 的边界页](../sdlc-reference/08-applicability-boundary.md)。
 
 ## 从新仓库开始
 
-一个合理的第一笔交付是：一种可观察行为、一个明确的载体、一条经真实发现与加载的运行路径、一条在回归时会失败的证据、一份说明当前用法的 README，以及一次干净安装验证。具体路径见[新仓起步](./01-new-extension-repository.md)；术语先查[术语与心智模型](./02-terms-and-mental-models.md)。
+一个合理的第一笔交付是：一种可观察行为、一种明确的资源类型、一条经真实发现与加载的运行路径、一条在回归时会失败的证据、一份说明当前用法的 README，以及一次干净安装验证。具体路径见[新仓起步](./01-new-extension-repository.md)；术语先查[术语与心智模型](./02-terms-and-mental-models.md)。
 
 ## 相关入口
 
 - [新仓起步](./01-new-extension-repository.md)：从最小扩展走到 package 分发与交付判断。
-- [术语与心智模型](./02-terms-and-mental-models.md)：运行时、载体、发现、验证词汇。
+- [术语与心智模型](./02-terms-and-mental-models.md)：运行时、资源类型、发现、验证词汇。
 - [SDLC Reference](../sdlc-reference/00-index.md)：pi-mono 的准入、检查、CI、发布精确条件。
 - [Development Harness](../repo-harness/00-index.md)：pi-mono 自身的 agent 参与组织。

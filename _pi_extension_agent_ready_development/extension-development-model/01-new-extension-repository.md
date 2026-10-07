@@ -45,6 +45,8 @@ Pi 用 `jiti` 加载本地 TypeScript 扩展，不需要单独编译步骤（运
 
 ## 4. 确定性证据（阶梯 4）
 
+![验证分层：每种验证只证明它观察的对象](./figures/verification-layers.svg)
+
 为扩展写不依赖真实 API 的语义测试。Pi 的发布包提供了所需的部件：`@earendil-works/pi-ai/compat` 导出 faux provider（`registerFauxProvider`、`streamSimple`），SDK 的 `createAgentSession` 允许注入 `modelRuntime`、`resourceLoader` 与 in-memory `SessionManager`（运行时事实，见 [SDK 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/sdk.md#L96-L118)）。
 
 pi-mono 的测试套件是参考实现：真实 `AgentSession` + 真实 ResourceLoader 发现路径 + 脚本化 provider 响应，断言公开事件序列（例如自动重试后恰好一次 `agent_settled` 且 `isIdle()` 为 true）。在 [test/suite/harness.ts](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/test/suite/harness.ts) 读它的组装方式，在自己的仓库用发布的包复刻同样的分层。
@@ -86,7 +88,7 @@ pi list
 交付记录回答四件事：
 
 1. 外部结果：用户现在能做什么之前做不到的事。
-2. 影响面：哪个载体的哪些文件变了。
+2. 影响面：哪类资源的哪些文件变了。
 3. 验证：实际运行的命令与结果（faux 断言、真实会话、干净安装各覆盖哪级）。
 4. 未验证项：明确列出（例如跨 provider 行为、多版本兼容、非 TUI 模式）。
 
@@ -103,5 +105,5 @@ pi list
 ## 相关入口
 
 - [术语与心智模型](./02-terms-and-mental-models.md)：本页出现的扩展运行时、发现、信任词汇。
-- [总览](./00-index.md)：四层区分、完成度阶梯与闭环。
+- [总览](./00-index.md)：四层区分、完成度阶梯与变更路径。
 - [SDLC Reference](../sdlc-reference/00-index.md)：需要核对 Pi 主仓某条精确规则时查阅。

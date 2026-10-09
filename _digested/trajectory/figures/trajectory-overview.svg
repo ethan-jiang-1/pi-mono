@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="680" viewBox="0 0 1240 680" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1240" height="680" fill="#f8fafc"/>
+  <text x="620" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">trajectory 专题总览 · 会话轨迹 = model-visible 状态的事实源</text>
+
+  <!-- ============ 左panel: 不变量链 ============ -->
+  <text x="300" y="70" text-anchor="middle" font-size="15" font-weight="700" fill="#1e3a8a">① 不变量链（01 篇）：请求从日志求值</text>
+  <rect x="60" y="86" width="480" height="560" rx="12" fill="#eff6ff" stroke="#bfdbfe"/>
+
+  <g font-size="12.5" fill="#0f172a">
+    <rect x="95" y="104" width="410" height="46" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="300" y="123" text-anchor="middle" font-weight="600">prompt sections + 工具注册</text>
+    <text x="300" y="141" text-anchor="middle" fill="#64748b">buildSystemPrompt() / AgentTool schema</text>
+
+    <rect x="95" y="176" width="410" height="56" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="300" y="197" text-anchor="middle" font-weight="600">system message（差量落盘）</text>
+    <text x="300" y="215" text-anchor="middle" fill="#64748b">sections patch（null 删）+ toolsAdded / toolsRemoved</text>
+
+    <rect x="95" y="258" width="410" height="56" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.6"/>
+    <text x="300" y="279" text-anchor="middle" font-weight="700">transcript = session.jsonl（append-only 树）</text>
+    <text x="300" y="297" text-anchor="middle" fill="#475569">message_end → appendMessage（agent-session.ts:1131）</text>
+
+    <rect x="95" y="340" width="410" height="56" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="300" y="361" text-anchor="middle" font-weight="600">buildSessionProjection() 折叠</text>
+    <text x="300" y="379" text-anchor="middle" fill="#64748b">压缩 checkpoint → context_edit 改写 → 平铺消息</text>
+
+    <rect x="95" y="422" width="410" height="56" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="300" y="443" text-anchor="middle" font-weight="600">declareToolChanges()（agent-loop.ts:323）</text>
+    <text x="300" y="461" text-anchor="middle" fill="#64748b">"replay always yields exactly context.tools"</text>
+
+    <rect x="95" y="504" width="410" height="56" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="300" y="525" text-anchor="middle" font-weight="600">Provider 请求</text>
+    <text x="300" y="543" text-anchor="middle" fill="#64748b">convertToLlm() ｜ before_provider_request = 最后断言点</text>
+  </g>
+
+  <g stroke="#475569" stroke-width="1.4" fill="none">
+    <line x1="300" y1="150" x2="300" y2="174" marker-end="url(#arr)"/>
+    <line x1="300" y1="232" x2="300" y2="256" marker-end="url(#arr)"/>
+    <line x1="300" y1="314" x2="300" y2="338" marker-end="url(#arr)"/>
+    <line x1="300" y1="396" x2="300" y2="420" marker-end="url(#arr)"/>
+    <line x1="300" y1="478" x2="300" y2="502" marker-end="url(#arr)"/>
+  </g>
+
+  <rect x="95" y="580" width="410" height="50" rx="8" fill="#fefce8" stroke="#fde047"/>
+  <text x="300" y="600" text-anchor="middle" font-size="12" font-weight="600" fill="#713f12">round-trip 合同测试（system-prompt-updates.test.ts:295）</text>
+  <text x="300" y="618" text-anchor="middle" font-size="12" fill="#a16207">"persisted JSON must replay to the same declarations"</text>
+
+  <text x="300" y="648" text-anchor="middle" font-size="12" fill="#475569">边界：账本级可重建（context 钩子变换 / 流事件不落盘）</text>
+
+  <!-- ============ 右panel: 录制-回放环 ============ -->
+  <text x="920" y="70" text-anchor="middle" font-size="15" font-weight="700" fill="#0f766e">② 录制-回放环（04 篇）：DIY 通路已实测</text>
+  <rect x="700" y="86" width="480" height="560" rx="12" fill="#f0fdfa" stroke="#99f6e4"/>
+
+  <g font-size="12.5" fill="#0f172a">
+    <rect x="750" y="104" width="380" height="46" rx="8" fill="#ffffff" stroke="#5eead4"/>
+    <text x="940" y="123" text-anchor="middle" font-weight="600">真会话运行（faux 驱动全真循环）</text>
+    <text x="940" y="141" text-anchor="middle" fill="#64748b">Phase 1 · SessionManager.create → 落盘 6 行轨迹</text>
+
+    <rect x="750" y="176" width="380" height="56" rx="8" fill="#ccfbf1" stroke="#14b8a6" stroke-width="1.6"/>
+    <text x="940" y="197" text-anchor="middle" font-weight="700">session.jsonl 入库（bug-report / /export 同源）</text>
+    <text x="940" y="215" text-anchor="middle" fill="#475569">system 行 = model-visible 状态；assistant 行 = 模型结算</text>
+
+    <rect x="750" y="258" width="380" height="56" rx="8" fill="#ffffff" stroke="#5eead4"/>
+    <text x="940" y="279" text-anchor="middle" font-weight="600">推导：assistant 结算 → FauxResponseStep[]</text>
+    <text x="940" y="297" text-anchor="middle" fill="#64748b">content 逐块 deep-equal（DSH llm-replay 思想的 Pi 版）</text>
+
+    <rect x="750" y="340" width="380" height="56" rx="8" fill="#ffffff" stroke="#5eead4"/>
+    <text x="940" y="361" text-anchor="middle" font-weight="600">SessionManager.open(path) + harness 无 key 续跑</text>
+    <text x="940" y="379" text-anchor="middle" fill="#64748b">Phase 3 · buildSessionContext() 灌 agent 态（sdk.ts:399）</text>
+
+    <rect x="750" y="422" width="380" height="56" rx="8" fill="#ffffff" stroke="#5eead4"/>
+    <text x="940" y="443" text-anchor="middle" font-weight="600">比对与重放一致</text>
+    <text x="940" y="461" text-anchor="middle" fill="#64748b">折叠序列 / getCurrentTools / before_provider_request</text>
+  </g>
+
+  <g stroke="#0f766e" stroke-width="1.4" fill="none">
+    <line x1="940" y1="150" x2="940" y2="174" marker-end="url(#arrb)"/>
+    <line x1="940" y1="232" x2="940" y2="256" marker-end="url(#arrb)"/>
+    <line x1="940" y1="314" x2="940" y2="338" marker-end="url(#arrb)"/>
+    <line x1="940" y1="396" x2="940" y2="420" marker-end="url(#arrb)"/>
+    <path d="M 1130 450 C 1190 430, 1190 150, 1132 128" marker-end="url(#arrb)"/>
+  </g>
+  <text x="1198" y="292" text-anchor="middle" font-size="11.5" fill="#0f766e" transform="rotate(90 1198 292)">append-only：新轮次落回同一文件（Phase 4 重开折叠一致）</text>
+
+  <rect x="750" y="500" width="182" height="66" rx="8" fill="#ffffff" stroke="#94a3b8"/>
+  <text x="841" y="521" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">DSH 一极：recorded</text>
+  <text x="841" y="539" text-anchor="middle" font-size="11.5" fill="#64748b">从录制推导脚本 · request/header pin</text>
+  <text x="841" y="556" text-anchor="middle" font-size="11.5" fill="#64748b">变更探测器 · 语料治理留在主仓</text>
+
+  <rect x="948" y="500" width="182" height="66" rx="8" fill="#ffffff" stroke="#94a3b8"/>
+  <text x="1039" y="521" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Pi 一极：authored</text>
+  <text x="1039" y="539" text-anchor="middle" font-size="11.5" fill="#64748b">faux 手写剧本 · 四类失败一等 API</text>
+  <text x="1039" y="556" text-anchor="middle" font-size="11.5" fill="#64748b">推导桥 = 本篇 DIY 通路</text>
+
+  <line x1="932" y1="533" x2="948" y2="533" stroke="#0f766e" stroke-width="1.6" marker-end="url(#arrb)" marker-start="url(#arrb)"/>
+
+  <rect x="750" y="584" width="380" height="50" rx="8" fill="#fefce8" stroke="#fde047"/>
+  <text x="940" y="604" text-anchor="middle" font-size="12" font-weight="600" fill="#713f12">按需启用（借 DSH #05 触发条件），默认不建</text>
+  <text x="940" y="622" text-anchor="middle" font-size="12" fill="#a16207">机制可以拿，语料治理不要抄</text>
+
+  <text x="920" y="652" text-anchor="middle" font-size="12" fill="#475569">风险清单：真实录制的模型重映射 / 噪声清洗 / 隐私 scrub 归 DIY 者</text>
+</svg>

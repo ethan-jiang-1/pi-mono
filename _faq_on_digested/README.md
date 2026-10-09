@@ -47,6 +47,7 @@ _faq_on_digested/
 - [`10_getting_started_first_extension/`](10_getting_started_first_extension/question.md) — 如何在 Pi 底下开发第一个插件/扩展？按诉求性质怎么选型与落地最合理？（性质推荐矩阵、三秒调试循环、五类模板、多轴门禁实战与工程避坑）
 - [`11_production_extension_repo_archetypes/`](11_production_extension_repo_archetypes/question.md) — 真实世界头部 Pi 扩展的工程架构与 Repo 组织解剖（866K 标杆逐案深度拆解：前后诉求、影响面、利用能力与代码逻辑结构）
 - [`12_pi_philosophy/`](12_pi_philosophy/question.md) — Pi 自己的理念是什么？（作者原生动机、核心纪律、上下文/会话/宿主选择、人的理解责任与自动恢复边界）
+- [`13_recorded_session_snapshots/`](13_recorded_session_snapshots/question.md) — Pi 里有没有 DSH「录制会话快照」的思想？（不变量同根实现两极：transcript 即请求源 vs request/header 录制；faux 全 authored 但四类失败覆盖三类半；轨迹资产的 DIY 夹具路径。**已升级**为 [`_digested/trajectory/`](../_digested/trajectory/README.md)，本目录保留研究过程归档）
 
 ## 引用规范
 

@@ -102,6 +102,7 @@ pi-mono 里需要严格区分两种 harness：
 - 想评价 pi 的结构优不优秀、好不好扩展：`harness/01-Architecture/`（1.1–1.4）+ `harness/02-Boundaries/`（2.1–2.4）
 - 想看 pi 开发有没有策略/纪律、自描述够不够：`harness/03-Discipline/`（3.1–3.4）+ `harness/04-Self-Description/`（4.1–4.4）
 - 想理解 Pi 自身的测试哲学、五级金字塔与零 Token 自动化测试体系：[`test-strategy/`](test-strategy/)
+- 想理解会话轨迹如何成为 model-visible 状态的事实源（不变量、session JSONL 形态、faux 表达力、录制回放 DIY 与 DSH 对照）：[`trajectory/`](trajectory/)
 
 ## 研究背后的期望
 
@@ -137,6 +138,7 @@ pi-mono 里需要严格区分两种 harness：
 | `composition/` | 配置哲学与用户决策 | 从设计哲学到配置决策的完整映射——五层框架、七条轴、AGENTS.md 设计艺术 |
 | `architecture-next/` | 新架构层（v0.85.x–1.0.0 演进） | chord/durable/server：组合运行时、持久化事实层（v1.0.0 接盘 harness/session/storage）、路由交换机（experimental） |
 | `test-strategy/` | 官方测试体系与工程纪律 | 强隔离沙箱、五级金字塔、Faux 驱动、TUI 无头、持久层恢复与评测分轨 |
+| `trajectory/` | 会话轨迹 | transcript 即 model-visible 状态：不变量链、session JSONL 形态、faux 表达力、录制回放 DIY（含 DSH 对照） |
 | `_change_log/` | 上游同步记录 | 每次 upstream 版本同步的变更摘要和影响评估 |
 
 ## 与同级目录的关系

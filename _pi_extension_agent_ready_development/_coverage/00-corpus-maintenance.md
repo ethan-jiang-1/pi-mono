@@ -140,3 +140,32 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 **口径必须与被核对象对齐，否则复核本身会制造假错误。** 本轮我在 `0007` 的"大删除清单"上犯了一次：用 `git show --numstat <commit>`（非重命名感知）得 109/30,899，据此判定原表的 101/28,721"系统性偏低"并改了它。实际原表用的是 `git diff -M v0.86.1 v1.0.0`（**重命名感知**）——101 已正确排除 **7 个 `R###` 重命名**到 `packages/durable/` 的文件（`tools/edit.ts`、`tools/write.ts` 等），`docs/` 的 64 亦正确排除了 2 个 `.diff` 与 1 个 `.zip`。**原表五行全部正确，是我的复核错了**，已全部回退，并在表下补"口径说明"记录正确方法，避免下一轮重蹈。
 
 **结论**：0010 报告的"Class 3 失配降至 0/1"**过于乐观**——机械扫描只能发现"数字与文件对不上"，发现不了"口径不同""订正未落地""结构性遗漏"。对抗性独立复核是必要的第二层，且必须由**无上下文**的执行者做，否则会继承同一套盲点。
+
+---
+
+## 0012 轮：全域锚点普查发现的 chord2 缺口
+
+**动机**：0011 的两个 subagent 复核的是我**指定给它们的文件**，因此继承了同一份"注意力预算"——没被点名的区域天然不会被查。本轮改用**全语料机械普查**来兜底：把三个目录里所有形如 `` `path/to/file.ts:NN` `` 的锚点全部抽出，对 `v1.2.0` 逐条解析（先按全路径，失败再按唯一后缀匹配以兼容语料"相对包根书写"的既有约定），检出两类硬错：**路径在 tag 上不存在**、**行号超出文件总行数**。
+
+**规模**：1,909 条锚点（已排除语料内部互引与 `_change_log`/`_coverage`），1,353 条当场通过。
+
+### 发现 1（实质）：`chord2` 重写未被 `extensions/2.5` 吸收
+
+`0104fef1e`（`feat(chord): replace the facet and service runtime with the chord2 host runtime`）在 v1.2.0 **整体替换**了 chord 的 facet/service 运行时。`packages/chord/CHANGELOG.md` 1.2.0 的 Breaking Changes 写得很明确：`defineService`、`createFacetHost`、`createRemoteServiceBinding`、`createStaticFacetLoader`、`combineFacetLoaders` 及 remote-service endpoint/provider/error/wire 助手**全部删除**，`packages/chord/src/api.ts` **整个文件消失**；旧的 `defineFacet`/`Facet`/`FacetLoader` 名字保留但语义换新为 typed host（`createHost`/`defineFacet`/`defineRegistry`）。
+
+**为什么 0009–0011 都漏了它**：0009 与 `_plan-1` 确实点过"facet/axis-8 集群 5 个文件"，但那轮标注的是**示例插件 `pi-example-plugin/` 的删除**（`7472cda0d`），不是**运行时替换**。两者是不同的提交、不同的失效面。`extensions/2.5` 因此拿到了一条"示例已删"的横幅就收工了，而它的**主体表格与锚点节全部还在按 v0.85.1 的 chord1 API 描述"chord 的现状"**——文中甚至明确写着"facet 轴的机制未变"。
+
+**已修 3 个文件**：
+- `extensions/02-Expansion/2.5_second_axis_facets.md`（改动最大）：新增 v1.2.0 横幅，**否定本文原有的"机制未变"结论**；"pecs vs 现状"对照表 5 行重写（`ServiceMode` 不是"缺 peer"而是**整个概念没了**，`definePeerService`/`onActivate` 同理）；状态表 `packages/chord` 行作废；锚点节 4 条删除线化并补 v1.2.0 现役锚点；例证 3 与"影响"第 4 条同步。
+- `composition/10_extension_axes/10i_process_axis.md`：锚点节同样的旧 `types.ts:60/206/227` 与 `api.ts:19/66/70/84/88` 删除线化。
+- `integration/07-chord-and-facets.md`：第 7 节表格里"chord 只有 `defineService()`"改为"v1.2.0 后连它也不存在"；另修正 `core/experimental.ts:4` → **`:2`**（该文件是本节少数**幸存者**，v1.2.0 仍在且全文仅 3 行）。
+
+### 发现 2（重要教训）：**一条订正把错误"传染"给了我**
+
+`extensions/2.5` 原有的一行断言是 **"chord 没有 manifest 字段；facet 是 `{ id, setup(env) }`"**。核实后**该断言本身是错的**：chord 有 `uses`——`FacetDefinition.uses?: readonly AnyContract[]`（`chord/src/host.ts:76`），`loader.ts:60` 实际读入 `{ name, setup, uses }`；缺的只有 `provides`。已改正并注明原判断有误。
+
+### 发现 3（方法论边界）：机械普查**能**发现行号越界，**不能**发现"路径存在但语义已换"
+
+本轮唯一的形式化硬错只有 1 条行号越界（`chord/src/types.ts:227`，该文件全文 79 行）。发现 1 之所以被发现，靠的**不是**越界检测，而是我顺着那一条越界锚点**读到了 `api.ts` 不存在**，再追到 CHANGELOG 才看清整片失效。换句话说：**"锚点存在性"检查对"名字保留、语义替换"这类重写是盲的**——`defineFacet` 在 v1.2.0 依然存在、行号也合法，只有读 CHANGELOG 才知道它的意思变了。
+
+> 这与 0009 留下的判断一致并进一步收窄：`verify.mjs` 查不了"链接目标被删/改名"，本轮证明**连"锚点行号普查"也查不了语义替换**。唯一可靠的是**读上游自己的 Breaking Changes 清单**——`packages/*/CHANGELOG.md` 是本区间被语料系统性低估的一手证据源（`packages/chord/CHANGELOG.md` 即为 v1.2.0 新增）。

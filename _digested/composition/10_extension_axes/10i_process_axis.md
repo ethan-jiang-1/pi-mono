@@ -56,10 +56,11 @@
 
 ## 锚点
 
-- `packages/chord/src/types.ts:60`（`ServiceMode`）、`:206`（`FacetEnvironment`）、`:227`（`setup(env)`）
-- `packages/chord/src/api.ts:19/66/70/84/88`：`createFacetHost` / `defineFacet` / `defineService` / `createRemoteServiceBinding` / `replicatedState`
-- `packages/coding-agent/examples/plugins/pi-example-plugin/`：活证据
-- `packages/agent/src/harness/context.ts`：chord 的 `Context`/`ContextKey` 已进非实验源码
+- ~~`packages/chord/src/types.ts:60`（`ServiceMode`）、`:206`（`FacetEnvironment`）、`:227`（`setup(env)`）~~ —— **v1.2.0 全部失效**（`types.ts` 现 79 行，`ServiceMode` 全树零命中）
+- ~~`packages/chord/src/api.ts:19/66/70/84/88`：`createFacetHost` / `defineFacet` / `defineService` / `createRemoteServiceBinding` / `replicatedState`~~ —— **`api.ts` 已删除**（`0104fef1e`）；`replicatedState` 保留在根导出，其余四个移除
+- **v1.2.0 现役锚点**：`packages/chord/src/host.ts:63`（`FacetApi`）/ `:74-78`（`FacetDefinition`，含 `uses`）/ `:85`（`defineFacet`）；`loader.ts:60`（`{ name, setup, uses }`）
+- ~~`packages/coding-agent/examples/plugins/pi-example-plugin/`：活证据~~ —— **v1.2.0 删除**（`7472cda0d`）
+- ~~`packages/agent/src/harness/context.ts`：chord 的 `Context`/`ContextKey` 已进非实验源码~~ —— **v1.0.0 删除**（`7fd478a2e`）
 - [`extensions/02-Expansion/2.5_second_axis_facets.md`](../../extensions/02-Expansion/2.5_second_axis_facets.md)：机制、术语碰撞、规格 vs 现状
 - [`composition/10_extension_axes/README.md`](./README.md)：前七轴总览
 - [`composition/12_security_boundaries.md`](../12_security_boundaries.md)：facet 投递路径的隔离方案（规格 + PoC）

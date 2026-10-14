@@ -181,7 +181,7 @@ pi.local.presentation-ui   {local:true}                              services/pr
 
 **【硬事实】** 带 `{local:true}` 的两个只在 presentation 进程本地，**不会出口到 RPC catalogue**（`experimental/services/README.md` 明说 "Presentation-only hookpoints such as `SlashCommands` are explicitly local and never enter an RPC catalogue."）。
 
-**【硬事实】** 唯一入口是 **repo checkout**：`PI_EXPERIMENTAL=1 ./pi-test.sh server|client`（`pi-test.sh` 末行把入口指向 `packages/coding-agent/src/experimental/cli.ts`）；门禁在 `experimental/commands.ts:94`，同时校验 `PI_EXPERIMENTAL=1`（`core/experimental.ts:4` 读的就是这个环境变量）与 `server`/`client` 子命令。**不在 npm 包、也不在 standalone binary 里** —— 发布的 `bin` 是 `dist/bundle/cli.js`（`packages/coding-agent/package.json`），走的是不含 experimental 的 `src/cli.ts`；`files` 还显式排除了 `dist/experimental` 与 `dist/cli/experimental`。
+**【硬事实】** 唯一入口是 **repo checkout**：`PI_EXPERIMENTAL=1 ./pi-test.sh server|client`（`pi-test.sh` 末行把入口指向 `packages/coding-agent/src/experimental/cli.ts`）；门禁在 `experimental/commands.ts:94`，同时校验 `PI_EXPERIMENTAL=1`（`core/experimental.ts:2` 读的就是这个环境变量——**该文件是本节少数幸存者**：v1.2.0 仍在，全文 3 行，`areExperimentalFeaturesEnabled()` 判断 `process.env.PI_EXPERIMENTAL === "1"`）与 `server`/`client` 子命令。**不在 npm 包、也不在 standalone binary 里** —— 发布的 `bin` 是 `dist/bundle/cli.js`（`packages/coding-agent/package.json`），走的是不含 experimental 的 `src/cli.ts`；`files` 还显式排除了 `dist/experimental` 与 `dist/cli/experimental`。
 
 ### 一个具体的示例插件
 
@@ -232,7 +232,7 @@ tui.ts        export default defineFacet({ id: ".../tui" })      —— use Slas
 |---|---|
 | 静态 `uses`/`provides`/`observes` manifest（§3，`:113-115`） | **没有**。chord 靠 setup 期的调用产生 ledger（`PLANNING.md:132`） |
 | `ServiceMode = "singleton" \| "keyed" \| "peer"`（`facets.md:42`） | chord 只有 `ServiceMode = "singleton" \| "keyed"`（`packages/chord/src/types.ts:60`） |
-| `defineKeyedService()` / `definePeerService()`（`facets.md:52-65`） | **不存在**。chord 只有 `defineService()`（`packages/chord/src/api.ts:70-82`） |
+| `defineKeyedService()` / `definePeerService()`（`facets.md:52-65`） | **不存在**。~~chord 只有 `defineService()`（`packages/chord/src/api.ts:70-82`）~~ —— **v1.2.0 后连 `defineService()` 也不存在了**：整组 `defineService`/`createFacetHost`/`createRemoteServiceBinding` 随 chord2 重写（`0104fef1e`）删除，注册入口改为 `defineRegistry` |
 | sync `construct` + 返回 provisions 数组（`:122-133`） | **没有**。chord 的 `setup(env)` 不返回值，异步走 `onActivate` |
 | "no lazy proxy"（`:136-141` 批评 `plugins.md` 的 lazy façade 是 "an object whose type is a lie"） | **批评被驳回**。chord 明确保留 lazy façade（`PLANNING.md:299`） |
 | host entry 名单固定为 `contract.ts`/`server.ts`/`worker.ts`/`tui.ts`（`facets.md:5-11`） | chord 的 entry 名是**不透明应用数据**（`PLANNING.md:486`："Chord does not assume names such as `server`, `session`, `tui`, or `web`"）；Pi 侧约定的是 `session`/`tui` |

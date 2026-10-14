@@ -179,7 +179,7 @@ TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages
 | 交互式问题 API | `/question/:id/reply` | 无等价物 |
 | GitHub Action/Agent | 预置集成 | 无预置集成 |
 | Slack bot | 预置集成 | 无预置集成 |
-| MCP server 能力 | 有 CLI 管理工具 | **v1.0.0 起有一级支持**（旧结论"无"失效）：独立客户端包 `packages/mcp`（`@earendil-works/pi-mcp`，零 pi 依赖 + OAuth）+ 内置 `mcp` 扩展；配置在 `~/.pi/agent/mcp.json` 与受信项目 `.pi/mcp.json`（sync 0008 重锚：项目 override 逻辑现 `extensions/mcp/config.ts:74-154`，旧 `:117-118` 已失效；v1.0.1 起项目条目没有 `command`/`url`/`type` 即为 override，只改 `enabled`/`exposure`/`toolExposure`，其余继承全局定义，#10277）；CLI `pi mcp add/remove/list/login/logout`（`extensions/mcp/cli.ts:34-39`）、`--no-mcp`（Unreleased）整体禁用内置 MCP 扩展；TUI `/mcp`（`extensions/mcp/index.ts:271`）。仍无 ACP |
+| MCP server 能力 | 有 CLI 管理工具 | **v1.0.0 起有一级支持**（旧结论"无"失效）：独立客户端包 `packages/mcp`（`@earendil-works/pi-mcp`，零 pi 依赖 + OAuth）+ 内置 `mcp` 扩展；配置在 `~/.pi/agent/mcp.json` 与受信项目 `.pi/mcp.json`（sync 0008 重锚：项目 override 逻辑现 `extensions/mcp/config.ts:74-154`，旧 `:117-118` 已失效；v1.0.1 起项目条目没有 `command`/`url`/`type` 即为 override，只改 `enabled`/`exposure`/`toolExposure`，其余继承全局定义，#10277）；CLI `pi mcp add/remove/list/login/logout`（`extensions/mcp/cli.ts:34-39`）、`--no-mcp`（**1.0.4 起已发布**，非 Unreleased）整体禁用内置 MCP 扩展；TUI `/mcp`（`extensions/mcp/index.ts:271`）。仍无 ACP |
 | ACP 编辑器协议 | 支持 | 无 |
 | SDK 跨语言方案 | `@opencode-ai/sdk` (JS/TS) | RPC JSONL（任意语言可实现）；另有 CBOR 二进制 protocol，但**已降级为 dev-only/source-only、非 supported**（见上文） |
 | CI JSON stream | `opencode run --format json` | RPC stdout JSONL |

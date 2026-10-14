@@ -40,7 +40,7 @@ session ──► input ──► before_agent_start ──► ┌─ agent loop
 ```
 
 - **留在核里的**：让这个循环转起来的最小件——消息图、session 树、provider 抽象、8 个内置工具、以及"让扩展能挂在循环上"的接缝本身。
-- **被赶出去的**：所有"工作流"（plan-mode、subagent、todo、preset、git-checkpoint）、所有"护栏偏好"（permission-gate、protected-paths、dirty-repo-guard）、所有"长相"（minimal-mode、footer、header、snake）、所有"后端接入"（custom-provider、ssh、sandbox）。（"后端接入"品类 v1.0.3+ 起官方自己也在核外兑现了一个——`packages/env`（pi-env，Unreleased），以独立包而非扩展的形态，见 [03-Patterns/3.2](03-Patterns/3.2_override_and_reuse.md) 的官方新样本注。）
+- **被赶出去的**：所有"工作流"（plan-mode、subagent、todo、preset、git-checkpoint）、所有"护栏偏好"（permission-gate、protected-paths、dirty-repo-guard）、所有"长相"（minimal-mode、footer、header、snake）、所有"后端接入"（custom-provider、ssh、sandbox）。（"后端接入"品类 v1.0.3+ 起官方自己也在核外兑现了一个——`packages/env`（pi-env，**v1.2.0 起已随 release 发布**），以独立包而非扩展的形态，见 [03-Patterns/3.2](03-Patterns/3.2_override_and_reuse.md) 的官方新样本注。）
 
 关键不是"pi 有很多扩展"，而是**这些被赶出去的东西，和核里的东西走的是同一条接缝（seam）**——一个 `pi` 对象（`ExtensionAPI`）、一个工厂函数（`export default function (pi) {}`）。这让"扩充"成为一种**可预测、可组合、可分发**的动作，而不是每次都要 fork 内部。
 

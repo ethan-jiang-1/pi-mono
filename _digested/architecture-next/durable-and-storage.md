@@ -88,6 +88,46 @@ v1.0.0 时 `src/env/` 只是"够 bash 工具用"的本地抽象；v1.0.3 一晚�
 - **依赖方向是 env → durable，反向不成立**：`packages/env/package.json` 依赖 `@earendil-works/pi-durable ^1.2.0`，其 `watch.ts`/`errors.ts`/`remote-env.ts` 从 `pi-durable/env` 导入（`FileError`/`FileWatcher`/`WatchChange` 等）；durable 不依赖 pi-env。durable 出契约，pi-env（TS 客户端 `RemoteExecutionEnv` + SSH 上的 Rust daemon）做实现。
 - **`RemoteExecutionEnv` 是 `ExecutionEnv` 的第二个官方实现**（`packages/env/src/remote-env.ts`，v1.2.0 起在 release 内）：工具的文件操作和命令执行整体搬到远端机器，而 Durable worker、存储与凭据留本地（`packages/env/README.md:3-4`）。合同是**语义等价**（`packages/env/docs/semantics.md`）：`RemoteExecutionEnv` 的结果必须等于 `NodeExecutionEnv` 直接跑在那台远端机器上的结果，只有错误消息文本允许不同——由 conformance（`packages/env/test/conformance.test.ts:4,16` 直接消费 durable 的 `registerEnvConformance`）与 differential（随机操作序列 + durable 工具，逐结果对比两个环境）双测试锁定，CI 跨 **5 OS 矩阵**（`env-daemons.yml` 的 8 目标交叉构建）跑，`env.yml` 的 `release-daemons` job 再在 **6 平台 runner** 上用发布构建实测（`env.yml:75-126`）。durable 侧每一步接口扩张（argv exec、window/skipped、scanLines 助手导出、watch）都在为这条消费线铺路。
 
+### images 子系统（v1.2.0 新增）
+
+durable 在 v1.2.0 长出了一个**图像处理**子系统，以子路径导出：`@earendil-works/pi-durable/images`、`/images/node`、`/images/cloudflare`。
+
+- 核心是 **Photon**（Rust → WASM）图像管线：`createPhotonImages(wasm)`（`src/images/index.ts`），EXIF 方向自动纠正（`src/images/exif.ts`）。
+- **三种宿主适配**：`/images/node` 把 Photon 放在 worker 线程里跑（`node.ts`，`idleMs` 默认 **30 秒**后回收，失败时回退到进程内）；`/images/cloudflare` 走 Wrangler 的 `CompiledWasm`（`cloudflare.ts`，注释明说其它 bundler 请直接用 `createPhotonImages()`）。
+- **默认限额** `DEFAULT_IMAGE_LIMITS = { maxWidth: 2000, maxHeight: 2000, maxBytes: 4.5 MiB }`（注意定义在 `src/tools/image-processor.ts:11`，不是 `src/images/`）。
+- 消费方式：`createCodingTools({ images })` 注入；**durable 的 `read` 工具因此能把图片作为 image block 返回**，而不是 `unsupported_image`（`src/tools/read.ts` 引用 `DEFAULT_IMAGE_LIMITS`）。
+
+**为什么放在 durable 而不是 coding-agent**：与 `ExecutionEnv` 同样的理由——图像编解码需要在**与工具执行相同的沙箱语义**下发生（浏览器/Worker/Node 三种宿主都要能跑），所以它是 durable 侧的能力面，coding-agent 通过 `createCodingTools` 消费。
+
+### packages/env 的 v1.2.0 能力面（原页只写到 v1.0.3 合同层）
+
+上一节讲的是 `ExecutionEnv` **合同**与 conformance；`packages/env` 作为它的官方远端实现，v1.2.0 起补齐了若干**此前缺失的能力**，本页旧文未覆盖：
+
+**1. `listFiles` 在 env 侧有了实现（含本地实现）**
+
+durable 只**声明**可选的 `ExecutionEnv.listFiles`（并有 conformance 用例），**实现**在 `packages/env`：
+
+- `LocalExecutionEnv`（`packages/env/src/list-files.ts:84`，"同一个实现在本地和远端"）——`extends NodeExecutionEnv implements ExecutionEnv`，构造参数类型 `LocalExecutionEnvOptions`（`:74`，即 `NodeExecutionEnv` 的构造参数再加额外项）。导出见 `src/index.ts:13`。
+- 远端路径经 daemon 的 list 操作；**旧 daemon 缺该能力时报 `not_supported`**（`list-files.ts:40`，官方文案 "The pi-env daemon does not list files; update it"），调用方据此回退到自己的遍历。
+
+> 这一条修掉了本语料先前的一处**易误读**：`orchestration/07-durable-tasks.md` 提到 `ExecutionEnv.listFiles` 时只讲了 durable 侧的**声明**，读者会以为它没有实现。
+
+**2. PTY / 交互式终端子系统（v1.2.0 新增）**
+
+`openTerminal()`、`RemoteTerminal` 与 `TerminalForeground` / `TerminalOptions` 类型（`packages/env/src/index.ts:31`，实现 `src/terminal.ts`；daemon 侧 `daemon/src/pty.rs`）。
+
+- `RemoteTerminal` 提供 `write` / `resize` / `close` / `foreground` / `exited`；写入按块（`WRITE_CHUNK = 1MiB`）切分。
+- 对应 daemon 操作：`pty` / `ptyWrite` / `ptyResize` / `ptyForeground`；resize 走 SIGWINCH，关闭时按**进程组** kill。
+- **仅 Unix**：Windows 上返回 `ENOTSUP`。
+
+这是"远端跑交互式命令"的能力——远端 daemon 存在的意义之一，此前 corpus 完全没有记录。
+
+**3. 平台名映射与 daemon 部署细节**
+
+- `nodePlatform(info)`（`src/connection.ts:60`）把 daemon 上报的 `os`/`arch` 映射成 Node 风格的 `platform`/`arch`。
+- 部署相关导出：`connectSsh` / `deployDaemon` / `detectPlatform` / `localDaemon` / `packagedDaemon` / `sshConnection` / `sshArguments`，以及主机密钥 API `scanHostKey` / `acceptHostKey` / `forgetHostKey` 与 `HostKeyUnknownError` / `HostKeyChangedError`、`SshError`（均在 `src/index.ts`）。
+- **daemon 按内容命名部署**：装到远端 `~/.pi/mobile/tools/pi-env-<sha256 前 32 位>`，**每次启动前校验**；`ssh` 以 `BatchMode`、严格主机密钥校验（应用自己的 known-hosts 文件 + 固定 alias）、无任何转发运行（`packages/env/README.md`）。供应线视角见 [`../test-strategy/09-supply-chain-and-protocol-conformance.md`](../test-strategy/09-supply-chain-and-protocol-conformance.md)。
+
 ## codemode：确定性代码执行层（v1.2.0 新增，硬事实）
 
 `packages/durable/src/codemode/`（5 文件，主体 `codemode.ts` 1,037 行）是 v1.2.0 新能力面。**注意：这与 `packages/coding-agent/src/extensions/codemode/` 是两套独立实现**——后者调用 `@earendil-works/pi-codemode` 包，前者是 durable 自己的 journal 式实现。不要把其中一个描述为另一个的迁移。
@@ -109,7 +149,7 @@ v1.0.0 时 `src/env/` 只是"够 bash 工具用"的本地抽象；v1.0.3 一晚�
 ## 锚点
 
 - `packages/durable/docs/spec.md`（**5,340** 行，normative；§1 `spec.md:46`，§7 执行环境契约段 `spec.md:2822-2860` 一带，§11 backends `spec.md:4462`）
-- `packages/durable/README.md`（**751** 行，experimental usage guide；`README.md:3` "Experimental" 横幅；provider 身份存活域 `README.md:113`）
+- `packages/durable/README.md`（**751** 行，experimental usage guide；`README.md:3` "Experimental" 横幅；provider 身份存活域 `README.md:115`）
 - `packages/durable/src/env/index.ts:373`：`ExecutionEnv`；`:358-372`：`Shell`/argv exec；`:315`：`window`；`:231/:256`：`openBinaryReader`/`openDirReader`；`:106`：`scanLines`；`:262`：`watch`（v1.0.3 时的对应行为 `:324`/`:315`/`:266`/`:193`/`:207`/`:106`/`:213`）
 - `packages/durable/src/env/node.ts:653-680`：argv exec 实现；`node-watch.ts:132-138`：快照差分设计文档；`:52/:54`：FSEvents settle 与目录预算
 - `packages/durable/src/testing/env-conformance.ts`（511 行）；`runner.ts:13/:28`：双 conformance 注册器

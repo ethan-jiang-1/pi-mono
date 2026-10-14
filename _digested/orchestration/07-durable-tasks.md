@@ -50,7 +50,7 @@ subagent 工具在 `api.commit()` 里以 `ownership: { kind: "task", taskId }` �
 
 ### 能力面延伸:工具跑远端,事实留本地(v1.2.0 起在 release 内)
 
-v1.0.3 之后 durable 的执行环境抽象(`ExecutionEnv`,`src/env/`)长出了第二个官方实现:新包 `@earendil-works/pi-env` 把"agent 的工具在另一台机器上执行"做成包级能力——pi-env README 的定位原文:"an agent's tools run on another machine, usually over SSH, while the Durable worker, its storage and credentials stay local"(`packages/env/README.md:3-4`)。即**工具的文件操作与命令执行整体上远端,而 Durable worker、存储与凭据留本地**——持久事实层与执行层可以拆到两台机器上。依赖方向是 env → durable(pi-env 实现 durable 的接口,反向不成立),且该包 Unreleased、monorepo 内暂无消费者。这是 durable 线的能力延伸证据,但不改变下面的 experimental 定位结论。
+v1.0.3 之后 durable 的执行环境抽象(`ExecutionEnv`,`src/env/`)长出了第二个官方实现:新包 `@earendil-works/pi-env` 把"agent 的工具在另一台机器上执行"做成包级能力——pi-env README 的定位原文:"an agent's tools run on another machine, usually over SSH, while the Durable worker, its storage and credentials stay local"(`packages/env/README.md:3-4`)。即**工具的文件操作与命令执行整体上远端,而 Durable worker、存储与凭据留本地**——持久事实层与执行层可以拆到两台机器上。依赖方向是 env → durable(pi-env 实现 durable 的接口,反向不成立),该包自 **v1.2.0 起随 release 发布**(`packages/env/package.json` 版本号 1.2.0;`98d2e1947` 时还是 1.0.3 且 Unreleased),monorepo 内仍无其它包依赖它。这是 durable 线的能力延伸证据,但不改变下面的 experimental 定位结论。
 
 ## 边界与上限
 

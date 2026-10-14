@@ -14,7 +14,7 @@ pi 的编排阶梯需要外部能力时,入口是 MCP:v1.0.0 起官方采纳(`pa
 - **项目 override**(v1.0.1,#10277):`.pi/mcp.json` 里没有 `command`/`url`/`type` 的条目被识别为 override,只允许改 `enabled`/`exposure`/`toolExposure` 三键,其余字段继承全局定义(`config.ts:74-77`,合并逻辑 `:108-118`)——项目条目从此有第三种形态:同名不再是"整体替换全局条目",而是"选择性覆盖"(含项目自己配不了的凭据仍留在全局)。
 - **渲染接管**(v1.0.1,#10285):扩展 API 新增 `pi.registerToolRenderer((toolName, next) => renderers)`(`packages/coding-agent/src/core/extensions/types.ts:1685`),解析器按扩展加载顺序运行、可为**未注册**的工具选渲染器——MCP 扩展用它匹配 `mcp__(.+?)__(.+)`,恢复的会话里 server 未连上的工具调用不再整段展开渲染。
 - **关闭语义**(v1.2.0 起在 tag 内,#10249):`McpServerConnection` 的 `closed` 布尔改为 `AbortController`(**v1.2.0：`packages/coding-agent/src/extensions/mcp/runtime.ts:156`**=`shutdown` AbortController，`closed` getter 在 `:206`；v1.0.3 时为 `:175`),`close()` abort 信号、取消重试等待并 `await` 在途连接(**v1.2.0：`:443`**；v1.0.3 时为 `:480`)——session 关闭时正在连接的 server 不再挂到超时。
-- **OAuth 增量**(一句带过):Client ID Metadata Document 改为选择性启用(coding-agent 侧 `oauth.clientRegistration: "cimd"`,v1.0.1 #10302),DCR 请求体按 MCP SEP-837 从 redirect_uris 推导 `application_type`(Unreleased,#10493);细节见 [`harness/02-Boundaries/2.2`](../harness/02-Boundaries/2.2_no_interop_protocol.md)。
+- **OAuth 增量**(一句带过):Client ID Metadata Document 改为选择性启用(coding-agent 侧 `oauth.clientRegistration: "cimd"`,v1.0.1 #10302),DCR 请求体按 MCP SEP-837 从 redirect_uris 推导 `application_type`(**pi-mcp 1.0.4 起已发布**,#10493);细节见 [`harness/02-Boundaries/2.2`](../harness/02-Boundaries/2.2_no_interop_protocol.md)。
 
 ## 边界与上限
 

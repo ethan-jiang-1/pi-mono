@@ -48,7 +48,7 @@ pi-mono 把「谁能进来、进什么、成本多少」全部显式化：新贡
 | `packages/coding-agent/docs/`（其中九篇可变性面文档） | 可变性面的官方定义 | [04](./04-extension-points-map.md) |
 | `packages/coding-agent/docs/session-format.md`、`docs/sessions.md`、`docs/slash-commands.md`、`.pi/extensions/import-repro.ts` | 会话账本与续接 | [05](./05-session-inspectability.md) |
 | `scripts/check-entry-graphs.mjs`、贡献门槛 | 范围纪律与成本合同 | [06](./06-scope-discipline-and-cost-contracts.md) |
-| `packages/`（13 个包） | 依赖面与发布面 | [07](./07-monorepo-taxonomy.md) |
+| `packages/`（11 个包） | 依赖面与发布面 | [07](./07-monorepo-taxonomy.md) |
 
 仓库还有第四类 `.pi/` 资产——`.pi/extensions/` 下的四个运行时扩展（`import-repro`、`prompt-url-widget`、`redraws`、`tps`）——它们不在本卷单独立页，其中注册 `/ir` 的 `import-repro` 在 [05](./05-session-inspectability.md) 中作为会话续接机制检视。
 

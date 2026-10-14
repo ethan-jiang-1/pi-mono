@@ -1,6 +1,8 @@
 # _digested
 
-> **当前源码基线**：pi-mono `v1.0.3`（tag `d78dc83d6`，工作树锚点 `98d2e1947`（= v1.0.3+23），**已 merge 进本仓库**——merge `fad4b11bd`）。2026-10-06 完成第七轮同步（v1.0.0→v1.0.3，79 commits，+17,127/−4,908——1.0.0 大收缩后的第一个纯建设周期）：① **pi-env 单日成包**（post-v1.0.3，Unreleased）：`@earendil-works/pi-env` SSH 远程执行环境——durable `ExecutionEnv` 的跨机器实现（TS 客户端 + Rust daemon，语义等价 conformance/differential 合同），monorepo 内暂零消费者；② **durable ExecutionEnv 大扩**（v1.0.3，4 条接口 Breaking）：argv exec、输出窗口 window/skipped、scanLines、FileSystem.watch；③ `--tools` 语义重做（allowlist 选声明面、exposure 管可达面、`--no-mcp`）；④ **azure provider 改名**（`azure-openai-responses`→`azure`，双 API dispatch，本轮唯一 release Breaking）；⑤ **npm-shrinkwrap 删除**（0007 预测兑现，钉依赖改由 install-lock 承接）+ Nix flake/stable 分支。详细影响评估见 [`_change_log/0008-v1.0.0-to-v1.0.3.md`](./_change_log/0008-v1.0.0-to-v1.0.3.md)。行号复核以 0008 影响表为准。
+> **当前源码基线**：pi-mono **`v1.2.0`（tag `06a466935`）**。2026-10-14 完成第九轮同步（区间起点 `98d2e1947`（= v1.0.3+23，**不是** v1.0.3 tag）→ release tag `v1.2.0`，139 commit，+53,199/−39,113）——三个主要结构性变化：① **experimental server/client/protocol 三包整体删除**（`packages/` 13 → 11，全库真实残留引用为 0；`coding-agent` 同时移除对 `@earendil-works/chord` 的依赖）；② **chord 经 chord2 重写**为 typed host runtime，旧 facet/service API 与 `./bundler` 子路径全删；③ **durable 从"任务运行时"扩为"工具执行内核"**（嵌套调用、structured output、内建 codemode、`documentRetentionMs`），且 **Storage 失败语义反转**——任何 `Storage` 方法（含读）抛错现在都失败并关闭 Session。另：`packages/env` 由 Unreleased 转入 release；配置 schema 发布到 `https://pi.dev/schemas/*`。详细影响评估见 [`_change_log/0009-v1.0.3-to-v1.2.0.md`](./_change_log/0009-v1.0.3-to-v1.2.0.md)，摘要见 [`_summary-v1.2.0.md`](./_change_log/_summary-v1.2.0.md)。
+>
+> **上一基线**：`v1.0.3`（tag `d78dc83d6`）。2026-10-06 完成第八轮同步（v1.0.0→v1.0.3，79 commits，+17,127/−4,908——1.0.0 大收缩后的第一个纯建设周期）：① **pi-env 单日成包**（post-v1.0.3，Unreleased——**v1.2.0 起已随 release 发布**）：`@earendil-works/pi-env` SSH 远程执行环境——durable `ExecutionEnv` 的跨机器实现（TS 客户端 + Rust daemon，语义等价 conformance/differential 合同）；② **durable ExecutionEnv 大扩**（v1.0.3，4 条接口 Breaking）：argv exec、输出窗口 window/skipped、scanLines、FileSystem.watch；③ `--tools` 语义重做（allowlist 选声明面、exposure 管可达面、`--no-mcp`）；④ **azure provider 改名**（`azure-openai-responses`→`azure`，双 API dispatch，本轮唯一 release Breaking）；⑤ **npm-shrinkwrap 删除**（0007 预测兑现，钉依赖改由 install-lock 承接）+ Nix flake/stable 分支。详细影响评估见 [`_change_log/0008-v1.0.0-to-v1.0.3.md`](./_change_log/0008-v1.0.0-to-v1.0.3.md)。行号复核以 0008 影响表为准。
 >
 > 历轮记录：v0.75.3→v0.83.0 见 [`_change_log/0002`](./_change_log/0002-v0.75.3-to-v0.83.0.md) 与 [`_plan-1`](./_change_log/_plan-1-v0.83.0.md)；v0.83→v0.84.2 见 [`_change_log/0003`](./_change_log/0003-v0.83.0-to-v0.84.2.md) 与 [`_plan-2`](./_change_log/_plan-2-v0.84.2.md)；v0.84.2→v0.84.3 见 [`_change_log/0004`](./_change_log/0004-v0.84.2-to-v0.84.3.md)；v0.84.3→v0.84.4 见 [`_change_log/0005`](./_change_log/0005-v0.84.3-to-v0.84.4.md)；v0.84.4→v0.86.1 见 [`_change_log/0006`](./_change_log/0006-v0.84.4-to-v0.86.1.md) 与 [`_summary-v0.86.1.md`](./_change_log/_summary-v0.86.1.md)；v0.86.1→v1.0.0 见 [`_change_log/0007`](./_change_log/0007-v0.86.1-to-v1.0.0.md) 与 [`_summary-v1.0.0.md`](./_change_log/_summary-v1.0.0.md)；本轮 v1.0.0→v1.0.3 见 [`_change_log/0008`](./_change_log/0008-v1.0.0-to-v1.0.3.md) 与 [`_summary-v1.0.3.md`](./_change_log/_summary-v1.0.3.md)。
 
@@ -37,11 +39,10 @@ pi-mono 可以作为终端 coding agent 使用，也能通过 SDK/RPC 被其它�
 | `packages/mcp` | **独立 MCP 客户端**（v1.0.0 新增）：传输中立核心 + stdio/Streamable HTTP + OAuth（零 pi 依赖）；v1.0.1+ 补 CIMD 与 DCR application_type | 集成 |
 | `packages/codemode` | **QuickJS-WASM 沙箱**（v1.0.0 新增）：worker 线程跑模型写的 JS，注入工具暴露为 `tools.<name>(args)`；v1.0.1+ 输出封顶 + built-ins lockdown | 集成 |
 | `packages/env` | **SSH 远程执行环境**（v1.2.0 起在 release 内，此前为 Unreleased）：durable `ExecutionEnv` 的跨机器实现——TS 客户端（Connection/RemoteExecutionEnv/ssh bootstrap）+ Rust daemon（8 目标交叉构建，SHA-256 命名部署），语义等价有 conformance/differential 合同 | 集成 |
-| ~~`packages/protocol`~~ | **v1.2.0 删除**：CBOR 二进制协议 + framing（experimental，PROTOCOL_VERSION=8） | — |
-| ~~`packages/client`~~ | **v1.2.0 删除**：传输无关的远程 session 客户端 | — |
-| ~~`packages/server`~~ | **v1.2.0 删除**：实验性路由层（SessionRouter → session 服务） | — |
 | `packages/telemetry` | vendor-neutral typed telemetry | 辅助 |
 | `packages/evals` | eval harness | 辅助 |
+
+> **v1.2.0 删除**（不在这 11 个之内）：`packages/protocol`（CBOR 二进制协议 + framing，experimental，`PROTOCOL_VERSION = 8`）、`packages/client`（传输无关的远程 session 客户端）、`packages/server`（实验性路由层 SessionRouter → session 服务）。三包及其 CHANGELOG 一并删除、不再发布，全库真实残留引用为 0。
 
 ## 核心思想
 

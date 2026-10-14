@@ -154,6 +154,29 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 - **fullscreen 下 Home/End 键位重排**（`6100fe5a8`，closes #10314，v1.0.3）：上文 "`tui.altScreen.bottom` = `end`" 的结论**已过时**——`tui.altScreen.top`/`bottom` 现绑 `ctrl+home`/`ctrl+end`（`packages/tui/src/keybindings.ts:208-209`，消费点 `packages/tui/src/tui-alt-screen.ts:782-786`），裸 `home`/`end` 在 fullscreen 下归编辑器（`cursorLineStart`/`cursorLineEnd` 只留裸键 + `ctrl+a`/`ctrl+e`，`keybindings.ts:98-102`；官方口径 `packages/coding-agent/docs/keybindings.md:117-118`）。根因：fullscreen（v1.0.0 起默认）下 `TuiAltScreen` 的输入层在把按键路由给焦点编辑器之前先逐个匹配 `tui.altScreen.*` 并 `consume: true` 吞掉，而旧默认键 `top`=Home、`bottom`=End 与编辑器同名绑定撞车，altScreen 层先赢——fullscreen 里按 Home/End 永远滚 transcript，光标跳不到行首/行尾，只剩 Ctrl+A/E 可用。修复是纯默认键位重排、不动路由代码：两层默认集合从此不相交，裸 Home/End 在任何 UI 模式都归编辑器，transcript 顶/底改 Ctrl+Home/End；用户 keybindings.json 的显式覆盖不受影响。这是 v1.0.3 CHANGELOG 里 tui 唯一的 Changed 条目。
 - **OAuth 登录屏也响应复制键**（`ced72c2f0`，v1.0.1）：`Ctrl+X`（`app.message.copy`）的复制能力扩展到 OAuth 登录屏——`/login` 与 `/mcp` 的登录屏现在显示复制提示并用 OSC 52 复制登录 URL（SSH 下可用；新组件 `packages/coding-agent/src/modes/interactive/components/auth-url.ts:22`），`/mcp login` 在 TUI 中改用登录屏而非通知。
 
+## v1.2.0 增量：远程剪贴板与终端程序状态
+
+两个都跟"终端能力协商"有关，且都带环境变量开关。
+
+**`PI_CLIPBOARD_OSC52=1`——让复制到达远程客户端**
+
+pi 在 SSH 下本来就会用 OSC 52 把复制内容送到终端。而在**检测不到远程会话**的场景（从另一台机器 attach 的 multiplexer、远端 IDE daemon），这条路径不会触发。设 `PI_CLIPBOARD_OSC52=1` 后，pi 在本地剪贴板写入**之后**，再**额外**用 OSC 52 发一次（`docs/environment-variables.md:91`）：
+
+> Set to `1` to also send copied text to the terminal with OSC 52 after the local clipboard write, as Pi does over SSH. Use it when a remote client reaches Pi without SSH variables, such as a multiplexer attached from another machine or a remote IDE daemon
+
+注意语义是"**额外再发一次**"，不是"改走 OSC 52"——本地写入照常发生。
+
+**`PI_PROGRAM_STATUS`——让终端/面板知道 pi 在干什么**
+
+v1.2.0 新增 OSC 7501 程序状态上报：支持的终端与 agent dashboard 能看到 pi 当前是 working / blocked（等对话框或登录）/ done / failed。默认**先问终端是否支持**，得到确认才上报；`PI_PROGRAM_STATUS=1` 跳过询问总是上报，`=0` 关闭（`docs/environment-variables.md:93`）。
+
+两点边界：
+
+- 上报内容**不含** prompt 或模型输出（`docs/terminal-setup.md:233`）。
+- **tmux 与 screen 不转发**该序列（同上）——所以在 multiplexer 里需要显式设 `1`，且外层终端要支持。
+
+**对 TUI 实现者是 Breaking**：`Terminal` 接口新增了**必需**方法 `setProgramStatus()`（`packages/tui/src/terminal.ts:125`），另有 `packages/tui/src/program-status.ts`（`PROGRAM_STATUS_QUERY` / `formatProgramStatus` / `isProgramStatusReply`，含 2048 字节上限）。自定义 `Terminal` 实现必须补这个方法。
+
 ## 引用
 
 - 源码：`packages/coding-agent/src/core/keybindings.ts` — 完整快捷键定义

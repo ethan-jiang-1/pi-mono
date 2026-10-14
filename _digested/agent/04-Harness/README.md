@@ -50,10 +50,12 @@ Agent (裸循环) → AgentHarness (骨架契约，v0.84.2 多为 stub) → Agen
 
 ## 源码锚点
 
-- AgentHarness: `packages/agent/src/harness/agent-harness.ts`
-- Harness 类型: `packages/agent/src/harness/types.ts`
-- Skills 加载: `packages/agent/src/harness/skills.ts`
-- System prompt: `packages/agent/src/harness/system-prompt.ts` / `packages/coding-agent/src/core/system-prompt.ts`
+- ~~AgentHarness: `packages/agent/src/harness/agent-harness.ts`~~（**v1.0.0 删除**，`7fd478a2e`；无同名替代）
+- ~~Harness 类型: `packages/agent/src/harness/types.ts`~~（**v1.0.0 删除**；现役为 `packages/durable/src/harness/types.ts`）
+- ~~Skills 加载: `packages/agent/src/harness/skills.ts`~~——现役 **`packages/coding-agent/src/core/skills.ts`**
+- System prompt: ~~`packages/agent/src/harness/system-prompt.ts`~~ / **`packages/coding-agent/src/core/system-prompt.ts`**（现役）
+
+> **⚠️ v1.2.0（2026-10-14 轮次 0013 核）**：本文件「源码位置」表与路径清单此前仍在引 `packages/agent/src/harness/**`，而该目录已于 **v1.0.0** 整体删除。四条路径逐条对 tag 核实：`agent-harness.ts`、`harness/types.ts`、`harness/skills.ts`、`harness/system-prompt.ts` **均不存在**。上表 `packages/agent/src/harness/` 一格同样已失效，现役内部接线层在 `packages/coding-agent/src/core/`。
 - Extension runner: `packages/coding-agent/src/core/extensions/runner.ts`
 - Extension loader: `packages/coding-agent/src/core/extensions/loader.ts`
 - Bash 工具: `packages/coding-agent/src/core/tools/bash.ts`

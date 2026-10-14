@@ -169,3 +169,77 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 本轮唯一的形式化硬错只有 1 条行号越界（`chord/src/types.ts:227`，该文件全文 79 行）。发现 1 之所以被发现，靠的**不是**越界检测，而是我顺着那一条越界锚点**读到了 `api.ts` 不存在**，再追到 CHANGELOG 才看清整片失效。换句话说：**"锚点存在性"检查对"名字保留、语义替换"这类重写是盲的**——`defineFacet` 在 v1.2.0 依然存在、行号也合法，只有读 CHANGELOG 才知道它的意思变了。
 
 > 这与 0009 留下的判断一致并进一步收窄：`verify.mjs` 查不了"链接目标被删/改名"，本轮证明**连"锚点行号普查"也查不了语义替换**。唯一可靠的是**读上游自己的 Breaking Changes 清单**——`packages/*/CHANGELOG.md` 是本区间被语料系统性低估的一手证据源（`packages/chord/CHANGELOG.md` 即为 v1.2.0 新增）。
+
+---
+
+## 0013 轮：清尾——把 0012 留下的"剩余清单"逐项归类
+
+**动机**：0012 结尾我列了一份"还剩什么"，但那份清单本身**只标了面积、没做归类**，所以无法判断哪些是真债、哪些是我自己工具的假阳性。本轮逐项过一遍，**结论是三条真债 + 三条假阳性**。
+
+### 一、先立一条被漏掉的口径：语料有三种路径写法（这是假阳性的根源）
+
+我的锚点普查把 555 条判为"unresolved"，其中**绝大多数不是错**，因为语料有意混用三种写法，而我的解析器只认第一种：
+
+| 写法 | 例子 | 语义 | 处置 |
+|---|---|---|---|
+| **仓库根相对** | `` `packages/ai/src/types.ts` `` | 相对 repo 根 | 可直接解析 |
+| **包根相对** | `` `src/types.ts` ``、`` `docs/spec.md` `` | 相对**当前讨论的那个包** | 需读上下文定包 |
+| **加前导斜杠** | `` `/packages/agent/src/agent-loop.ts` `` | 同"仓库根相对"，`agent/02-Runtime` 与 `03-Memory` 的**行文习惯** | **不是错，勿改** |
+
+第三条尤其要记：我一度把 21 处前导斜杠当成 malformed 路径准备批量修，核实后发现它们去掉斜杠**全部指向真实文件**，且集中出现在 `2.1`/`2.2`/`2.4`/`2.6`/`2.7`/`3.1`–`3.4`——是**一贯的风格而非笔误**。批量"修正"会制造 21 处无意义 diff。
+
+> **给后续审计的规则**：`` `src/xxx.ts` `` 这类**不构成**缺陷证据；只有当你**先确定它属于哪个包**、再核实该包下无此文件时，才算缺陷。把这条写进 `_coverage`，是为了避免下一轮重走我这次的 555 条假阳性。
+
+### 二、三条真债（全部已修）
+
+**债 1：`harness/02-Boundaries/2.3_agent_lane_contract_first.md` —— 9 条 v1.0.0 锚点在 v1.2.0 全部错位**
+
+该页基线是 v1.0.0，**从未对 v1.2.0 复核**。`packages/durable/src/harness/harness.ts` 从 v1.0.0 的 409+ 行长到 v1.2.0 的 **470 行**，其间插入的代码让 9 条锚点全部漂移：
+
+| 符号 | 原引（v1.0.0） | v1.2.0 实测 |
+|---|---|---|
+| `HarnessImpl` | `:164` | **`:169`** |
+| `export type Harness` | `:405` | **`:443`** |
+| `export const Harness` | `:407` | **`:445`** |
+| `Harness.open()` | `:409` | **`:447-451`** |
+| `Conversation.agent()` | `:91` | **`:95`** |
+| `Conversation.configure()` | `:95` | **`:99`** |
+| `taskGraph()` | `:296` | **`:307`** |
+| `watchTaskGraph()` | `:300` | **`:311`** |
+| `AgentDoc`（agent.ts） | `:36` | **`:43`** |
+| `resolveSettings`（agent.ts） | `:47` | **`:57`** |
+| `createAgentSession()`（core/sdk.ts） | `:175` | **`:191`** |
+
+同页**第 69 行"消费者清单"**仍在把 `experimental/durable/runtime.ts:138`、`experimental/vacation/runtime.ts:135`、`experimental/session-worker.ts:773/784`、`test/fixtures/faux-session-worker.ts:24`、`experimental/durable/harness-setup.ts` 当现状引用——而该页**第 13 行的横幅早已宣布这四条路径全部作废**。这是**同一页内横幅与锚点节自相矛盾**（0021 型缺陷的又一例，与 `3.4` 同型）。5 条路径逐条对 tag 确认缺失；例证 2 的"消费仍限 experimental"结论也随之不成立（v1.2.0 `src/core/` 对 pi-durable 零引用）。
+
+**债 2：`agent/03-Memory/3.3_Token_Estimation.md` —— 整篇停在 v0.84.2**
+
+`0007`/`0009` 都没点到它。它引的 `packages/agent/src/harness/compaction/compaction.ts` 随 harness 于 v1.0.0 删除，**现役实现分两处**：`packages/coding-agent/src/core/compaction/compaction.ts`（1,119 行）与 `packages/ai/src/utils/estimate.ts`。已补 v1.2.0 横幅并给两处现役锚点；原行号表标注为 v0.84.2 存档。
+
+**债 3：`agent/03-Memory/3.4_Session_Tree.md` + `agent/04-Harness/README.md`**
+
+- `3.4` 的"源码位置"块两条 agent 侧路径均已删除；`SessionTreeEntry`/`LeafEntry` 在 v1.2.0 **全树零命中**（`getLeafEntry()` 是 method 名不是类型）。该页**同样存在横幅说已删除、锚点块仍当现状**的自相矛盾。
+- `04-Harness/README.md` 的路径清单四条（`agent-harness.ts`、`harness/types.ts`、`harness/skills.ts`、`harness/system-prompt.ts`）**全部不存在**；已逐条删除线化并给出替代（`coding-agent/src/core/skills.ts`、`core/system-prompt.ts`、`durable/src/harness/types.ts`；`agent-harness.ts` 无同名替代）。
+
+### 三、三条假阳性（**不改**，记录以免下轮重查）
+
+1. **555 条 unresolved 中的 269 个路径**：绝大多数是"包根相对"写法（见上表），非缺陷。
+2. **`/Users/bowhead/...` 绝对路径 11 处**：`_faq_on_digested/06_pi_vs_dsh/` 与 `13_recorded_session_snapshots/` 是在**跨仓库比对**（对象是另一个 worktree `deepseek-harness`），绝对路径**必要且已注明**；`composition/5_agents_md.md` 等自指本机 checkout 亦属语料一贯做法。**不改**。
+3. **70 个无 `v1.2.0` 字样的文件**：逐类排查后无新债。`_change_log/0002`–`0008`、`_summary-*`、`_plan-*` 是**历史断面**，按定义不该有 v1.2.0 字样；`composition/` 方法论页不含版本化事实。对 22 个**含 ≥3 条真锚点**的 topic 页做了逐文件失败率统计：**`DELETED` 一栏全为 0**——即 0012 找到的 chord2 那类"整片运行时被换掉"的缺口，在这 22 页中**不存在**。
+
+### 三点五、补记：表格层的同型缺陷（在写完上面三段后才查出）
+
+`3.3` 与 `3.4` 两页各有一张**自称「以下均为硬事实」的行号表**，而两张表的行号都指向**已删除**的 `agent/src/harness/**`。前面我只改了「源码位置」块，**表本身没动**——于是这两页变成「横幅说已删、锚点块说已删、**表格仍说硬事实**」的三方矛盾。已补：
+
+- `3.3`：表头加整体作废声明，并写明旧表指的是 agent 侧 `compaction.ts`（**v0.84.4 实测确为 848 行**，与原文一致——所以错的不是行数而是**文件已不在**），现役为 coding-agent 侧 1,119 行版 + ai 侧 `estimate.ts`，两者行号与旧表均不对应。
+- `3.4`：同样加整体作废声明。`LeafEntry` 的措辞也已收紧——我最初写「`SessionTreeEntry` 与 `LeafEntry` 全树零命中」，但 `LeafEntry` **作为子串**在 method 名 `getLeafEntry()` 里有 4 处命中；已改为「作为**类型名**零命中，唯一命中是 method 名子串，不是本文所述类型」。**这正是我自己前几轮反复抓的那个毛病：把「我没找到」说成「不存在」。**
+
+### 四、方法学结论（本轮最该记住的一条）
+
+0012 我担心"机械普查对语义替换是盲的"，于是 0013 补了**逐文件失败率**这个中间粒度指标。它的价值在于**能廉价地证伪**：22 个高风险文件一次跑完，`DELETED=0`，我就获得了"这片区域没有第二处 chord2"的**正面证据**，而不是继续凭"没被点名就没查"的运气。**但同一指标也放过了 `2.3`/`3.3`/`3.4`/`README`**——它们的路径**全部解析成功**，错的是**行号**。所以真正抓住它们的是**符号级锚点核对**（抓 `2.3` 的 9 条），而不是路径存在性。三层指标各有盲区，缺一层就会漏：
+
+| 指标 | 抓得到 | 抓不到 |
+|---|---|---|
+| 路径存在性 | 文件被删/改名 | 行号漂移、语义替换 |
+| **逐文件 `DELETED` 失败率** | **整片运行时被换（chord2 型）** | **行号漂移** |
+| 符号级锚点核对 | 行号漂移（2.3 的 9 条） | 语义替换（名字还在） |

@@ -3,6 +3,16 @@
 > **基线**：v0.85.1（tag `d981de122`，merge `e3aa42f46`）。本文全部结论来自当前工作树的静态读源码取证，**没有运行 chord 测试**（原因与后果见末节）。
 > **⚠️ v1.0.0 增补（2026-10-02，`_change_log/0007`）**：chord 的依赖关系与 API 已变——① **pi-agent-core 与 chord 脱钩**（agent 包 src 零 chord import，`dependencies` 移除；v1.0.0 起 chord 的运行时依赖方是 client / coding-agent / **durable**（新）/ protocol / server 五个包，`Context`/`JsonValue` 类型的主要消费者是 pi-durable）；② **Replicated state 破坏性改形**：`MutableReplicatedState` 的 `state` 代理 + `publish()` 被 `change(context, mutate)` / `replace(context, value)` 取代（`src/types.ts:59-71`、实现 `src/services/state.ts:184/202/231`），`replicatedState()` 新增 `ReplicatedStateSource` 重载返回 `AttachedReplicatedState`（`src/api.ts:91-106`）；③ **delta 六动词 → 七动词**：新增 `m`（数组 reorder），delta 引擎收敛为唯一不可变 tracker（astra/cow 原型删除，`tracker.ts` 2,205 行，`delta/index.ts` 1,879→694 行）；④ esbuild pin 0.28.1→0.28.2；⑤ §7/§9/§10 引用的 `packages/agent/docs/**`（plugins.md、rpc.md、mobile-handoff 全树）已于 v1.0.0 整树删除——相关"规格 vs 现状"分析转为 git 历史考古。chord 仍无 CHANGELOG；本文正文保留 v0.85.1 取证原貌，以下按节标注 v1.0.0 变化点。
 >
+> **⚠️ v1.2.0 大幅作废（最重要的一条）**：本文取证于 v0.85.1、经 v1.0.0 增补，而 **v1.2.0 把本文的 Pi 侧研究对象整体删除了**，chord 自身也被重写。读本文前请先接受以下事实：
+>
+> 1. **§6「Pi 侧的落地」整节作废**：`packages/coding-agent/src/experimental/services/` 不存在了。
+> 2. **§1/§2 的依赖方列表作废**：`packages/protocol`、`packages/client`、`packages/server` 三包已删除（`7472cda0d`）；`packages/coding-agent` 与 chord 的依赖关系也已解除。**v1.2.0 只有 `packages/durable` 与 `packages/env` 依赖 chord**。文中所有"五个包依赖 chord"的表格与清单均已失效。
+> 3. **§3/§5 的 chord API 作废**：chord2 重写（`0104fef1e`）删除了 `src/facets/`、`src/services/`、`src/api.ts` 与 `PLANNING.md`。`defineService`、`FacetHost`、`$chord.` 保留前缀、`ReplicatedStateSource` 重载（`src/api.ts:91-106`）等**锚点与 API 名全部失效**。本文引用的 `PLANNING.md:476` 等行号同样失效。
+> 4. **§5「术语碰撞」仍最有价值**：它讲的是 chord 与 Pi 扩展系统两套 `defineService`/`service` 词的语义冲突，这个区分在 chord2 下依然成立，且更容易踩。
+> 5. **chord 侧的存活内容**：`src/delta/` 未经重写（行号大概率仍有效）；chord 在 v1.2.0 **首次有了 CHANGELOG.md**（本文"chord 无 CHANGELOG"的论断已过期），并新增 `docs/{guide,spec,tutorial}.md`。
+>
+> 因此本文的**历史取证价值**仍在（chord1 的设计、Pi 为何采用它、术语碰撞），但**不能作为 v1.2.0 的事实来源**。现状请以 `_digested/architecture-next/chord.md` 与 `packages/chord/docs/spec.md` 为准。
+
 > **标注约定**：本目录此前没有强制标记法，本文对关键判断显式标注 —— **【硬事实】** 可直接读源码/文档验证；**【解释】** 基于事实的推断；**【未取证/推测】** 没有直接证据。其余沿用本目录的粗体强调与 `>` 提示块。
 
 ## 这篇在讲什么，不重复什么
@@ -31,9 +41,11 @@ packages/server/src/types.ts:1                    JsonValue / ServiceCall / Serv
 packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 chord
 ```
 
+> **⚠️ v1.2.0**：上表**后五行**（`packages/protocol/**` 3 行、`packages/client/src/types.ts`、`packages/server/**` 2 行）所引的**三个包已在 v1.2.0 整体删除**（`7472cda0d`，161 文件、+32/−21,561），这些 import 路径**已不存在**。本区间有效的 chord 消费者只剩 **`packages/durable`** 与 **`packages/env`**——`packages/coding-agent` 也不再依赖 chord（chord2 重写 `0104fef1e`）。
+>
 > **⚠️ v1.0.0**：上表前三行（`packages/agent/src/harness/**`）已随 pi-agent-core 收缩**整体删除**——agent 包 src 现在零 chord import、`dependencies` 也移除了 chord。chord 的 `Context`/`JsonValue` 消费者换成 **`packages/durable`**（`src/entries.ts:1`、`src/tools/*.ts:1`、`src/storage/sqlite/storage.ts:1` 等）。其余各行（protocol/client/server）仍成立。
 
-**【硬事实】** 五个包把 chord 声明为**运行时 `dependencies`**（不是 dev）：
+**【硬事实】** 当时有五个包把 chord 声明为**运行时 `dependencies`**（不是 dev）；**v1.2.0 后只剩 `packages/durable` 与 `packages/env` 两个**（`packages/coding-agent` 已移除对 chord 的依赖）：
 
 | 包 | `@earendil-works/chord` 位置 |
 |---|---|
@@ -151,7 +163,7 @@ packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 
 
 **【解释】** 义项 1 与 2 是**同名不同物**，而且形状相反：义项 1 是"一个进程里的一段挂载代码"，义项 2 是"一个跨进程分发的包"。义项 3 只是前两者的口语统称。**任何写"pi 的扩展"的文档都必须先声明用哪个义项** —— 本篇之后一律用 "extension（`core/extensions`）" 与 "plugin 包（facet 分发）" 区分。
 
-## 6. Pi 侧的落地：`experimental/services/`（dev-only，非 supported）
+## 6. Pi 侧的落地：`experimental/services/`（**v1.2.0 已删除，本节整体作废**）
 
 **【硬事实】** chord 的 facet/service 概念在 coding-agent 侧有一份**完整落地**：`packages/coding-agent/src/experimental/services/`（47 个文件的 `experimental/` 目录的一部分）。service token **全带 `pi.` 前缀**：
 
@@ -195,6 +207,8 @@ tui.ts        export default defineFacet({ id: ".../tui" })      —— use Slas
 **【解释】** 对照 §4 的 extension 系统：那条路的代码是**用户在本机放置**的；这条路是**server 打包、选择、投递，client 只加载收到的**。方向相反，所以"第四条 authoring 面"改的是**谁决定客户端跑什么代码**（是宿主应用，不是终端用户）。这也是为什么它有独立的安全含义 —— 但 chord 自己声明**不做信任策略**（`PLANNING.md:820`："trust policy, code signing, sandboxing, or capability security" 是非目标）。
 
 **【硬事实，重复但重要】** 这条整线**全是 dev-only / source-only / 非 supported**。背景是 v0.85.0 曾把整套 experimental 远程栈误发布进 npm 包、消费者一装就 import 失败（#9132），v0.85.1 用 `devDependencies` + `files` 排除 + `./client`/`./experimental/plugin` 两个 `{"source": ...}` only 的 exports 子路径修复（详见 [`06-coverage-and-parity.md`](06-coverage-and-parity.md) 的"三包是 dev-only"一节）。
+
+> **本节整体作废（v1.2.0）**：`experimental/services/` 与 `experimental/mini/` 均已删除，`src/experimental/` 只剩 `source-resolver.ts`。以下内容仅作 chord1 落地方式的记录。原文中所有 `services/*.ts` 行号、服务 token 清单、`PI_EXPERIMENTAL=1 ./pi-test.sh server|client` 入口、`commands.ts:94` 等均已失效。删除提交 `7472cda0d`（−21,561 行）。durable 侧对应能力（Harness、task graph、`ConversationView`）未被删除。
 
 ## 7. ⚠️ 现状 vs 规格：这一节是本篇的诚实底线
 
@@ -242,7 +256,7 @@ tui.ts        export default defineFacet({ id: ".../tui" })      —— use Slas
 
 **【解释】** 两份文档都叫 "RPC" 但**没有任何关系**：前者是 stdio 上的 JSON 帧协议，后者是"跨进程调用 service 成员"的语义说明。任何链接或引用 `rpc.md` 的地方都必须带路径。这个碰撞本身值得写，因为搜索"pi rpc"的人极可能落在错的那份上。
 
-## 8. 对集成者的意义
+## 8. 对集成者的意义（v1.2.0 后已大幅收窄）
 
 **【解释】** 按读者分三类：
 
@@ -266,27 +280,33 @@ tui.ts        export default defineFacet({ id: ".../tui" })      —— use Slas
 
 ## 9. 源码锚点
 
-chord 本体：
+chord 本体——**v1.2.0 仍存在的**（链接有效）：
 
-- 定位 / 用法总览：[`packages/chord/README.md`](../../packages/chord/README.md)
-- 实现计划与边界（含迁移表、禁用词汇表、退出条件）：[`packages/chord/PLANNING.md`](../../packages/chord/PLANNING.md)
+- 定位 / 用法总览：[`packages/chord/README.md`](../../packages/chord/README.md)（v1.2.0 续存，147 行）
 - 边界守卫测试：[`packages/chord/test/boundary.test.ts`](../../packages/chord/test/boundary.test.ts)
-- 核心类型（`Facet` `:225`、`FacetEnvironment` `:206`、`ServiceMode` `:60`、`ReplicatedState` `:43`、`RemoteServiceTransport` `:184`）：[`packages/chord/src/types.ts`](../../packages/chord/src/types.ts)
-- 根 API（`createFacetHost` `:19`、`defineFacet` `:66`、`defineService` `:70`、`createRemoteServiceBinding` `:84`、`replicatedState` `:88`）：[`packages/chord/src/api.ts`](../../packages/chord/src/api.ts)
 - 公开导出面：[`packages/chord/src/index.ts`](../../packages/chord/src/index.ts)
-- 跨边界 wire 语法（`$chord.service` 控制调用、snapshot/update 校验、错误码）：[`packages/chord/src/services/wire.ts`](../../packages/chord/src/services/wire.ts)、[`errors.ts`](../../packages/chord/src/services/errors.ts)、[`state-codec.ts`](../../packages/chord/src/services/state-codec.ts)
-- delta 原语与指南：[`packages/chord/src/delta/index.ts`](../../packages/chord/src/delta/index.ts)、[`packages/chord/src/delta/README.md`](../../packages/chord/src/delta/README.md)
-- facet host 与 loader：[`packages/chord/src/facets/host.ts`](../../packages/chord/src/facets/host.ts)、[`loader.ts`](../../packages/chord/src/facets/loader.ts)
-- bundler / Node 加载：[`packages/chord/src/bundler.ts`](../../packages/chord/src/bundler.ts)、[`node.ts`](../../packages/chord/src/node.ts)
+- delta 原语与指南：[`packages/chord/src/delta/index.ts`](../../packages/chord/src/delta/index.ts)、[`packages/chord/src/delta/README.md`](../../packages/chord/src/delta/README.md)（**delta 未经 chord2 重写，本文原有行号大概率仍有效**）
+- v1.2.0 新增：[`packages/chord/docs/spec.md`](../../packages/chord/docs/spec.md)、[`docs/guide.md`](../../packages/chord/docs/guide.md)、[`docs/tutorial.md`](../../packages/chord/docs/tutorial.md)、[`CHANGELOG.md`](../../packages/chord/CHANGELOG.md)
+- Node 加载：[`packages/chord/src/node.ts`](../../packages/chord/src/node.ts)
 
-Pi 侧：
+chord 本体——**v1.2.0 已删除的**（以下为历史锚点，不建链接，避免死链）：
 
-- 被实现的那份规格：[`packages/agent/docs/plugins.md`](../../packages/agent/docs/plugins.md)（service transport 语义：[`packages/agent/docs/rpc.md`](../../packages/agent/docs/rpc.md)，**注意与 `coding-agent/docs/rpc.md` 同名不同物**）**⚠️ v1.0.0：两文件已随 `packages/agent/docs/` 整树删除，仅存 git 历史**
-- **规格、未实现**：[`packages/agent/docs/mobile-handoff/02-plugins/01-facets/facets.md`](../../packages/agent/docs/mobile-handoff/02-plugins/01-facets/facets.md)、状态表 [`mobile-handoff/README.md`](../../packages/agent/docs/mobile-handoff/README.md) **⚠️ v1.0.0：同上，已删除**
-- 落地实现：[`packages/coding-agent/src/experimental/services/`](../../packages/coding-agent/src/experimental/services/)（服务清单见同目录 `README.md`）
-- Pi 侧插件 API 与打包/加载适配：[`experimental/plugin.ts`](../../packages/coding-agent/src/experimental/plugin.ts)、[`experimental/plugins/bundled.ts`](../../packages/coding-agent/src/experimental/plugins/bundled.ts)、[`experimental/plugins/package.ts`](../../packages/coding-agent/src/experimental/plugins/package.ts)
-- 示例 plugin 包：[`packages/coding-agent/examples/plugins/pi-example-plugin/`](../../packages/coding-agent/examples/plugins/pi-example-plugin/)（`contract.ts` / `session.ts` / `tui.ts`）
-- 非实验的 chord 接入点：~~`packages/agent/src/harness/context.ts`~~（v0.86.1 整段 re-export；**v1.0.0 已删除**——agent 与 chord 脱钩，chord Context 的主要消费者是 `packages/durable`）
+- `packages/chord/PLANNING.md`（本文多处引用其行号，如 `:3` 的 "not a stable public API contract yet"、`:476` 的 version negotiation 要求）——随 chord2 重写删除，**无替代文档**；其"迁移表/禁用词汇表/退出条件"内容在 v1.2.0 无对应物
+- `packages/chord/src/api.ts`（`createFacetHost`、`defineFacet`、`defineService`、`createRemoteServiceBinding`、`replicatedState` 重载）
+- `packages/chord/src/facets/host.ts`、`facets/loader.ts`
+- `packages/chord/src/services/wire.ts`、`services/errors.ts`、`services/state-codec.ts`
+- `packages/chord/src/bundler.ts`（`./bundler` 子路径与 esbuild 依赖一并移除）
+- 上列对应的 `src/types.ts` 旧行号（`Facet` `:225`、`FacetEnvironment` `:206`、`ServiceMode` `:60`、`ReplicatedState` `:43`、`RemoteServiceTransport` `:184`）——`types.ts` 文件仍在，但 facet/service 类型已不在其中
+
+Pi 侧（**全部已删除，不建链接**）：
+
+- `packages/agent/docs/plugins.md`（"被实现的那份规格"）、`packages/agent/docs/rpc.md`、`packages/agent/docs/mobile-handoff/` 整树——v1.0.0 删除，仅存 git 历史
+- `packages/coding-agent/src/experimental/services/`（落地实现与其 `README.md` 服务清单）——v1.2.0 删除
+- `packages/coding-agent/src/experimental/plugin.ts`、`experimental/plugins/bundled.ts`、`experimental/plugins/package.ts`（插件 API 与打包/加载适配）——v1.2.0 删除
+- `packages/coding-agent/examples/plugins/pi-example-plugin/`（示例 plugin 包）——v1.2.0 删除
+- `packages/agent/src/harness/context.ts`（非实验的 chord 接入点）——v1.0.0 删除；agent 与 chord 脱钩
+
+**v1.2.0 的 chord 接入点只剩两处**：[`packages/durable/package.json`](../../packages/durable/package.json) 与 [`packages/env/package.json`](../../packages/env/package.json)。`packages/coding-agent` 不再依赖 chord。
 
 ## 10. 未取证 / 不确定
 

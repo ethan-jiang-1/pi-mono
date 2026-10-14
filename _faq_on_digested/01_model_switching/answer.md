@@ -148,5 +148,5 @@ const { session } = await createAgentSession({
 - 基线：pi-mono `v0.85.1`（tag `d981de122`，merge `e3aa42f46`）
 - 源码：`packages/coding-agent/src/core/keybindings.ts` → `KEYBINDINGS` 对象
 - 源码：`packages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts`
-- `_digested/`：[agent/01-Anatomy/1.1_Agent_Info.md](_digested/agent/01-Anatomy/1.1_Agent_Info.md) — AgentLoopConfig
-- `_digested/`：[integration/03-runtime-api.md](_digested/integration/03-runtime-api.md) — SDK/RPC 模型管理 API
+- `_digested/`：[agent/01-Anatomy/1.1_Agent_Info.md(../../_digested/agent/01-Anatomy/1.1_Agent_Info.md) — AgentLoopConfig
+- `_digested/`：[integration/03-runtime-api.md(../../_digested/integration/03-runtime-api.md) — SDK/RPC 模型管理 API

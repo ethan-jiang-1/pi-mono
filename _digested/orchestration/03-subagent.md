@@ -18,7 +18,8 @@ subagent 的身份定义是 markdown + YAML frontmatter(`name`/`description`/`to
 
 - `["--mode", "json", "-p", "--no-session"]`(`:300`)——JSON 输出、print 模式、不留会话;
 - 未指定 `model` 时继承派发会话的 model/thinking(`:301-306`;README `:140`);
-- `--tools` 按 agent 定义收缩工具面(`:307`)——**警示(Unreleased,04b97ef00)**:`--tools` 不再隐式移除 MCP 工具。agent 定义若指望 `--tools` 顺带把 MCP server 挡在子代理外,现在会落空——未命中的 MCP 工具保持注册,codemode 脚本与 tool_search 仍可达;要彻底排除须显式 `--exclude-tools 'mcp__*'`,或用 `--no-mcp` 直接不加载内置 MCP 扩展;
+- `--tools` 按 agent 定义收缩工具面(`:307`)——**警示(04b97ef00，v1.2.0 起在 tag 内)**:`--tools` 不再隐式移除 MCP 工具。agent 定义若指望 `--tools` 顺带把 MCP server 挡在子代理外,现在会落空——未命中的 MCP 工具保持注册,codemode 脚本与 tool_search 仍可达;要彻底排除须显式 `--exclude-tools 'mcp__*'`,或用 `--no-mcp` 直接不加载内置 MCP 扩展;
+- **v1.2.0 补充**：`--tools` 现在也接受 **`+name`/`-name` 增量项**（`ddaa0a034`，in-tag；基线文档原写 "`--tools` does not accept `+name` or `-name`"）。**只含增量项**的列表不是白名单——它在默认集上增删（`sdk.ts:76-87` 的文档块、`:280-283` 经 `getToolListError` 强制）；含普通工具名才是整体替换。要点：`+name` 只能匹配**确切工具名**，且增量项与普通名混在同一个列表里会抛错。
 - 自定义 system prompt 写临时文件走 `--append-system-prompt`(`:334-339`);
 - `spawn` 独立进程(`:344-350`),父侧逐行解析 JSON 事件流累计 usage/turns/stopReason(`:353-395`)。
 

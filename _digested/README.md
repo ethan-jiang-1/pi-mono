@@ -24,22 +24,22 @@ Agent 内核入口：[`agent/`](agent/)
 
 pi-mono 可以作为终端 coding agent 使用，也能通过 SDK/RPC 被其它产品驱动；本消化层将这一结构概括为 **library-first**，不将其当作官方逐字产品优先级或跨版本 API 稳定性承诺。这里要分开三个责任层：Agent 基础运行核；coding-agent 的 `AgentSession` 与 [`SessionManager` 会话树](../packages/coding-agent/docs/sdk.md#sessionmanager-api)；独立 experimental [`durable` 运行时](../packages/durable/README.md)。v1.0.0 迁出 agent 包的是内层 durable/harness 能力，**不是 coding-agent JSONL 会话持久化整体迁走**。
 
-当前基线（v1.0.3）它由 14 个包组成一个 monorepo（v1.0.0 的 13 包基础上 +`env`——**Unreleased，post-v1.0.3 单日成包**；更早的 `web-ui`/`mom`/`pods` 已移除，`storage` 于 v0.84 并入 session-backends（该包于 v1.0.0 删除），`chord`/`durable` 于 v0.85.x–0.86.x 新增，`mcp`/`codemode` 于 v1.0.0 新增）：
+当前基线（**v1.2.0**，tag `06a466935`）它由 **11** 个包组成一个 monorepo（v1.0.0 的 13 包基础上 +`env`；v1.2.0 又删除 `client`/`protocol`/`server` 三包，13+1−3 = 11；更早的 `web-ui`/`mom`/`pods` 已移除，`storage` 于 v0.84 并入 session-backends（该包于 v1.0.0 删除），`chord`/`durable` 于 v0.85.x–0.86.x 新增，`mcp`/`codemode`/`env` 于 v1.0.0–v1.2.0 新增）：
 
 | 包 | 职责 | 层级 |
 |---|---|---|
 | `packages/ai` | LLM 抽象层：模型定义、多 provider 适配、流式协议、消息类型（TranscriptContext）；v1.0.0 起 image/classifier 模型统一进 `Model`/`Provider` 面；v1.0.3 起 provider 名为 `azure`（双 API：Responses + Chat Completions） | 基础设施 |
 | `packages/agent` | **最小核**（v1.0.0 收缩）：Agent、agent loop、proxy stream、类型——不含 session/harness/工具 | Agent 内核 |
-| `packages/coding-agent` | 完整应用层：CLI/TUI/RPC/SDK、扩展系统、会话管理、内置工具、MCP/codemode/tool_search 内置扩展、experimental services | 应用外壳 |
+| `packages/coding-agent` | 完整应用层：CLI/TUI/RPC/SDK、扩展系统、会话管理、内置工具、MCP/codemode/tool_search 内置扩展（**experimental services 已于 v1.2.0 删除**） | 应用外壳 |
 | `packages/tui` | 终端 UI 库：组件系统、渲染引擎、输入处理、fullscreen 模式（v1.0.0 默认） | UI 框架 |
 | `packages/durable` | **持久会话事实层**（v1.0.0 接盘）：Pico record contracts + Harness 运行时 + task graph + SQLite/JSONL/Memory 存储后端；v1.0.3 起 `ExecutionEnv` 扩为跨平台契约（argv exec/watch/输出窗口 + env-conformance），成为 pi-env 的契约上游 | 新架构层 |
-| `packages/chord` | 应用组合运行时：facets、services、replicated state（事务性 change/replace）、remote-service wire（**非 Pi 包**，零 Pi 依赖） | 新架构层 |
+| `packages/chord` | 应用组合运行时：typed host runtime、contracts、replicated state、link/RPC（**非 Pi 包**，零 Pi 依赖）。**v1.2.0 经 chord2 重写**，旧 facet/service API 不兼容 | 新架构层 |
 | `packages/mcp` | **独立 MCP 客户端**（v1.0.0 新增）：传输中立核心 + stdio/Streamable HTTP + OAuth（零 pi 依赖）；v1.0.1+ 补 CIMD 与 DCR application_type | 集成 |
 | `packages/codemode` | **QuickJS-WASM 沙箱**（v1.0.0 新增）：worker 线程跑模型写的 JS，注入工具暴露为 `tools.<name>(args)`；v1.0.1+ 输出封顶 + built-ins lockdown | 集成 |
-| `packages/env` | **SSH 远程执行环境**（**Unreleased**，post-v1.0.3 单日成包）：durable `ExecutionEnv` 的跨机器实现——TS 客户端（Connection/RemoteExecutionEnv/ssh bootstrap）+ Rust daemon，语义等价有 conformance/differential 合同；monorepo 内暂零消费者 | 集成 |
-| `packages/protocol` | CBOR 二进制协议 + framing（experimental，chord/durable 线；PROTOCOL_VERSION=8） | 集成 |
-| `packages/client` | 传输无关的远程 session 客户端（experimental，chord/durable 线） | 集成 |
-| `packages/server` | 实验性路由层：SessionRouter 把 client 连接路由到 session 服务（业务语义在 coding-agent/src/experimental/services/） | 集成 |
+| `packages/env` | **SSH 远程执行环境**（v1.2.0 起在 release 内，此前为 Unreleased）：durable `ExecutionEnv` 的跨机器实现——TS 客户端（Connection/RemoteExecutionEnv/ssh bootstrap）+ Rust daemon（8 目标交叉构建，SHA-256 命名部署），语义等价有 conformance/differential 合同 | 集成 |
+| ~~`packages/protocol`~~ | **v1.2.0 删除**：CBOR 二进制协议 + framing（experimental，PROTOCOL_VERSION=8） | — |
+| ~~`packages/client`~~ | **v1.2.0 删除**：传输无关的远程 session 客户端 | — |
+| ~~`packages/server`~~ | **v1.2.0 删除**：实验性路由层（SessionRouter → session 服务） | — |
 | `packages/telemetry` | vendor-neutral typed telemetry | 辅助 |
 | `packages/evals` | eval harness | 辅助 |
 
@@ -136,7 +136,7 @@ pi-mono 里需要严格区分两种 harness：
 | `orchestration/` | 工作编排 | 驾驶座视角的原语阶梯：双队列/loop 钩子/扩展/todo/plan-mode/subagent/codemode/MCP/durable，选择决策与诚实空白 |
 | `extensions/` | 扩充思路 | 极简核 + 靠扩展长能力：核有多小、扩充四轴、扩充套路 |
 | `composition/` | 配置哲学与用户决策 | 从设计哲学到配置决策的完整映射——五层框架、七条轴、AGENTS.md 设计艺术 |
-| `architecture-next/` | 新架构层（v0.85.x–1.0.0 演进） | chord/durable/server：组合运行时、持久化事实层（v1.0.0 接盘 harness/session/storage）、路由交换机（experimental） |
+| `architecture-next/` | 新架构层（v0.85.x–1.2.0 演进） | chord/durable：组合运行时、持久化事实层（v1.0.0 接盘 harness/session/storage）。**路由交换机（server/client/protocol）已于 v1.2.0 删除**，该页保留为删除记录 |
 | `test-strategy/` | 官方测试体系与工程纪律 | 强隔离沙箱、五级金字塔、Faux 驱动、TUI 无头、持久层恢复与评测分轨 |
 | `trajectory/` | 会话轨迹 | transcript 即 model-visible 状态：不变量链、session JSONL 形态、faux 表达力、录制回放 DIY（含 DSH 对照） |
 | `_change_log/` | 上游同步记录 | 每次 upstream 版本同步的变更摘要和影响评估 |

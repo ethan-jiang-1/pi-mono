@@ -7,7 +7,7 @@
 > - 入口模块图预算守卫：`scripts/check-entry-graphs.mjs`
 > - npm 审计显式豁免：`scripts/npm-audit.mjs`
 > - 安装锁生成与生命周期脚本 allowlist：`scripts/generate-coding-agent-install-lock.mjs`
-> - 消费者真实打包冒烟：`scripts/coding-agent-consumer.mjs`、`scripts/coding-agent-consumer.test.mjs`
+> - 消费者真实打包冒烟：`scripts/check-package-install.mjs`（编排）+ `package-artifacts.mjs` + `local-package-install.mjs` + `coding-agent-smoke.mjs`
 > - 跨平台同构打包冒烟：`scripts/check-browser-smoke.mjs`
 > - 跨后端等价性测试套件：`packages/durable/src/testing/storage-conformance.ts`（1584 行）
 > - 跨环境等价性测试套件：`packages/durable/src/testing/env-conformance.ts`（511 行）
@@ -114,29 +114,40 @@ v1.0.1 起（`581e7ba78`，closes #5653）仓库删除了 `npm-shrinkwrap.json`�
 
 ## 四、真实消费者打包冒烟（Consumer Smoke Testing）
 
-普通的单测只是在源文件树（TS 源码）上运行。为了杜绝“发包后用户用不了”，Pi 编写了 `scripts/coding-agent-consumer.mjs`：
+普通的单测只是在源文件树（TS 源码）上运行。为了杜绝“发包后用户用不了”，Pi 用一组脚本做真实消费者打包冒烟。
 
-1. **真实物理打包**：调用 `npm pack --ignore-scripts`，将所有公开发布的包真实打包为 `.tgz` 压缩归档；
-2. **宿主隔离沙箱**：在系统的 `/tmp` 目录下创建一个全新的空目录作为外部消费者工程，写入一个使用 `file:./tarballs/...` 的真实 `package.json`；
-3. **真实包管理器安装**：分别调用 `npm install --omit=dev` 与 `bun install --production` 执行物理安装；
-4. **包内脏资产审查**：
-   ```javascript
-   for (const path of ["dist/client", "dist/experimental", "dist/bundle/client.js"]) {
-     if (existsSync(join(packageDir, path))) {
-       throw new Error(`Published package contains development-only code: ${path}`);
-     }
-   }
-   ```
-   严格断言发布的 tarball 中**绝不能残留任何开发期/实验性模块**；
-5. **消费端 SDK 与 CLI 校验**：以纯外部第三方的视角执行一段 `smoke-sdk.mjs`，验证能否成功导入 `{ createAgentSession, SessionManager, ModelRuntime }`，并执行编译后的 CLI 二进制（`pi --version`），断言其输出与版本号完全吻合。
+> **v1.2.0 改形**：原单一脚本 `scripts/coding-agent-consumer.mjs`（138 行）已删除，职能拆成四个模块。旧脚本断言 `dist/client`、`dist/experimental` 等 dev-only 目录不残留——**这些目录随 experimental client/server 的移除一并消失，该断言已无对象**。新结构：
+
+| 脚本 | 职责 |
+|---|---|
+| `scripts/check-package-install.mjs` | 编排入口（`npm run check:package-install`）：建临时根，产 artifact set，逐包建隔离消费者、安装、冒烟 |
+| `scripts/package-artifacts.mjs` | `produceArtifactSet()`：`npm pack` 全量公开发布包、算哈希、组装 artifact 目录 |
+| `scripts/local-package-install.mjs` | `installConsumer()` / `packageConsumerDirectoryName()`：生成消费者 `package.json`（`file:` 指向 tarball），跑真实安装 |
+| `scripts/coding-agent-smoke.mjs` | `smokeTestNpmConsumer()` 通用导出冒烟；`smokeTestCodingAgent()` 针对 coding-agent 的 SDK 导出与 CLI `--version` 校验 |
+
+驱动逻辑（`check-package-install.mjs:10-22`）：
+
+```javascript
+const artifactSet = produceArtifactSet({ build: false, outDir: ..., repoRoot: process.cwd() });
+for (const pkg of artifactSet.packages) {
+  const directory = join(root, "consumers", packageConsumerDirectoryName(pkg.name));
+  installConsumer({ artifactSet, directory, packageNames: [pkg.name] });
+  smokeTestNpmConsumer({ artifactSet, directory, packageName: pkg.name });
+  if (pkg.name === codingAgentName) smokeTestCodingAgent(directory);
+}
+```
+
+即：**每个包各自建一个只以它为 direct dependency 的隔离消费者工程**，真实安装后验证导出面；coding-agent 额外跑一次 CLI 版本冒烟。这与旧脚本“一个消费者工程装全部包”的形态不同——逐包隔离更严，能发现单个包自身的发布缺陷。
 
 ### pi-env daemon：随 npm 包分发的二进制供应链案例
 
-新包 `@earendil-works/pi-env`（post-v1.0.3，Unreleased）把供应链纪律延伸到了**随 npm 包发布的原生二进制**（8 目标交叉构建的 Rust daemon），三道守卫环环相扣：
+包 `@earendil-works/pi-env`（v1.2.0 起在 tag 内；此前为 post-v1.0.3 的 Unreleased 状态）把供应链纪律延伸到了**随 npm 包发布的原生二进制**（8 目标交叉构建的 Rust daemon），三道守卫环环相扣：
 
-1. **SHA-256 命名部署 + 每次启动前验证**：daemon 部署到远端 `~/.pi/mobile/tools/pi-env-<sha256前32位>`，按内容哈希命名、版本永不冲突；上传走临时文件、校验哈希匹配后才 rename 到位，且 `connectSsh` 的 `beforeStart` 钩子保证**每次重启 daemon 前重新校验/部署**——二进制在任何一次执行前都经过哈希验证（`packages/env/src/ssh.ts:396-452`）。升级无需显式机制：包版本变、哈希变、远端路径即变。
-2. **npm pack 清单 CI 校验**：`env.yml` 的 `check` job 用 `npm pack --dry-run --json` 校验包文件清单——必须含全部 8 个 `bin/pi-env-*/pi-env` 二进制 + `dist/` + `docs/protocol.md`，不得混入 `src/`/`daemon/`/`test/`（`.github/workflows/env.yml:59-72`），与第四节"包内脏资产审查"同一纪律的 CI 化。
+1. **SHA-256 命名部署 + 每次启动前验证**：daemon 部署到远端 `~/.pi/mobile/tools/pi-env-<sha256前32位>`（`daemonPath()`，`packages/env/src/ssh.ts:379-383`），按内容哈希命名、版本永不冲突；上传走临时文件、校验哈希匹配后才 rename 到位。**v1.2.0 的钩子形态变了**：旧的 `beforeStart?` 选项已删除，改由 `sshConnectionFor()` 闭包内的 `state.verified` 记录"上次已验证的 daemon"，`Connection.command` 在每次启动时先 `detectPlatform`（仅一次）再校验或部署（`ssh.ts:485-500`）。语义不变：二进制在任何一次执行前都经过哈希验证。升级无需显式机制——包版本变、哈希变、远端路径即变。
+2. **npm pack 清单 CI 校验**：`env.yml` 的 `check` job 用 `npm pack --dry-run --json` 校验包文件清单——必须含全部 8 个 `bin/pi-env-*/pi-env[.exe]` 二进制 + `dist/` + `README.md` + `CHANGELOG.md` + `docs/protocol.md`，不得混入 `src/`/`daemon/`/`test/`（`.github/workflows/env.yml:59-68`），与第四节同一纪律的 CI 化。
 3. **release 构建逐 OS 实测（"as shipped" 原则）**：`release-daemons` job 在 6 种 OS runner（含 windows-11-arm、Rosetta 下的 darwin-x64）用**发布的 release 构建**跑全部 pi-env 测试（`PI_ENV_DAEMON` 指向 artifact，`env.yml:75-126`）——测试的不是本机构建的 debug 二进制，而是用户实际收到的那份。
+
+   补：8 目标交叉构建清单在可复用的 `.github/workflows/env-daemons.yml:24-31`，`build-binaries.yml` 通过 `uses:` 调用它，`publish-npm` 消费其 artifact。
 
 ---
 
@@ -188,5 +199,5 @@ v1.0.3 起 durable 有了第二条同构套件：`packages/durable/src/testing/e
 |---|---|---|
 | **物理环境真空** | `test.sh`（`env -i`、`.pi-test-owned`） | 消除宿主配置泄漏与磁盘脏残留 |
 | **全真状态机仿真** | `faux.ts`（710 行）+ `harness.ts` | 0 Token、毫秒级驱动 Agentic Loop 闭环 |
-| **发布与供应链守卫** | `check-runtime-deps` + `coding-agent-consumer` + `npm-audit.mjs` 豁免 + install-lock allowlist + pi-env daemon（SHA-256 部署/npm pack 校验/release 实测） | 消除 Monorepo 幽灵依赖与发包不可用 |
+| **发布与供应链守卫** | `check-runtime-deps` + `check:package-install`（逐包隔离消费者冒烟）+ `npm-audit.mjs` 豁免 + install-lock allowlist + pi-env daemon（SHA-256 部署/npm pack 校验/release 实测） | 消除 Monorepo 幽灵依赖与发包不可用 |
 | **标准契约证据锁** | MCP `baseline.json` + `storage-conformance.ts` + `env-conformance.ts` | 跨外部协议、跨后端存储、跨执行环境的长周期防退化 |

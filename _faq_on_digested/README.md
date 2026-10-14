@@ -4,7 +4,7 @@
 
 简单说：**一子目录 = 一个探究过的问题，答案是自己综合出来的，不是从某一份材料里直接抄的。**
 
-> **当前研究基线**：涉及运行时行为的结论以 pi-mono `v1.0.3`（upstream tag `d78dc83d6`，工作树锚点 `98d2e1947`，2026-10-06 随 sync-0008 merge `fad4b11bd` 进本仓库）为准；旧版本仅用于变更史解释，不能替代当前源码验证。**注意**：v0.85.x–1.0.0 的研究债务已在 sync-0007 执行轮清偿（06/09 等篇含 v1.0.0 更正）；sync-0008 增量（azure 改名、Home/End 键位、`--tools` MCP 语义、pi-env 成包等）已更新 01/02/03 并给 07/08 补注，其余各篇经 0008 取证逐条核对未受影响——变更明细见 [`_digested/_change_log/0008-v1.0.0-to-v1.0.3.md`](../_digested/_change_log/0008-v1.0.0-to-v1.0.3.md) 的影响评估。
+> **当前研究基线**：涉及运行时行为的结论以 pi-mono **`v1.2.0`（upstream tag `06a466935`）** 为准；旧版本仅用于变更史解释，不能替代当前源码验证。（上一基线：`v1.0.3`，tag `d78dc83d6`，工作树锚点 `98d2e1947`，2026-10-06 随 sync-0008 merge `fad4b11bd` 进本仓库。）**sync-0009 增量**：`packages/{client,protocol,server}` 三包与 `coding-agent/src/experimental/` 服务栈整体删除、`chord2` 重写、`packages/env` 由 Unreleased 转入 release、tools 修饰符 `+name`/`-name`、`chord/PLANNING.md` 删除。经 0009 取证，本目录受影响篇目已逐条核对并更新（01/02/03/06/07/08/12），其余各篇未受影响——变更明细见 [`_digested/_change_log/0009-v1.0.3-to-v1.2.0.md`](../_digested/_change_log/0009-v1.0.3-to-v1.2.0.md) 的影响评估。**注意**：v0.85.x–1.0.0 的研究债务已在 sync-0007 执行轮清偿（06/09 等篇含 v1.0.0 更正）；sync-0008 增量（azure 改名、Home/End 键位、`--tools` MCP 语义、pi-env 成包等）已更新 01/02/03 并给 07/08 补注，其余各篇经 0008 取证逐条核对未受影响——变更明细见 [`_digested/_change_log/0008-v1.0.0-to-v1.0.3.md`](../_digested/_change_log/0008-v1.0.0-to-v1.0.3.md) 的影响评估。
 
 > **新增研究的独立锚点**：第 12 篇理念 FAQ 核对到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`，与上述全库研究基线区分；其它篇不因此被视为已全量同步。
 

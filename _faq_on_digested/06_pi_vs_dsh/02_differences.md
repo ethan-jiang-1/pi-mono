@@ -35,7 +35,11 @@
 
 - pi：`createAgentSession()` 进程内 SDK + JSONL RPC 子进程；TUI（`packages/tui`）是自研 terminal 渲染器——依赖仅 `get-east-asian-width` + `marked`，无 react/ink，作为 SDK 的 consumer 参考实现。
 - DSH：CLI / Web / ACP / JSON-RPC 复用同一套 runtime spine，入口只是"组合出不同插件树的 profile"；`dsh --profile web` 是 bootstrap 组合时序，比 pi 的 SDK 启动复杂得多。
-- 注（v0.85.x）：pi 这一侧 2026-09 长出了实验性的连接层——`packages/chord`（0.85.0 进入 `dependencies`，0.85.1 列入 README 的 All Packages 表）、`packages/protocol`（`PROTOCOL_VERSION = 8`）、`packages/client`、`packages/server`。0.85.1 把它们往回圈：`pi-client` / `pi-protocol` 从 `dependencies` 挪到 `devDependencies`（`pi-server` 也只在 devDeps），`./client` 与 `./experimental/plugin` 子路径从 `dist` 改为 `source`-only，`files` 里加上 `!dist/client`、`!dist/experimental`、`!dist/cli/experimental`。所以"接入形态"这条轴目前仍是：**pi 的稳定面是进程内 SDK + JSONL RPC，连接层是圈起来的实验品**（`pi-test.sh` 能用，npm 包不再带它们）。
+- 注（v0.85.x）：pi 这一侧 2026-09 长出了实验性的连接层——`packages/chord`（0.85.0 进入 `dependencies`，0.85.1 列入 README 的 All Packages 表）、`packages/protocol`（`PROTOCOL_VERSION = 8`）、`packages/client`、`packages/server`。0.85.1 把它们往回圈：`pi-client` / `pi-protocol` 从 `dependencies` 挪到 `devDependencies`（`pi-server` 也只在 devDeps），`./client` 与 `./experimental/plugin` 子路径从 `dist` 改为 `source`-only，`files` 里加上 `!dist/client`、`!dist/experimental`、`!dist/cli/experimental`。所以当时的"接入形态"这条轴是：**pi 的稳定面是进程内 SDK + JSONL RPC，连接层是圈起来的实验品**。
+
+**v1.2.0 更新（sync-0009）：这条注记整体作废——"圈起来的实验品"被直接删除了。** `packages/protocol`、`packages/client`、`packages/server` 三包在 v1.2.0 已不存在（提交 `7472cda0d`，161 文件、+32/−21,561 行），连同 `coding-agent/src/experimental/` 的服务栈与 `chord` 对 coding-agent 的依赖。上面关于 `devDependencies` 降级、`./client` source-only 子路径、`!dist/client` 的 `files` 排除等细节**全部失去对象**。
+
+因此"接入形态"这条轴现在的准确表述是：**pi 的稳定面是进程内 SDK + JSONL RPC；`chord` 仍是 chord2 形态的独立组合运行时，但消费者只剩 `durable` 与 `env` 两个包；不存在官方的跨进程/远程连接层**。DSH 侧的 ACP/JSON-RPC/Web 仍是其独有维度——这一对比结论比原来**更强**，因为 pi 侧不再是"暂时圈起来"，而是"没有"。
 
 ## 一张表收束
 

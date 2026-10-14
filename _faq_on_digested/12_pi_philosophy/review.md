@@ -18,11 +18,11 @@
 |---|---|---|
 | 需求与贡献准入 | [贡献者批准及 auto-close](../../CONTRIBUTING.md#L21-L34)；大改动先通过 [RFC](../../CONTRIBUTING.md#L99-L102) 讨论 | 核心克制先发生在需求入口；维护者的审阅时间也是受保护的资源 |
 | 问题诊断 | [bug 模板](../../.github/ISSUE_TEMPLATE/bug.yml)要求先排除扩展；[issue 分析 prompt](../../.pi/prompts/is.md)要求独立追踪代码路径 | 输入的分析与实现建议不自动成为事实；先建立可复核的问题，再决定是否实现 |
-| 设计与实施 | [项目开发规则](../../AGENTS.md)；[Chord 规划](../../packages/chord/PLANNING.md)分开合同、非目标、工作包、验收与迁移 | “做完”需要行为和边界条件，不能只以文件齐全或功能能跑来定义 |
+| 设计与实施 | [项目开发规则](../../AGENTS.md)；[Chord 规格](../../packages/chord/docs/spec.md)分开合同、硬约束、已知限制与决策 | “做完”需要行为和边界条件，不能只以文件齐全或功能能跑来定义 |
 | 确定性回归 | [faux-provider 测试套件](../../packages/coding-agent/test/suite/README.md)；[settled 回归](../../packages/coding-agent/test/suite/regressions/6363-agent-settled-event.test.ts) | 把重试、并发、取消和完成事件变成可断言的语义，减少真实模型波动 |
 | 静态与构建质量 | [check 脚本组合](../../package.json#L20-L27)；[主 CI](../../.github/workflows/ci.yml) | 类型、依赖声明、入口成本、安装锁和实际浏览器 bundle 分别检查不同错误 |
 | 模型行为与文档 | [evals](../../packages/evals/README.md)区分 host eval 与成对文档评估 | 程序合同正确与模型能完成任务是两个需要分别验证的问题 |
-| 安装与发布 | [packed consumer](../../scripts/coding-agent-consumer.mjs)；[release 脚本](../../scripts/release.mjs#L251-L289)；[tag 管线](../../.github/workflows/build-binaries.yml) | monorepo 里跑通不代表发布包能独立安装；发布完成也不只是 push tag |
+| 安装与发布 | [packed consumer](../../scripts/check-package-install.mjs)；[release 脚本](../../scripts/release.mjs#L251-L289)；[tag 管线](../../.github/workflows/build-binaries.yml) | monorepo 里跑通不代表发布包能独立安装；发布完成也不只是 push tag |
 | 发布恢复与数据更新 | [幂等 npm 发布](../../scripts/publish.mjs)；[发布公告与指针](../../scripts/publish-release-announcement.mjs)；[独立模型目录管线](../../.github/workflows/publish-model-catalog.yml) | 对已发生的外部副作用分步恢复；代码版本之外还有数据交付面 |
 
 这是一组不同触发条件的流程，不能把整张表合并成“每个 PR 都执行所有检查”。[主 CI](../../.github/workflows/ci.yml#L14-L65)配置为 Linux build/check/test 和独立 MCP conformance；跨平台 env、Nix、供应链 audit、tag 发布和模型目录另有工作流。文档行为评估没有普通 PR 主 CI 调用证据。详细触发矩阵见 [SDLC 证据第 3 节](sdlc_evidence.md#L58-L80)。
@@ -47,11 +47,13 @@
 
 ### 3.3 设计文档包含退出条件与迁移顺序
 
-[Chord 规划](../../packages/chord/PLANNING.md#L619-L750)将实现拆为工作包，分别列交付项、测试和退出条件；[迁移顺序](../../packages/chord/PLANNING.md#L564-L571)是先让独立实现通过 conformance，再加 Pi adapter、迁移调用者、跑集成测试，最后删除重复实现。[完成定义](../../packages/chord/PLANNING.md#L846-L859)还要求包能在 monorepo 外工作，并由自动检查证明没有反向依赖 Pi。
+[Chord 规格](../../packages/chord/docs/spec.md)把运行时写成可判定的合同：第 2 节定义 type/contract，第 12 节「Known limitations and decisions」列出运行时**尚未做到的事**与各节留待决定的取舍，开头即声明「文档与代码不一致时以不一致为 bug」。这是把"做完了"落成可核对边界的方式——非目标被写在规格里，而不是留在人的记忆里。
 
-它对竞态测试也提出具体方法：[控制精确交错点](../../packages/chord/PLANNING.md#L813)，例如取消与请求接纳、reload cutover 与更新发布，而不是靠时间猜测竞态是否出现。这比“模块清晰、可测试”更能说明研发方法。
+竞态与交错点在 v1.2.0 主要靠**测试**而非规划文档承载：`packages/chord/test/` 下有 `reload.test.ts`、`replication.test.ts`、`websocket.test.ts`、`link.test.ts`、`manager.test.ts` 等，覆盖 reload cutover、取消与请求接纳、fork 生命周期等场景。规格第 11 节「Test coverage」逐项点名对应测试文件——这比"模块清晰、可测试"更能说明研发方法。
 
-这是一份当前项目的设计过程证据，不能据此声称全仓库统一实行某种正式方法。[文档状态](../../packages/chord/PLANNING.md#L3)明确区分已实现与规划部分；其 definition of done 不是已经全部达成的证明。
+> **证据基础已变更**：本节此前引用 `packages/chord/PLANNING.md`（工作包拆分、迁移顺序、完成定义、精确交错点控制）。该文件在本区间被 chord2 重写（`0104fef1e`，facet/service runtime → typed host runtime）**删除**，上述内容没有等价替代文档——workpackage 与 definition-of-done 的叙述在 v1.2.0 的 chord 文档中不存在。现引用 `docs/{guide,spec,tutorial}.md`（本区间新增），结论相应收窄为"规格内的合同与已知限制 + 测试覆盖清单"。
+
+本卷不能声称全仓库统一实行某种正式方法。chord 的规格是**单个包**的设计文档，其"硬约束"节（`:5-9`）声明运行时只依赖自身 `delta` 模块与 `typebox`、不依赖其它 Pi 包——这是该包的自述，不是全仓制度的证明。
 
 ### 3.4 公开入口承担依赖成本合同
 
@@ -93,7 +95,7 @@
 
 ### 3.7 验证用户安装的包，而不只验证工作区源码
 
-monorepo 中的依赖提升、workspace link 或构建残留，可能让缺依赖或漏文件的包仍能运行。[runtime-deps 检查](../../scripts/check-runtime-deps.mjs)先检查 runtime import 是否在 manifest 中声明；[packed consumer](../../scripts/coding-agent-consumer.mjs#L27-L124)再逐包 pack，在仓库外临时目录按生产依赖安装，检查 SDK/CLI、禁止泄露的实验目录与隐藏 subpath。
+monorepo 中的依赖提升、workspace link 或构建残留，可能让缺依赖或漏文件的包仍能运行。[runtime-deps 检查](../../scripts/check-runtime-deps.mjs)先检查 runtime import 是否在 manifest 中声明；[packed consumer](../../scripts/check-package-install.mjs)再逐包 pack，在仓库外临时目录按生产依赖装进只含该包的隔离工程，检查 SDK/CLI 与隐藏 subpath。
 
 [release 脚本](../../scripts/release.mjs#L251-L265)在检查、离线构建和测试后实际调用消费端检查；[tag publish job](../../.github/workflows/build-binaries.yml#L363-L376)也调用它。发布准备另有 Node/Bun 与真实交互的人工 smoke 要求，见 [SDLC 证据第 5 节](sdlc_evidence.md#L100-L108)；不可把文档要求误写成 release 脚本自动完成了全部交互测试。
 

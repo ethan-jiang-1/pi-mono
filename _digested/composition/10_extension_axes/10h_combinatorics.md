@@ -64,7 +64,9 @@
 
 ## 案例 4：轴 8 不走"组合"这套算法（v0.85.1 追加）
 
-**位置**：`packages/coding-agent/examples/plugins/pi-example-plugin/`（`src/contract.ts` / `src/session.ts` / `src/tui.ts`）
+**位置**（**v1.2.0 已删除**）：`packages/coding-agent/examples/plugins/pi-example-plugin/`（`src/contract.ts` / `src/session.ts` / `src/tui.ts`）
+
+> **⚠️ v1.2.0（sync 0009）**：`packages/coding-agent/examples/plugins/pi-example-plugin/` 已在 v1.2.0 删除（`7472cda0d`），`packages/chord/src/api.ts` 与旧 facet/service 运行时随 chord2 重写（`0104fef1e`）删除。下文对这两者的引用只作历史线索；chord 现状见 [`architecture-next/chord.md`](../../architecture-next/chord.md)。
 
 前面三个案例的"组合"发生在**一个文件内**：一个 `export default function (pi)`，里面挂多条轴的接线。第八根轴不是这么加的：
 

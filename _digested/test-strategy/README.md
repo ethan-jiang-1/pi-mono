@@ -1,6 +1,6 @@
 # test-strategy/ — Pi-mono 官方测试策略与工程纪律的消化层
 
-> **基线**：pi-mono `v1.0.0`（tag `a13d35a74`，merge `9e387e653` 锚定本仓库工作树）。本目录是 `_digested/` 下对 **Pi-mono 官方测试体系与工程纪律** 的全景解剖层，全面覆盖其测试宪法、分层架构、仿真内核、持久化验证与端到端发布门禁。
+> **基线**：pi-mono **`v1.2.0`（tag `06a466935`）**。此前为 `v1.0.0`（tag `a13d35a74`）。本区间（v1.0.3 → v1.2.0）测试面的主要变化：`scripts/coding-agent-consumer.mjs` 拆为 `check-package-install.mjs` + `package-artifacts.mjs` + `local-package-install.mjs` + `coding-agent-smoke.mjs`；`durable-env.yml` 改名 `env.yml` 并扩为三 job（`daemons`/`check`/`release-daemons`）；`env-daemons.yml` 增 8 目标交叉构建；新增 `packages/env` 的 Rust daemon 构建与 pack 校验。详见 [`_change_log/0009`](../_change_log/0009-v1.0.3-to-v1.2.0.md)。本目录是 `_digested/` 下对 **Pi-mono 官方测试体系与工程纪律** 的全景解剖层，全面覆盖其测试宪法、分层架构、仿真内核、持久化验证与端到端发布门禁。
 
 ---
 
@@ -30,7 +30,7 @@ Pi-mono 是一个以极简、高执行速度与强嵌入性著称的 AI Coding A
 | **二进制与冒烟资产** | `scripts/smoke-test-codemode-binary.mjs`（本地微型 SSE 流服务器）+ `.pi/skills/interactive-testing.md`（tmux 虚拟终端控制） |
 | **模型能力评测车道** | `packages/evals/`（独立评测包，与基础 CI 严格物理隔离，使用独立 `vitest-evals` 运行） |
 | **协议合规证据锁** | `packages/coding-agent/test/mcp-conformance/`（运行官方 `@modelcontextprotocol/conformance`，以 `baseline.json` 强锁防退化） |
-| **供应链与工程守卫** | `scripts/check-runtime-deps.mjs`（AST 幽灵依赖审计）、`check-entry-graphs.mjs`（图预算）、`coding-agent-consumer.mjs`（真实 Tarball 消费验证） |
+| **供应链与工程守卫** | `scripts/check-runtime-deps.mjs`（AST 幽灵依赖审计）、`check-entry-graphs.mjs`（图预算）、`check-package-install.mjs` + `package-artifacts.mjs`（真实 Tarball 逐包隔离消费验证） |
 | **存储通用一致性** | `packages/durable/src/testing/storage-conformance.ts`（1584 行跨 SQLite / JSONL / Memory 参数化等价性套件） |
 
 ---

@@ -1,12 +1,12 @@
 # orchestration/ — pi 的工作编排原语阶梯(驾驶座视角)
 
-> **历史起点**：`v1.0.0`（tag `a13d35a74`，当时复核锚点 `f0e079560`）；后续同步按 [全库记录](../README.md)追踪。本轮只校正本导览的责任层与完成边界，并复核相关合同到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`，不声明目录全部行号或源码仍与旧 tag 一致。
+> **当前基线：`v1.2.0`（tag `06a466935`）**，上一基线 `v1.0.3`（tag `d78dc83d6`）。**历史起点**：`v1.0.0`（tag `a13d35a74`，当时复核锚点 `f0e079560`）；后续同步按 [全库记录](../README.md)追踪。本轮只校正本导览的责任层与完成边界，并复核相关合同到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`，不声明目录全部行号或源码仍与旧 tag 一致。
 >
 > 方法论备注：原语阶梯、统一维度矩阵和诚实登记空白的组织视角历史上受 DSH `orchestration-ladder` 启发；保留出处不等于以 DSH 作为 Pi 原生理念证据。行为事实仍取自 Pi，不能预设它应长成与外部项目同构的阶梯。
 
 ## 一句话
 
-Pi 的 coding-agent 默认工作流围绕单 agent loop 和扩展面展开：双队列、循环钩子与工具结算在运行核；计划/委派在示例扩展或生态；MCP 与 codemode 提供工具接入和代码编排；独立 durable 提供实验性持久任务。不能把“coding-agent 没有统一长目标工作流”扩大成整个 monorepo 没有调度能力。
+Pi 的 coding-agent 默认工作流围绕单 agent loop 和扩展面展开：双队列、循环钩子与工具结算在运行核；计划/委派在示例扩展或生态；MCP 与 codemode 提供工具接入和代码编排（codemode 在 v1.2.0 有 coding-agent 与 durable **两份平行实现**）；独立 durable 提供实验性持久任务，v1.2.0 起同时是**工具执行内核**（内建 Code Mode、嵌套工具调用、tool-search）。不能把“coding-agent 没有统一长目标工作流”扩大成整个 monorepo 没有调度能力。
 
 **完成边界**：应用会话可能在 `agent_end` 后自动重试、压缩或续跑；宿主需要等待 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#respect-the-runtime-lifecycle)。业务正确性仍需另行验收，见 [重试设置](../../packages/coding-agent/docs/settings.md#network-and-retries)。
 
@@ -24,7 +24,7 @@ Pi 的 coding-agent 默认工作流围绕单 agent loop 和扩展面展开：双
 | todo(示例扩展) | `examples/extensions/todo.ts` | 上下文内计划留痕;状态存在 toolResult details 里,随 branch 重建 | 同上下文 | 会话 | 范本扩展 |
 | plan-mode(示例扩展) | `examples/extensions/plan-mode/` | 计划先行(收缩工具面)→ 人工批准 → 执行([DONE:n] 推进) | 工具面收缩 | 会话 | 范本扩展 |
 | subagent(示例扩展) | `examples/extensions/subagent/` | 每个 subagent 一个独立 `pi` 进程;single / parallel(≤8) / chain(`{previous}`) | **独立进程** | 一次性 | 范本扩展 |
-| codemode(内置工具) | `packages/codemode` | 模型写 JS 在 QuickJS-WASM 沙箱里编排**工具调用**,嵌套调用不进 LLM 上下文 | 沙箱 VM | 单次执行 | 内置工具 |
+| codemode(内置工具) | `packages/codemode`（coding-agent 侧）+ **`packages/durable/src/codemode`（durable 侧，v1.2.0 新增）** | 模型写 JS 在 QuickJS-WASM 沙箱里编排**工具调用**,嵌套调用不进 LLM 上下文。**两份平行实现**：前者宿主持久化 store；后者以 `pi.codemode.journal` 做确定性重放 | 沙箱 VM | 单次执行 | 内置工具 |
 | MCP 工具接入 | `packages/mcp` + coding-agent 内置扩展 | 外部工具生态适配为 `AgentTool` | 进程外 server | 按调用 | v1.0.0 采纳 |
 | durable tasks | `packages/durable/src/harness/` | 持久任务图:child tasks、join policy、owned conversations、自底向上 abort | 独立 conversation | **跨重启** | experimental |
 
@@ -48,7 +48,7 @@ Pi 的 coding-agent 默认工作流围绕单 agent loop 和扩展面展开：双
 |------|----------|------|
 | 双队列 / loop 钩子 | 是(core) | `packages/agent/src/index.ts` |
 | 扩展 API | 是(coding-agent) | `packages/coding-agent/src/core/extensions/types.ts` |
-| codemode | 扩展通常加载，但工具注册为 inactive，须显式启用 | [settings](../../packages/coding-agent/docs/settings.md#tools)、[codemode](../../packages/coding-agent/docs/codemode.md) |
+| codemode | 扩展通常加载，但工具注册为 inactive，须显式启用；另有 `codemode.mode` / `codemode.inlineBudget` 设置（`settings.md:43-44`） | [settings](../../packages/coding-agent/docs/settings.md#tools)、[codemode](../../packages/coding-agent/docs/codemode.md)、[durable 侧 Code Mode](../../packages/durable/README.md#code-mode) |
 | MCP | 内置扩展通常加载；连接 server 需配置，工具暴露取决于设置 | [MCP 文档](../../packages/coding-agent/docs/mcp.md)；[采纳记录](../harness/02-Boundaries/2.2_no_interop_protocol.md) |
 | todo / plan-mode / subagent | 否；可复制、链接或显式加载示例，也可安装生态 package | [扩展加载](../../packages/coding-agent/docs/extensions.md#create-and-load-an-extension)、[packages](../../packages/coding-agent/docs/packages.md) |
 | durable | 否——experimental 独立包,自带 examples | `packages/durable/README.md:3` |

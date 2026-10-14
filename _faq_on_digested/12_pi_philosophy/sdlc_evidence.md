@@ -85,7 +85,7 @@
 
 AGENTS 明确要求 direct external deps exact pin（[`AGENTS.md#L43-L50`](../../AGENTS.md#L43-L50)）。代码检查器跳过内部 workspace 包和非 registry specifier，因此“所有直接依赖 exact”实际含有明确例外（[`scripts/check-pinned-deps.mjs#L25-L39`](../../scripts/check-pinned-deps.mjs#L25-L39)、[`scripts/check-pinned-deps.mjs#L48-L56`](../../scripts/check-pinned-deps.mjs#L48-L56)）。例如 `packages/coding-agent` 的内部 `@earendil-works/pi-*` 依赖使用 `^1.0.3`，而外部 `undici` 等使用 exact（[`packages/coding-agent/package.json#L49-L72`](../../packages/coding-agent/package.json#L49-L72)）；这不是违规，而是检查器设计出的 workspace 版本策略。
 
-`package-lock.json` 为 lockfile v3，registry entries 带 `resolved` 和 `integrity`（[`package-lock.json#L1-L6`](../../package-lock.json#L1-L6)、[`package-lock.json#L31-L42`](../../package-lock.json#L31-L42)）。所核查的 CI 及 packed consumer 安装路径都带 `--ignore-scripts`，降低安装时执行第三方 lifecycle 的范围（例如 [`ci.yml#L32-L34`](../../.github/workflows/ci.yml#L32-L34)、[`scripts/coding-agent-consumer.mjs#L42-L58`](../../scripts/coding-agent-consumer.mjs#L42-L58)）。但这不等于源码静态安全或 npm registry 永久不可变。
+`package-lock.json` 为 lockfile v3，registry entries 带 `resolved` 和 `integrity`（[`package-lock.json#L1-L6`](../../package-lock.json#L1-L6)、[`package-lock.json#L31-L42`](../../package-lock.json#L31-L42)）。所核查的 CI 及 packed consumer 安装路径都带 `--ignore-scripts`，降低安装时执行第三方 lifecycle 的范围（例如 [`ci.yml#L32-L34`](../../.github/workflows/ci.yml#L32-L34)、[`scripts/local-package-install.mjs`](../../scripts/local-package-install.mjs)）。但这不等于源码静态安全或 npm registry 永久不可变。
 
 ### 4.2 install-lock 与脚本 allowlist
 
@@ -93,7 +93,9 @@ coding-agent 安装锁从根 lockfile 提取生产依赖，删除 dev/devOptiona
 
 ### 4.3 发布包的消费端验证
 
-`coding-agent-consumer.mjs` 逐包 `npm pack --ignore-scripts`，在临时目录只把 coding-agent 设为 direct dependency、用 overrides 指向本次 tarballs，然后 `npm install --ignore-scripts --omit=dev --no-audit --no-fund`（[`scripts/coding-agent-consumer.mjs#L27-L58`](../../scripts/coding-agent-consumer.mjs#L27-L58)）。它随后拒绝 `pi-client/pi-protocol/pi-server` 出现在安装树，拒绝 coding-agent 发布包中出现 `dist/client`、`dist/experimental` 等 dev-only 目录，并用离线环境验证 SDK exports、CLI version 和隐藏 subpath（[`scripts/coding-agent-consumer.mjs#L60-L84`](../../scripts/coding-agent-consumer.mjs#L60-L84)、[`scripts/coding-agent-consumer.mjs#L85-L124`](../../scripts/coding-agent-consumer.mjs#L85-L124)）。
+`scripts/check-package-install.mjs` 产 artifact set 后逐包建隔离消费者：`package-artifacts.mjs` 的 `produceArtifactSet()` 真实 `npm pack` 全部公开发布包，`local-package-install.mjs` 的 `installConsumer()` 在临时目录生成只以该包为 direct dependency、用 `file:` 指向本地 tarball 的 `package.json`，再跑 `npm install --omit=dev`（[`scripts/check-package-install.mjs`](../../scripts/check-package-install.mjs)、[`scripts/local-package-install.mjs`](../../scripts/local-package-install.mjs)）。随后 `coding-agent-smoke.mjs` 以外部第三方视角验证 SDK exports、CLI version 与隐藏 subpath（[`scripts/coding-agent-smoke.mjs`](../../scripts/coding-agent-smoke.mjs)）。
+
+> 该脚本此前名为 `coding-agent-consumer.mjs`，且曾断言 `pi-client`/`pi-protocol`/`pi-server` 不出现在安装树、coding-agent 发布包中不含 `dist/client` 与 `dist/experimental`。v1.2.0 删除了这三个包与那些 dev-only 目录，断言失去对象；脚本拆为上述四个模块，隔离粒度从"一个消费者装全部包"改为"每包一个消费者"。
 
 这项验证在 release script 本地流程中执行（[`scripts/release.mjs#L251-L266`](../../scripts/release.mjs#L251-L266)），在 tag 的 `publish-npm` job 中也执行（[`build-binaries.yml#L363-L376`](../../.github/workflows/build-binaries.yml#L363-L376)），但不在普通 PR 的主 CI 步骤中出现（[`ci.yml#L35-L45`](../../.github/workflows/ci.yml#L35-L45)）。
 

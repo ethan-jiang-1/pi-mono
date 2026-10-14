@@ -94,7 +94,7 @@
 | `packages/ai/src/auth/` | ✅ 已写 [5.2_AI_Auth_Subsystem.md](./05-Infra/5.2_AI_Auth_Subsystem.md)（v0.84 警示已加） | — |
 | `packages/agent/src/harness/tools/` | ✅ 已写 [4.7_Harness_Tools.md](./04-Harness/4.7_Harness_Tools.md)（v0.84 警示已加） | — |
 | `packages/agent/src/search/` | 通用搜索模块（`scanning.ts`），v0.84 新增 | 中 |
-| `packages/protocol` / `client` / `server` | client/server 协议栈（experimental），见 integration/06 的路径介绍 | 中（属 integration 域） |
+| ~~`packages/protocol` / `client` / `server`~~ | client/server 协议栈（experimental）——**v1.2.0 整栈删除**，不再属任何域的待写项 | 作废 |
 | `packages/telemetry` | vendor-neutral typed telemetry，从 agent 包 re-export | 低 |
 | `packages/session-backends/sqlite-node` | SQLite session 后端（从 `storage/` 迁入） | 低 |
 | `packages/coding-agent/src/extensions/` | built-in extensions 层 + llama.cpp 参考实现（v0.83 遗留） | 中 |

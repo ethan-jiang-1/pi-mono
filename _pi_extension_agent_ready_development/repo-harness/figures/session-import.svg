@@ -6,7 +6,7 @@
   </defs>
   <rect width="1120" height="520" fill="#ffffff"/>
   <text x="560" y="38" text-anchor="middle" font-size="21" font-weight="700" fill="#172033">会话接续：CI 分析到本地续接</text>
-  <text x="560" y="62" text-anchor="middle" font-size="12" fill="#5f6b7a">分析的全部推理与工具调用可被本地接续，而不必复述结论（v1.0.3 机制）</text>
+  <text x="560" y="62" text-anchor="middle" font-size="12" fill="#5f6b7a">分析的全部推理与工具调用可被本地接续，而不必复述结论（v1.2.0 机制）</text>
 
   <rect x="30" y="120" width="180" height="120" rx="8" fill="#edf5ff" stroke="#5791c9" stroke-width="1.5"/>
   <text x="120" y="152" text-anchor="middle" font-size="13.5" font-weight="700" fill="#173f67">GitHub issue</text>
@@ -53,5 +53,5 @@
   <text x="560" y="420" text-anchor="middle" font-size="12" font-weight="700" fill="#7a2a26">边界：导入 ≠ 重放 ≠ 环境恢复</text>
   <text x="560" y="442" text-anchor="middle" font-size="10.5" fill="#7a2a26">只搬运对话历史与 cwd 字符串；文件内容、命令结果、凭据与环境状态不随之而来，历史结论须重新验证</text>
 
-  <text x="560" y="496" text-anchor="middle" font-size="11" fill="#5f6b7a">来源：earendil-works/pi v1.0.3 · .github/workflows/issue-analysis.yml · .pi/prompts/is.md · .pi/extensions/import-repro.ts · docs/session-format.md</text>
+  <text x="560" y="496" text-anchor="middle" font-size="11" fill="#5f6b7a">来源：earendil-works/pi v1.2.0 · .github/workflows/issue-analysis.yml · .pi/prompts/is.md · .pi/extensions/import-repro.ts · docs/session-format.md</text>
 </svg>

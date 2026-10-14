@@ -69,5 +69,5 @@
   <rect x="572" y="466" width="216" height="38" rx="7" fill="#edf8f1" stroke="#55a36f"/><text x="680" y="490" text-anchor="middle" font-size="11" fill="#1f6139">用户文档：当前用法</text>
   <rect x="808" y="466" width="216" height="38" rx="7" fill="#f3efff" stroke="#8269bd"/><text x="916" y="490" text-anchor="middle" font-size="11" fill="#513b85">行为验证：回归会失败</text>
 
-  <text x="560" y="556" text-anchor="middle" font-size="11" fill="#5f6b7a">来源：综合自 earendil-works/pi v1.0.3 · extensions.md 生命周期与工具合同 · packages.md 安装合同</text>
+  <text x="560" y="556" text-anchor="middle" font-size="11" fill="#5f6b7a">来源：综合自 earendil-works/pi v1.2.0 · extensions.md 生命周期与工具合同 · packages.md 安装合同</text>
 </svg>

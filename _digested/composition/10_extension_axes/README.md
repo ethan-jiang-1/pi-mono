@@ -24,7 +24,7 @@ Pi 的扩展系统被描述为"一个口子进、多种能力出"。但"多种�
 
 | 轴 | 是什么 | 关键 API | 示例 |
 |----|--------|----------|------|
-| 8 | 按 host 拆分同一 feature 的实现，各跑各的进程 / 环境 | `defineService(id)` + `defineFacet()`（`packages/chord`）；`contract.ts` / `session.ts` / `tui.ts` 三份 bundle | `examples/plugins/pi-example-plugin/` |
+| 8 | 按 host 拆分同一 feature 的实现，各跑各的进程 / 环境 | **v1.2.0**：`defineFacet()` + `createHost()`（`packages/chord`，chord2）；~~`defineService(id)`~~ 已随 facet 运行时删除 | ~~`examples/plugins/pi-example-plugin/`~~（**v1.2.0 已删除**） |
 
 **轴 8 与前七轴不是并列关系，而是横切关系。** 前七轴问"挂到哪个口子"，轴 8 问"这段代码跑在哪"。一个 facet 化的 feature，它的每份 bundle 内部**仍然在用**轴 1/2/5 那些动作，只是分别发生在不同 host 里。
 
@@ -88,7 +88,7 @@ export default function (pi: ExtensionAPI) {
 - `packages/coding-agent/examples/extensions/`：70+ 个示例扩展
 - `harness/01-Architecture/1.2_single_injection.md`：统一注入点的评价分析
 - `extensions/02-Expansion/`：四条扩充轴的机制分析
-- 轴 8：`packages/chord/src/types.ts:60/206/227`、`packages/chord/src/api.ts:19/66/70/84/88`、`packages/coding-agent/examples/plugins/pi-example-plugin/`
+- 轴 8（**v1.2.0 锚点全部失效**）：~~`packages/chord/src/types.ts:60/206/227`~~、~~`packages/chord/src/api.ts:19/66/70/84/88`~~、~~`packages/coding-agent/examples/plugins/pi-example-plugin/`~~——`api.ts` 与示例插件均在 v1.2.0 删除；chord2 现状见 [`../../architecture-next/chord.md`](../../architecture-next/chord.md)
 
 ## 最小例证
 

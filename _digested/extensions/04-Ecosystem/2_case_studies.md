@@ -32,7 +32,7 @@
 
 ## 案例 2：pi-subagents（子代理，~1.1K/月）
 
-**解决的问题**：core 故意不做 subagent（[01-Core/1.2](../../01-Core/1.2_skipped_features.md)），这个包把它做成产品级：委派、并行、后台、可观测。
+**解决的问题**：core 故意不做 subagent（[01-Core/1.2](../../extensions/01-Core/1.2_skipped_features.md)），这个包把它做成产品级：委派、并行、后台、可观测。
 
 **用到哪些接缝**：
 

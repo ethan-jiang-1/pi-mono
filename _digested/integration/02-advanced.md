@@ -9,7 +9,7 @@
 
 ## 三层架构（从集成视角看）
 
-pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集成面（外围还有 `pi-tui`、`pi-telemetry`、`pi-evals` 等配套包，以及 v0.84 新增的 experimental `pi-protocol`/`pi-client`/`pi-server` 远程会话三件套，见下文。v1.0.0 变化：`packages/session-backends/`（npm `@earendil-works/pi-session-backend-sqlite-node`）整包删除，SQLite 会话存储由 `pi-durable` 的 `src/storage/sqlite/` 承接；新增 `pi-mcp`/`pi-codemode` 两个独立包）：
+pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集成面（外围还有 `pi-tui`、`pi-telemetry`、`pi-evals` 等配套包，以及已于 v1.2.0 删除的 experimental `pi-protocol`/`pi-client`/`pi-server` 远程会话三件套（见下文"远程/server 形态"）；v1.0.0 变化：`packages/session-backends/`（npm `@earendil-works/pi-session-backend-sqlite-node`）整包删除，SQLite 会话存储由 `pi-durable` 的 `src/storage/sqlite/` 承接；新增 `pi-mcp`/`pi-codemode` 两个独立包）：
 
 ```
 ┌──────────────────────────────────────┐
@@ -39,7 +39,7 @@ pi-mono 的核心是三个包的明确分层，每一层都可以独立作为集
 | pi-agent-core | `Agent` class（循环内核 `agentLoop`/`runAgentLoop`） | LLM + 工具循环、消息（v1.0.0：包收缩为最小核——只剩 Agent/agent-loop/proxy/stream-fn/types，exports 仅 `.` 与 `./package.json`；session、compaction、harness 全部移除） | 具体工具定义、扩展系统、session 持久化（v1.0.0 起 compaction hook 也不在了——compaction 由 coding-agent/durable 承接） |
 | pi-coding-agent | `createAgentSession()` 或 RPC | 完整产品：8 个内置工具（read/bash/edit/write/grep/find/ls/powershell，默认激活前 4 个）、扩展、session 树、bash 安全 | HTTP server、多租户、认证 |
 
-> **同名工厂警示（v1.0.3+ Unreleased，sync 0008）**：上表的 powershell 是 coding-agent 侧 Windows-only 工具（SDK `createPowerShellTool()`，自带 UTF-8 输出 shim）。durable 侧另有**同名**工厂 `createPowerShellTool()`（`packages/durable/src/tools/bash.ts:148`）——跨平台、以 argv exec 形式直接启动 pwsh（缺席则 Windows PowerShell）而不经 shell 解析，属 Unreleased。两者不是一回事，混用两套 SDK 时注意区分。
+> **同名工厂警示（v1.2.0 起在 release 内，sync 0008/0009）**：上表的 powershell 是 coding-agent 侧 Windows-only 工具（SDK `createPowerShellTool()`，自带 UTF-8 输出 shim）。durable 侧另有**同名**工厂 `createPowerShellTool()`（`packages/durable/src/tools/bash.ts:148`）——跨平台、以 argv exec 形式直接启动 pwsh（缺席则 Windows PowerShell）而不经 shell 解析，属 Unreleased。两者不是一回事，混用两套 SDK 时注意区分。
 
 第一版集成建议直接用 `pi-coding-agent`。只有在你已经有一套自己的工具/扩展系统，只想要纯循环逻辑时，才退到 `pi-agent-core`。
 
@@ -72,7 +72,7 @@ JSONL 成帧逻辑在 [`packages/coding-agent/src/modes/rpc/jsonl.ts`](../../pac
 
 ### 33 个 RPC 命令
 
-`RpcCommand` union（`rpc-types.ts`）当前有 33 个变体（v0.84.4 起，新增 `clear_queue`）：
+`RpcCommand` union（`rpc-types.ts`）当前有 33 个变体（v0.84.4 起，新增 `clear_queue`）——**v1.0.3→v1.2.0 区间 `modes/rpc/` 整目录零改动**，该计数与全部 RPC 结论在 v1.2.0 依然成立：
 
 | 分类 | 命令 | 说明 |
 |---|---|---|
@@ -137,7 +137,7 @@ stdout 上有两类 JSONL 消息：
 ```
 
 - `response`：对一个带 `id` 命令的应答——`{ id?, type: "response", command, success: true, data? }` 或 `{ ..., success: false, error }`（完整 union 见 `RpcResponse`，rpc-types.ts:110 起）。注意 payload 在 `data` 字段，且必须回显 `command` 名；不存在 `payload` 字段。
-- 事件：**有 `{"type":"event", ...}` 外层包装**——`rpc-mode.ts:355-356` 是 `session.subscribe((event) => output(toJsonEvent(event)))`，`toJsonEvent()` 改写 `message_update`（剥离累积 `partial` 快照；v0.84.3 起对 `toolcall_start` delta 额外补上 `id`/`toolName`，见 `json-event.ts`）；其余事件原样放 `event` 字段（`agent_start`/`turn_start`/`tool_execution_start|update|end`/`message_end`/`agent_end`/`agent_settled`/`compaction_*`/`auto_retry_*`/`queue_update` 等）。宿主解析时按 `04-event-model.md` 的三种顶层类型（event / response）处理。
+- 事件：**有 `{"type":"event", ...}` 外层包装**——`rpc-mode.ts:357-358`（v1.0.3 时为 `:355-356`）是 `session.subscribe((event) => output(toJsonEvent(event)))`，`toJsonEvent()` 改写 `message_update`（剥离累积 `partial` 快照；v0.84.3 起对 `toolcall_start` delta 额外补上 `id`/`toolName`，见 `json-event.ts`）；其余事件原样放 `event` 字段（`agent_start`/`turn_start`/`tool_execution_start|update|end`/`message_end`/`agent_end`/`agent_settled`/`compaction_*`/`auto_retry_*`/`queue_update` 等）。宿主解析时按 `04-event-model.md` 的三种顶层类型（event / response）处理。
 - **没有 `ended` 消息**。一轮 prompt 的完成信号是 `{"type":"event","event":{"type":"agent_settled"}}`（`RpcClient.waitForIdle()`/`collectEvents()` 靠它判断）。
 - `extension_ui_request`（stdout）与 `extension_ui_response`（stdin）：extension 需要宿主代答的 UI 请求（select/confirm/input/editor/notify/setStatus/setWidget/setTitle/set_editor_text），宿主以 `extension_ui_response` 回复。
 
@@ -145,22 +145,20 @@ stdout 上有两类 JSONL 消息：
 
 **v0.86.0 行为备注**：① `steer` / `follow_up` RPC 命令不再绕过扩展——所有 queued 消息（含 direct RPC）都走扩展 `input` 事件管线（transform/handled 语义生效，#8718；`agent-session.ts:253-259` `PromptOptions.streamingBehavior` + `source`，emitInput 调用点 agent-session.ts:1277）。如果宿主依赖"RPC 注入的输入不触发扩展 handler"的旧行为，需要重新评估。② 扩展的 `user_bash` hook 从 fail-open 改为 **fail-closed**（`runner.ts:1056-1085`）：handler 抛错或返回非法结果时命令直接中止（不回退本地执行、不调用后续 handler），**只有返回 `undefined` 才放行**到下一 handler / 本地 shell——宿主若自带扩展宿主实现，需对齐这个语义，否则拦截类扩展可能被绕过。
 
-## 远程/server 形态：protocol / client / server 三件套（experimental）
+## 远程/server 形态：**官方路径已移除**（v1.2.0）
 
-本文早先版本描述的 web-ui（把 agent 编译进浏览器、直连 LLM provider）**已删除**——v0.75.3 → v0.83.0 之间就已移除，v0.84.2 树里没有 `apps/web-ui/`。如果需要 server-first / 远程会话形态，现在有一条官方路径——三个 experimental 新包：
+本文早先版本描述过两条已消失的路径，都不要再引用：
 
-| 包 | npm 名 | 角色 |
-|---|---|---|
-| `packages/protocol/` | `@earendil-works/pi-protocol` | transport 中立的 CBOR 协议：length-prefixed framing + schema（`framing.ts`、`schemas.ts`、`codec.ts`） |
-| `packages/client/` | `@earendil-works/pi-client` | `PiClient`：通过 `ByteTransport` 接口（WebSocket/Unix socket 等任意有序字节流）与 server 交换 framed CBOR；session lease（exclusive/shared）、快照订阅、按 ID 关联请求。无 Node 专属 import，可在浏览器运行 |
-| `packages/server/` | `@earendil-works/pi-server` | `PiServer` session server：宿主实现 `PiServerService`（listSessions/listModels/createSession/openSession...），`createUnixServer()` 等 listener 组装传输层。README 明确标注 "Experimental... may change or be removed without notice" |
+1. **web-ui**（把 agent 编译进浏览器、直连 LLM provider）——v0.75.3 → v0.83.0 之间移除，`apps/web-ui/` 不存在。
+2. **protocol / client / server 三件套**——`packages/protocol`（`@earendil-works/pi-protocol`，CBOR framing）、`packages/client`（`@earendil-works/pi-client`，`PiClient` + `ByteTransport` + session lease）、`packages/server`（`@earendil-works/pi-server`，`PiServer` + `PiServerService` + `createUnixServer()`）**已于 v1.2.0 整体删除**（提交 `7472cda0d`，161 文件、+32/−21,561 行），连同 `packages/coding-agent/src/experimental/` 下的 services/worker/durable-TUI 一并与 `PROTOCOL_VERSION = 8` 协议线消失。
 
-这条路径与 JSONL RPC 的分工：JSONL RPC（`pi --mode rpc`）面向**同机子进程**、人类可读、面向流式 stdout；protocol/client/server 面向**远程/多客户端**会话管理，二进制成帧、快照一致。做 web/远程产品时，现在有四种选择：
+**上游没有替代的官方远程会话路径。** 做 web/远程产品时只剩自建方案：
 
-1. **pi-client + pi-server**（官方 experimental server 栈，适合远程会话/多前端）
-2. 用 SDK 在 Node server 中包装，暴露 HTTP/WS 给前端（自建 server，最可控）
-3. 用 RPC 子进程方案，让 server 管理 spawn 的 agent 进程（JSONL 协议）
-4. 纯前端直连 provider（pi-ai 本身可在浏览器跑，但没有文件/系统工具，是受限子集）
+1. 用 SDK 在 Node server 中包装，暴露 HTTP/WS 给前端（最可控）
+2. 用 RPC 子进程方案，让 server 管理 spawn 的 agent 进程（JSONL 协议，`pi --mode rpc`）
+3. 纯前端直连 provider（pi-ai 本身可在浏览器跑，但没有文件/系统工具，是受限子集）
+
+与 JSONL RPC 的分工不变：JSONL RPC 面向**同机子进程**、人类可读、面向流式 stdout。原先"protocol/client/server 面向远程/多客户端、二进制成帧、快照一致"这一档**现在没有官方实现**——若需要，得自己按第 1 或第 2 种方式搭。
 
 ## 权限模型：hook-based 而非交互弹窗
 
@@ -202,4 +200,4 @@ pi-mono 的权限模型和 OpenCode 有根本差异：
 5. JSON 事件改写 → [`packages/coding-agent/src/modes/json-event.ts`](../../packages/coding-agent/src/modes/json-event.ts)
 6. 循环内核 → [`packages/agent/src/agent-loop.ts`](../../packages/agent/src/agent-loop.ts)；工具钩子 → [`packages/agent/src/types.ts`](../../packages/agent/src/types.ts)
 7. Harness（session/lane 编排，v1.0.0 起在 durable） → [`packages/durable/src/harness/harness.ts`](../../packages/durable/src/harness/harness.ts)（`packages/agent/src/harness/` 已删除）
-8. 远程会话三件套 → [`packages/protocol/src/`](../../packages/protocol/src/)、[`packages/client/src/`](../../packages/client/src/)、[`packages/server/src/`](../../packages/server/src/)
+8. ~~远程会话三件套~~ → **v1.2.0 已删除**（`packages/protocol`、`packages/client`、`packages/server` 均不存在；见提交 `7472cda0d`）

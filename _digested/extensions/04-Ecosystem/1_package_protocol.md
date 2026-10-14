@@ -47,7 +47,7 @@ packages.md:20 的警告是协议层最硬的一句：
 
 > Pi packages run with **full system access**. Extensions execute arbitrary code, and skills can instruct the model to perform any action including running executables. **Review source code before installing third-party packages.**
 
-协议层给的缓解全是**用户侧**的：`pi -e` 临时试用（packages.md:45-47）、project trust 闸门、版本 pin。没有签名、没有沙箱承诺、没有审核。机制层的真实护栏在扩展系统内部（`user_bash` fail-closed 等，见 [03-Patterns/3.3](../../03-Patterns/3.3_safety_guards.md)）。
+协议层给的缓解全是**用户侧**的：`pi -e` 临时试用（packages.md:45-47）、project trust 闸门、版本 pin。没有签名、没有沙箱承诺、没有审核。机制层的真实护栏在扩展系统内部（`user_bash` fail-closed 等，见 [03-Patterns/3.3](../../extensions/03-Patterns/3.3_safety_guards.md)）。
 
 ## 为什么这套协议重要（解释）
 

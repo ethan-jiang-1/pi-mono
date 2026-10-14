@@ -7,9 +7,39 @@
 ## 位置
 
 - 全局：`~/.pi/agent/settings.json`
-- 项目层：无项目级 `settings.json`（项目层只有 prompts/skills/extensions 目录）
+- 项目层：**有**项目级 `.pi/settings.json`（`docs/configuration.md:30` 列为 Project-level settings；项目值覆盖 agent-dir 值，`docs/settings.md:2`）
 
-**设置项只在全局层配置**，所有项目共享同一份。
+**设置项分两层**：agent-dir（`<agent-dir>/settings.json`）与项目层（`.pi/settings.json`）。项目值**覆盖** agent-dir 值，资源列表则**合并**（`docs/settings.md:2`）。少数键被限定只能写在 agent-dir（如 `defaultProjectTrust`，`settings.md:36`）。
+
+## 编辑器补全：`$schema` 与发布的 JSON Schema（v1.2.0 新增）
+
+v1.2.0 起 pi **发布**了四份配置 JSON Schema，放在 `https://pi.dev/schemas/` 下，供编辑器做校验与补全：
+
+| Schema URL | 对应文件 |
+|---|---|
+| `https://pi.dev/schemas/settings.schema.json` | `settings.json` |
+| `https://pi.dev/schemas/models.schema.json` | `models.json` |
+| `https://pi.dev/schemas/keybindings.schema.json` | keybindings 配置 |
+| `https://pi.dev/schemas/theme.schema.json` | theme 配置 |
+
+用法：在配置文件顶层加一行 `$schema`（`docs/settings.md:5` 的官方原文：*"Add `"$schema": "https://pi.dev/schemas/settings.schema.json"` to `settings.json` for editor validation and completion."*）：
+
+```json
+{
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
+  "defaultThinkingLevel": "high"
+}
+```
+
+**硬事实**：
+
+- 四份 schema 是**从 TypeScript 源码生成**的，不是手写：schema 文件头部自带 `"$comment": "This file is generated from TypeScript source. Do not edit it manually; run npm run generate:schemas."`（`packages/coding-agent/schemas/settings.schema.json:4`）。
+- 生成器在 `packages/coding-agent/scripts/generate-schemas.ts`，入口 `npm run generate:schemas`（`packages/coding-agent/package.json:39`，注意该脚本经 `src/experimental/source-resolver.ts` 加载——这是 `src/experimental/` 在 v1.2.0 **唯一存活**的文件）。
+- schema 采用 JSON Schema draft 2020-12（`$schema: "https://json-schema.org/draft/2020-12/schema"`），`$id` 即上表的发布 URL。
+- 四份文件的仓库位置：`packages/coding-agent/schemas/{settings,models,keybindings,theme}.schema.json`。
+- 源码侧的对应实现：`src/core/settings-schema.ts`（键与类型的单一事实源）、`src/core/settings-defaults.ts`（默认值）、`src/core/keybindings-schema.ts`、`src/core/key-id-schema.ts`、`src/modes/interactive/theme/theme-schema.ts` + `theme-tokens.ts`。
+
+**为什么重要**：schema 同时是**键名的权威清单**。本页下文若与 `settings.schema.json` 的键冲突，以 schema 为准——它是生成的，而本页是人写的。
 
 ## 配置项清单
 
@@ -19,7 +49,7 @@
 {
   "defaultProvider": "deepseek",
   "defaultModel": "deepseek-v4-flash",
-  "thinking": "high",
+  "defaultThinkingLevel": "high",
   "defaultTools": ["read", "bash", "edit", "write", "grep", "find", "ls"]
 }
 ```
@@ -29,7 +59,7 @@
 | `defaultProvider` | string | 默认 LLM 提供商 | 无（首次启动选） | 可用 `Ctrl+P` 运行时切换 |
 | `defaultModel` | string | 默认模型 ID | 无 | 可以是自定义模型名 |
 | `thinking` | string | 思考模式 | `"normal"` | `"off"`/`"normal"`/`"high"`/`"xhigh"`/`"max"` |
-| `defaultTools` | string[] | 启动时启用的内置工具 | `["read","bash","edit","write"]`（`settings-manager.ts:215`） | settings.json 的实际键名是 **`defaultTools`**（旧文写的 `tools` 不是有效键；CLI flag 才是 `--tools`）。v1.0.0 起支持 **`+name`/`-name` 增量项**：只含增量项的列表在继承/默认集上增删，含普通工具名的列表整体替换（字段 `settings-manager.ts:168`，合并 `:225-234`，解析 `:236-250`）；`/reload` 会启用新加入的工具（0.99.2），`--tools`/`--no-tools` 仍可覆盖。v1.0.3+ 口径同步：CLI `--tools`/`--exclude-tools` 现支持 `*` pattern，且 `--tools` 不再移除 MCP 工具（除非条目以 `mcp__` 开头） |
+| `defaultTools` | string[] | 启动时启用的内置工具 | `["read","bash","edit","write"]`（v1.2.0 为 `DEFAULT_TOOL_NAMES`，`settings-manager.ts:83`；v1.0.3 时在 `:215`） | settings.json 的实际键名是 **`defaultTools`**（旧文写的 `tools` 不是有效键；CLI flag 才是 `--tools`）。v1.0.0 起支持 **`+name`/`-name` 增量项**：只含增量项的列表在继承/默认集上增删，含普通工具名的列表整体替换。**注意**：这些具名函数在 v1.0.3 基线**就已存在**（当时为 `isToolModifier` `:217`、`mergeDefaultTools` `:225`、`resolveDefaultTools` `:236`），v1.2.0 的新变化只是把 `isToolModifier`/`applyToolModifiers` **导出**、并抽出 `applyToolModifiers`——**不是**新增五个符号。**v1.2.0 真正新增的是 CLI 侧行为**：`--tools` 也开始接受 `+name`/`-name`（`ddaa0a034`，`docs/settings.md:56`），此前基线文档明确写着 "`--tools` does not accept `+name` or `-name`"（v1.0.3 时字段 `:168`、合并 `:225-234`、解析 `:236-250`；v1.2.0 的**行号**为 `DEFAULT_TOOL_NAMES` `:83`、`isToolModifier` `:86`、`applyToolModifiers` `:108`、`mergeDefaultTools` `:124`、`resolveDefaultTools` `:135`）；`/reload` 会启用新加入的工具（0.99.2），`--tools`/`--no-tools` 仍可覆盖。v1.0.3+ 口径同步：CLI `--tools`/`--exclude-tools` 现支持 `*` pattern，且 `--tools` 不再移除 MCP 工具（除非条目以 `mcp__` 开头） |
 
 ### 技能与扩展配置
 
@@ -115,7 +145,7 @@ Provider 认证不在 `settings.json` 里——它在以下位置：
 | `compaction.reserveTokens` | number | 压缩预留 token | `16384` | |
 | `compaction.keepRecentTokens` | number | 压缩保留最近消息 token | `20000` | |
 | `compaction.modelOverrides` | Record | 按 `"provider/modelId"` 键覆盖上面两项 | `{}` | `settings-manager.ts:32` 声明、`:940` 读取（按当前 modelKey 查 override，未命中回落全局默认，v1.0.0 行号）；不同模型上下文窗口差异大时按模型调预算 |
-| `compat.allowedFallbackModels` | — | Bedrock/Anthropic 兼容层：声明允许的 fallback 模型 | 无 | `packages/ai/src/types.ts:839`（#9294）；为空/缺省时调用方必须省略 `fallbacks` 字段（Anthropic 对无许可 fallback 目标的模型拒绝该字段） |
+| `compat.allowedFallbackModels` | — | Bedrock/Anthropic 兼容层：声明允许的 fallback 模型 | 无 | **`packages/ai/src/providers/compat-schema.ts:485`**（v1.2.0 迁出；v1.0.3 时为 `ai/src/types.ts:839`）（#9294）；为空/缺省时调用方必须省略 `fallbacks` 字段（Anthropic 对无许可 fallback 目标的模型拒绝该字段） |
 
 cache warming 的成本模型（何时值得刷）见 [13_token_budget_audit.md](./13_token_budget_audit.md)。
 
@@ -133,7 +163,7 @@ cache warming 的成本模型（何时值得刷）见 [13_token_budget_audit.md]
 
 **错误 2：项目 `.pi/settings.json`**
 
-pi 不读项目层的 `settings.json`。所有设置项都在全局 `~/.pi/agent/settings.json`。如果你需要某个配置不同项目用不同的值，目前只能靠 CLI 层覆盖——这是 pi 配置系统的一个已知缺口。
+pi **读**项目层的 `.pi/settings.json`，且项目值覆盖 agent-dir 值（`docs/configuration.md:30`、`docs/settings.md:2`）。若某配置需要按项目区分，直接写项目层即可，不必靠 CLI 覆盖。
 
 **错误 3：在 settings 里配凭证**
 
@@ -160,7 +190,7 @@ pi 不读项目层的 `settings.json`。所有设置项都在全局 `~/.pi/agent
 {
   "defaultProvider": "deepseek",
   "defaultModel": "deepseek-v4-flash",
-  "thinking": "high",
+  "defaultThinkingLevel": "high",
   "defaultTools": ["read", "bash", "edit", "write", "grep", "find", "ls"],
   "skills": ["~/.claude/skills"]
 }
@@ -173,9 +203,9 @@ pi 不读项目层的 `settings.json`。所有设置项都在全局 `~/.pi/agent
 - 本机审计的 settings：`~/.pi/agent/settings.json`（只有 `defaultProvider` / `defaultModel` / `thinking` / 主题）
 - `packages/coding-agent/docs/usage.md`（settings 的 CLI 参数对照表）
 - `packages/coding-agent/docs/skills.md`（"Using Skills from Other Harnesses" 的官方做法——`skills` 数组）
-- `packages/coding-agent/src/core/settings-manager.ts`：`CACHE_WARMING_MODES`（L82，v1.0.0 行号）、`cacheWarming`（L182）、`CompactionSettings.modelOverrides`（L32）、override 读取（L940）
-- v1.0.0 键锚点（均已对照当前工作树核实）：`QuietStartup` 类型（`settings-manager.ts:112`）、`quietStartup` 字段（`:150`）、`getQuietStartup()`（`:1089-1092`）、`tuiMode` 字段默认注释（`:184`）、`getTuiMode()`（`:1348-1350`）、`fullscreenWheelScrollLines` 字段（`:188`）、`getFullscreenWheelScrollLines()`（`:1389-1396`）、`defaultTools` 字段（`:168`）与 `+name/-name` 合并/解析（`:225-250`）、`DEFAULT_TOOL_NAMES`（`:215`）；`--tui-mode` 帮助文本（`cli/args.ts:326`）
-- `packages/ai/src/types.ts`：`allowedFallbackModels`（L839）
+- `packages/coding-agent/src/core/settings-manager.ts`：`CACHE_WARMING_MODES`（**v1.2.0：L52**；v1.0.0 时为 L82）、`cacheWarming` 读取（**L915**）、`CompactionSettings.modelOverrides`（schema **L22**）、override 读取（**L831**）。文件 1533→**1428** 行
+- v1.0.0 键锚点（均已对照当前工作树核实）：`QuietStartup` 类型（**v1.2.0：于 `settings-schema.ts:465` 定义**，`:20`/`:42` 处 import）、`quietStartup` getter（**`settings-manager.ts:981-983`**）、`getQuietStartup()`（**`:981`**）、`tuiMode` getter（**`:1241-1242`**）、`getTuiMode()`（**`:1241`**）、`fullscreenWheelScrollLines`（**`:1284`**）、`getFullscreenWheelScrollLines()`（`:1389-1396`）、`defaultTools` 字段（`:168`）与 `+name/-name` 合并/解析（`:225-250`）、`DEFAULT_TOOL_NAMES`（`:215`）；`--tui-mode` 帮助文本（`cli/args.ts:326`）
+- **`packages/ai/src/providers/compat-schema.ts`：`allowedFallbackModels`（L485）**——v1.2.0 已不在 `ai/src/types.ts`（该文件 1172→893 行，类型外迁）
 - `packages/coding-agent/src/core/cache-warmer.ts`：成本模型常量与刷新时机（L20、L26、L29）
 - 官方 docs：`packages/coding-agent/docs/settings.md`（`#cache-warming` 小节）
 

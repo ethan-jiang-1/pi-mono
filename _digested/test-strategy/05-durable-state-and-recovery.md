@@ -79,7 +79,7 @@
 
 v1.0.3 把同一套"参数化一致性套件"模式从存储层复制到了**执行环境层**：[`packages/durable/src/testing/env-conformance.ts`](file:///Users/bowhead/pi-mono/packages/durable/src/testing/env-conformance.ts)（511 行）经 `registerEnvConformance`（`src/testing/runner.ts:28`）把任意 `ExecutionEnv` 实现接入同一套断言，覆盖面正是本轮接口扩张的能力：argv exec（数组命令直接 spawn、不经 shell）、输出窗口（`window`/`skipped` 的省略量语义）、以及体量最大的 watch 双模式案例（native/polling，缺失文件创建/替换/删除、父目录改名重建、exclude、close 幂等；watch 案例超时放宽到 30 秒以覆盖轮询延迟，`env-conformance.ts:108`）。
 
-这条线的第一个外部消费者是新包 `pi-env`（SSH 远程执行环境，post-v1.0.3、Unreleased）：其 `RemoteExecutionEnv` 与本机 `NodeExecutionEnv` 跑**同一套** env-conformance 断言（`packages/env/test/conformance.test.ts:16` 直接调用 `registerEnvConformance`），配合 differential 测试（随机操作序列逐结果对比两个环境）锁定"远程结果 == 本机直跑"的语义等价合同。CI 上由 `.github/workflows/env.yml` 跨 5 OS 矩阵驱动——一致性套件从"跨存储后端"扩展到了"跨机器、跨操作系统"。
+这条线的第一个外部消费者是新包 `pi-env`（SSH 远程执行环境，**v1.2.0 起在 release 内**）：其 `RemoteExecutionEnv` 与本机 `NodeExecutionEnv` 跑**同一套** env-conformance 断言（`packages/env/test/conformance.test.ts:16` 直接调用 `registerEnvConformance`），配合 differential 测试（随机操作序列逐结果对比两个环境）锁定"远程结果 == 本机直跑"的语义等价合同。CI 上由 `.github/workflows/env.yml` 跨 5 OS 矩阵驱动——一致性套件从"跨存储后端"扩展到了"跨机器、跨操作系统"。
 
 ---
 

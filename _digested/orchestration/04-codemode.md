@@ -2,6 +2,8 @@
 
 codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模型写 JS，在 QuickJS-WASM 中调用宿主注入能力；它编排的是工具调用，不是专用子代理原语。
 
+> **⚠️ v1.2.0：codemode 有**两份平行实现**，不是一次迁移。** 本页主体描述的是 **coding-agent 侧**（`packages/codemode` 独立包 + `packages/coding-agent/src/extensions/codemode/` 内置扩展）。v1.2.0 在 **durable 侧**又**独立新增**了一套 `packages/durable/src/codemode/`——它**不是**上述实现的下移或替代，两者并存、互不继承。差异见下节。
+
 > **应用合同局部复核**：`cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`。下文部分细节属于独立 `CodemodeSandbox` 包，不能直接当 coding-agent 默认值：应用 `codemode` 工具默认 inactive，需显式启用；成功的 `store` 写会话 custom entry，失败写入不保留；应用还注入 `models`、工具搜索等能力，脚本未指定超时则无默认期限。见 [应用 codemode 文档](../../packages/coding-agent/docs/codemode.md)、[启用设置](../../packages/coding-agent/docs/settings.md#tools)。
 
 ## 为什么是这个形状:设计考量
@@ -10,43 +12,55 @@ codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模�
 
 这条合同回答的是扇出型工具工作(批量读文件、聚合多个来源、多步数据变换)的上下文经济学:逐轮委派时,每个中间工具结果都要付一次 LLM 上下文的钱;把循环搬进代码,中间结果留在 VM 里,**只有脚本吐出的 output 和返回值进上下文**。与 DSH workflow 的对照:`agent()` 钩子让脚本扇出子代理(隔离的是整个 agent 上下文);codemode 让脚本扇出工具调用(隔离的是工具结果的上下文)——**同一思想("脚本而不是对话持有循环、分支与中间结果"),作用在更轻的一级**。
 
+## 两份实现的分工（v1.2.0）
+
+| | coding-agent 侧 | durable 侧（v1.2.0 新增） |
+|---|---|---|
+| 包 | `packages/codemode`（独立）+ `packages/coding-agent/src/extensions/codemode/` | `packages/durable/src/codemode/`（5 个文件：`codemode.ts` 1,037 行、`describe.ts`、`index.ts`、`models.ts`、`output.ts`） |
+| 入口 | 扩展 `index.ts` → `tool.ts`，依赖 `@earendil-works/pi-codemode` | `createCodemodeExtension` / `createCodemodeTool`（`index.ts` 导出） |
+| 状态 | 成功 `store` 写会话 `codemode-store` custom entry | 每次投递结果写 **`pi.codemode.journal`**（kind 常量 `codemode.ts:149`），按投递顺序 |
+| 核心差异 | 沙箱只管执行，持久化由宿主扩展实现 | **journal + 时钟值重放**：给定同样的脚本、`startedAt`、`seed`、工具与 store，在同一 fingerprint 的 VM 上重放出同样的调用、参数与输出（确定性重放，`codemode.ts:10-29` 有完整说明） |
+| 版本/名 | — | `CODEMODE_MODULE_VERSION = 2`（`codemode.ts:86`）、`CODEMODE_TOOL_NAME = "codemode"`（`:88`）、`DEFAULT_CODEMODE_INLINE_BUDGET`（`describe.ts` 导出） |
+
+**为什么值得记**：这是"同一问题域、两种正当解法"的实例——coding-agent 需要的是**会话内可恢复的 store**；durable 是持久任务运行时，需要的是**可确定性重放的执行记录**（崩溃后重放要产出逐字相同的结果）。把一者描述成另一者的迁移是错的。
+
 ## 机制
 
 ### 独立包的基础能力（应用层另有注入）
 
-- `tools.<name>(args)`:调用注入工具,参数与结果做 JSON 往返;非法标识符字符转 `_`(`README.md:40`);
-- `ALL_TOOLS`:列出全部注入工具的 `{ name, description }`(`:41`);脚本可以**先发现再调用**——这是沙箱内的自省面;
-- `text(value)` / `image(...)` / `console.*`:向 `result.output` 追加内容(`:42-44`);
-- `store(key, value)` / `load(key)`:跨次执行的 JSON 状态,单值上限 256 Ki、总量 1 Mi(`:65`);
-- `exit()`:立即成功结束,保留 output 与 store 写入(`:44`);
+- `tools.<name>(args)`:调用注入工具,参数与结果做 JSON 往返;非法标识符字符转 `_`(`README.md:40`；v1.2.0 未变);
+- `ALL_TOOLS`:列出全部注入工具的 `{ name, description }`(v1.2.0：`README.md:50`);脚本可以**先发现再调用**——这是沙箱内的自省面;
+- `text(value)` / `image(...)` / `console.*`:向 `result.output` 追加内容(v1.2.0：`README.md:51`);
+- `store(key, value)` / `load(key)`:跨次执行的 JSON 状态,单值上限 256 Ki、总量 1 Mi(v1.2.0：`README.md:74`);
+- `exit()`:立即成功结束,保留 output 与 store 写入(v1.2.0：`README.md:53`);
 - **可注入 globals**：独立包支持宿主 globals，应用用它提供 `models`、工具搜索/声明等，见 [包合同](../../packages/codemode/README.md#usage)与[应用 Globals](../../packages/coding-agent/docs/codemode.md#globals)。没有原生 timers、`fetch`、`process`、`require`、modules、`WebAssembly`；可通过宿主提供的工具触及外部世界。
 
 ### 资源与终止
 
-- `timeoutMs` 默认有期限,`Infinity` 显式免除;**"等一个永远无法 settle 的 promise"会立即失败而不是挂死**——VM 无 timer 无 I/O,宿主能识别这种死态(`:49`);
-- `memoryLimitBytes` 封顶 VM 堆,超限在脚本内部抛 `InternalError: out of memory`(`:51`);
-- 输出封顶(v1.0.1,#10283):`text()`/`image()`/`console.*` 桥接到宿主的输出也有限额——超过 `MAX_OUTPUT_CHARS`(16 Mi 字符,含 base64 图像数据)或 `MAX_OUTPUT_ITEMS`(10 万条)即以 `RangeError` 失败脚本(`packages/codemode/src/runtime/prelude-source.ts:40-41`)。此前 VM 堆有 `memoryLimitBytes` 但宿主侧留存无限额:一个死循环 `console.log` 能把**宿主进程**内存耗到崩溃;item 上限正是堵"循环打印空串"的绕过。
+- `timeoutMs` 默认有期限,`Infinity` 显式免除;**"等一个永远无法 settle 的 promise"会立即失败而不是挂死**——VM 无 timer 无 I/O,宿主能识别这种死态(v1.2.0：`README.md:58`);
+- `memoryLimitBytes` 封顶 VM 堆,超限在脚本内部抛 `InternalError: out of memory`(v1.2.0：`README.md:60`);
+- 输出封顶(v1.0.1,#10283):`text()`/`image()`/`console.*` 桥接到宿主的输出也有限额——超过 `MAX_OUTPUT_CHARS`(16 Mi 字符,含 base64 图像数据)或 `MAX_OUTPUT_ITEMS`(10 万条)即以 `RangeError` 失败脚本(**v1.2.0：`packages/codemode/src/runtime/prelude-source.ts:42-43`**)。此前 VM 堆有 `memoryLimitBytes` 但宿主侧留存无限额:一个死循环 `console.log` 能把**宿主进程**内存耗到崩溃;item 上限正是堵"循环打印空串"的绕过。
 
 ### 状态语义
 
 独立沙箱自己不持久化：宿主传入 `options.store`，成功结果返回 `storeWrites`，失败结果不报告写入，见 [独立包 Store 合同](../../packages/codemode/README.md#store)。coding-agent 已实现宿主持久化：成功 store 写 `codemode-store` custom entry，恢复和分支按会话路径重建，见 [应用 Store values](../../packages/coding-agent/docs/codemode.md#store-values)。**不提交 store 不等于撤销脚本已调用工具的副作用**；工具操作真实发生，失败前的文件/网络操作不会自动回滚。
 
-### lockdown:built-ins 冻结与桥校验(Unreleased,b223082bb)
+### lockdown:built-ins 冻结与桥校验(b223082bb，v1.2.0 起在 tag 内)
 
 "唯一能力是注入工具"的合同此前有一个软肋:prelude 与模型脚本**共享同一套 VM built-ins**,prelude 用 `JSON.stringify` 把返回值、store 写入、错误描述序列化后经 bridge 发给宿主。脚本若改写 `Array.prototype.toJSON` 或整个替换 `globalThis.JSON`,序列化桥即被劫持——prelude 发出的 payload 畸形,宿主在 worker message listener 里同步 `JSON.parse` 抛错,直接变成宿主进程的未捕获异常且 `execute()` 永不 settle(注入工具的调用结果同样经这条桥往返,payload 一坏整条执行链失效,#10444)。
 
 修复落在两侧:
 
-- **VM 侧冻结**:prelude 最前面的 `lockdown()` IIFE(`packages/codemode/src/runtime/prelude-source.ts:56-135`)BFS 遍历 `globalThis` 自有键与从实例够到的 intrinsics,逐个 `Object.freeze`;built-in global 的数据属性改只读不可配置。freeze 的经典坑"override mistake"(原型上只读数据属性会让实例赋值也抛)用 accessor 化化解:`OVERRIDABLE` 集合(`constructor`/`name`/`message`/`toString`/`toLocaleString`/`valueOf`/`toJSON`)与 `Object.prototype` 全部成员转 getter/setter——实例上定义自有属性仍可用(`class MyError extends Error` 里 `this.name = "MyError"` 照常工作),对原型本身赋值抛 `TypeError`。
-- **宿主侧校验**:每个 worker payload 经 `parseBridgeJson`/`parseStoreWrites`/`parseScriptError` 严格校验形状,不合法即 `BridgeError`(`packages/codemode/src/runtime/host.ts:54-95`);message listener 包 try/catch,`BridgeError` 以 sandbox 错误收场("Sandbox bridge broken: ... The script may have modified built-ins",`:200-211`);`finish()` 本身不再解析 JSON,返回值在 finish 之前解码完毕——"worker 消息 = 可信输入"的假设废除。
+- **VM 侧冻结**:prelude 最前面的 `lockdown()` IIFE(**v1.2.0：`packages/codemode/src/runtime/prelude-source.ts:58`起**（v1.0.1 时为 `:56-135`；文件 512→522 行）)BFS 遍历 `globalThis` 自有键与从实例够到的 intrinsics,逐个 `Object.freeze`;built-in global 的数据属性改只读不可配置。freeze 的经典坑"override mistake"(原型上只读数据属性会让实例赋值也抛)用 accessor 化化解:`OVERRIDABLE` 集合(`constructor`/`name`/`message`/`toString`/`toLocaleString`/`valueOf`/`toJSON`)与 `Object.prototype` 全部成员转 getter/setter——实例上定义自有属性仍可用(`class MyError extends Error` 里 `this.name = "MyError"` 照常工作),对原型本身赋值抛 `TypeError`。
+- **宿主侧校验**:每个 worker payload 经 `parseBridgeJson`/`parseStoreWrites`/`parseScriptError` 严格校验形状,不合法即 `BridgeError`(**v1.2.0 已迁移：`packages/codemode/src/runtime/execution.ts:102`=`BridgeError`、`:104`=`parseBridgeJson`、`:112`=`parseStoreWrites`、`:131`=`parseScriptError`**);message listener 包 try/catch,`BridgeError` 以 sandbox 错误收场("Sandbox bridge broken: ... The script may have modified built-ins",**v1.2.0：`execution.ts:324`**);`finish()` 本身不再解析 JSON,返回值在 finish 之前解码完毕——"worker 消息 = 可信输入"的假设废除。
 
 这对 :9 "中间结果留在 VM 里"的可靠性边界是实质加固:脚本不能再借原型改写污染序列化桥。但它不触及进程边界——冻结的是 **VM 能力面**,注入工具仍以宿主权限执行("无进程级隔离"结论保留,见下节)。
 
 ### 图像:输出落盘与读图返回 image block(coding-agent 侧)
 
-- **出**:`image()` 的输出此前无法再次引用——脚本不能写文件、`write` 工具只收文本。v1.0.3 起 codemode 结果里的每个 image item 在截断**之后**统一落盘,前面插入 `[Image saved to <path> (…)]` 文本标签(`saveImages`,`packages/coding-agent/src/extensions/codemode/execute.ts:281-313`;截断后执行,路径永不与图片分离);输出文件统一经 `src/utils/output-files.ts` 创建,权限 **0o600**、`wx` flag 防符号链接抢占,写盘失败降级为标签文本而非丢结果(#10310)。
+- **出**:`image()` 的输出此前无法再次引用——脚本不能写文件、`write` 工具只收文本。v1.0.3 起 codemode 结果里的每个 image item 在截断**之后**统一落盘,前面插入 `[Image saved to <path> (…)]` 文本标签(`saveImages`,**v1.2.0：`packages/coding-agent/src/extensions/codemode/execute.ts:359`**（标签在 `:370`）;截断后执行,路径永不与图片分离);输出文件统一经 `src/utils/output-files.ts` 创建,权限 **0o600**、`wx` flag 防符号链接抢占,写盘失败降级为标签文本而非丢结果(#10310)。
 - **进**:`tools.read()` 读图片文件返回 image block 而非 resize 提示文本——read 工具新增 outputSchema(`string | {type:"image", data, mimeType, note}` 联合,`packages/coding-agent/src/core/tools/read.ts:33`),结果包成 `structuredContent`(`:216`),脚本可直接把它喂给 `image()` 展示(#10251)。
-- **guidelines 随声明走**:codemode 的工具声明现在把 prompt guidelines 渲染成 bullet 追加到 description(`toCodemodeDeclaration`,`packages/coding-agent/src/extensions/codemode/tool.ts:160-174`)——隐藏工具的 guidelines 从 system prompt rules 迁到工具声明,脚本自省面(`ALL_TOOLS`)拿到的描述自带使用约束(#10343)。
+- **guidelines 随声明走**:codemode 的工具声明现在把 prompt guidelines 渲染成 bullet 追加到 description(`toCodemodeDeclaration`,**v1.2.0：`packages/coding-agent/src/extensions/codemode/tool.ts:145`**)——隐藏工具的 guidelines 从 system prompt rules 迁到工具声明,脚本自省面(`ALL_TOOLS`)拿到的描述自带使用约束(#10343)。
 
 ## 边界与上限
 
@@ -68,11 +82,11 @@ codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模�
 | `packages/codemode/README.md:3` | 核心合同:唯一能力是注入工具;嵌套调用不进 LLM 上下文 |
 | `packages/codemode/README.md:5` | 脚本词汇表与内置 `codemode` 工具 |
 | `packages/codemode/README.md:40-47` | 脚本能力封闭清单 |
-| `packages/codemode/README.md:49-51` | 超时与内存上限;死态立即失败 |
-| `packages/codemode/README.md:55-65` | store/load:宿主持久、失败无写入、容量上限 |
-| `packages/codemode/src/runtime/prelude-source.ts:40-41` | 输出封顶常量 MAX_OUTPUT_CHARS / MAX_OUTPUT_ITEMS |
-| `packages/codemode/src/runtime/prelude-source.ts:56-135` | lockdown:built-ins 冻结与 OVERRIDABLE accessor 化 |
-| `packages/codemode/src/runtime/host.ts:54-95,200-211` | 宿主侧 BridgeError 严格校验与 sandbox 错误收场 |
-| `packages/coding-agent/src/extensions/codemode/execute.ts:281-313` | image() 输出落盘与 `[Image saved to ...]` 前置标签 |
+| **`packages/codemode/README.md:58,60`** | 超时与内存上限;死态立即失败（v1.0.1 时为 `:49-51`） |
+| **`packages/codemode/README.md:74`** | store/load:宿主持久、失败无写入、容量上限（v1.0.1 时为 `:55-65`） |
+| **v1.2.0：`packages/codemode/src/runtime/prelude-source.ts:42-43`** | 输出封顶常量 MAX_OUTPUT_CHARS / MAX_OUTPUT_ITEMS |
+| **v1.2.0：`packages/codemode/src/runtime/prelude-source.ts:58`起**（v1.0.1 时为 `:56-135`；文件 512→522 行） | lockdown:built-ins 冻结与 OVERRIDABLE accessor 化 |
+| **`packages/codemode/src/runtime/execution.ts:102-131,324`** | 宿主侧 BridgeError 严格校验与 sandbox 错误收场（**v1.2.0 从 `host.ts` 迁出**；`host.ts` 416→79 行） |
+| **`packages/coding-agent/src/extensions/codemode/execute.ts:359`** | image() 输出落盘与 `[Image saved to ...]` 前置标签（`:370`） |
 | `packages/coding-agent/src/core/tools/read.ts:33,216` | tools.read() 读图返回 image block |
-| `packages/coding-agent/src/extensions/codemode/tool.ts:160-174` | 工具声明附 guidelines(toCodemodeDeclaration) |
+| **`packages/coding-agent/src/extensions/codemode/tool.ts:145`** | 工具声明附 guidelines(toCodemodeDeclaration)（渲染在 `:149`） |

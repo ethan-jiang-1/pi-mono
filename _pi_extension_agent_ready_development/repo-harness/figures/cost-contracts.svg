@@ -9,7 +9,7 @@
   <text x="530" y="62" text-anchor="middle" font-size="12" fill="#5f6b7a">三层的名字都是 pi-mono 的原话：core is minimal · Entry points are cost contracts · Auto-closing creates a buffer</text>
 
   <rect x="30" y="90" width="320" height="330" rx="8" fill="#edf5ff" stroke="#5791c9" stroke-width="1.5"/>
-  <text x="190" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#173f67">范围纪律（v1.0.3 原话）</text>
+  <text x="190" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#173f67">范围纪律（v1.2.0 原话）</text>
   <text x="190" y="144" text-anchor="middle" font-size="11.5" font-weight="600" fill="#276da8">"pi's core is minimal"</text>
   <rect x="50" y="164" width="280" height="104" rx="6" fill="#ffffff" stroke="#8bb3d7"/>
   <text x="190" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#2f8550">约束</text>
@@ -23,7 +23,7 @@
   <text x="190" y="370" text-anchor="middle" font-size="10.5" fill="#526175">审阅判断发生在人，不在脚本</text>
 
   <rect x="370" y="90" width="320" height="330" rx="8" fill="#fff5e6" stroke="#d99939" stroke-width="1.5"/>
-  <text x="530" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#744408">成本合同（v1.0.3 原话）</text>
+  <text x="530" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#744408">成本合同（v1.2.0 原话）</text>
   <text x="530" y="144" text-anchor="middle" font-size="11.5" font-weight="600" fill="#b3662a">"Entry points are cost contracts"</text>
   <rect x="390" y="164" width="280" height="104" rx="6" fill="#ffffff" stroke="#d99939"/>
   <text x="530" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#2f8550">约束</text>
@@ -37,7 +37,7 @@
   <text x="530" y="370" text-anchor="middle" font-size="10.5" fill="#526175">未列出的入口不受预算约束</text>
 
   <rect x="710" y="90" width="320" height="330" rx="8" fill="#edf8f1" stroke="#55a36f" stroke-width="1.5"/>
-  <text x="870" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#1f6139">审阅缓冲（v1.0.3 原话）</text>
+  <text x="870" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#1f6139">审阅缓冲（v1.2.0 原话）</text>
   <text x="870" y="144" text-anchor="middle" font-size="11.5" font-weight="600" fill="#2f8550">"Auto-closing creates a buffer"</text>
   <rect x="730" y="164" width="280" height="104" rx="6" fill="#ffffff" stroke="#55a36f"/>
   <text x="870" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#2f8550">约束</text>
@@ -53,5 +53,5 @@
   <rect x="30" y="446" width="1000" height="72" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
   <text x="530" y="474" text-anchor="middle" font-size="13" font-weight="700" fill="#27364a">共同的形态：把模糊的社会性约束转写为会失败的检查（本语料的观察归纳）</text>
   <text x="530" y="498" text-anchor="middle" font-size="11" fill="#526175">「请保持核心精简」是提醒，PR 被拒是机制；「维护者很忙」是提醒，默认关闭 + lgtm 解锁是机制</text>
-  <text x="530" y="556" text-anchor="middle" font-size="11" fill="#5f6b7a">来源：earendil-works/pi v1.0.3 · CONTRIBUTING.md L7-L11 与 FAQ · scripts/check-entry-graphs.mjs L3-L12</text>
+  <text x="530" y="556" text-anchor="middle" font-size="11" fill="#5f6b7a">来源：earendil-works/pi v1.2.0 · CONTRIBUTING.md L7-L11 与 FAQ · scripts/check-entry-graphs.mjs L3-L12</text>
 </svg>

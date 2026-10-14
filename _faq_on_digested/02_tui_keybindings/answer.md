@@ -159,5 +159,5 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 - 源码：`packages/coding-agent/src/core/keybindings.ts` — 完整快捷键定义
 - 源码：`packages/coding-agent/src/modes/interactive/interactive-mode.ts` — TUI 主逻辑
 - 源码：`packages/coding-agent/src/modes/interactive/components/` — TUI 组件目录
-- `_digested/`：[agent/04-Harness/README.md](_digested/agent/04-Harness/README.md) — AgentHarness 和工具
-- `_digested/`：[integration/02-advanced.md](_digested/integration/02-advanced.md) — TUI vs SDK 架构关系
+- `_digested/`：[agent/04-Harness/README.md(../../_digested/agent/04-Harness/README.md) — AgentHarness 和工具
+- `_digested/`：[integration/02-advanced.md(../../_digested/integration/02-advanced.md) — TUI vs SDK 架构关系

@@ -40,7 +40,9 @@
 和第二条扩展轴一样，**轴 8 目前是实验路径，不是可用的部署选项**：
 
 - **运行时在**：`packages/chord`（第 11 个包，零 Pi 依赖，由 `packages/chord/test/boundary.test.ts` 自动守住边界）；
-- **活证据在**：`packages/coding-agent/examples/plugins/pi-example-plugin/`（`src/contract.ts` / `src/session.ts` / `src/tui.ts`）；
+- **活证据在**（**v1.2.0 已删除**）：`packages/coding-agent/examples/plugins/pi-example-plugin/`（`src/contract.ts` / `src/session.ts` / `src/tui.ts`）；
+
+> **⚠️ v1.2.0（sync 0009）**：`packages/coding-agent/examples/plugins/pi-example-plugin/` 已在 v1.2.0 删除（`7472cda0d`），`packages/chord/src/api.ts` 与旧 facet/service 运行时随 chord2 重写（`0104fef1e`）删除。下文对这两者的引用只作历史线索；chord 现状见 [`architecture-next/chord.md`](../../architecture-next/chord.md)。
 - **但它只在 repo checkout + `PI_EXPERIMENTAL=1` 下可用**，**不在 npm 包和 standalone binary 里**（v0.85.0 曾把整个 experimental 远程栈打进 npm 包，#9132；v0.85.1 已把相关依赖降为 `devDependencies` 并排除 `dist/experimental`）；
 - **被引为"设计"的文档是规格不是现状**：`packages/agent/docs/mobile-handoff/02-plugins/01-facets/facets.md` 自称 supersede `plugins.md`，但 `peer` service mode、`definePeerService`、静态 `uses`/`provides` manifest 在 chord 里**全部没有实现**（chord 的 `ServiceMode` 只有 `"singleton" | "keyed"`，`packages/chord/src/types.ts:60`）。`mobile-handoff/README.md:22` 自己写着 "Three units ship working code. Four are specifications. Do not assume a doc describes something that exists."
 

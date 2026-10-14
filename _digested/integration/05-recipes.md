@@ -312,7 +312,7 @@ class PiAgent:
 - **编码**：stdin/stdout 使用 UTF-8。
 - **进程管理**：确保 agent 进程在宿主退出时被 kill。
 - **超时**：设置读写超时，避免卡死。
-- **其他路径**：多客户端/远程场景可评估 experimental 的 `@earendil-works/pi-client` + `pi-server`（CBOR framing，见 `integration/02-advanced.md`）；不想手写成帧的话，把 `rpc-client.ts` 的 JSONL 语义移植过去即可。
+- **其他路径**：~~多客户端/远程场景可评估 experimental 的 `@earendil-works/pi-client` + `pi-server`（CBOR framing，见 `integration/02-advanced.md`）~~——**该路径已于 v1.2.0 删除**（`7472cda0d`：`packages/client`、`packages/server`、`packages/protocol` 三包整体移除，CBOR 协议线本体一并删除），**官方未提供替代的远程栈**。若仍需多客户端/远程场景，只能自行在 RPC 子进程路径（本页上文）之上构建，或改用 SDK 进程内路径。
 
 ## 各 Recipe 对比
 

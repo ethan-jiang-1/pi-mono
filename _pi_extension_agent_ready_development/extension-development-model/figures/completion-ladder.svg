@@ -21,5 +21,5 @@
   <text x="430" y="560" font-size="11" fill="#2f8550" transform="rotate(-19 430 560)">交付可信度逐级上升</text>
 
   <rect x="30" y="596" width="940" height="30" rx="6" fill="#f8fafc" stroke="#94a3b8"/>
-  <text x="500" y="616" text-anchor="middle" font-size="11" fill="#526175">验证方式：1-2 启动诊断 · 3-4 faux provider 断言 · 5 真实交互 · 6 干净安装 · 7 交付记录｜来源：综合自 earendil-works/pi v1.0.3 扩展运行时合同</text>
+  <text x="500" y="616" text-anchor="middle" font-size="11" fill="#526175">验证方式：1-2 启动诊断 · 3-4 faux provider 断言 · 5 真实交互 · 6 干净安装 · 7 交付记录｜来源：综合自 earendil-works/pi v1.2.0 扩展运行时合同</text>
 </svg>

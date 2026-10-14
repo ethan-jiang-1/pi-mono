@@ -45,7 +45,7 @@ function mutate(name, fn) {
 		writeFileSync(file, `link to [nowhere](https://example.com/other)\n`);
 	});
 	const { errors } = verifyCorpus(dir);
-	assert.ok(errors.some((e) => e.includes("pinned v1.0.3")), `expected pinned-link rejection, got: ${errors.join("; ")}`);
+	assert.ok(errors.some((e) => e.includes("pinned v1.2.0")), `expected pinned-link rejection, got: ${errors.join("; ")}`);
 }
 
 // 3. Missing anchor in a relative link is rejected.

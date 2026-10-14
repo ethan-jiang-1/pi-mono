@@ -11,7 +11,7 @@
 | issue/PR 默认自动关闭、`lgtmi`/`lgtm` 解锁、`.github/APPROVED_CONTRIBUTORS` | 这是维护者带宽下的流量策略；扩展仓的贡献者规模与风险面不同 | [01](01-contribution-gates.md) |
 | `@issuron analyze` 的 CI 诊断链（org 成员 + 仓库写权限双重授权、专用 auth.json、secret gist） | 依赖 pi-mono 自己的组织成员、environment secret 与专用登录 | [02](02-issue-diagnosis-and-session-import.md) |
 | `npm run check` 的具体条目（pinned-deps、entry-graphs 预算、browser-smoke、install-lock 等） | 每条都针对 pi-mono 的包结构、浏览器目标与发布形态 | [03](03-check-pipeline.md) |
-| 主 CI 的 `build-check-test` 与 `mcp-conformance` 两个 job、durable-env 五 OS 矩阵、Nix/audit/模型目录工作流 | 触发器与检查范围由主仓的事件与路径设计决定 | [04](04-ci-matrix.md) |
+| 主 CI 的 `build-check-test` 与 `mcp-conformance` 两个 job、env 工作流的六平台 daemon 矩阵、Nix/audit/模型目录工作流 | 触发器与检查范围由主仓的事件与路径设计决定 | [04](04-ci-matrix.md) |
 | `test/suite/` 的 CI-safe 规则、bash 隔离环境、evals 的 Docker 配对 | 规则本身写给主仓测试；扩展仓要用需自建同等约束 | [05](05-testing-layers.md) |
 | The One Rule 的具体措辞与「两次违规即封禁」 | 门槛值与处罚由各仓自己定 | [06](06-review-and-human-role.md) |
 | lockstep 版本、`release.mjs` 十步、六平台二进制、npm trusted publishing、R2 公告、`stable` 分支 | 依赖主仓的包清单、平台承诺、npm 组织、R2 凭据与 Nix flake | [07](07-release-and-recovery.md) |
@@ -27,10 +27,10 @@
 |---|---|---|
 | 扩展生命周期 | factory 只做注册；长命资源从 `session_start` 或按需启动；清理放幂等 `session_shutdown` | Extensions 文档 |
 | 事件边界 | run 从 `before_agent_start` 到 `agent_end`；`agent_before_settle` 是最后可行动边界；`agent_settled` 只通知 | Extensions 文档 |
-| package 依赖划分 | host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）放 `peerDependencies` 用 `"*"`，不得放 `dependencies` | [Packages 文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/packages.md#L80-L92) |
+| package 依赖划分 | host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）放 `peerDependencies` 用 `"*"`，不得放 `dependencies` | [Packages 文档](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/packages.md#L80-L92) |
 | 工具不可注销 | 只能以 `exposure: "hidden"` 重注册收回；`terminate: true` 需要同批已完成工具一致同意 | Extensions 文档 |
 | 模式差异 | JSON/print 无 UI；RPC 不转发自定义终端组件；用 `ctx.mode`/`ctx.hasUI` 守卫 | Extensions 文档 |
-| 会话文件格式 | 带树结构的 JSONL；导出/导入是搬运历史，不是重放（见[02 页](02-issue-diagnosis-and-session-import.md)的 `/ir` 边界） | [Session 格式文档](https://github.com/earendil-works/pi/blob/v1.0.3/packages/coding-agent/docs/session-format.md) |
+| 会话文件格式 | 带树结构的 JSONL；导出/导入是搬运历史，不是重放（见[02 页](02-issue-diagnosis-and-session-import.md)的 `/ir` 边界） | [Session 格式文档](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/session-format.md) |
 
 区别判据很简单：**换成任何 Pi 用户都成立的是运行时合同；只有在这个仓库工作才成立的是主仓要求。**正文中的「主仓要求」标注就是给这条判据用的。
 
@@ -77,7 +77,7 @@
 - **「主仓这么写，所以这是 Pi 的推荐做法」**：不成立。本卷通篇标注了「主仓要求」与「扩展仓建议」的差别；主仓多数机制没有对外效力。
 - **「运行时合同可以按仓库改」**：也不成立。生命周期、依赖划分、模式差异是不可协商的运行时事实；违反它们的扩展会在并发、无头模式或干净安装时失败，与仓库制度无关。
 - **「借鉴等于复制」**：不等于。借原则的收益来自把判据适配到自己的失败面；照抄门槛值通常会把别人的带宽假设搬成自己的长期红灯。
-- **「本卷的三条立场是 Pi 的方法论」**：不是。那是对 `v1.0.3` 可观察机制的综合归纳，属**扩展仓建议**；Pi 没有声明采用任何统一开发方法名。
+- **「本卷的三条立场是 Pi 的方法论」**：不是。那是对 `v1.2.0` 可观察机制的综合归纳，属**扩展仓建议**；Pi 没有声明采用任何统一开发方法名。
 
 ## 下一步
 

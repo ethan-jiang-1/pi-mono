@@ -1,7 +1,7 @@
 # 06 — 二进制本地 SSE 桩与 Tmux 受控交互测试：端到端冒烟工程学
 
 > **源码锚点**：
-> - 独立二进制 SSE 冒烟测试：`scripts/smoke-test-codemode-binary.mjs`（179 行）
+> - 独立二进制 SSE 冒烟测试：`scripts/smoke-test-codemode-binary.mjs`（178 行）
 > - 终端交互式冒烟规程：`.pi/skills/interactive-testing.md`
 > - 发布流程前置检查：`AGENTS.md`（"Testing pi Interactive Mode with tmux"）
 

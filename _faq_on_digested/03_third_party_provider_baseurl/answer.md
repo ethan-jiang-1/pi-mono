@@ -157,3 +157,26 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 - **自定义 provider 的新官方范例**：Azure Foundry 上只讲 Chat Completions 的部署（代表：deepseek/deepseek-v4-pro）现在可用 `provider: "azure"` + `api: "openai-completions"` 挂进 models.json——azure provider 从单一 Responses API 扩为双 API dispatch（`packages/ai/src/providers/azure.ts:44-53`，`azureStreams` 在 dispatch 前解析 endpoint 并把请求里的 `model` 换成部署名、`model.id` 保持 catalog id）。`AZURE_OPENAI_DEPLOYMENT_NAME_MAP` / `azureDeploymentName`（`packages/ai/src/api/azure-openai-config.ts:27-33`）对两种 API 都生效（此前部署名映射只作用于 Responses 路径，Chat Completions 发的是 catalog model id，任何部署名≠模型名的部署 404）。本篇 §2 的"新 provider 名 + 手动补 compat"流程因此多了一个官方范本。
 - **provider id 集合已变**：`azure-openai-responses` 已改名 `azure`（`a37306d43`，v1.0.3 唯一 Breaking）——models.json/auth.json/settings.json 里键为 `azure-openai-responses` 的条目必须改 `azure`（SDK 侧 `getModel("azure", ...)`）。本篇正文以自定义 provider（micuapi）为例不直接命中，但通用流程叙述里凡涉及官方 provider id 集合的地方均以此为准。
 - **锚点漂移声明（本轮追加）**：`generate-models.ts` 本轮 +100 行左右（`DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP` 已不在 L286，现 :289；Together 改名集 `:201`）、`provider-composer.ts` +21（`applyModelsJson` :281 → :300、`modelFromJson` :192 → :210）、`openai-completions.ts` +14（deepseek 魔法探测 :1598 → :1611）。§7 开头"锚点仍以 v0.85.1 为准"的声明继续适用，本段追加 v1.0.3（`76dfb88f6` 等）这轮漂移。
+
+## 8. v1.2.0 增量（2026-10-13 sync-0009 同步后）
+
+> **锚点基线变更**：本节所有行号以 **tag `v1.2.0`（`06a466935`）** 为准，不再沿用 §7 的 v0.85.1 基线。§1–§7 正文的历史锚点**未逐项重验**。
+
+- **`RefreshModelsContext.baseUrl`：目录刷新现在知道"注册后"的 base URL**（`packages/ai/src/models.ts:100`，接口 `:80`，文件 1269 行）。注释原文：
+
+  > Base URL of the registered provider, including configuration overrides that wrappers apply outside the provider receiving this context.
+
+  关键是"**wrappers apply outside**"：provider 对象自己硬编码的 base URL 是 `https://openrouter.ai/api/v1`（`packages/ai/src/providers/openrouter.ts:13`），而 models.json 的区域覆盖是在**更外层**由 composer 合成的——`provider-composer.ts:608` 的 `baseUrl: extension?.baseUrl ?? config?.baseUrl ?? base?.baseUrl`。所以刷新逻辑若读自己的常量就拿不到覆盖；读 `context.baseUrl` 才拿得到。赋值点在 `models.ts:554`（`runProviderRefreshPhase` 内 `baseUrl: provider.baseUrl`），即取自**已注册**的 provider 对象。
+
+- **具体收益——OpenRouter 区域端点**：`personalizeOpenRouterCatalog` 用 `context.baseUrl ?? OPENROUTER_BASE_URL` 拼出 `/models/user` 请求（`openrouter.ts:30`）。因此 models.json 里把 OpenRouter 指向区域端点（如 `https://us.openrouter.ai/api/v1`）时，**该区域的过滤规则会随之生效**，而不是永远打全球端点。
+
+- **新增能力：按 key 裁剪模型目录**（`ee409a85f`）。`personalizeOpenRouterCatalog`（`openrouter.ts:24`，文件 88 行）请求 `GET /models/user`，把目录裁成**该 key 真正可用**的 chat 模型集合。三条精确语义：
+  1. **无 key（匿名）→ 原样返回目录**（`openrouter.ts:28-29`：`context.credential?.type === "oauth" ? context.credential.access : context.credential?.key`，取不到 key 就 return）。这是"登录用户与匿名用户看到不同目录"的真实机制——代码只区分**有 key / 无 key**，不区分免费档与付费档。
+  2. **图片与分类模型不过滤**（`openrouter.ts:47`：`if (!isModelType(model, "chat")) return [model];`）。
+  3. **回退规则很窄**：仅 **401/403/404** 时整体退回原目录（`:34`）；其它非 OK 状态**抛错**（`:35`）。缺 limit 时保留目录原值，per-key 值经 `top_provider`（contextWindow/maxTokens）与 `openRouterCost`（cost）覆盖目录。
+
+- **接线在 coding-agent**：`packages/coding-agent/src/core/model-runtime.ts:230-238` 对 `provider.id === "openrouter"` 走 `withPersonalizedCatalog(provider, personalizeOpenRouterCatalog, ...)`，其它 provider 落到 `withRemoteCatalog`（:239）。两者都是 `remote-catalog-provider.ts` 里的函数（文件 240 行）：`withRemoteCatalog` :104 是 pi.dev 目录叠加，`withPersonalizedCatalog` :195 则**跳过刷新间隔/etag 缓存，并把个性化结果持久化为目录**（:232-237），因此离线、`pi -p`、RPC 路径也用得上。
+
+  > **版本判定注意**：`remote-catalog-provider.ts` **不是** v1.2.0 新增（v1.1.0 已有，158 → 240 行，+109/−27）；新增的是其中的 `withPersonalizedCatalog` 函数，以及新文件 `packages/ai/src/providers/openrouter-api.ts`（77 行，含 `OpenRouterModel` :28、`openRouterCost` :50）。
+
+- **对本篇主题的含义**：`personalizeOpenRouterCatalog` **不是一个 `fetchModels` 字段**——`createProvider()`（`openrouter.ts:62-87`）没有 `fetchModels`，它是被 coding-agent 注入的**自由函数**。回答"第三方 provider 的 baseUrl 怎么影响模型列表"时，这是 v1.2.0 新增的第三条路径（前两条是 §1–§7 讲的 pi.dev 目录与 models.json 自定义条目）。

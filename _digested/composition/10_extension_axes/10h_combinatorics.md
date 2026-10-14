@@ -26,7 +26,7 @@
 
 ## 案例 2：`plan-mode/index.ts`（五轴）
 
-**位置**：`packages/coding-agent/examples/extensions/plan-mode/index.ts`（390 行）
+**位置**：`packages/coding-agent/examples/extensions/plan-mode/index.ts`（394 行）
 
 **解决问题**：给 pi 加一套计划模式——agent 只能读、写计划、不能改代码。
 
@@ -95,7 +95,7 @@
 
 - pi-mono 项目 `.pi/extensions/import-repro.ts`（三轴组合实例，351 行）
 - pi-mono 项目 `.pi/extensions/prompt-url-widget.ts`（两轴组合实例，270 行）
-- `packages/coding-agent/examples/extensions/plan-mode/index.ts`（五轴组合实例，390 行）
+- `packages/coding-agent/examples/extensions/plan-mode/index.ts`（五轴组合实例，394 行）
 - `packages/coding-agent/examples/plugins/pi-example-plugin/`（第八根轴的实例，见案例 4）
 - `harness/01-Architecture/1.2_single_injection.md`：统一注入点分析——"跨能力组合在统一口子里是天然的，在多协议里要拼接"
 

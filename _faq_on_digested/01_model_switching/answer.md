@@ -142,6 +142,25 @@ const { session } = await createAgentSession({
 - **azure provider 改名（v1.0.3 唯一 Breaking，`a37306d43`）**：KnownProvider 的 `azure-openai-responses` 改名为 `azure`（`packages/ai/src/types.ts:46`；coding-agent 侧 `packages/coding-agent/src/core/model-resolver.ts:25`）。**用户侧迁移**：models.json / auth.json / settings.json 里以 `azure-openai-responses` 为键的条目必须改名 `azure`；SDK 用户改 `getModel("azure", ...)` 与 `providers/azure` 导入；依赖 provider id 字符串的脚本/配置同受影响；存量会话下一轮会看到不同的 provider 名。api id `azure-openai-responses` 未变，`AZURE_OPENAI_*` 环境变量名不变。
 - **Together 模型 ID 改名（`28eaccb8e`，#10336）**：`deepseek-ai/DeepSeek-V4-Pro` → `deepseek-ai/DeepSeek-V4-Pro-0813`（toggle-reasoning 集合同步改名，`packages/ai/scripts/generate-models.ts:201`），否则该模型丢失 thinking level 控制。按模型 id 字符串引用 Together 该模型的配置/脚本是一处小迁移。
 
+## v1.2.0 注记（2026-10-13 sync-0009 同步，未逐项重验本篇其余结论）
+
+- **本区间模型目录"零新增"——这点本身是结论**：`packages/ai/src/models.generated.ts`、`packages/ai/src/providers/*.models.ts`（42 个）与 `packages/ai/src/providers/data/*.json` 在 `98d2e1947..v1.2.0` 区间**全部未变**（`git diff --stat` 无输出）。因此**没有需要补进本篇的新模型条目**；计划里"新模型条目"一项经核实不成立（详见下方两条订正）。
+- **订正 1：Haiku 5.5 不是新模型条目，而是 effort-level 正则扩宽**。`generate-models.ts` 把 `xhigh` 的可用性判据从只认 Sonnet 5 扩到同时认 Haiku 5.5（`:1094` 注释改为 "…Sonnet 5, Haiku 5.5, and Fable 5."；对应正则 `^claude-(?:sonnet|haiku)-5[.-]5(?:-\d{8})?$`，另有 `haiku-5-5`/`haiku-5.5` 分支）。**注意断言边界**：Haiku 5.5 只出现在**生成器脚本**里（`scripts/generate-models.ts`），**未出现在任何已发布的 catalog 文件**中——搜 `models.generated.ts` 与 `*.models.ts` 均无命中。所以正确的说法是"生成器已预备 Haiku 5.5 的 effort 元数据映射"，而**不是**"v1.2.0 新增了 Haiku 5.5 模型"。
+- **订正 2：「GPT-6 Luna（分类器）」这一表述有误导**。`GPT-6 Luna` 确实存在于 `generate-models.ts`（`:2700`/`:2910`/`:3155`），但它是 **chat 模型**（`gpt-6-sol` 的同系列兄弟，`:2756`：`id === "gpt-6-sol" ? "GPT-6 Sol" : "GPT-6 Luna"`），**不是分类器**；且如上是**区间前既有**，本轮未新增。本篇不应据此写"新增分类器模型"。
+- **真正新增的分类器能力在 llama.cpp，且它是"原生决策模型"而非新模型条目**（见下条）。分类器 API 的清单可查 `packages/ai/src/types.ts:82`（api 联合类型）与 `:876-886`（`ClassifierModel` 契约）。
+
+- **llama.cpp 原生分类器：`typesafe-system-one`（v1.2.0 新增）**。v1.0.3 时 llama.cpp 的所有模型都只有一种分类方式——`llama-cpp-classify`（从 next-token 标签概率读答案）。v1.2.0 起分两路（`packages/coding-agent/src/extensions/llama/provider.ts`）：
+
+  | llama.cpp 模型形态 | 判定 | 分类 API | baseUrl |
+  |---|---|---|---|
+  | **决策模型**（decision model） | `architecture.output_modalities` 含 `"decisions"` | `typesafe-system-one`（**新增**） | `llamaInferenceUrl(serverUrl)` → `/v1/systemone` |
+  | **chat 模型** | 其它（含旧版服务端） | `llama-cpp-classify`（原有） | `serverUrl` |
+
+  - 判定函数 `isDecisionModel()` / `isChatModel()`：源码注释说明 llama.cpp **0.6.0 起** `/models` 会为决策模型列出 `decisions`，且**对未加载与 sleeping 的模型也报**（router 从 GGUF 元数据读出，不需加载）；旧版报 `["text"]` 或不报 `architecture`，其决策模型被当作 chat 模型。
+  - **重要语义**：`isChatModel()` 为 `!isDecisionModel(model) || output_modalities.includes("text")`——即**纯决策模型（不含 `text`）不会出现在 `/model` 列表里**，只作为分类器存在。这是 `/model` 与分类器两个列表在本轮的第一次分化。
+  - 官方文档已同步：`packages/coding-agent/docs/llama-cpp.md`（Classification 节重写，分"Decision models"与"Chat models as classifiers"两路，点名 Julia-1、Laya、Kev、lev、OpenJev 等决策模型）。
+  - **与 OpenRouter 按 key 目录的关系**：两者都在 v1.2.0 让"模型列表随凭据/服务端能力而变"，但机制不同（前者按**本地服务端报告的架构**，后者按**key 的授权集合**）。OpenRouter 那条见 [`03_third_party_provider_baseurl`](../03_third_party_provider_baseurl/answer.md) §8。
+
 ## 引用
 
 - 源码：`packages/coding-agent/src/modes/interactive/interactive-mode.ts` → `cycleModel()` (L4190)、`setModel()` 调用点（L4849/4993）

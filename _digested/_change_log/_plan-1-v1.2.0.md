@@ -54,26 +54,31 @@
 
 - [x] `orchestration/03-subagent.md` —— `+`/`-` 语义（**不引用 #10785**）
 - [x] `orchestration/05-ecosystem-tools.md` —— tool-search（BM25）、`callers`/`deferred`、`reachesTools`、`aliases`
-- [ ] `orchestration/07-durable-tasks.md` —— `abandonOnRestart`、`abortOwned`/`ownedTasks`、环检测、调度器有界性
+- [x] `orchestration/07-durable-tasks.md` —— `abandonOnRestart`（:8、:77）、调度器/文档缓存有界性（含 `documentRetentionMs`）
+- [ ] `orchestration/07-durable-tasks.md` —— **剩余 2 项**：`abortOwned`/`ownedTasks`（ownership 索引）、环检测（`#validateWait()`/`#waitCycle()`）
 - [x] `agent/01-Anatomy/1.3_Tool_Registry.md` —— `reachesTools`、`aliases`、deferred、`callers`
 - [x] `agent/01-Anatomy/1.4_Extension_System.md` —— `before_agent_start` union（Breaking）、`durationMs`、`agent_settled.aborted`
 - [x] `agent/04-Harness/4.3_System_Prompt.md` —— codemode 约束标签、去 thinking
-- [ ] `agent/03-Memory/`（compaction 篇）—— 去 thinking、阻塞阈值失败即 `model_error`、`compactionFailure`
+- [ ] `agent/03-Memory/3.1_Compaction.md` —— 去 thinking、阻塞阈值失败即 `model_error`、`pi.live.compactionFailure`
+  > **悬空指针**：`orchestration/07:14` 已写「详见 3.1_Compaction.md」，但该页目前**不含**这些事实。必须补，否则指针指向空处。
 - [x] `agent/05-Infra/5.1_AI_API_Layer.md` —— `AssistantMessageEventStream`（Breaking）、`durationMs`、openai-decisions、Haiku 5.5、OpenRouter 按 key 目录、重试面
-- [ ] `composition/`（config 系列）—— `$schema` 发布、theme 严格校验（**无 `vars` 迁移**）、`~` 展开、`showHardwareCursor`
+- [x] `composition/8_settings_json.md` —— `$schema` 与发布的四份 JSON Schema（`pi.dev/schemas/*`）
+- [ ] `composition/`（config 系列）—— **剩余**：theme 严格校验（**无 `vars` 迁移**）、`~` 展开、`showHardwareCursor`
 - [x] `composition/10_extension_axes/10d_toolset_switching.md` —— `+`/`-` 条目
-- [ ] `test-strategy/` —— env conformance 加 listFiles（实现指向 `packages/env`）、durable conformance 的 `order`
+- [ ] `test-strategy/` —— env conformance 加 `listFiles`（实现指向 `packages/env`）、durable conformance 的 `order`
 
 ### E. `_faq_on_digested/`
 
 - [x] `README.md` —— 基线 → v1.2.0
-- [ ] `01_model_switching` —— Haiku 5.5、GPT-6 Luna、llama.cpp 分类器、OpenRouter 按 key
-- [ ] `02_tui_keybindings` —— `showHardwareCursor`、shifted symbol、program status（`PI_PROGRAM_STATUS` 仅 tui 读取）
-- [ ] `03_third_party_provider_baseurl` —— `RefreshModelsContext.baseUrl`、OpenRouter 区域 endpoint
+- [x] `01_model_switching` —— 已补 `## v1.2.0 注记`（llama.cpp 原生决策模型 `typesafe-system-one`、OpenRouter 按 key 目录交叉引用）
+  > **核实后两处订正**：① **模型目录在本区间零新增**——`models.generated.ts`、42 个 `*.models.ts`、`providers/data/*.json` 全部未变，故"新模型条目"不成立；② "Haiku 5.5"只出现在**生成器脚本** `scripts/generate-models.ts:1094`（effort-level 正则扩宽），**不在任何已发布 catalog**；"GPT-6 Luna（分类器）"也**不是分类器**，它是 chat 模型（`generate-models.ts:2700/2756`）且区间前既有。页面已把这两点写成订正而非新增事实。
+  > 归属说明（原文保留）：这些事实已写入 `agent/05-Infra/5.1_AI_API_Layer.md`，两处归属不同：5.1 是 AI 层机制解剖，本页是「TUI 里怎么换模型」的操作视角。
+- [x] `02_tui_keybindings` —— 已补两处：`showHardwareCursor`（**语义为 v1.2.0 变更**，`1cedd3272`）、shifted symbol（`getLogicalShiftedSymbolCandidate` 为 v1.2.0 新增，`normalizeShiftedLetterIdentityCodepoint` 为 v0.68.0 既有，页面已分开标注）
+- [x] `03_third_party_provider_baseurl` —— 已补 `## 8. v1.2.0 增量`：`RefreshModelsContext.baseUrl`（`models.ts:100`，赋值点 :554）、OpenRouter 区域 endpoint、按 key 目录（`personalizeOpenRouterCatalog`）
 - [x] `06_pi_vs_dsh/02_differences.md:38` —— 三包删除（A 类）
 - [x] `07_pi_usage_scenarios` —— PTY、`LocalExecutionEnv`
 - [x] `08_extension_vs_package` —— durable 子路径导出样本（注意 `/codemode` 是自有实现）
-- [ ] `12_pi_philosophy/sdlc_evidence.md`、`review.md` —— `coding-agent-consumer`（B 类）
+- [x] `12_pi_philosophy/sdlc_evidence.md:98` —— `coding-agent-consumer` 删除已加注（B 类）
 
 ### F. `_pi_extension_agent_ready_development/` re-pin
 

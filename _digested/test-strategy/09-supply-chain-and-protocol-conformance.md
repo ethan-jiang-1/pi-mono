@@ -9,8 +9,8 @@
 > - 安装锁生成与生命周期脚本 allowlist：`scripts/generate-coding-agent-install-lock.mjs`
 > - 消费者真实打包冒烟：`scripts/check-package-install.mjs`（编排）+ `package-artifacts.mjs` + `local-package-install.mjs` + `coding-agent-smoke.mjs`
 > - 跨平台同构打包冒烟：`scripts/check-browser-smoke.mjs`
-> - 跨后端等价性测试套件：`packages/durable/src/testing/storage-conformance.ts`（1584 行）
-> - 跨环境等价性测试套件：`packages/durable/src/testing/env-conformance.ts`（511 行）
+> - 跨后端等价性测试套件：`packages/durable/src/testing/storage-conformance.ts`（1,663 行）
+> - 跨环境等价性测试套件：`packages/durable/src/testing/env-conformance.ts`（633 行）
 
 ---
 
@@ -38,7 +38,7 @@ npm run test:mcp-conformance
 它利用 `npx` 调度官方锁定的合规测试套件（`@modelcontextprotocol/conformance@0.2.0-alpha.11`），针对 Pi 所支持的每一个协议版本（`2025-03-26`、`2025-06-18`、`2025-11-25`）逐一启动场景服务器，并运行 Pi 的真实 MCP 客户端通信逻辑。
 
 ### 2. baseline.json 证据锁的硬核拦截逻辑
-官方套件可能包含一些 Pi 本身设计上不实现、或者当前版本尚在迭代中的特性。Pi 没有选择“跳过这些测试”，而是将全量测试输出固化进版本控制的 [`baseline.json`](file:///Users/bowhead/pi-mono/packages/coding-agent/test/mcp-conformance/baseline.json)：
+官方套件可能包含一些 Pi 本身设计上不实现、或者当前版本尚在迭代中的特性。Pi 没有选择“跳过这些测试”，而是将全量测试输出固化进版本控制的 `packages/coding-agent/test/mcp-conformance/baseline.json`：
 
 ![Pi-mono 契约证据锁与发布消费验证体系](figures/05-supply-chain-and-evidence-lock.svg)
 
@@ -153,7 +153,7 @@ for (const pkg of artifactSet.packages) {
 
 ## 五、跨后端等价性测试套件（Storage Conformance Suite）
 
-在 `packages/durable/src/testing/storage-conformance.ts` 中，Pi 沉淀了一套长达 **1584 行** 的通用存储规范测试集。
+在 `packages/durable/src/testing/storage-conformance.ts` 中，Pi 沉淀了一套长达 **1,663 行** 的通用存储规范测试集。
 
 ### 为什么需要统一 Conformance Suite？
 `packages/durable` 同时支持三种存储后端：
@@ -166,12 +166,12 @@ for (const pkg of artifactSet.packages) {
 ### 参数化断言架构
 Pi 的解法是将全量的状态机行为抽象为参数化的 `runStorageConformanceTests(factory)`：
 1. **统一生命周期**：测试套件统一覆盖根会话创建、多分支分叉、任务拓扑挂载、游标回放、快照压缩与脏读防御；
-2. **多包复用**：`test/sqlite-storage.test.ts`、`test/jsonl-storage.test.ts` 与 `test/memory-storage.test.ts` 仅仅负责提供各自的数据库实例工厂，随后直接挂入这套 1584 行的断言套件；
+2. **多包复用**：`test/sqlite-storage.test.ts`、`test/jsonl-storage.test.ts` 与 `test/memory-storage.test.ts` 仅仅负责提供各自的数据库实例工厂，随后直接挂入这套 1,663 行的断言套件；
 3. **行为完全等价**：保证任何第三方或者未来新增的存储驱动，只要能跑通这套 Conformance Suite，就能 100% 无缝替换生产环境的底层存储。
 
 ### 第二条线：env-conformance（执行环境契约，v1.0.3 起）
 
-v1.0.3 起 durable 有了第二条同构套件：`packages/durable/src/testing/env-conformance.ts`（511 行，`registerEnvConformance`），把"参数化一致性"从存储后端复制到执行环境——argv exec、输出窗口省略量语义、watch 双模式（native/polling）案例跑同一套断言（详见 [05](./05-durable-state-and-recovery.md)）。它的第一个消费者是 `pi-env`：`RemoteExecutionEnv`（SSH 远端）与本机 `NodeExecutionEnv` 通过同一套断言 + differential 随机操作序列逐结果对比，锁定语义等价合同。**"标准契约证据锁"的适用域从跨存储后端扩展到了跨机器、跨操作系统**。
+v1.0.3 起 durable 有了第二条同构套件：`packages/durable/src/testing/env-conformance.ts`（633 行，`registerEnvConformance`），把"参数化一致性"从存储后端复制到执行环境——argv exec、输出窗口省略量语义、watch 双模式（native/polling）案例跑同一套断言（详见 [05](./05-durable-state-and-recovery.md)）。它的第一个消费者是 `pi-env`：`RemoteExecutionEnv`（SSH 远端）与本机 `NodeExecutionEnv` 通过同一套断言 + differential 随机操作序列逐结果对比，锁定语义等价合同。**"标准契约证据锁"的适用域从跨存储后端扩展到了跨机器、跨操作系统**。
 
 ---
 

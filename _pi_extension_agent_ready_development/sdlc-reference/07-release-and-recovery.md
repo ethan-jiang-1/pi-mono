@@ -76,7 +76,7 @@ pi-mono 的发布不是「一条命令把包推到 npm」，而是一条跨本�
 
 1. **npm 发布可重跑**。`publish.mjs` 对每个包先查 `npm view <name>@<version>`（`isPublished()`，[publish.mjs L13-L28](https://github.com/earendil-works/pi/blob/v1.2.0/scripts/publish.mjs#L13-L28)），已发布的包只打印跳过、不进 `npm publish` 循环（[L50-L53](https://github.com/earendil-works/pi/blob/v1.2.0/scripts/publish.mjs#L50-L53)），未发布的才以 `--provenance --ignore-scripts` 发布（[L54-L61](https://github.com/earendil-works/pi/blob/v1.2.0/scripts/publish.mjs#L54-L61)）。
 
-   > **v1.2.0 改形**：`publish.mjs` 由 108 行缩为 64 行——打包与 tarball 校验移入 `scripts/package-artifacts.mjs`（`produceArtifactSet()`），`npm` 调用移入 `scripts/npm-command.mjs`（`execNpmSync()`），本脚本只剩编排。因此"已发布则只做 `npm pack --dry-run` 内容校验"这一表述在 v1.2.0 不再准确：内容校验现在由 `package-artifacts.mjs` 承担，`publish.mjs` 只按 `published` 布尔分流。
+   > **v1.2.0 改形**：`publish.mjs` 由 **110** 行缩为 64 行（`wc -l` 实测：v0.86.1 / v1.0.0 / v1.0.3 / `98d2e1947` 均为 110 行，v1.2.0 为 64 行；原写 108 行不成立于任何 tag）——打包与 tarball 校验移入 `scripts/package-artifacts.mjs`（`produceArtifactSet()`），`npm` 调用移入 `scripts/npm-command.mjs`（`execNpmSync()`），本脚本只剩编排。因此"已发布则只做 `npm pack --dry-run` 内容校验"这一表述在 v1.2.0 不再准确：内容校验现在由 `package-artifacts.mjs` 承担，`publish.mjs` 只按 `published` 布尔分流。
 2. **公告可重跑**。release record 与 installer 对象都用 `if-none-match: *` 写入，已存在时 release record 打印一行、installer 对象静默跳过；`latest.json` 指针用 ETag 条件写并有「不降级」判断（见上节）。
 3. **GitHub Release 有草稿中间态**。draft 先建、公开最后做；资产集合不符即失败；失败路径由 `cleanup-draft-github-release` 兜底——该 job 用 `always()` 且仅在 stage-github-release 实际运行过（非 `skipped`）而它自身或任一后续 job 未成功时运行，删除仍是 draft 的 Release——包括 stage 在草稿已创建后失败的情况；构建/smoke 等更早失败使 stage 被跳过（无草稿）时不运行（[L428-L452](https://github.com/earendil-works/pi/blob/v1.2.0/.github/workflows/build-binaries.yml#L428-L452)）。
 

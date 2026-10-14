@@ -32,13 +32,14 @@ pi-mono 的质量检查不是单一「全仓检查」按钮，而是按事件与
 - 面向 `main` 的 PR，同样限这些路径；
 - 手动 `workflow_dispatch`。
 
-即它从 v1.0.3 的「工作分支检查、不在普通 PR 上跑」变成了**路径门控的 PR 检查**。三个 job：
+即它从 v1.0.3 的「工作分支检查、不在普通 PR 上跑」变成了**路径门控的 PR 检查**。**四个 job**（`daemons`、`check`、`release-daemons`、`tests`）：
 
 - **daemons**：复用 `env-daemons.yml`（`uses: ./.github/workflows/env-daemons.yml`），为每个受支持平台/架构原生构建 pi-env daemon 并上传为 `pi-env-<platform>-<arch>` artifact（[L19-L22](https://github.com/earendil-works/pi/blob/v1.2.0/.github/workflows/env.yml#L19-L22)、[env-daemons.yml](https://github.com/earendil-works/pi/blob/v1.2.0/.github/workflows/env-daemons.yml#L1-L11)）。
 - **check**：`needs: daemons`；Linux 上完整 build、check，下载 daemon artifact 到 `packages/env/bin`，再校验 `npm pack` 的文件清单**恰好**包含 `dist/*`、`README.md`、`CHANGELOG.md`、`docs/protocol.md` 与八个平台的 `bin/pi-env-<name>/pi-env[.exe]`，且不含 `src/`、`daemon/`、`test/`（[L24-L68](https://github.com/earendil-works/pi/blob/v1.2.0/.github/workflows/env.yml#L24-L68)）。
 - **release-daemons**：`needs: daemons`；**六平台** matrix `ubuntu-latest`(linux-x64)、`ubuntu-24.04-arm`(linux-arm64)、`macos-latest`(darwin-arm64)、`macos-latest`(darwin-x64，走 Rosetta)、`windows-latest`(windows-x64)、`windows-11-arm`(windows-arm64)，对 daemon 的**发布构建**跑 pi-env 测试（[L70-L81](https://github.com/earendil-works/pi/blob/v1.2.0/.github/workflows/env.yml#L70-L81)）。
+- **tests**（先前遗漏，2026-10-14 轮次 0011 补入）：`fail-fast: false`，**五** OS matrix —— `ubuntu-latest`、`ubuntu-24.04-arm`、`macos-latest`、`windows-latest`、`windows-11-arm`（[L128-L200](https://github.com/earendil-works/pi/blob/v1.2.0/.github/workflows/env.yml#L128-L200)）。跑 cargo fmt/clippy/test（desktop 配置）、构建 daemon、跑 durable env 测试与 pi-env 测试，并在 Linux 上先装 OpenSSH server 以覆盖 bootstrap 测试（`if: runner.os == 'Linux'` → `command -v sshd || test -x /usr/sbin/sshd || (sudo apt-get update && sudo apt-get install -y openssh-server)`）。**它是 v1.0.3 `env-tests` job 的改名续存体**（同为五 OS matrix），不是新增能力。
 
-> 与 v1.0.3 的差异不止改名：v1.0.3 是 `check`（Linux 上 build/check/durable vitest）+ `env-tests`（**五** OS matrix）；v1.2.0 是 `daemons` + `check`（加了 pack 清单校验）+ `release-daemons`（**六**平台，且构建的是发布形态的 daemon）。
+> 与 v1.0.3 的差异不止改名：v1.0.3 是 `check`（Linux 上 build/check/durable vitest）+ `env-tests`（**五** OS matrix）；v1.2.0 是 `daemons` + `check`（加了 pack 清单校验）+ `release-daemons`（**六**平台，且构建的是发布形态的 daemon）+ `tests`（**五** OS matrix，即 `env-tests` 的续存体）。**订正**：本节曾写作"三个 job"并漏掉 `tests`，据此得出的"`check` + `env-tests` → `daemons` + `check` + `release-daemons`"这条 delta 也是错的——`tests` 在 v1.0.3 与 v1.2.0 都存在，只是改了名。
 
 ### nix.yml
 

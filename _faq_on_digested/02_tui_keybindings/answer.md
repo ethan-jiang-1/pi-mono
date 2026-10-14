@@ -100,6 +100,46 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 
 > 除 `app.*` 之外还有一层 `tui.*` 命名空间：它来自独立包 `packages/tui/src/keybindings.ts`（`TUI_KEYBINDINGS`），coding-agent 通过 `KEYBINDINGS = { ...TUI_KEYBINDINGS, ... }` 合并并覆盖少数平台差异。例如 `tui.altScreen.bottom`（v0.85.0 新增时为 `end`，由 `tui-alt-screen.ts:764` 消费）——**v1.0.3 起已改绑 `ctrl+end`**（`packages/tui/src/keybindings.ts:208-209`，消费点 `tui-alt-screen.ts:782-786`），见下方 v1.0.3 注记。完整键位表以 `packages/coding-agent/docs/keybindings.md` 为准。
 
+### 匹配层：shifted 符号（v1.2.0 新增能力）
+
+**用户可见结论**：v1.2.0 起，keybindings.json 里可以**按产出的字符**写符号键——`+`、`ctrl++` 这类写法能匹配上；`shift+=` 这种**物理键**写法同时保留。**这不是新增了默认快捷键**：默认键位表（`packages/coding-agent/src/core/keybindings.ts` 与 `packages/tui/src/keybindings.ts`）里**没有任何符号键**，所以不要读成"新增了 shift+1/! 之类"。
+
+**要解决的问题**：Kitty keyboard protocol（flag 4，alternate keys）下终端能同时报三个 codepoint（`packages/tui/src/keys.ts:605-610`）：
+
+```
+\x1b[<codepoint>:<shifted>;<mod>u
+\x1b[<codepoint>:<shifted>:<base>;<mod>u
+```
+
+按下 `Shift+=` 时终端报的是"物理键 `=`（61）+ shifted `+`（43）+ Shift 修饰位"，而用户写的是产出的字符 `+`。旧逻辑要求 codepoint 与修饰位**同时**相等，于是 `+` 谁也匹配不上：既不是 codepoint 43，`shift+=` 又多了 Shift 位。
+
+**v1.2.0 的解法**是把匹配拆成顺序两试（`matchesKittySequence`，`keys.ts:669-702`）：
+
+1. **physical match**：codepoint 与全部修饰位相等 → 保住 `shift+=` 写法；
+2. **logical match**：对 `parsed.shiftedKey` 调 `getLogicalShiftedSymbolCandidate()`（`keys.ts:372-381`），**消费掉隐式 Shift** 但保留 Ctrl/Alt/Super → 让 `+` / `ctrl++` 成立。
+
+源码注释（`keys.ts:685-687`）：
+
+> Logical match: Kitty reports symbols such as "+" as Shift plus the physical "=" key. Bindings name the produced symbol, so consume that implicit Shift while preserving Ctrl, Alt, and Super. The physical "shift+=" spelling remains valid through the match above.
+
+**两套符号集合，范围不同（易错点）**：
+
+| 终端路径 | 集合 | 覆盖 |
+|---|---|---|
+| Kitty / CSI-u | `SYMBOL_KEYS`（`keys.ts:258-290`） | 宽：`` ` - = [ ] \ ; ' , . / ! @ # $ % ^ & * ( ) _ + \| ~ { } : < > ? `` |
+| xterm `modifyOtherKeys`（`\x1b[27;<mod>;<code>~`） | `SHIFTED_SYMBOL_KEYS`（`keys.ts:292`） | **窄**：仅 `~!@#$%^&*()_+\|{}:<>?` |
+
+窄集合是刻意的：只对"按 Shift 才产出"的字符做逻辑匹配，避免把 `-`、`/` 这类未按 Shift 的字符也误当 shifted。v1.2.0 同时删掉了 `matchesPrintableModifyOtherKeys` 里两道旧早退（`expectedModifier === 0` 与 `parsed.modifier !== expectedModifier` 直接 return false），这正是让 `parseKey("+")`/`matchesKey("+","+")` 在 xterm 下能工作的原因。
+
+**与 keybindings 的关系**：`matchesKey()` 是绑定匹配入口，上面两条 logical match 就加在它里面；`parseKey()`（key-name 出口，`keys.ts:1292-1311`）用同一个 helper，保证"报出来的名字"与"能匹配的绑定"一致——否则 `+` 会以 `shift+=` 之名出现却绑不上。v1.2.0 新增测试直接锁定：`keys.test.ts:137-145`（`matchesKey("\x1b[61:43;2u","+") === true`、`=== "shift+="` 也为 true、`ctrl++` 同理）、`:275-278`、`:612-616`。
+
+**版本归属要点（half-new）**：
+- `getLogicalShiftedSymbolCandidate`（logical match 本体）**是 v1.2.0 新增**（`7f9e1198f`，`git tag --contains` 仅 `v1.2.0`）。
+- 相邻的 `normalizeShiftedLetterIdentityCodepoint`（`keys.ts:364-370`，把 Shift+A 压回小写 a-z 让 `shift+E` 一致匹配）**不是** v1.2.0 新增——它来自 `6b55d6859`（首个 tag `v0.68.0`，修 xterm shifted 输入）。
+- 编辑器侧对应注释在 `packages/tui/src/components/editor.ts:218`（2473 行）。
+
+**未验证边界**：`!` 是否能经 `modifyOtherKeys` 的 logical match 匹配到（`!` 不在 `SHIFTED_SYMBOL_KEYS` 内，据此推断为**否**，仅 Kitty 路径经 `SYMBOL_KEYS` 生效）——该点未跑测试确认。
+
 ---
 
 ## 复制/显示行为（v0.84.4 起，v0.85.1 仍成立）
@@ -176,6 +216,24 @@ v1.2.0 新增 OSC 7501 程序状态上报：支持的终端与 agent dashboard �
 - **tmux 与 screen 不转发**该序列（同上）——所以在 multiplexer 里需要显式设 `1`，且外层终端要支持。
 
 **对 TUI 实现者是 Breaking**：`Terminal` 接口新增了**必需**方法 `setProgramStatus()`（`packages/tui/src/terminal.ts:125`），另有 `packages/tui/src/program-status.ts`（`PROGRAM_STATUS_QUERY` / `formatProgramStatus` / `isProgramStatusReply`，含 2048 字节上限）。自定义 `Terminal` 实现必须补这个方法。
+
+**`showHardwareCursor`——设置是旧的，语义是 v1.2.0 新的（重要）**
+
+`showHardwareCursor` 控制终端**硬件光标（真实光标）是否可见**。它**不是** v1.2.0 新增的设置（引入于 `673916f63`，首个 tag `v0.49.0`），但它的**行为在 v1.2.0 被改了**，且这正是 v1.2.0 的 Changed 条目之一：
+
+> Changed the `showHardwareCursor` setting to use only the terminal cursor instead of also drawing Pi's reverse-video cursor（`packages/coding-agent/CHANGELOG.md:30`）
+
+> Changed `showHardwareCursor` to show only the terminal cursor: focused `Editor` and `Input` components no longer draw a reverse-video cursor when it is enabled. This avoids terminals that extend edge cell colors into the window padding stretching the drawn cursor at the first or last column（`packages/tui/CHANGELOG.md:15`，含 Breaking Changes）
+
+引入该语义变更的 commit 是 `1cedd3272`（`git tag --contains` 仅 `v1.2.0`）。**对使用者的含义**：任何"开了 `showHardwareCursor` 后编辑区还会看到一个反色方块光标"的旧描述在 v1.2.0 已不成立——现在**只剩终端真实光标**。旧的实现注释仍留在 `packages/tui/src/tui.ts:1473-1477`。
+
+精确行为（三层）：
+
+- **默认 `false`**，两条独立证据：`packages/tui/src/tui.ts:519`（`private showHardwareCursor = false;`）与 `docs/settings.md:104`（`| showHardwareCursor | boolean | false | Use the terminal cursor instead of Pi's drawn cursor. Pi still positions it for input methods. |`）。注意 schema 里**没有** `default:` 字段（`settings-schema.ts:376-378` 是 `Type.Optional(Type.Boolean({ description: "Show the terminal cursor while still positioning it for IME." }))`，对比邻近的 `autocompleteMaxVisible` `:370-375` 有 `default: SETTINGS_DEFAULTS.autocompleteMaxVisible`）——默认值由运行时兜底。
+- **env 判定是严格 `=== "1"`**（`packages/coding-agent/src/core/settings-manager.ts:1363-1365`：`return this.settings.showHardwareCursor ?? process.env.PI_HARDWARE_CURSOR === "1";`）。settings 优先（`??`），未设置时才看 env；只有字符串 `"1"` 算开启，`true`/`yes`/`0` 都算 false——**与 `PI_TELEMETRY` 那种宽松解析不同**。文档也只承诺 `1`（`docs/environment-variables.md:90`）。这个 `??` 优先级与上文 :108 讲的"终端能力覆盖（settings > env > 自动检测）"是同一套顺序。
+- **无论开关如何，pi 始终把光标定位到编辑区插入点**（IME 候选窗跟随）——这正是 `673916f63` 当初加它的原因（"while still positioning it for IME support"）。开启时用 `\x1b[?25h` 显示真实光标并**丢弃**焦点组件画的那格反色假光标；关闭时隐藏真实光标、改由 TUI 把假光标渲染成反色（`\x1b[7m`）。两条渲染路径**各自**实现该开关：`tui-alt-screen.ts:1774` 与 `tui-main-screen.ts:650`；假光标解析在 `tui.ts:1478-1485`（`resolveFakeCursors`）。
+- **只管光标**，与全屏/alt-screen 无关——那是另一个设置 `tuiMode`（`settings-manager.ts:1241-1243`）。
+- **交互式设置选择器里有**（`settings-selector.ts:809-815`，label "Show hardware cursor"，插在 skill-commands 之后），回调 `:946-948` → `interactive-mode.ts:5079-5081`（`setShowHardwareCursor` + `ui.setShowHardwareCursor`），**即刻生效无需重启**。
 
 ## 引用
 

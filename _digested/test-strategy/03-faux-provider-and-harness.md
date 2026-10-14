@@ -1,8 +1,8 @@
 # 03 — 虚拟模型驱动内核与 Agent 会话测试：faux.ts 与 harness.ts 深度解密
 
 > **源码锚点**：
-> - 官方 Faux Provider 内核：`packages/ai/src/providers/faux.ts`（711 行）
-> - Agent 会话集成测试套件驱动：`packages/coding-agent/test/suite/harness.ts`（276 行）
+> - 官方 Faux Provider 内核：`packages/ai/src/providers/faux.ts`（727 行；v1.0.3 时为 711）
+> - Agent 会话集成测试套件驱动：`packages/coding-agent/test/suite/harness.ts`（275 行）
 > - 核心驱动范例：`packages/coding-agent/test/test-harness.test.ts`
 
 ---

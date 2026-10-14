@@ -18,7 +18,7 @@ Pi 没有像 DSH 那样在静态层把"地图"画出来（薄内核页表 + tier
 | （无 root `docs/`） | — | Pi 的 docs 在 `packages/coding-agent/docs/`（30+ 篇） | 没有 root `architecture.md` |
 | （无 root `CLAUDE.md`） | — | 只有 `.claude/settings.local.json`（本地设置） | 不像 DSH 把 CLAUDE.md symlink 到 AGENTS.md |
 | `SECURITY.md` | 人 | 安全披露流程 | — |
-| package README | 用/改某包的人或 agent | **API 参考**（如 `packages/agent/README.md` 517 行：Quick Start / Event Flow / Options / Methods） | 不是"合同"，是教程式参考 |
+| package README | 用/改某包的人或 agent | **API 参考**（如 `packages/agent/README.md` 564 行：Quick Start / Event Flow / Options / Methods） | 不是"合同"，是教程式参考 |
 
 **关键观察**：`README.md:51` 写的是 AGENTS.md *"for both humans and agents"*——Pi 把人和模型混为一谈，没有 DSH 的两入口分流。
 
@@ -63,7 +63,7 @@ Pi 静态层**没有**的东西，恰好是 DSH 静态层的核心：
 - `README.md`：L11（auto-close 提示）、L24（"ask the agent to explain itself"）、L26-35（All Packages 表，只列 6 个）、L51（AGENTS.md "for both humans and agents"）
 - `AGENTS.md`（根）：169 行，无 repository layout 节、无 core-minimal 总模型
 - `CONTRIBUTING.md`：开篇 "pi's core is minimal" + "The One Rule"
-- `packages/agent/README.md`：517 行 API 参考（Quick Start / Event Flow / Options / Methods）
+- `packages/agent/README.md`：564 行 API 参考（Quick Start / Event Flow / Options / Methods）
 - `packages/coding-agent/package.json`：`files` 含 `docs`、`examples`
 - `scripts/`（根）：无 verify-md-links / doc-budget
 - 运行时消费（另一半）：[`05_root_entry_doc_navigation`](../05_root_entry_doc_navigation/answer.md)

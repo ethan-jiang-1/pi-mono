@@ -152,7 +152,7 @@ durable 只**声明**可选的 `ExecutionEnv.listFiles`（并有 conformance 用
 - `packages/durable/README.md`（**751** 行，experimental usage guide；`README.md:3` "Experimental" 横幅；provider 身份存活域 `README.md:115`）
 - `packages/durable/src/env/index.ts:373`：`ExecutionEnv`；`:358-372`：`Shell`/argv exec；`:315`：`window`；`:231/:256`：`openBinaryReader`/`openDirReader`；`:106`：`scanLines`；`:262`：`watch`（v1.0.3 时的对应行为 `:324`/`:315`/`:266`/`:193`/`:207`/`:106`/`:213`）
 - `packages/durable/src/env/node.ts:653-680`：argv exec 实现；`node-watch.ts:132-138`：快照差分设计文档；`:52/:54`：FSEvents settle 与目录预算
-- `packages/durable/src/testing/env-conformance.ts`（511 行）；`runner.ts:13/:28`：双 conformance 注册器
+- `packages/durable/src/testing/env-conformance.ts`（633 行；v1.0.3 时为 473，511 是同步起点 `98d2e1947` 的值）；`runner.ts:13/:28`：双 conformance 注册器
 - `packages/durable/src/harness/provider.ts:12`：`ProviderDoc`；`:26`：`ensureProviderSessionId`；`view.ts:48-54`：挂载表含 ProviderDoc
 - `packages/durable/src/tools/bash.ts:145/:168`：`createBashTool`/`createPowerShellTool`（后者不进 `CodingTools`）
 - `packages/env/README.md:3-4`：远程执行定位；`packages/env/docs/semantics.md`：语义等价合同；`packages/env/package.json:49`：env → durable 依赖方向

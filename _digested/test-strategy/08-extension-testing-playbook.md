@@ -184,7 +184,7 @@ describe("Security Guard Extension Loop Test", () => {
 ## 四、UI 与人机交互的无头测试技巧
 
 当扩展需要调用 UI 弹窗与用户进行复杂交互时，绝不要试图在测试中启动 TUI 界面。
-Pi 提供了无头 UI 替身工具：[`createTestUiContext`](file:///Users/bowhead/pi-mono/packages/coding-agent/test/suite/harness.ts#L75)。
+Pi 提供了无头 UI 替身工具：`createTestUiContext`（`packages/coding-agent/test/suite/harness.ts:75`）。
 
 ```typescript
 import { createTestUiContext } from "@earendil-works/pi-coding-agent/test/suite/harness";

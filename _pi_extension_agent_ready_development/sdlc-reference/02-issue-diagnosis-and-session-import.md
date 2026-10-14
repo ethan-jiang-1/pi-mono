@@ -24,7 +24,7 @@ pi-mono 把「诊断一个 issue」定义成两份合同：agent 侧行为合同
 
 —— [is.md](https://github.com/earendil-works/pi/blob/v1.2.0/.pi/prompts/is.md#L14-L28)
 
-另有两条操作性约束：分析开始前给 issue 加 `inprogress` 标签并 assign 给本地 `gh` 用户，**但 CI 环境下（`CI=true`）两个动作都不做**（[is.md](https://github.com/earendil-works/pi/blob/v1.2.0/.pi/prompts/is.md#L9)）；完整读取 issue 及全部评论与关联 issue/PR（[is.md](https://github.com/earendil-works/pi/blob/v1.2.0/.pi/prompts/is.md#L10-L13)）。配套的 `remove-inprogress-on-close.yml` 在 issue 关闭事件上自动摘除 `inprogress` 标签（[remove-inprogress-on-close.yml](https://github.com/earendil-works/pi/blob/v1.2.0/.github/workflows/remove-inprogress-on-close.yml#L3-L31)），避免标签状态泄漏。
+另有两条操作性约束：分析开始前给 issue 加 `inprogress` 标签并 assign 给本地 `gh` 用户，**但 CI 环境下（`CI=true`）两个动作都不做**（[is.md](https://github.com/earendil-works/pi/blob/v1.2.0/.pi/prompts/is.md#L9)）；完整读取 issue 及全部评论与关联 issue/PR（[is.md](https://github.com/earendil-works/pi/blob/v1.2.0/.pi/prompts/is.md#L10)；该行是条目 2 本身，紧随其后的 `#L11-L13` 是它引用的 `gh issue view --json ...` 代码围栏，不是一个独立的约束）。配套的 `remove-inprogress-on-close.yml` 在 issue 关闭事件上自动摘除 `inprogress` 标签（[remove-inprogress-on-close.yml](https://github.com/earendil-works/pi/blob/v1.2.0/.github/workflows/remove-inprogress-on-close.yml#L3-L31)），避免标签状态泄漏。
 
 「只提议不实现」是诊断合同与实现合同的边界：`/is` 的产出是根因与修复提案，不是补丁。
 

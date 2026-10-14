@@ -26,7 +26,7 @@ pi-mono 的规则假设读者是零上下文到达的 agent：规则集中在仓
 
 ### 立场二：程序化知识放进仓库
 
-「怎么做一次 issue 分析」「怎么发一个 release」在多数仓库里是维护者的隐性经验；在 pi-mono 里它们是仓库内的文件——六个 prompts（[02](./02-prompts-as-procedural-contracts.md)）和三个 skills（[03](./03-repo-skills.md)），任何会话按需加载。同时，工作历史本身也是仓库外的可检视账本：会话以带树结构的 JSONL 持久化，CI 分析会话能被 `/ir` 导入本地续接（[05](./05-session-inspectability.md)）。
+「怎么做一次 issue 分析」「怎么发一个 release」在多数仓库里是维护者的隐性经验；在 pi-mono 里它们是仓库内的文件——七个 prompts（[02](./02-prompts-as-procedural-contracts.md)）和三个 skills（[03](./03-repo-skills.md)），任何会话按需加载。同时，工作历史本身也是仓库外的可检视账本：会话以带树结构的 JSONL 持久化，CI 分析会话能被 `/ir` 导入本地续接（[05](./05-session-inspectability.md)）。
 
 这立场的可借鉴内核是：把反复执行的工作流程写成 prompt/skill 文件、把工作记录写成可机读格式，让程序性知识随仓库版本化，而不是随人员流失（扩展仓建议）。
 

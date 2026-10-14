@@ -23,7 +23,7 @@ git show v1.2.0:<path>
 | 页面 | 回答什么 | 关键一手来源 |
 |---|---|---|
 | [Agent 入口规则](./01-agent-entry-rules.md) | 一个没来过的 agent 进入 pi-mono 后受哪些规则约束？ | `AGENTS.md`、`CONTRIBUTING.md` |
-| [Prompts 即程序性合同](./02-prompts-as-procedural-contracts.md) | `.pi/prompts/` 六个 prompt 各自划定的行为边界是什么？ | `.pi/prompts/is/pr/wr/deslop/sa/cl.md` |
+| [Prompts 即程序性合同](./02-prompts-as-procedural-contracts.md) | `.pi/prompts/` 七个 prompt 各自划定的行为边界是什么？ | `.pi/prompts/is/pr/wr/deslop/sa/cl/dup.md` |
 | [仓库 skills](./03-repo-skills.md) | 三个 skill 怎样封装跨多文件、跨阶段的专家程序？ | `.pi/skills/add-llm-provider/interactive-testing/release.md` |
 | [扩展点地图](./04-extension-points-map.md) | Pi 的可变性面有哪些，何时选哪种资源？ | `docs/extensions.md` 等九篇文档 |
 | [会话可检视性](./05-session-inspectability.md) | 会话文件合同、原生接续命令与 `/ir` 如何让工作可复查、可续接？ | `docs/session-format.md`、`docs/sessions.md`、`docs/slash-commands.md`、`.pi/extensions/import-repro.ts` |

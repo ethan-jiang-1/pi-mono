@@ -37,7 +37,7 @@ FAQ 里同一立场有更直接的一次表述（**主仓要求**）：
 
 ## 反推测性抽象：写成 agent 可执行的程序
 
-`deslop.md` 是六个 prompt 中唯一以「删减」为目标的（见卷三 [prompts 页](../repo-harness/02-prompts-as-procedural-contracts.md)）。它把评审中最难言传的一条判断——「这是真需要的复杂度还是想象出来的」——写成可执行条款（**主仓要求**，约束在该仓运行 `/deslop` 的 agent）：
+`deslop.md` 是七个 prompt 中唯一以「删减」为目标的（见卷三 [prompts 页](../repo-harness/02-prompts-as-procedural-contracts.md)）。它把评审中最难言传的一条判断——「这是真需要的复杂度还是想象出来的」——写成可执行条款（**主仓要求**，约束在该仓运行 `/deslop` 的 agent）：
 
 > - Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.
 > - Remove speculative defensive programming inside trusted code. Validate at real trust boundaries; rely on types and established invariants internally.

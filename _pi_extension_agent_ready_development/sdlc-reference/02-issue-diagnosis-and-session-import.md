@@ -50,6 +50,21 @@ pi-mono 把「诊断一个 issue」定义成两份合同：agent 侧行为合同
 
 导入动作（[L283-L345](https://github.com/earendil-works/pi/blob/v1.2.0/.pi/extensions/import-repro.ts#L283-L345)）：取 session 头部的 cwd，把整个 JSONL 中该 cwd 的各种拼写变体（含 Windows 盘符与 MSYS 形式，[L154-L170](https://github.com/earendil-works/pi/blob/v1.2.0/.pi/extensions/import-repro.ts#L154-L170)）以及任何以该高熵目录名结尾的 Windows 风格路径（[L207-L217](https://github.com/earendil-works/pi/blob/v1.2.0/.pi/extensions/import-repro.ts#L207-L217)）替换为本地 `sessionManager.getCwd()`；写入当前 session 目录并 `switchSession` 切换过去；目标文件已存在时先确认覆盖；跨平台接续（如 Windows session 导入 Unix 机器）插入一条说明性消息（[L187-L195](https://github.com/earendil-works/pi/blob/v1.2.0/.pi/extensions/import-repro.ts#L187-L195)）。
 
+## `scripts/issues/`：本地 triage 工具（v1.2.0 新增）
+
+`/is` 是**人**在会话里对单个 issue 用的一次性诊断合同（上一节）。v1.2.0 新增的 `scripts/issues/` 是它的**批量、常驻**对应物：一个本地跑的 triage 服务，把 inbox 里的 issue 逐条送进 pi 会话。
+
+**它是主仓自己用的工具，不是 pi 的产品功能**——放在 `scripts/` 下，`data/` 目录被 gitignore。25 个文件（`5a1049269` "feat: add local issue triage tool in scripts/issues"）。
+
+机制要点：
+
+- **一条 issue = 一个 pi-durable 会话**（`triage.ts`）。triage 结论作为 `triage.state` 文档落进该会话——这是 `scripts/` 下**少见的 durable 真实消费者**，与扩展示例的 toy 用法不同。
+- `main.ts` 跑同步循环 + 本地 HTTP 服务（默认 `http://127.0.0.1:7788`），`ui.html` 是对应界面，`github.ts` 负责取 issue。
+- **分类由 15 个 `categories/*.md` 定义**（`agent-loop`、`cli`、`codemode`、`compaction`、`durable`、`extensions`、`mcp`、`models`、`other`、`prompt`、`providers`、`sdk`、`sessions`、`tools`、`tui`），每类自带 `owner`。`prompt.md` 是喂给模型的提示。
+- 环境变量（`scripts/issues/README.md:45-53`）：`TRIAGE_MODEL`（默认 `openai-codex/gpt-5.6-sol`；仅 `openai-codex` 与 `anthropic`）、`TRIAGE_THINKING`（默认 `medium`）、`TRIAGE_CONCURRENCY`（`4`）、`TRIAGE_INBOX_DAYS`（`2`）、`TRIAGE_CORPUS_DAYS`（`120`）、`TRIAGE_SYNC_MINUTES`（`20`）、`TRIAGE_PORT`（`7788`）、`TRIAGE_SOCKET`（改用 unix socket，供反代）、`TRIAGE_DATA`（`scripts/issues/data`）。
+
+**与既有线的分工**：`issue-analysis.yml`（上一节）在**CI 里**对**被触发的单个 issue** 做诊断；`scripts/issues/` 在**开发者本机**对**整个 inbox** 做批量 triage。两者都产出结构化判断，但前者是授权链约束下的自动响应，后者是人主动运行的常驻工具——**不要把它当成 CI 的一部分**：它不在任何 workflow 里被调用。
+
 ## 边界：导入不等于重放
 
 **不能证明什么**：

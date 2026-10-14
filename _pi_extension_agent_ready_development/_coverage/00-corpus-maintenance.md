@@ -18,7 +18,7 @@
 | 来源 | 核验内容 |
 |---|---|
 | `packages/coding-agent/docs/` @ v1.2.0 | 文档清单与 `docs.json` 与 v1.0.3 一致（无增删）；17 个文件有修改（extensions.md、mcp.md、codemode.md、cli.md、providers.md +47、llama-cpp.md、models.md、settings.md、themes.md、message-types.md、compaction.md、terminal-setup.md、keybindings.md、environment-variables.md、json.md、tui.md、cli-integration.md） |
-| `.pi/` @ v1.2.0 | 六个 prompts（is/pr/wr/deslop/sa/cl）+ 新增 `dup.md`（查重）；三个 skills（add-llm-provider/interactive-testing/release）；四个 extensions（import-repro/prompt-url-widget/redraws/tps） |
+| `.pi/` @ v1.2.0 | 七个 prompts（is/pr/wr/deslop/sa/cl/dup；`dup.md` 为本区间新增，查重）；三个 skills（add-llm-provider/interactive-testing/release）；四个 extensions（import-repro/prompt-url-widget/redraws/tps） |
 | `.github/workflows/` @ v1.2.0 | 13 个工作流的存在性与触发条件（ci、env、env-daemons、nix、npm-audit、issue-gate、pr-gate、approve-contributor、issue-analysis、build-binaries、publish-model-catalog、issue-triage-labels、remove-inprogress-on-close）。`ci.yml` 在本区间未变；`durable-env.yml` 改名为 `env.yml` 且触发器改为路径门控；`build-binaries.yml` 新增 `env-daemons` job；`issue-triage-labels.yml` 新增按标签指派 |
 | `packages/` @ v1.2.0 | 11 个包的清单与角色（v1.0.3 为 13 个；`client`/`protocol`/`server` 已删除） |
 | `scripts/` @ v1.2.0 | check 管线脚本的存在性（check-entry-graphs、check-runtime-deps、check-pinned-deps、check-lockfile-commit、generate-coding-agent-install-lock、check-package-install 等）。**`coding-agent-consumer.mjs` 已删除**，职能拆入 `check-package-install.mjs` + `coding-agent-smoke.mjs` + `local-package-install.mjs` + `package-artifacts.mjs`；新增 `biome-check.mjs`、`npm-command.mjs`、`pack-packages.mjs`、`use-local-packages.mjs` 与整个 `scripts/issues/` |

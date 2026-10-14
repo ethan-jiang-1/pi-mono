@@ -115,3 +115,33 @@
 - [x] `agent/05-Infra/5.1_AI_API_Layer.md` —— **`api/openrouter-images.ts` 未被删除**（删的是 `providers/` 下的同名文件）；`api/` 40→43 文件；`TranscriptContext` :780、`SimpleStreamOptions` :369 等重锚
 - [x] `agent/04-Harness/4.3_System_Prompt.md` —— **`emitBeforeAgentStart` 错误代码样例更正**（三参数 → 单 `trigger` 对象，`agent-session.ts:1894`）；union 说明；锚点块重锚
 - [x] `orchestration/03-subagent.md`、`composition/10_extension_axes/10d_toolset_switching.md` —— `--tools` 接受 `+name`/`-name`（`ddaa0a034`，in-tag）
+
+### 自审复核（第三轮，用户要求「从新增/调整/删除三个角度再 REVIEW」）
+
+两路独立 subagent 审计 + 逐条人工复核。**关键结论：此前只做了"重锚定"，漏掉了"内容增补"**——`0009` 记录了这些变化，但 corpus 正文从未写入。`_plan-1` 中对应项当时仍是 `[ ]`。
+
+**（1）新增内容 —— 已补写**
+
+- [x] `composition/8_settings_json.md` —— **新专节**：`$schema` 与发布的四份 JSON Schema（`pi.dev/schemas/*`）、生成器 `scripts/generate-schemas.ts`、`settings-schema.ts`/`settings-defaults.ts` 事实源
+- [x] `architecture-next/durable-and-storage.md` —— **两个新专节**：`packages/env` v1.2.0 能力面（**PTY 子系统** `openTerminal`/`RemoteTerminal`、`LocalExecutionEnv` + `nodePlatform` + `listFiles` 实现、daemon 内容寻址部署）；**images 子系统**（Photon/WASM、三种宿主适配、`DEFAULT_IMAGE_LIMITS`、`read` 返回 image block）
+- [x] `orchestration/04-codemode.md` —— **新专节**：`packages/codemode` 的**三种沙箱后端**（`CodemodeSandboxBase`/`Inline`/`Remote`）+ `./portable`/`./cloudflare`/`./worker` 子路径 + `sandbox.start()` 确定性重放 API
+- [x] `agent/05-Infra/5.1_AI_API_Layer.md` —— **新专节**：按 key 的 OpenRouter 目录（`personalizeOpenRouterCatalog` + `RefreshModelsContext.baseUrl?` `models.ts:99`）、`openai-decisions`、`ModelCostTier`、`api/` 40→43
+- [x] `_faq_on_digested/02_tui_keybindings/answer.md` —— **新专节**：`PI_CLIPBOARD_OSC52`、OSC 7501 程序状态 + `PI_PROGRAM_STATUS`、`Terminal.setProgramStatus()` 为必需方法（Breaking）
+- [x] `_pi.../sdlc-reference/02-issue-diagnosis-and-session-import.md` —— **新专节**：`scripts/issues/` 本地 triage 工具（25 文件 / 15 categories / 9 个 `TRIAGE_*` 环境变量；**不在任何 workflow 中**）
+- [x] `_pi.../repo-harness/02-prompts-as-procedural-contracts.md` —— `.pi/prompts/` **六 → 七个**（新增 `dup`）
+
+**（2）内容调整 —— 已改**
+
+- [x] **全局 stale 标记**：`"v1.0.3+ Unreleased"` 共 **11 处**改为 `"v1.2.0 起在 release 内"`（`packages/env` 相关 6 处 + `--tools`/MCP 关闭语义/lockdown/同名工厂等）——此前把**已随 v1.2.0 发布**的东西仍标为 Unreleased
+- [x] `agent/03-Memory/3.5_Session_v4.md:24` —— `StorageRejected` **已删除**（改述为 `StorageRequestError` + `SessionFailed`）；行号 `:4/:12/:20` → `:17/:49`
+- [x] `agent/04-Harness/4.1_AgentHarness.md` —— `docs/pico-v5-handoff.md` **已删除**（4 处引用加注）；`spec.md` 行数 4,601 → **5,340**
+- [x] `_faq_on_digested` 等页面的 `Unreleased` 描述与 v1.2.0 状态对齐
+
+**（3）内容删除/作废 —— 已标注**
+
+- [x] `harness/02-Boundaries/2.3_agent_lane_contract_first.md` —— **本页论点作废**：4 个 experimental 消费者路径全删；coding-agent **已不依赖 pi-durable**（原页零 v1.2.0 标记）
+- [x] `integration/05-recipes.md:315` —— 删除的 `pi-client`/`pi-server` 从"可评估选项"改为"已删除，无替代"
+- [x] **facet/axis-8 集群 5 个文件**（`extensions/2.5`、`extensions/3.1`、`composition/10h`、`10i`、`10_extension_axes/README.md`）—— `chord/src/api.ts` + `examples/plugins/pi-example-plugin/` 全删，此前仍作"活证据"
+- [x] `.pi/prompts` / `PLANNING.md` 残留引用加注
+
+**审计覆盖声明**：两路审计各自列出了"检查过且判定 OK"的清单（三包删除、`coding-agent-consumer.mjs` 拆分、`./facets`/`./bundler` + esbuild 移除、chord README 锚点等），确认这些传播正确。审计同时**排除**了两个我可能误报的项：`--no-builtin-tools` 与 `RetryPolicy` 在区间起点**已存在**，不是新特性。

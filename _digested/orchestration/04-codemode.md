@@ -12,6 +12,23 @@ codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模�
 
 这条合同回答的是扇出型工具工作(批量读文件、聚合多个来源、多步数据变换)的上下文经济学:逐轮委派时,每个中间工具结果都要付一次 LLM 上下文的钱;把循环搬进代码,中间结果留在 VM 里,**只有脚本吐出的 output 和返回值进上下文**。与 DSH workflow 的对照:`agent()` 钩子让脚本扇出子代理(隔离的是整个 agent 上下文);codemode 让脚本扇出工具调用(隔离的是工具结果的上下文)——**同一思想("脚本而不是对话持有循环、分支与中间结果"),作用在更轻的一级**。
 
+## `packages/codemode` 的三种沙箱后端（v1.2.0 新增，硬事实）
+
+前两节讲的是"谁在用 codemode"。这一节讲**沙箱本身跑在哪**——v1.2.0 把单一沙箱模型扩成了三种后端 + 一个共享基类：
+
+| 后端 | 实现文件 | 形态 |
+|---|---|---|
+| `CodemodeSandboxBase` | `src/runtime/execution.ts` | **共享基类**，其余后端继承它；桥校验与错误类型也在这里 |
+| `InlineCodemodeSandbox` | `src/runtime/inline.ts` | 不另起 worker 线程，在同一 runtime 内跑；带 `interruptBudget`（默认 `DEFAULT_INTERRUPT_BUDGET`） |
+| `RemoteCodemodeSandbox` | `src/runtime/remote.ts` | VM 在**另一个 isolate**，工具调用回到调用方；配套 `serveCodemodeRemote` 与 `CodemodeRemote*` 消息类型 |
+| `CodemodeSandbox` | `src/runtime/host.ts` | 宿主侧封装（原有的那条路径） |
+
+新增**子路径导出**（`packages/codemode/package.json` 的 `exports`）：`./portable`（不引 Node 内建，供非 Node 宿主）、`./cloudflare`（`CodemodeSandboxDurableObject`）、`./worker`；加上原有的 `.`、`./declarations`、`./source`。仓库内附 `examples/cloudflare`。
+
+这条线意味着：**codemode 的沙箱不必然是本机的一个 worker 线程**。在 Cloudflare 上它可以是一个 Durable Object，在远端场景是另一个 isolate——这对"脚本在哪执行、工具副作用落在哪"的判断是决定性的。
+
+**确定性重放 API（`sandbox.start()`）**：v1.2.0 的沙箱启动面支持按记录重放——`onCall`、`run.deliver()`、`seed`、虚拟时钟（由 `startedAt` 起算）、`onStarted`（指纹）、`onIdle`、`run.finished`；契约要求 UTC、不得依赖 `WeakRef`/`FinalizationRegistry`。这是 durable 侧 `pi.codemode.journal` 那套确定性重放能成立的前提。
+
 ## 两份实现的分工（v1.2.0）
 
 | | coding-agent 侧 | durable 侧（v1.2.0 新增） |

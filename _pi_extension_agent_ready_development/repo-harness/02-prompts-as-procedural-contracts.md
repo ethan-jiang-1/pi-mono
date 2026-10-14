@@ -1,10 +1,12 @@
-# Prompts 即程序性合同：`.pi/prompts/` 的六个模板
+# Prompts 即程序性合同：`.pi/prompts/` 的七个模板
 
-`v1.2.0` 的 `.pi/prompts/` 下有六个 prompt template：`is`、`pr`、`wr`、`deslop`、`sa`、`cl`。它们把六类高频工作流写成文件，任何会话以 `/is`、`/pr` 等命令调用。本页先给总表，再逐个检视每个 prompt 划定的合同边界。**这些是主仓为自己定的工作流（主仓要求/仓库自定范畴）**：对 pi-mono 的贡献工作适用；独立扩展仓可以把它们当作自己工作流模板的参考（扩展仓建议）。
+`v1.2.0` 的 `.pi/prompts/` 下有**七个** prompt template：`is`、`pr`、`wr`、`deslop`、`sa`、`cl`、`dup`。它们把高频工作流写成文件，任何会话以 `/is`、`/pr` 等命令调用。（总表列全七个；正文逐个检视其中**六个**——`dup` 是本区间新增的精简样本，见下方增量注。）
+
+> **v1.2.0 增量（sync-0009）**：第七个模板 **`dup`** 在本区间新增（`bd21693b9` "docs: add dup prompt template"；基线 `98d2e1947` 上该文件不存在）。它有 frontmatter `description: Find potential duplicates of a GitHub issue` / `argument-hint: "<issue-url>"`，正文给出三步检索法（`gh issue view` 读原文 → `gh search issues` / `gh issue list --search` / `gh pr list --search` 多关键词变体 → 读候选确认同一问题）、一条判据（"same symptom with the same likely cause"，共享组件或报错**不算**）、一条产出约定（草稿评论 + `written by AI` 披露；无则回 "No duplicates found."）与一条禁止项（"Do not post, label, or close anything."）。**注意它并不比其它模板薄**：`argument-hint` 并非它独有（`is`/`pr`/`sa` 也有），它同样有条文式的边界；差别只在每条都压成一句。本页先给总表，再逐个检视每个 prompt 划定的合同边界。**这些是主仓为自己定的工作流（主仓要求/仓库自定范畴）**：对 pi-mono 的贡献工作适用；独立扩展仓可以把它们当作自己工作流模板的参考（扩展仓建议）。
 
 prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` 命令、文件名即命令名（[prompt-templates.md L19](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/prompt-templates.md#L19)），参数经 `$ARGUMENTS`/`$@` 等替换进入提示（[替换表 L38-L47](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/prompt-templates.md#L38-L47)）。资源类型的判别见 [04](./04-extension-points-map.md)。
 
-## 总表：六个合同
+## 总表：七个合同
 
 | 命令 | 用途 | 合同的核心边界 |
 |---|---|---|
@@ -14,6 +16,7 @@ prompt template 的机制本身是运行时事实：Markdown 文件成为 `/` �
 | `/deslop` | 简化已完成的 workpackage | 反推测性抽象；重大删除须逐项获批 |
 | `/sa <advisory>` | 更新安全公告供发布 | 不发布、不改状态、不请求 CVE，除非用户同意或草稿明示 `request_cve: true` |
 | `/cl` | 发布前审计 changelog | 逐 commit 对账，跨包复制规则固定 |
+| `/dup <issue-url>` | 在 GitHub 仓内查找该 issue 的潜在重复 | 步骤 + 判据 + 产出一应俱全，但**每条都只一句**，且唯一禁止项是"不要 post/label/close" |
 
 ## `/is`：独立诊断，只提议
 

@@ -40,9 +40,11 @@
 
 ### 未解决的重审债务（0006 登记，不阻塞）
 
-re-pin 只机械改了 362 条外链的 tag 段，并修掉了 6 处**结构性**越界锚点（`durable-env.yml` 三处、`scripts/publish.mjs` 三处）。另有 **21 处**引用的 v1.0.3 原文在 v1.2.0 已不存在于该文件任何位置——即锚点在范围内但内容已被改写。这些锚点**当前不会使 `verify.mjs` 失败**（它不核对远端内容），但引文可能与 tag 不符。清单与逐条分类见 [`01-repin-v1.2.0-survey.md`](01-repin-v1.2.0-survey.md)。
+re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉了 6 处**结构性**越界锚点（`durable-env.yml` 三处、`scripts/publish.mjs` 三处）。除此之外另有 **21 处**引用的 v1.0.3 原文在 v1.2.0 已不存在于该文件任何位置——即锚点在范围内但内容已被改写。这一类**必须人工逐条复核**：`verify.mjs` 不核对远端内容，所以它们静默通过所有自动检查，引文却可能与 tag 不符。清单与逐条分类见 [`01-repin-v1.2.0-survey.md`](01-repin-v1.2.0-survey.md)。
 
-主要集中在：`sdlc-reference/03-check-pipeline.md`（5）、`sdlc-reference/07-release-and-recovery.md`（7，其中 3 处已随本轮的 workflows 重做修正）、`repo-harness/07-monorepo-taxonomy.md`（3，本轮已随包表修正）、`repo-harness/04-extension-points-map.md`（2）。
+21 处的分布：`sdlc-reference/07-release-and-recovery.md`（7）、`sdlc-reference/03-check-pipeline.md`（5）、`repo-harness/07-monorepo-taxonomy.md`（3）、`repo-harness/04-extension-points-map.md`（2）、`sdlc-reference/04-ci-matrix.md`（1）、`sdlc-reference/01-contribution-gates.md`（1）、`repo-harness/06-scope-discipline-and-cost-contracts.md`（1）、`repo-harness/02-terms-and-mental-models.md`（1）。
+
+**本轮的处置**：21 处已逐条对 tag 复核并更正（`_summary-v1.2.0.md` 的"21 处内容性失效锚点更正"指的就是这一项），涉及上述 8 个文件全部；其中 `07-release-and-recovery.md` 的 7 处有 3 处、`07-monorepo-taxonomy.md` 的 3 处，是随本轮 workflows 与包表重做一并修正的。这条例外的意义在于——**机械改 tag 与"锚点仍对得上原文"是两件事**：前者由 `verify.mjs` 兜底；后者它不核对远端内容，只能靠人工对 tag 复核。巡检时若发现某条引文与 tag 不符，先查此处是否漏列，而不是先怀疑 tag 取错。
 
 ## 重审触发路径
 

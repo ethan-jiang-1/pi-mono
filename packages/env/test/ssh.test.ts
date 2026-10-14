@@ -16,6 +16,8 @@ import { join } from "node:path";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { getOrThrow } from "@earendil-works/pi-durable/env";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { Connection } from "../src/connection.ts";
+import { LocalExecutionEnv } from "../src/list-files.ts";
 import { RemoteExecutionEnv } from "../src/remote-env.ts";
 import {
 	acceptHostKey,
@@ -25,6 +27,7 @@ import {
 	HostKeyUnknownError,
 	type SshTarget,
 	scanHostKey,
+	sshConnection,
 } from "../src/ssh.ts";
 import { daemon } from "./daemon.ts";
 
@@ -182,8 +185,43 @@ describe.skipIf(sshd === undefined)("SSH bootstrap", () => {
 		}
 	}, 60_000);
 
+	it("lists files over SSH as the local environment lists them", async () => {
+		const tree = join(home, "tree");
+		for (const file of ["a/b.txt", "a/c/d.txt", ".hidden", "out/x.js", "skip/y.txt", ".git/HEAD"]) {
+			mkdirSync(join(tree, file, ".."), { recursive: true });
+			writeFileSync(join(tree, file), "");
+		}
+		mkdirSync(join(tree, "empty"));
+		writeFileSync(join(tree, ".gitignore"), "out/\n");
+		const { connection } = await connectSsh({ ...target, binary: daemon });
+		const local = new Connection({ command: [daemon] });
+		try {
+			const remote = new RemoteExecutionEnv({ connection, id: "pi-env:test", cwd: home });
+			const listing = getOrThrow(await remote.listFiles("tree", { exclude: ["skip"] }, context));
+			expect(listing).toEqual({
+				entries: [
+					{ path: ".gitignore", kind: "file" },
+					{ path: ".hidden", kind: "file" },
+					{ path: "a", kind: "directory" },
+					{ path: "a/b.txt", kind: "file" },
+					{ path: "a/c", kind: "directory" },
+					{ path: "a/c/d.txt", kind: "file" },
+					{ path: "empty", kind: "directory" },
+				],
+				truncated: false,
+			});
+			const env = new LocalExecutionEnv({ connection: local, cwd: home });
+			expect(getOrThrow(await env.listFiles("tree", { exclude: ["skip"] }, context))).toEqual(listing);
+		} finally {
+			connection.close();
+			local.close();
+		}
+	}, 60_000);
+
 	it("starts the daemon through the login shell only when asked", async () => {
+		// The login shell is the account's shell: sh and bash read .profile, zsh (the macOS default) reads .zprofile.
 		writeFileSync(join(home, ".profile"), "export PI_ENV_LOGIN=yes\n");
+		writeFileSync(join(home, ".zprofile"), "export PI_ENV_LOGIN=yes\n");
 		const login = async (loginShell: boolean) => {
 			const { connection } = await connectSsh({ ...target, binary: daemon, loginShell });
 			try {
@@ -203,6 +241,26 @@ describe.skipIf(sshd === undefined)("SSH bootstrap", () => {
 		};
 		expect(await login(false)).toBe("");
 		expect(await login(true)).toBe("yes");
+	}, 60_000);
+
+	it("connects lazily and reports a failed start as the error of the operation", async () => {
+		const lazyTarget = { ...target, knownHostsFile: join(root, "lazy_known_hosts") };
+		const { connection, remote } = sshConnection({ ...lazyTarget, binary: daemon });
+		try {
+			expect(remote()).toBeUndefined();
+			const env = new RemoteExecutionEnv({ connection, id: "pi-env:test", cwd: home });
+			// Nothing is trusted yet: each operation fails with the reason and tries again.
+			const read = await env.readTextFile("missing.txt", context);
+			expect(read.ok ? "ok" : read.error.message).toMatch(/not trusted/);
+			const command = await env.exec(["sh", "-c", "exit 0"], undefined, context);
+			expect(command.ok ? "ok" : command.error.code).toBe("spawn_error");
+			await acceptHostKey(lazyTarget, (await scanHostKey(lazyTarget)).lines);
+			const accepted = await env.exec(["sh", "-c", "exit 0"], undefined, context);
+			expect(accepted.ok ? accepted.value.exitCode : accepted.error.message).toBe(0);
+			expect(remote()?.home).toBe(home);
+		} finally {
+			connection.close();
+		}
 	}, 60_000);
 
 	it("accepts only host keys for the alias and never replaces a trusted key silently", async () => {

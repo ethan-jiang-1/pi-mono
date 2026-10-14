@@ -1,10 +1,10 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { BACKGROUND_CONTEXT, withAbortSignal } from "@earendil-works/chord/context";
 import { getOrThrow, type ShellOutputInfo } from "@earendil-works/pi-durable/env";
 import { afterAll, describe, expect, it } from "vitest";
-import { Connection } from "../src/connection.ts";
+import { Connection, nodePlatform } from "../src/connection.ts";
 import { RemoteExecutionEnv } from "../src/remote-env.ts";
 import { daemon } from "./daemon.ts";
 
@@ -70,6 +70,40 @@ describe("RemoteExecutionEnv", () => {
 		expect(Date.now() - started).toBeLessThan(10_000);
 	}, 30_000);
 
+	it("reports the remote system in Node's names", async () => {
+		const { connection } = environment();
+		expect(nodePlatform(await connection.info())).toEqual({ platform: process.platform, arch: process.arch });
+		expect(nodePlatform({ os: "windows", arch: "aarch64" })).toEqual({ platform: "win32", arch: "arm64" });
+		expect(nodePlatform({ os: "macos", arch: "x86_64" })).toEqual({ platform: "darwin", arch: "x64" });
+	});
+
+	it("reports listFiles as not supported by daemons released before it", async () => {
+		const { env } = environment();
+		expect((await env.connection.info()).features).toContain("listFiles");
+		const connection = new Connection({ command: [process.execPath, join(import.meta.dirname, "old-daemon.ts")] });
+		connections.push(connection);
+		const old = new RemoteExecutionEnv({ connection, id: "pi-env:old", cwd: env.cwd });
+		const listed = await old.listFiles(".", undefined, context);
+		expect(listed.ok ? "ok" : listed.error.code).toBe("not_supported");
+	});
+
+	it("cancels a listing in the daemon", async () => {
+		const { env, connection } = environment();
+		for (let dir = 0; dir < 100; dir++) {
+			mkdirSync(join(env.cwd, `d${dir}`));
+			for (let file = 0; file < 100; file++) writeFileSync(join(env.cwd, `d${dir}`, `f${file}`), "");
+		}
+		// The cancel follows the request at once, bypassing the client's own abort check, so the daemon stops the walk.
+		const controller = new AbortController();
+		controller.abort();
+		const cancelled = connection.request("listFiles", { path: env.cwd }, { signal: controller.signal });
+		await expect(cancelled).rejects.toMatchObject({ code: "aborted" });
+		const listed = getOrThrow(await env.listFiles(".", undefined, context));
+		expect([listed.entries.length, listed.truncated]).toEqual([10_100, false]);
+		const bounded = getOrThrow(await env.listFiles(".", { maxEntries: 5000 }, context));
+		expect([bounded.entries.length, bounded.truncated]).toEqual([5000, true]);
+	});
+
 	it("times out a command that produces no output", async () => {
 		const { env } = environment();
 		const started = Date.now();
@@ -94,6 +128,29 @@ describe("RemoteExecutionEnv", () => {
 		expect(new TextDecoder().decode(getOrThrow(await b.read(0, 3, context)))).toBe("BBB");
 		await a.close(context);
 		await b.close(context);
+	});
+
+	it("computes the command at each start and retries a start that failed", async () => {
+		const cwd = mkdtempSync(join(tmpdir(), "pi-env-remote-"));
+		dirs.push(cwd);
+		let starts = 0;
+		const connection = new Connection({
+			command: async () => {
+				starts++;
+				if (starts === 1) throw new Error("ssh gpu-box failed: Network is unreachable");
+				return [daemon];
+			},
+		});
+		connections.push(connection);
+		const env = new RemoteExecutionEnv({ connection, id: "pi-env:test", cwd });
+		const offline = await env.readTextFile("missing.txt", context);
+		expect(offline.ok ? "ok" : [offline.error.code, offline.error.message]).toEqual([
+			"unknown",
+			"ssh gpu-box failed: Network is unreachable",
+		]);
+		const command = await env.exec(["sh", "-c", "exit 0"], undefined, context);
+		expect(command.ok ? command.value.exitCode : command.error.code).toBe(0);
+		expect(starts).toBe(2);
 	});
 
 	it("writes and reads files larger than one transfer chunk in order", async () => {

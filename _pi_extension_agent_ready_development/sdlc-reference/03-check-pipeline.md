@@ -78,7 +78,7 @@
 ## 边界与反例
 
 - **本地 hook 不是 CI 必检**。`check-lockfile-commit.mjs` 需要 staged index 才有意义，CI 不跑它；`PI_ALLOW_LOCKFILE_CHANGE` 是有意的人工豁免面，不能描述为不可绕过的供应链门禁。CI 侧的 lockfile 保证来自 `npm ci --ignore-scripts` 与 install-lock 的 `--check`（[04 页](04-ci-matrix.md)）。
-- pinned-deps 检查**约束全部 registry 依赖（含内部 workspace 包）**，但不检查传递依赖。v1.4.0 实测仓库内已无 `^` 内部依赖（`sync-versions.js` 同步精确版本）。
+- pinned-deps 检查**约束全部 registry 依赖（含内部 workspace 包）**，但不检查传递依赖。现行仓库内已无 `^` 内部依赖（`sync-versions.js` 同步精确版本）。
 - runtime-deps 只看**静态可解析**的说明符；运行时用变量拼接的动态 import、外部服务的运行时行为、依赖的安全性都不在它的证明范围内。
 - browser-smoke 证明「浏览器目标下模块图可打包且不含 Node 专用代码」，不证明打包产物在真实浏览器里功能正确。
 - 全部检查都是**主仓要求**；`npm run check` 通过是提 PR 的必要条件（[01 页](01-contribution-gates.md)），但不构成维护者技术评审的替代。

@@ -3911,6 +3911,166 @@
 			],
 			"page": "repo-harness/07-monorepo-taxonomy.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E106",
+			"claim": "skill 启动时只把 name/description/path 放进系统提示，完整指令按需加载；描述同时写做什么与何时用",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/skills.md",
+					"locator": {
+						"kind": "text",
+						"value": "At startup, Pi scans configured skill locations and adds each skill’s name, description, and path to the system prompt. It does not add the full instructions."
+					},
+					"quote": "At startup, Pi scans configured skill locations and adds each skill’s name, description, and path to the system prompt. It does not add the full instructions.",
+					"hintLine": 43,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/skills.md",
+					"locator": {
+						"kind": "text",
+						"value": "The description determines when the model considers loading the skill. State both what the skill does and when it applies. Avoid descriptions such as “Helps with PDFs,” which do not provide enough routing information."
+					},
+					"quote": "The description determines when the model considers loading the skill. State both what the skill does and when it applies. Avoid descriptions such as “Helps with PDFs,” which do not provide enough routing information.",
+					"hintLine": 37,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/03-repo-skills.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E107",
+			"claim": "github-work 不承载流程，路由到 is/pr/wr 三个 prompt 模板",
+			"sources": [
+				{
+					"path": ".pi/skills/github-work.md",
+					"locator": {
+						"kind": "text",
+						"value": "|---|---|"
+					},
+					"quote": "|---|---|",
+					"hintLine": 11,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/skills/github-work.md",
+					"locator": {
+						"kind": "text",
+						"value": "| Wrap up issue or PR work: changelog, final comment, commit, push, close | `.pi/prompts/wr.md` |"
+					},
+					"quote": "| Wrap up issue or PR work: changelog, final comment, commit, push, close | `.pi/prompts/wr.md` |",
+					"hintLine": 14,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/03-repo-skills.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E108",
+			"claim": "add-llm-provider 是有序检查单：核心类型→实现→懒注册→模型生成→测试矩阵→接线→文档",
+			"sources": [
+				{
+					"path": ".pi/skills/add-llm-provider.md",
+					"locator": {
+						"kind": "text",
+						"value": "A new provider touches multiple files. Work through these steps in order."
+					},
+					"quote": "A new provider touches multiple files. Work through these steps in order.",
+					"hintLine": 8,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/skills/add-llm-provider.md",
+					"locator": {
+						"kind": "text",
+						"value": "- For `cross-provider-handoff.test.ts`, add at least one provider/model pair. If the provider exposes multiple model families (e.g. GPT and Claude), add at least one pair per family."
+					},
+					"quote": "- For `cross-provider-handoff.test.ts`, add at least one provider/model pair. If the provider exposes multiple model families (e.g. GPT and Claude), add at least one pair per family.",
+					"hintLine": 43,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/03-repo-skills.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E109",
+			"claim": "interactive-testing 给 tmux 配方；release smoke 必须提交真实 prompt 并等模型回复",
+			"sources": [
+				{
+					"path": ".pi/skills/interactive-testing.md",
+					"locator": {
+						"kind": "text",
+						"value": "tmux new-session -d -s pi-test -x 80 -y 24"
+					},
+					"quote": "tmux new-session -d -s pi-test -x 80 -y 24",
+					"hintLine": 11,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/skills/interactive-testing.md",
+					"locator": {
+						"kind": "text",
+						"value": "For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test."
+					},
+					"quote": "For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.",
+					"hintLine": 19,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/03-repo-skills.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E110",
+			"claim": "release：lockstep、仓外本地 smoke、tag 后不重跑脚本；smoke 未过是 blocker 除非用户显式接受风险",
+			"sources": [
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases."
+					},
+					"quote": "**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.",
+					"hintLine": 10,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):"
+					},
+					"quote": "2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):",
+					"hintLine": 14,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## [Unreleased]` changelog sections, commits `Add [Unreleased] section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed."
+					},
+					"quote": "The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## [Unreleased]` changelog sections, commits `Add [Unreleased] section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.",
+					"hintLine": 46,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "Verify both Node and Bun startup, model/account listing, interactive startup, and at least one real prompt with the intended default provider. The bare commands `/tmp/pi-local-release/node/pi` and `/tmp/pi-local-release/bun/pi` start interactive mode; run each in tmux, submit a prompt, and wait for the model reply before considering the interactive smoke test passed. Failures are release blockers unless the user explicitly accepts the risk."
+					},
+					"quote": "Verify both Node and Bun startup, model/account listing, interactive startup, and at least one real prompt with the intended default provider. The bare commands `/tmp/pi-local-release/node/pi` and `/tmp/pi-local-release/bun/pi` start interactive mode; run each in tmux, submit a prompt, and wait for the model reply before considering the interactive smoke test passed. Failures are release blockers unless the user explicitly accepts the risk.",
+					"hintLine": 33,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/03-repo-skills.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

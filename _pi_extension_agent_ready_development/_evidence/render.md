@@ -2501,3 +2501,107 @@ lockstep：所有公开包同一版本，sync-versions 校验集合唯一
   ```
 
 核验：`v1.4.0`
+
+## repo-harness/03-repo-skills.md
+
+### E106
+
+skill 启动时只把 name/description/path 放进系统提示，完整指令按需加载；描述同时写做什么与何时用
+
+- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md) — text: `At startup, Pi scans configured skill locations and adds each skill’s name, description, and path to the system prompt. It does not add the full instructions.`，提示行 43
+
+  ```text
+  At startup, Pi scans configured skill locations and adds each skill’s name, description, and path to the system prompt. It does not add the full instructions.
+  ```
+
+- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md) — text: `The description determines when the model considers loading the skill. State both what the skill does and when it applies. Avoid descriptions such as “Helps with PDFs,” which do not provide enough routing information.`，提示行 37
+
+  ```text
+  The description determines when the model considers loading the skill. State both what the skill does and when it applies. Avoid descriptions such as “Helps with PDFs,” which do not provide enough routing information.
+  ```
+
+核验：`v1.4.0`
+
+### E107
+
+github-work 不承载流程，路由到 is/pr/wr 三个 prompt 模板
+
+- [`.pi/skills/github-work.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/github-work.md) — text: `|---|---|`，提示行 11
+
+  ```text
+  |---|---|
+  ```
+
+- [`.pi/skills/github-work.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/github-work.md) — text: `| Wrap up issue or PR work: changelog, final comment, commit, push, close | `.pi/prompts/wr.md` |`，提示行 14
+
+  ```text
+  | Wrap up issue or PR work: changelog, final comment, commit, push, close | `.pi/prompts/wr.md` |
+  ```
+
+核验：`v1.4.0`
+
+### E108
+
+add-llm-provider 是有序检查单：核心类型→实现→懒注册→模型生成→测试矩阵→接线→文档
+
+- [`.pi/skills/add-llm-provider.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/add-llm-provider.md) — text: `A new provider touches multiple files. Work through these steps in order.`，提示行 8
+
+  ```text
+  A new provider touches multiple files. Work through these steps in order.
+  ```
+
+- [`.pi/skills/add-llm-provider.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/add-llm-provider.md) — text: `- For `cross-provider-handoff.test.ts`, add at least one provider/model pair. If the provider exposes multiple model families (e.g. GPT and Claude), add at least one pair per family.`，提示行 43
+
+  ```text
+  - For `cross-provider-handoff.test.ts`, add at least one provider/model pair. If the provider exposes multiple model families (e.g. GPT and Claude), add at least one pair per family.
+  ```
+
+核验：`v1.4.0`
+
+### E109
+
+interactive-testing 给 tmux 配方；release smoke 必须提交真实 prompt 并等模型回复
+
+- [`.pi/skills/interactive-testing.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/interactive-testing.md) — text: `tmux new-session -d -s pi-test -x 80 -y 24`，提示行 11
+
+  ```text
+  tmux new-session -d -s pi-test -x 80 -y 24
+  ```
+
+- [`.pi/skills/interactive-testing.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/interactive-testing.md) — text: `For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.`，提示行 19
+
+  ```text
+  For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.
+  ```
+
+核验：`v1.4.0`
+
+### E110
+
+release：lockstep、仓外本地 smoke、tag 后不重跑脚本；smoke 未过是 blocker 除非用户显式接受风险
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.`，提示行 10
+
+  ```text
+  **Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.
+  ```
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):`，提示行 14
+
+  ```text
+  2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):
+  ```
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## ［Unreleased］` changelog sections, commits `Add ［Unreleased］ section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.`，提示行 46
+
+  ```text
+  The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## [Unreleased]` changelog sections, commits `Add [Unreleased] section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.
+  ```
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `Verify both Node and Bun startup, model/account listing, interactive startup, and at least one real prompt with the intended default provider. The bare commands `/tmp/pi-local-release/node/pi` and `/tmp/pi-local-release/bun/pi` start interactive mode; run each in tmux, submit a prompt, and wait for the model reply before considering the interactive smoke test passed. Failures are release blockers unless the user explicitly accepts the risk.`，提示行 33
+
+  ```text
+  Verify both Node and Bun startup, model/account listing, interactive startup, and at least one real prompt with the intended default provider. The bare commands `/tmp/pi-local-release/node/pi` and `/tmp/pi-local-release/bun/pi` start interactive mode; run each in tmux, submit a prompt, and wait for the model reply before considering the interactive smoke test passed. Failures are release blockers unless the user explicitly accepts the risk.
+  ```
+
+核验：`v1.4.0`

@@ -1,6 +1,6 @@
 # 仓库 skills：按需加载的专家程序
 
-`v1.4.0` 的 `.pi/skills/` 下有**四个** skill：`add-llm-provider`、`github-work`（v1.4.0 新增）、`interactive-testing`、`release`。与 prompt template（纯指令文本）不同，skill 是「指令 + 约定配套资产」的目录形态；pi-mono 的这四个是单文件 Markdown skill，各自封装一项跨多文件、跨阶段、高出错成本的专家流程。以下为对 `v1.4.0` 内容的检视；它们是主仓为自己维护的流程（主仓要求/仓库自定），机制本身是运行时事实。
+`.pi/skills/` 下有**四个** skill：`add-llm-provider`、`github-work`、`interactive-testing`、`release`。与 prompt template（纯指令文本）不同，skill 是「指令 + 约定配套资产」的目录形态；pi-mono 的这四个是单文件 Markdown skill，各自封装一项跨多文件、跨阶段、高出错成本的专家流程。以下为对基线内容的检视；它们是主仓为自己维护的流程（主仓要求/仓库自定），机制本身是运行时事实。
 
 ## 机制：描述决定路由
 
@@ -8,15 +8,19 @@ skill 的加载分两级（运行时事实）：启动时只有名字、描述�
 
 > At startup, Pi scans configured skill locations and adds each skill’s name, description, and path to the system prompt. It does not add the full instructions.
 >
-> — [skills.md L43](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md#L43)
+> —
 
 路由质量取决于描述的写法（运行时事实）：
 
 > The description determines when the model considers loading the skill. State both what the skill does and when it applies.
 >
-> — [skills.md L37](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md#L37)
+> —
+
+[E106](../_evidence/render.md#e106)
 
 四个 skill 的描述都写了「做什么」；`github-work` 还写了「何时用」：调查/分析/修复 issue、评审 PR、以及收尾（changelog/评论/commit/push/close）。它本身不承载流程，而是**路由到三个 prompt 模板**——issue → `.pi/prompts/is.md`、PR → `pr.md`、收尾 → `wr.md`，并规定 `is.md` 只分析不实现、`pr.md` 不切分支、`wr.md` 只在用户要求收尾时跑且每会话最多一条最终评论。`interactive-testing` 与 `release` 还带显式的「何时用」（Use for …）从句，`add-llm-provider` 的适用时机则隐含在首句「Checklist for adding a new LLM provider」的覆盖面里：`add-llm-provider` 点明覆盖类型、实现、懒注册、模型生成、测试矩阵、coding-agent 接线与文档；`interactive-testing` 点明 tmux 受控终端与 release smoke；`release` 点明准备、本地 smoke、发布与「失败 CI 或公告」的恢复场景——恢复场景入描述意味着失败时的续接也是该 skill 的路由目标。
+
+[E107](../_evidence/render.md#e107)
 
 ## `add-llm-provider`：跨层有序检查单
 
@@ -24,7 +28,7 @@ skill 的加载分两级（运行时事实）：启动时只有名字、描述�
 
 > A new provider touches multiple files. Work through these steps in order.
 >
-> — [`.pi/skills/add-llm-provider.md` L8](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/add-llm-provider.md#L8)
+> —
 
 步骤链是：核心类型（`Api` 联合、options 接口、`ApiOptionsMap`、`KnownProvider`）→ provider 实现（`stream*` 事件标准化）→ 子路径导出与**懒注册**（`register-builtins.ts` 用 lazy loader 包装，禁止静态导入）→ 模型生成脚本 → 测试矩阵 → coding-agent 接线（默认模型、登录显示名、env 文档、README、`docs/providers.md`）→ 文档与 changelog。
 
@@ -32,9 +36,11 @@ skill 的加载分两级（运行时事实）：启动时只有名字、描述�
 
 > For `cross-provider-handoff.test.ts`, add at least one provider/model pair. If the provider exposes multiple model families (e.g. GPT and Claude), add at least one pair per family.
 >
-> — [add-llm-provider.md L43](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/add-llm-provider.md#L43)
+> —
 
 这条矩阵把「流式、中止、空响应、上下文溢出、Unicode 代理对、孤儿 tool call、图片结果、token 计量、跨 provider 移交」定义为 provider 完整性的固定观察面——一个新 provider 不跑完这些就不算接好。
+
+[E108](../_evidence/render.md#e108)
 
 ## `interactive-testing`：受控终端与真实验证
 
@@ -42,9 +48,11 @@ skill 的加载分两级（运行时事实）：启动时只有名字、描述�
 
 > For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.
 >
-> — [`.pi/skills/interactive-testing.md` L19](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/interactive-testing.md#L19)
+> —
 
 三个边界值得注意：从 `/tmp` 起步（避免 release 二进制偶然解析到仓库内的工作区文件）；Node 与 Bun 两种二进制分开测（同一份逻辑、两种运行时）；**必须提交 prompt 并等到真实模型回复**——启动成功不算 smoke 通过，这防止「能开机」冒充「能用」。
+
+[E109](../_evidence/render.md#e109)
 
 ## `release`：lockstep、repo 外 smoke 与失败恢复
 
@@ -52,15 +60,17 @@ release skill 固定了版本纪律与验证顺序（主仓要求）：
 
 > **Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.
 >
-> — [`.pi/skills/release.md` L10](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md#L10)
+> —
 
-流程为：先确认跑过 `/cl`（changelog 审计，见 [02](./02-prompts-as-procedural-contracts.md)）→ 在仓库外做本地 smoke——「build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files)」（[release.md L14](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md#L14)）→ 跑 release 脚本（版本、changelog、`npm run check`、提交、tag、推送一条龙，且「tag 推送后不得重跑 release 脚本」，[release.md L44](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md#L44)）→ CI 经 npm trusted publishing 发布并验证 → Nix 构建并 fast-forward `stable`。失败恢复纪律是幂等重试失败任务而不是重跑发布：
+流程为：先确认跑过 `/cl`（changelog 审计，见 [02](./02-prompts-as-procedural-contracts.md)）→ 在仓库外做本地 smoke——「build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files)」→ 跑 release 脚本（版本、changelog、`npm run check`、提交、tag、推送一条龙，且「tag 推送后不得重跑 release 脚本」）→ CI 经 npm trusted publishing 发布并验证 → Nix 构建并 fast-forward `stable`。失败恢复纪律是幂等重试失败任务而不是重跑发布：
 
 > Do not rerun `npm run release:patch` or `npm run release:minor` for the same version.
 >
-> — [release.md L50](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md#L50)
+> —
 
-交互 smoke 未过是 release blocker，除非用户显式接受风险（[release.md L33](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md#L33)）——把「带风险的例外」也写成必须显式声明的决定。
+交互 smoke 未过是 release blocker，除非用户显式接受风险——把「带风险的例外」也写成必须显式声明的决定。
+
+[E110](../_evidence/render.md#e110)
 
 ## 观点
 

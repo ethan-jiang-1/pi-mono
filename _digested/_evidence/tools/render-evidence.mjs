@@ -51,9 +51,8 @@ for (const entry of claims.entries ?? []) {
 	lines.push(`### ${entry.id}`, "");
 	lines.push(entry.claim ?? "", "");
 	for (const source of entry.sources ?? []) {
-		const locator = source.locator
-			? `${source.locator.kind}: \`${String(source.locator.value).replace(/\n/gu, " ")}\``
-			: "整文件";
+		const displayValue = source.locator ? String(source.locator.value).replace(/\n/gu, " ").replace(/\[/gu, "［").replace(/\]/gu, "］") : "";
+		const locator = source.locator ? `${source.locator.kind}: \`${displayValue}\`` : "整文件";
 		const hint = source.hintLine ? `，提示行 ${source.hintLine}` : "";
 		if (source.expect === "absent") {
 			lines.push(`- \`${source.path}\`：**${tag} 起不存在**`);
@@ -63,7 +62,7 @@ for (const entry of claims.entries ?? []) {
 			`- [\`${source.path}\`](https://github.com/${repository}/blob/${tag}/${source.path}) — ${locator}${hint}`,
 		);
 		if (source.quote) {
-			lines.push("", "  > " + source.quote.replace(/\n/gu, " "), "");
+			lines.push("", "  ```text", "  " + source.quote.replace(/\n/gu, " "), "  ```", "");
 		}
 	}
 	lines.push(`核验：\`${entry.checkedAt ?? tag}\``, "");

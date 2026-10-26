@@ -1997,6 +1997,380 @@
 			],
 			"page": "sdlc-reference/03-check-pipeline.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E057",
+			"claim": "新贡献者 issue/PR 默认自动关闭；维护者用 lgtmi/lgtm 恢复资格，命令须在回复首或尾",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "All issues and PRs from new contributors are auto-closed by default."
+					},
+					"quote": "All issues and PRs from new contributors are auto-closed by default.",
+					"hintLine": 23,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar below will not be reopened or receive a reply."
+					},
+					"quote": "Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar below will not be reopened or receive a reply.",
+					"hintLine": 27,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "- `lgtmi`: your future issues will not be auto-closed"
+					},
+					"quote": "- `lgtmi`: your future issues will not be auto-closed",
+					"hintLine": 31,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs."
+					},
+					"quote": "The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.",
+					"hintLine": 34,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/01-contribution-gates.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E058",
+			"claim": "issue 质量门槛：用模板、短而具体、值得读",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "If you open an issue, you must use one of the two GitHub issue templates."
+					},
+					"quote": "If you open an issue, you must use one of the two GitHub issue templates.",
+					"hintLine": 38,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "If you open an issue, keep it short, concrete, and worth reading."
+					},
+					"quote": "If you open an issue, keep it short, concrete, and worth reading.",
+					"hintLine": 40,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/01-contribution-gates.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E059",
+			"claim": "PR 前置：已获 lgtm；npm run check 与 ./test.sh 都通过；不改 CHANGELOG",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above."
+					},
+					"quote": "Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.",
+					"hintLine": 58,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "npm run check"
+					},
+					"quote": "npm run check",
+					"hintLine": 63,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "Both must pass."
+					},
+					"quote": "Both must pass.",
+					"hintLine": 67,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers."
+					},
+					"quote": "Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.",
+					"hintLine": 69,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/01-contribution-gates.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E060",
+			"claim": "issue-gate 只在 opened 触发；受信 bot/协作者/批准文件放行，其余加 untriaged 并以 not_planned 关闭",
+			"sources": [
+				{
+					"path": ".github/workflows/issue-gate.yml",
+					"locator": {
+						"kind": "text",
+						"value": "types: [opened]"
+					},
+					"quote": "types: [opened]",
+					"hintLine": 5,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-gate.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const TRUSTED_BOT_AUTHORS = new Set(['dependabot[bot]', 'sentry[bot]', 'claude[bot]']);"
+					},
+					"quote": "const TRUSTED_BOT_AUTHORS = new Set(['dependabot[bot]', 'sentry[bot]', 'claude[bot]']);",
+					"hintLine": 20,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-gate.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const permission = await getPermission(issueAuthor);"
+					},
+					"quote": "const permission = await getPermission(issueAuthor);",
+					"hintLine": 84,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-gate.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const approvedContent = await getTextFile(APPROVED_FILE);"
+					},
+					"quote": "const approvedContent = await getTextFile(APPROVED_FILE);",
+					"hintLine": 90,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-gate.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const message = ["
+					},
+					"quote": "const message = [",
+					"hintLine": 99,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/01-contribution-gates.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E061",
+			"claim": "untriaged 标签由 issue-triage-labels 维护：重开/标记时清理，last-read 前进时关闭未处理项",
+			"sources": [
+				{
+					"path": ".github/workflows/issue-triage-labels.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const UNTRIAGED_LABEL = 'untriaged';"
+					},
+					"quote": "const UNTRIAGED_LABEL = 'untriaged';",
+					"hintLine": 17,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-triage-labels.yml",
+					"locator": {
+						"kind": "text",
+						"value": "state_reason: 'not_planned',"
+					},
+					"quote": "state_reason: 'not_planned',",
+					"hintLine": 165,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/01-contribution-gates.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E062",
+			"claim": "pr-gate 只在 pull_request_target opened 触发；批准文件需 capability 恰为 pr，否则关闭 PR",
+			"sources": [
+				{
+					"path": ".github/workflows/pr-gate.yml",
+					"locator": {
+						"kind": "text",
+						"value": "types: [opened]"
+					},
+					"quote": "types: [opened]",
+					"hintLine": 5,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/pr-gate.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const permission = await getPermission(prAuthor);"
+					},
+					"quote": "const permission = await getPermission(prAuthor);",
+					"hintLine": 101,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/pr-gate.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const approvedContent = await getTextFile(APPROVED_FILE);"
+					},
+					"quote": "const approvedContent = await getTextFile(APPROVED_FILE);",
+					"hintLine": 107,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/pr-gate.yml",
+					"locator": {
+						"kind": "text",
+						"value": "console.log(`${prAuthor} is not approved, closing PR`);"
+					},
+					"quote": "console.log(`${prAuthor} is not approved, closing PR`);",
+					"hintLine": 116,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/01-contribution-gates.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E063",
+			"claim": "approve-contributor 在 issue_comment created 生效；评论者需写权限，lgtm→pr、lgtmi→issue，已有 pr 不降级，随后 bot 提交批准文件",
+			"sources": [
+				{
+					"path": ".github/workflows/approve-contributor.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const approvalAtStartPattern = /^[\\s.]*(?:@[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?(?:\\s*,\\s*|[.:]\\s*|\\s+))*(lgtmi|lgtm)(?=$|[\\s]|[^\\p{L}\\p{N}_\\s])/iu;"
+					},
+					"quote": "const approvalAtStartPattern = /^[\\s.]*(?:@[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?(?:\\s*,\\s*|[.:]\\s*|\\s+))*(lgtmi|lgtm)(?=$|[\\s]|[^\\p{L}\\p{N}_\\s])/iu;",
+					"hintLine": 33,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/approve-contributor.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const { data: permissionLevel } = await github.rest.repos.getCollaboratorPermissionLevel({"
+					},
+					"quote": "const { data: permissionLevel } = await github.rest.repos.getCollaboratorPermissionLevel({",
+					"hintLine": 46,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/approve-contributor.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const content = fs.readFileSync(APPROVED_FILE, 'utf8');"
+					},
+					"quote": "const content = fs.readFileSync(APPROVED_FILE, 'utf8');",
+					"hintLine": 133,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/approve-contributor.yml",
+					"locator": {
+						"kind": "text",
+						"value": "for (const username of approvalTargets) {"
+					},
+					"quote": "for (const username of approvalTargets) {",
+					"hintLine": 140,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/approve-contributor.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Commit and push"
+					},
+					"quote": "- name: Commit and push",
+					"hintLine": 176,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/01-contribution-gates.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E064",
+			"claim": "四类 issue 模板：bug 要求 pi -ne 预验证与最小复现，contribution 是 PR 前置，package-report 走独立入口，config 关闭空白 issue",
+			"sources": [
+				{
+					"path": ".github/ISSUE_TEMPLATE/bug.yml",
+					"locator": {
+						"kind": "text",
+						"value": "**Important:** before reporting an issue in core, please validate first with `pi -ne` that this is not caused by an extension you loaded."
+					},
+					"quote": "**Important:** before reporting an issue in core, please validate first with `pi -ne` that this is not caused by an extension you loaded.",
+					"hintLine": 14,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/ISSUE_TEMPLATE/bug.yml",
+					"locator": {
+						"kind": "text",
+						"value": "description: Minimal steps to trigger the bug."
+					},
+					"quote": "description: Minimal steps to trigger the bug.",
+					"hintLine": 28,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/ISSUE_TEMPLATE/contribution.yml",
+					"locator": {
+						"kind": "text",
+						"value": "description: Propose a change or feature (required for new contributors before submitting a PR)"
+					},
+					"quote": "description: Propose a change or feature (required for new contributors before submitting a PR)",
+					"hintLine": 2,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/ISSUE_TEMPLATE/package-report.yml",
+					"locator": {
+						"kind": "text",
+						"value": "description: Report a problematic Pi package listed on pi.dev"
+					},
+					"quote": "description: Report a problematic Pi package listed on pi.dev",
+					"hintLine": 2,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/ISSUE_TEMPLATE/config.yml",
+					"locator": {
+						"kind": "text",
+						"value": "blank_issues_enabled: false"
+					},
+					"quote": "blank_issues_enabled: false",
+					"hintLine": 1,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/01-contribution-gates.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

@@ -830,3 +830,147 @@ evals 文档评估：Docker 配对 with/without docs，两臂各一分数才计�
   > The report flags no lift, negative deltas, saturated controls or treatments, and observed flakiness. One repetition cannot establish stability.
 
 核验：`v1.4.0`
+
+## sdlc-reference/03-check-pipeline.md
+
+### E048
+
+check 链：biome（--write，warning 即失败）→ pinned-deps → runtime-deps → ts-imports → entry-graphs → install-lock → tsc → browser-smoke
+
+- [`package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/package.json) — text: `"check": "node scripts/biome-check.mjs --write && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-imports && npm run check:entry-graphs && npm run check:install-lock:coding-agent && tsc --noEmit && npm run check:browser-smoke",`，提示行 21
+
+  > "check": "node scripts/biome-check.mjs --write && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-imports && npm run check:entry-graphs && npm run check:install-lock:coding-agent && tsc --noEmit && npm run check:browser-smoke",
+
+核验：`v1.4.0`
+
+### E049
+
+pinned-deps：所有直接 registry 依赖（含内部包）必须 exact，非 registry specifier 跳过
+
+- [`scripts/check-pinned-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-pinned-deps.mjs) — text: `for (const [name, specifier] of Object.entries(dependencies)) {`，提示行 47
+
+  > for (const [name, specifier] of Object.entries(dependencies)) {
+
+- [`scripts/check-pinned-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-pinned-deps.mjs) — text: `function isNonRegistrySpecifier(specifier) {`，提示行 24
+
+  > function isNonRegistrySpecifier(specifier) {
+
+- [`scripts/check-pinned-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-pinned-deps.mjs) — text: `function getVersionSpecifier(specifier) {`，提示行 28
+
+  > function getVersionSpecifier(specifier) {
+
+核验：`v1.4.0`
+
+### E050
+
+runtime-deps：检查公开 workspace 包 src 的静态 import/export/require，要求依赖已声明
+
+- [`scripts/check-runtime-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-runtime-deps.mjs) — text: `function checkSource(source, manifest) {`，提示行 26
+
+  > function checkSource(source, manifest) {
+
+核验：`v1.4.0`
+
+### E051
+
+ts-imports：禁止 .ts 源码里相对 .js 说明符
+
+- [`scripts/check-ts-relative-imports.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-ts-relative-imports.mjs) — text: `function isRelativeJavaScriptSpecifier(specifier) {`，提示行 37
+
+  > function isRelativeJavaScriptSpecifier(specifier) {
+
+- [`scripts/check-ts-relative-imports.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-ts-relative-imports.mjs) — text: `if (failures.length > 0) {`，提示行 101
+
+  > if (failures.length > 0) {
+
+核验：`v1.4.0`
+
+### E052
+
+entry-graphs：入口即成本合同；按入口给 maxFiles/forbid/allow 预算，只计 value import
+
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `* Entry points are cost contracts.`，提示行 3
+
+  > * Entry points are cost contracts.
+
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `* Only value imports count. `import type` / `export type` are erased before Node sees them.`，提示行 11
+
+  > * Only value imports count. `import type` / `export type` are erased before Node sees them.
+
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `"./models": {`，提示行 38
+
+  > "./models": {
+
+核验：`v1.4.0`
+
+### E053
+
+install-lock --check：重生成并逐字比对；带 install script 的包须在显式 allowlist
+
+- [`scripts/generate-coding-agent-install-lock.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/generate-coding-agent-install-lock.mjs) — text: `const allowedInstallScriptPackages = new Map([`，提示行 17
+
+  > const allowedInstallScriptPackages = new Map([
+
+- [`scripts/generate-coding-agent-install-lock.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/generate-coding-agent-install-lock.mjs) — text: `if (!packageName || !entry.version) {`，提示行 320
+
+  > if (!packageName || !entry.version) {
+
+核验：`v1.4.0`
+
+### E054
+
+browser-smoke：用 esbuild 打浏览器目标，断言包含中立入口且不含 node adapter/被禁依赖
+
+- [`scripts/check-browser-smoke.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-browser-smoke.mjs) — text: `for (const expectedInput of [`，提示行 66
+
+  > for (const expectedInput of [
+
+- [`scripts/check-browser-smoke.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-browser-smoke.mjs) — text: `for (const forbiddenInput of [`，提示行 100
+
+  > for (const forbiddenInput of [
+
+核验：`v1.4.0`
+
+### E055
+
+pre-commit：无条件 lockfile gate + npm run check；仅命中前端/依赖路径时加跑 browser smoke；随后重暂存
+
+- [`.husky/pre-commit`](https://github.com/earendil-works/pi/blob/v1.4.0/.husky/pre-commit) — text: `node scripts/check-lockfile-commit.mjs`，提示行 6
+
+  > node scripts/check-lockfile-commit.mjs
+
+- [`.husky/pre-commit`](https://github.com/earendil-works/pi/blob/v1.4.0/.husky/pre-commit) — text: `RUN_BROWSER_SMOKE=0`，提示行 37
+
+  > RUN_BROWSER_SMOKE=0
+
+- [`.husky/pre-commit`](https://github.com/earendil-works/pi/blob/v1.4.0/.husky/pre-commit) — text: `# Restage files that were previously staged and may have been modified by formatting`，提示行 56
+
+  > # Restage files that were previously staged and may have been modified by formatting
+
+核验：`v1.4.0`
+
+### E056
+
+lockfile gate：PI_ALLOW_LOCKFILE_CHANGE 放行、仅 workspace 元数据放行，其余失败并打印人工审查清单
+
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `const stagedFiles = git(["diff", "--cached", "--name-only"])`，提示行 77
+
+  > const stagedFiles = git(["diff", "--cached", "--name-only"])
+
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `const allowValue = process.env.PI_ALLOW_LOCKFILE_CHANGE;`，提示行 5
+
+  > const allowValue = process.env.PI_ALLOW_LOCKFILE_CHANGE;
+
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `if (allowed) {`，提示行 86
+
+  > if (allowed) {
+
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `const changes = getLockfilePackageChanges();`，提示行 91
+
+  > const changes = getLockfilePackageChanges();
+
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `console.error("Review lockfile changes before committing:");`，提示行 99
+
+  > console.error("Review lockfile changes before committing:");
+
+核验：`v1.4.0`

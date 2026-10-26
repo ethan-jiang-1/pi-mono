@@ -1705,6 +1705,298 @@
 			],
 			"page": "sdlc-reference/05-testing-layers.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E048",
+			"claim": "check 链：biome（--write，warning 即失败）→ pinned-deps → runtime-deps → ts-imports → entry-graphs → install-lock → tsc → browser-smoke",
+			"sources": [
+				{
+					"path": "package.json",
+					"locator": {
+						"kind": "text",
+						"value": "\"check\": \"node scripts/biome-check.mjs --write && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-imports && npm run check:entry-graphs && npm run check:install-lock:coding-agent && tsc --noEmit && npm run check:browser-smoke\","
+					},
+					"quote": "\"check\": \"node scripts/biome-check.mjs --write && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-imports && npm run check:entry-graphs && npm run check:install-lock:coding-agent && tsc --noEmit && npm run check:browser-smoke\",",
+					"hintLine": 21,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/03-check-pipeline.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E049",
+			"claim": "pinned-deps：所有直接 registry 依赖（含内部包）必须 exact，非 registry specifier 跳过",
+			"sources": [
+				{
+					"path": "scripts/check-pinned-deps.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "for (const [name, specifier] of Object.entries(dependencies)) {"
+					},
+					"quote": "for (const [name, specifier] of Object.entries(dependencies)) {",
+					"hintLine": 47,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-pinned-deps.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function isNonRegistrySpecifier(specifier) {"
+					},
+					"quote": "function isNonRegistrySpecifier(specifier) {",
+					"hintLine": 24,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-pinned-deps.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function getVersionSpecifier(specifier) {"
+					},
+					"quote": "function getVersionSpecifier(specifier) {",
+					"hintLine": 28,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/03-check-pipeline.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E050",
+			"claim": "runtime-deps：检查公开 workspace 包 src 的静态 import/export/require，要求依赖已声明",
+			"sources": [
+				{
+					"path": "scripts/check-runtime-deps.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function checkSource(source, manifest) {"
+					},
+					"quote": "function checkSource(source, manifest) {",
+					"hintLine": 26,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/03-check-pipeline.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E051",
+			"claim": "ts-imports：禁止 .ts 源码里相对 .js 说明符",
+			"sources": [
+				{
+					"path": "scripts/check-ts-relative-imports.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function isRelativeJavaScriptSpecifier(specifier) {"
+					},
+					"quote": "function isRelativeJavaScriptSpecifier(specifier) {",
+					"hintLine": 37,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-ts-relative-imports.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "if (failures.length > 0) {"
+					},
+					"quote": "if (failures.length > 0) {",
+					"hintLine": 101,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/03-check-pipeline.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E052",
+			"claim": "entry-graphs：入口即成本合同；按入口给 maxFiles/forbid/allow 预算，只计 value import",
+			"sources": [
+				{
+					"path": "scripts/check-entry-graphs.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "* Entry points are cost contracts."
+					},
+					"quote": "* Entry points are cost contracts.",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-entry-graphs.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "* Only value imports count. `import type` / `export type` are erased before Node sees them."
+					},
+					"quote": "* Only value imports count. `import type` / `export type` are erased before Node sees them.",
+					"hintLine": 11,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-entry-graphs.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "\"./models\": {"
+					},
+					"quote": "\"./models\": {",
+					"hintLine": 38,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/03-check-pipeline.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E053",
+			"claim": "install-lock --check：重生成并逐字比对；带 install script 的包须在显式 allowlist",
+			"sources": [
+				{
+					"path": "scripts/generate-coding-agent-install-lock.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const allowedInstallScriptPackages = new Map(["
+					},
+					"quote": "const allowedInstallScriptPackages = new Map([",
+					"hintLine": 17,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/generate-coding-agent-install-lock.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "if (!packageName || !entry.version) {"
+					},
+					"quote": "if (!packageName || !entry.version) {",
+					"hintLine": 320,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/03-check-pipeline.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E054",
+			"claim": "browser-smoke：用 esbuild 打浏览器目标，断言包含中立入口且不含 node adapter/被禁依赖",
+			"sources": [
+				{
+					"path": "scripts/check-browser-smoke.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "for (const expectedInput of ["
+					},
+					"quote": "for (const expectedInput of [",
+					"hintLine": 66,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-browser-smoke.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "for (const forbiddenInput of ["
+					},
+					"quote": "for (const forbiddenInput of [",
+					"hintLine": 100,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/03-check-pipeline.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E055",
+			"claim": "pre-commit：无条件 lockfile gate + npm run check；仅命中前端/依赖路径时加跑 browser smoke；随后重暂存",
+			"sources": [
+				{
+					"path": ".husky/pre-commit",
+					"locator": {
+						"kind": "text",
+						"value": "node scripts/check-lockfile-commit.mjs"
+					},
+					"quote": "node scripts/check-lockfile-commit.mjs",
+					"hintLine": 6,
+					"volatility": "medium"
+				},
+				{
+					"path": ".husky/pre-commit",
+					"locator": {
+						"kind": "text",
+						"value": "RUN_BROWSER_SMOKE=0"
+					},
+					"quote": "RUN_BROWSER_SMOKE=0",
+					"hintLine": 37,
+					"volatility": "medium"
+				},
+				{
+					"path": ".husky/pre-commit",
+					"locator": {
+						"kind": "text",
+						"value": "# Restage files that were previously staged and may have been modified by formatting"
+					},
+					"quote": "# Restage files that were previously staged and may have been modified by formatting",
+					"hintLine": 56,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/03-check-pipeline.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E056",
+			"claim": "lockfile gate：PI_ALLOW_LOCKFILE_CHANGE 放行、仅 workspace 元数据放行，其余失败并打印人工审查清单",
+			"sources": [
+				{
+					"path": "scripts/check-lockfile-commit.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const stagedFiles = git([\"diff\", \"--cached\", \"--name-only\"])"
+					},
+					"quote": "const stagedFiles = git([\"diff\", \"--cached\", \"--name-only\"])",
+					"hintLine": 77,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-lockfile-commit.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const allowValue = process.env.PI_ALLOW_LOCKFILE_CHANGE;"
+					},
+					"quote": "const allowValue = process.env.PI_ALLOW_LOCKFILE_CHANGE;",
+					"hintLine": 5,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-lockfile-commit.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "if (allowed) {"
+					},
+					"quote": "if (allowed) {",
+					"hintLine": 86,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-lockfile-commit.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const changes = getLockfilePackageChanges();"
+					},
+					"quote": "const changes = getLockfilePackageChanges();",
+					"hintLine": 91,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/check-lockfile-commit.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "console.error(\"Review lockfile changes before committing:\");"
+					},
+					"quote": "console.error(\"Review lockfile changes before committing:\");",
+					"hintLine": 99,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/03-check-pipeline.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

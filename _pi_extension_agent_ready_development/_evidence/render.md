@@ -1974,3 +1974,155 @@ deslop 对重大删除设审批门：列清删什么/为什么/影响/替代并�
   ```
 
 核验：`v1.4.0`
+
+## repo-harness/04-extension-points-map.md
+
+### E083
+
+三种资源判别：扩展=可执行行为；skill=指令+资产；prompt template=固定命令
+
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.`，提示行 3
+
+  ```text
+  Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.
+  ```
+
+- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md) — text: `Use a skill when a workflow needs more context than a prompt template but does not need a new executable integration point. Skills can bundle scripts, references, and assets alongside their instructions.`，提示行 5
+
+  ```text
+  Use a skill when a workflow needs more context than a prompt template but does not need a new executable integration point. Skills can bundle scripts, references, and assets alongside their instructions.
+  ```
+
+- [`packages/coding-agent/docs/prompt-templates.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/prompt-templates.md) — text: `Prompt templates turn Markdown files into reusable `/` commands. Use one when you want to reuse the same prompt without adding executable behavior or a larger set of supporting instructions.`，提示行 3
+
+  ```text
+  Prompt templates turn Markdown files into reusable `/` commands. Use one when you want to reuse the same prompt without adding executable behavior or a larger set of supporting instructions.
+  ```
+
+核验：`v1.4.0`
+
+### E084
+
+集成点表列全可注册能力；另有 tool namespace、prepareLoadout、registerToolRenderer 与 named actions 可重绑
+
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `## Choose an integration point`，提示行 171
+
+  ```text
+  ## Choose an integration point
+  ```
+
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: ``namespace: { name, aliases, description, instructions }` groups related tools, as MCP servers do. Codemode tools list a namespace under one heading with its `description`. `instructions` holds longer usage guidance; it is not listed, and codemode scripts read it with `describeNamespace(name)`. `aliases` are other names scripts may look the namespace up by, for example the server name `docs` for `mcp__docs`; a name and the same name as a script identifier (`my-docs`, `my_docs`) match alike.`，提示行 275
+
+  ```text
+  `namespace: { name, aliases, description, instructions }` groups related tools, as MCP servers do. Codemode tools list a namespace under one heading with its `description`. `instructions` holds longer usage guidance; it is not listed, and codemode scripts read it with `describeNamespace(name)`. `aliases` are other names scripts may look the namespace up by, for example the server name `docs` for `mcp__docs`; a name and the same name as a script identifier (`my-docs`, `my_docs`) match alike.
+  ```
+
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `A tool that orchestrates other tools can adjust what the model sees while it is active with `prepareLoadout(loadout)`. It runs whenever the active tools change and receives the declared tools, the callable tools, and every registered tool with its exposure, namespace, and prompt guidelines. It returns replacement `descriptions` for declared tools (including its own) and `hiddenDeclarations`: active tools whose declarations requests leave out while they stay active and callable. The default system prompt leaves hidden tools out of its tool list and rules, and names no tool in the skills hint when the file reader is hidden, so the orchestrating tool should present their guidelines itself. `codemode` uses only this hook, `exposure`, `reachesTools`, and `ctx.executeTool()`, so another tool can implement the same behavior under a different name.`，提示行 293
+
+  ```text
+  A tool that orchestrates other tools can adjust what the model sees while it is active with `prepareLoadout(loadout)`. It runs whenever the active tools change and receives the declared tools, the callable tools, and every registered tool with its exposure, namespace, and prompt guidelines. It returns replacement `descriptions` for declared tools (including its own) and `hiddenDeclarations`: active tools whose declarations requests leave out while they stay active and callable. The default system prompt leaves hidden tools out of its tool list and rules, and names no tool in the skills hint when the file reader is hidden, so the orchestrating tool should present their guidelines itself. `codemode` uses only this hook, `exposure`, `reachesTools`, and `ctx.executeTool()`, so another tool can implement the same behavior under a different name.
+  ```
+
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `A tool's `renderCall` and `renderResult` draw its calls in the interactive transcript and in HTML exports. `pi.registerToolRenderer((toolName, next) => renderers)` chooses renderers for calls to any tool, including tools that are not registered yet, such as MCP tools in a resumed session before their server connected. `next()` returns what the remaining resolvers (in extension load order), then the registered tool, would use, so `next() ?? mine` only fills in.`，提示行 305
+
+  ```text
+  A tool's `renderCall` and `renderResult` draw its calls in the interactive transcript and in HTML exports. `pi.registerToolRenderer((toolName, next) => renderers)` chooses renderers for calls to any tool, including tools that are not registered yet, such as MCP tools in a resumed session before their server connected. `next()` returns what the remaining resolvers (in extension load order), then the registered tool, would use, so `next() ?? mine` only fills in.
+  ```
+
+- [`packages/coding-agent/docs/keybindings.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/keybindings.md) — text: `Pi exposes named actions, such as `app.session.new`, that can be assigned keybindings. You can change default assignments or bind unassigned actions in Pi's ［user configuration］(configuration.md#agent-directory).`，提示行 3
+
+  ```text
+  Pi exposes named actions, such as `app.session.new`, that can be assigned keybindings. You can change default assignments or bind unassigned actions in Pi's [user configuration](configuration.md#agent-directory).
+  ```
+
+核验：`v1.4.0`
+
+### E085
+
+四个专题面：MCP 连接、codemode 沙箱、自定义 provider、虚拟模型路由
+
+- [`packages/coding-agent/docs/mcp.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/mcp.md) — text: `Pi connects to ［Model Context Protocol］(https://modelcontextprotocol.io) servers over stdio or streamable HTTP and makes their tools and resources available to the model.`，提示行 3
+
+  ```text
+  Pi connects to [Model Context Protocol](https://modelcontextprotocol.io) servers over stdio or streamable HTTP and makes their tools and resources available to the model.
+  ```
+
+- [`packages/coding-agent/docs/codemode.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/codemode.md) — text: `The `codemode` tool lets the model write a JavaScript script that calls pi's other tools and runs non-LLM models, such as classifiers and image models. Only the script's output reaches the model, so a script can run calls in parallel and filter large results before the model sees them. To turn it on, see ［Enable codemode］(cli.md#enable-codemode).`，提示行 3
+
+  ```text
+  The `codemode` tool lets the model write a JavaScript script that calls pi's other tools and runs non-LLM models, such as classifiers and image models. Only the script's output reaches the model, so a script can run calls in parallel and filter large results before the model sees them. To turn it on, see [Enable codemode](cli.md#enable-codemode).
+  ```
+
+- [`packages/coding-agent/docs/custom-provider.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/custom-provider.md) — text: `A provider extension connects Pi to a model service that needs custom authentication, model discovery, request handling, or streaming. If the service already speaks a supported API, configure it in `models.json` instead.`，提示行 3
+
+  ```text
+  A provider extension connects Pi to a model service that needs custom authentication, model discovery, request handling, or streaming. If the service already speaks a supported API, configure it in `models.json` instead.
+  ```
+
+- [`packages/coding-agent/docs/virtual-models.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/virtual-models.md) — text: `A virtual model is a selectable model that picks a physical model for each request. Use one to route by task, cost, or conversation state. For example, a router can send quick questions to a small model and hard problems to a large one, while the user selects a single model.`，提示行 3
+
+  ```text
+  A virtual model is a selectable model that picks a physical model for each request. Use one to route by task, cost, or conversation state. For example, a router can send quick questions to a small model and hard problems to a large one, while the user selects a single model.
+  ```
+
+核验：`v1.4.0`
+
+### E086
+
+themes 是最轻的 JSON 配色面；package 是四类资源+主题的运输容器
+
+- [`packages/coding-agent/docs/themes.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/themes.md) — text: `Themes control the colors Pi uses in interactive mode and HTML exports. Pi includes the `system`, `dark`, and `light` themes. You can select one theme, follow your terminal's light or dark appearance, or create your own palette.`，提示行 3
+
+  ```text
+  Themes control the colors Pi uses in interactive mode and HTML exports. Pi includes the `system`, `dark`, and `light` themes. You can select one theme, follow your terminal's light or dark appearance, or create your own palette.
+  ```
+
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.`，提示行 3
+
+  ```text
+  Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.
+  ```
+
+核验：`v1.4.0`
+
+### E087
+
+核心不含权限系统：以启动用户/进程权限运行；安全靠运行环境隔离与只装可信来源
+
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `Pi does not include a built-in permission system for restricting filesystem, process, network, or credential access. By default, it runs with the permissions of the user and process that launched it.`，提示行 90
+
+  ```text
+  Pi does not include a built-in permission system for restricting filesystem, process, network, or credential access. By default, it runs with the permissions of the user and process that launched it.
+  ```
+
+- [`packages/coding-agent/docs/security.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/security.md) — text: `Treat model-generated commands and code as untrusted. Pi can read, change, and execute files with the permissions of the account that started it, and it does not ask for approval before every tool call. Extensions, package installers, language servers, and other child processes run with those same permissions unless an operating-system or virtualization boundary restricts them.`，提示行 3
+
+  ```text
+  Treat model-generated commands and code as untrusted. Pi can read, change, and execute files with the permissions of the account that started it, and it does not ask for approval before every tool call. Extensions, package installers, language servers, and other child processes run with those same permissions unless an operating-system or virtualization boundary restricts them.
+  ```
+
+- [`packages/coding-agent/docs/security.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/security.md) — text: `Files, comments, instructions, command output, and model responses can steer the model through prompt injection. Project trust controls which project resources load at startup, but it does not make that content or the resulting actions safe.`，提示行 5
+
+  ```text
+  Files, comments, instructions, command output, and model responses can steer the model through prompt injection. Project trust controls which project resources load at startup, but it does not make that content or the resulting actions safe.
+  ```
+
+- [`packages/coding-agent/docs/containerization.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/containerization.md) — text: `Use an isolated environment to limit the files, credentials, processes, and network services that generated commands can access or affect.`，提示行 3
+
+  ```text
+  Use an isolated environment to limit the files, credentials, processes, and network services that generated commands can access or affect.
+  ```
+
+- [`SECURITY.md`](https://github.com/earendil-works/pi/blob/v1.4.0/SECURITY.md) — text: `Pi treats the local user account and files writable by that account as inside`，提示行 11
+
+  ```text
+  Pi treats the local user account and files writable by that account as inside
+  ```
+
+- [`SECURITY.md`](https://github.com/earendil-works/pi/blob/v1.4.0/SECURITY.md) — text: `Pi relies on users installing trustworthy extensions and loading trustworthy`，提示行 19
+
+  ```text
+  Pi relies on users installing trustworthy extensions and loading trustworthy
+  ```
+
+核验：`v1.4.0`

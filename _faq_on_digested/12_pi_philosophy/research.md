@@ -21,8 +21,8 @@
 
 **一手合同**：
 
-- [README:15–21](../../README.md#L15-L21)：minimal/extensible/make your own、适配用户工作流、powerful defaults、跳过内置 sub-agent/plan mode、四种驱动入口。
-- [CONTRIBUTING:7–11](../../CONTRIBUTING.md#L7-L11)：不属于 core 的功能应成为 extension；膨胀 core 的 PR **可能**被拒；hook 也须谨慎讨论。
+- [E205](../_evidence/render.md#e205)：minimal/extensible/make your own、适配用户工作流、powerful defaults、跳过内置 sub-agent/plan mode、四种驱动入口。
+- [E206](../_evidence/render.md#e206)：不属于 core 的功能应成为 extension；膨胀 core 的 PR **可能**被拒；hook 也须谨慎讨论。
 
 **性质**：原文定位与贡献规则是事实；“职责克制以保护用户选择”是解释。不能推出“所有新核心 PR 必拒”或“扩展点越多越好”。
 
@@ -38,7 +38,7 @@
 
 ## 4. 可嵌入不等于唯一产品优先级
 
-**一手合同**：[README:21](../../README.md#L21)、[SDK](../../packages/coding-agent/docs/sdk.md)、[RPC](../../packages/coding-agent/docs/rpc.md)提供多种驱动方式；作者文章明确希望构建替代 UI。
+**一手合同**：[E207](../_evidence/render.md#e207)、[SDK](../../packages/coding-agent/docs/sdk.md)、[RPC](../../packages/coding-agent/docs/rpc.md)提供多种驱动方式；作者文章明确希望构建替代 UI。
 
 **性质**：“TUI 不是唯一宿主”有直接机制支持；“library-first”是本文与既有消化材料的结构概括，不是当前 README 的逐字定位，也不证明开发先后顺序。
 
@@ -69,7 +69,7 @@
 
 - [agent-loop](../../packages/agent/src/agent-loop.ts)和[工具合同](../../packages/agent/src/types.ts)：工具执行错误转换为模型可见错误结果。
 - [settings:125–133](../../packages/coding-agent/docs/settings.md#network-and-retries)：agent-level retry 默认开启、最多 3 次，provider 重试另有配置。
-- [AgentSession:1839–1876](../../packages/coding-agent/src/core/agent-session.ts#L1839-L1876)处理重试与压缩后的续跑；[_prepareRetry:3747–3786](../../packages/coding-agent/src/core/agent-session.ts#L3747-L3786)执行预算、指数退避及事件通知。
+- [E208](../_evidence/render.md#e208)处理重试与压缩后的续跑；[E209](../_evidence/render.md#e209)执行预算、指数退避及事件通知。
 - [extensions:62–67](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)：`agent_end` 后仍可能有自动工作；`agent_settled` 才是最终通知边界。
 
 **性质**：当前行为事实。工具业务重试常由模型选择，但“Pi 从不自动恢复/裁决”是错误的全局归纳。
@@ -88,7 +88,7 @@
 
 **一手支撑**：[扩展生命周期](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)、[package](../../packages/coding-agent/docs/packages.md)、[贡献纪律](../../CONTRIBUTING.md#philosophy)说明用户与维护者仍需管理资源、选择能力并理解交互。
 
-[package.json:20–27](../../package.json#L20-L27)与[tsconfig:56–57](../../tsconfig.json#L52-L53)显示 examples 多数参加类型检查，但 gondolin 明确排除。类型兼容也不保证运行语义正确。[runtime-deps 负例测试:27–34](../../scripts/check-runtime-deps.test.mjs#L27-L34)直接反驳“Pi 门禁从不测负例”。
+[E210](../_evidence/render.md#e210)与[E211](../_evidence/render.md#e211)显示 examples 多数参加类型检查，但 gondolin 明确排除。类型兼容也不保证运行语义正确。[E212](../_evidence/render.md#e212)直接反驳“Pi 门禁从不测负例”。
 
 **性质**：“用组装与理解成本换职责受控、上下文可调和宿主选择权”是解释。没有成本测量，不能声称“低一个数量级”；没有逐项覆盖审计，不能声称所有散文都无验证、所有 examples 都保真。
 
@@ -100,4 +100,4 @@
 4. 去掉跨版本稳定性、数量级成本和无负例测试等无证据结论；图示与正文同步修正。
 5. 区分本次源码核对锚点与既有全库消化基线；索引页不再声称所有历史引用与旧 tag 逐字一致。
 6. 直接衔接的[文件/会话 UI](../../_digested/composition/9_session_and_file_ui.md)取消“Pi 不管理状态”及所有内置计划都无持久性的比较。
-7. [编排导览](../../_digested/orchestration/README.md)与[codemode 分析](../../_digested/orchestration/04-codemode.md)区分扩展注册、工具启用和应用持久化：当前 codemode 工具注册为 inactive；成功 store 写会话条目；store 失败不提交不等于回滚已经调用工具的外部副作用。依据：[settings:44](../../packages/coding-agent/docs/settings.md#L44)、[Store values](../../packages/coding-agent/docs/codemode.md#store-values)、[脚本失败合同](../../packages/coding-agent/docs/codemode.md#scripts)。
+7. [编排导览](../../_digested/orchestration/README.md)与[codemode 分析](../../_digested/orchestration/04-codemode.md)区分扩展注册、工具启用和应用持久化：当前 codemode 工具注册为 inactive；成功 store 写会话条目；store 失败不提交不等于回滚已经调用工具的外部副作用。依据：[E213](../_evidence/render.md#e213)、[Store values](../../packages/coding-agent/docs/codemode.md#store-values)、[脚本失败合同](../../packages/coding-agent/docs/codemode.md#scripts)。

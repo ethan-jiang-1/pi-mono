@@ -17,7 +17,7 @@
 
 - 工具声明以 `toolsAdded` / `toolsRemoved` 写进 transcript 的 system message；agent-loop 的注释把设计意图说穿了："so replay always yields exactly `context.tools`"（[agent-loop.ts:323-331](../../packages/agent/src/agent-loop.ts)）。
 - 求值入口只有一套：[transcript.ts](../../packages/ai/src/utils/transcript.ts) 的 `getCurrentTools` / `getCurrentSystemMessage`——按顺序重放所有 system message 得到当前 prompt 与工具，provider 侧拿到的就是它。
-- 这个不变量被当作测试合同而不是希望：`system-prompt-updates.test.ts` 里 "keeps tool declarations stable across a session JSON round-trip"，注释原话 "Simulate a resume: the persisted JSON must replay to the same declarations"（[system-prompt-updates.test.ts:295](../../packages/coding-agent/test/system-prompt-updates.test.ts#L295)）。
+- 这个不变量被当作测试合同而不是希望：`system-prompt-updates.test.ts` 里 "keeps tool declarations stable across a session JSON round-trip"，注释原话 "Simulate a resume: the persisted JSON must replay to the same declarations"（[E001](../_evidence/render.md#e001)）。
 - 连压缩都不破坏它：compaction 入口携带完整 prompt/tool checkpoint，成为压缩后上下文的 leading system message（[session-format.md](../../packages/coding-agent/docs/session-format.md) 的 compaction 节）。
 
 两种实现的分工差异：
@@ -37,20 +37,20 @@ DSH `replay.override.json` 四类失败 ↔ faux 对应物：
 
 | DSH override 失败类 | faux 对应物 | 证据（faux.ts） |
 |---|---|---|
-| pre-2xx 抛（首个 chunk 前） | 工厂函数 throw → 捕获 → `stopReason: "error"` 结算 | [faux.ts:556-560](../../packages/ai/src/providers/faux.ts#L556-L560) |
-| post-2xx 抛（接受后部分流失败） | step 直接给 `stopReason: "error"` / `"aborted"` 的结算，先推部分流再推 error | [faux.ts:427-431](../../packages/ai/src/providers/faux.ts#L427-L431) |
-| 取消 / 挂起 | signal 逐块中止检查；deferred 响应 + `pendingFetches` 模拟挂起与轮询 | [faux.ts:358](../../packages/ai/src/providers/faux.ts#L358) 起、[faux.ts:526-551](../../packages/ai/src/providers/faux.ts#L526-L551) |
-| 注入重试 | 无内建一次性失败原语，但 `state.callCount` 让「前 N 次失败、第 N+1 次成功」两行写完；AgentSession 另有完整重试事件面 | [faux.ts:447](../../packages/ai/src/providers/faux.ts#L447)、`agent-session-retry-events.test.ts` |
+| pre-2xx 抛（首个 chunk 前） | 工厂函数 throw → 捕获 → `stopReason: "error"` 结算 | [E002](../_evidence/render.md#e002) |
+| post-2xx 抛（接受后部分流失败） | step 直接给 `stopReason: "error"` / `"aborted"` 的结算，先推部分流再推 error | [E003](../_evidence/render.md#e003) |
+| 取消 / 挂起 | signal 逐块中止检查；deferred 响应 + `pendingFetches` 模拟挂起与轮询 | [E004](../_evidence/render.md#e004) 起、[E005](../_evidence/render.md#e005) |
+| 注入重试 | 无内建一次性失败原语，但 `state.callCount` 让「前 N 次失败、第 N+1 次成功」两行写完；AgentSession 另有完整重试事件面 | [E006](../_evidence/render.md#e006)、`agent-session-retry-events.test.ts` |
 
-faux 还有一项 DSH replay 没有的表达力：脚本是 `FauxResponseFactory`，每一步能读到宿主刚传来的**真实** TranscriptContext 动态决策（[faux.ts:490-503](../../packages/ai/src/providers/faux.ts#L490-L503)）——剧本可以看菜下饭。差异的本质：DSH 回放要保真，脚本被钉死在录制上；faux 是测试脚手架，要的是可控与可编排。另外 faux 的流是真实分块的（thinking/text/toolcall 的 start/delta/end 事件、可调 tokensPerSecond），不是一次性吐完整消息。
+faux 还有一项 DSH replay 没有的表达力：脚本是 `FauxResponseFactory`，每一步能读到宿主刚传来的**真实** TranscriptContext 动态决策（[E007](../_evidence/render.md#e007)）——剧本可以看菜下饭。差异的本质：DSH 回放要保真，脚本被钉死在录制上；faux 是测试脚手架，要的是可控与可编排。另外 faux 的流是真实分块的（thinking/text/toolcall 的 start/delta/end 事件、可调 tokensPerSecond），不是一次性吐完整消息。
 
 ## 结论 3：轨迹是一等运行时资产，不是测试语料
 
 Pi 的 session JSONL 有完整的官方通道：
 
-- 生命周期：`SessionManager.open(path)` / `continueRecent` / `forkFrom`（[session-manager.ts:1766](../../packages/coding-agent/src/core/session-manager.ts#L1766) 起）——resume 和分叉（会话树）都是原生能力；
-- 可移植：`/export` 导出 jsonl（[session-export.ts:38](../../packages/coding-agent/src/core/session-export.ts#L38)）、`/import` 换入会话、`session-share.ts` 分享、bug-report 自动把 `session.jsonl` 打进诊断包（[bug-report.ts:262](../../packages/coding-agent/src/core/bug-report.ts#L262)）；
-- 格式世代：header 带 `version`，旧会话载入时在内存迁移 v1→v2→v3（[session-manager.ts:286-329](../../packages/coding-agent/src/core/session-manager.ts#L286-L329)、[session-format.md](../../packages/coding-agent/docs/session-format.md)）——和 DSH 回放器「旧夹具就地升级后重放」是同一个设计判断。
+- 生命周期：`SessionManager.open(path)` / `continueRecent` / `forkFrom`（[E008](../_evidence/render.md#e008) 起）——resume 和分叉（会话树）都是原生能力；
+- 可移植：`/export` 导出 jsonl（[E009](../_evidence/render.md#e009)）、`/import` 换入会话、`session-share.ts` 分享、bug-report 自动把 `session.jsonl` 打进诊断包（[E010](../_evidence/render.md#e010)）；
+- 格式世代：header 带 `version`，旧会话载入时在内存迁移 v1→v2→v3（[E011](../_evidence/render.md#e011)、[session-format.md](../../packages/coding-agent/docs/session-format.md)）——和 DSH 回放器「旧夹具就地升级后重放」是同一个设计判断。
 
 但它不是测试语料：本仓 `packages/coding-agent/test` 与 `packages/agent/test` 里没有任何入库的 session.jsonl 夹具（仅 `/import` 参数解析和启动传路径的测试提到这个文件名）；vitest snapshot 只用在个别 UI 面（`interactive-mode-status.test.ts`）。Pi 选择了另一条路：用 faux + harness 把模型变成测试的控制变量（毫秒级、确定性、零 key），用 round-trip 测试守住组装面。
 
@@ -59,10 +59,10 @@ Pi 的 session JSONL 有完整的官方通道：
 三件套：
 
 1. **录制**：真实会话的 session.jsonl——bug-report 会自动带，或直接取 `~/.pi/agent/sessions/` 下的文件。
-2. **注入**：`createHarness({ sessionManager: SessionManager.open(path) })`。`HarnessOptions.sessionManager` 的注释原话就是 "Session to continue, for example to test a resume"（[harness.ts:122-123](../../packages/coding-agent/test/suite/harness.ts#L122-L123)）。
+2. **注入**：`createHarness({ sessionManager: SessionManager.open(path) })`。`HarnessOptions.sessionManager` 的注释原话就是 "Session to continue, for example to test a resume"（[E012](../_evidence/render.md#e012)）。
 3. **推导**：写一个 assistant 结算 → `FauxResponseStep[]` 的转换器。session JSONL 里的 assistant message 带 content blocks、stopReason、usage、toolCall id，足够重建脚本——这正是 DSH llm-replay「从持久化结算推导模型脚本」思想的 Pi 版。四类失败用结论 2 的 faux 能力表达。
 
-断言点对应：DSH 的 `request/header` pin ↔ Pi 的 [`before_provider_request`](../../packages/coding-agent/src/core/extensions/types.ts#L879-L883)（模型可见 payload 的最后一站，可断言可替换）+ `before_provider_headers` + `context_with_system`（handler 拥有 prompt 与工具声明）。
+断言点对应：DSH 的 `request/header` pin ↔ Pi 的 [E013](../_evidence/render.md#e013)（模型可见 payload 的最后一站，可断言可替换）+ `before_provider_headers` + `context_with_system`（handler 拥有 prompt 与工具声明）。
 
 要付的账（诚实清单）：
 

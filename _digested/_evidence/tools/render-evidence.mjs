@@ -49,9 +49,9 @@ for (const entry of claims.entries ?? []) {
 		lines.push(`## ${currentPage}`, "");
 	}
 	lines.push(`### ${entry.id}`, "");
-	lines.push(entry.claim ?? "", "");
+	lines.push((entry.claim ?? "").replace(/```/gu, "'''"), "");
 	for (const source of entry.sources ?? []) {
-		const displayValue = source.locator ? String(source.locator.value).replace(/\n/gu, " ").replace(/\[/gu, "［").replace(/\]/gu, "］") : "";
+		const displayValue = source.locator ? String(source.locator.value).replace(/\n/gu, " ").replace(/\[/gu, "［").replace(/\]/gu, "］").replace(/```/gu, "'''") : "";
 		const locator = source.locator ? `${source.locator.kind}: \`${displayValue}\`` : "整文件";
 		const hint = source.hintLine ? `，提示行 ${source.hintLine}` : "";
 		if (source.expect === "absent") {
@@ -62,7 +62,7 @@ for (const entry of claims.entries ?? []) {
 			`- [\`${source.path}\`](https://github.com/${repository}/blob/${tag}/${source.path}) — ${locator}${hint}`,
 		);
 		if (source.quote) {
-			lines.push("", "  ```text", "  " + source.quote.replace(/\n/gu, " "), "  ```", "");
+			lines.push("", "  ```text", "  " + source.quote.replace(/\n/gu, " ").replace(/```/gu, "'''"), "  ```", "");
 		}
 	}
 	lines.push(`核验：\`${entry.checkedAt ?? tag}\``, "");

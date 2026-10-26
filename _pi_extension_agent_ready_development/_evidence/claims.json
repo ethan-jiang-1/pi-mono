@@ -3325,6 +3325,188 @@
 			],
 			"page": "repo-harness/04-extension-points-map.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E088",
+			"claim": "JSONL 合同：每行一个对象、id/parentId 成树；header 带版本与 cwd，当前版本 3 且旧版自动迁移；prompt/工具变化走 system 消息；compaction 存摘要与 firstKeptEntryId",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/session-format.md",
+					"locator": {
+						"kind": "text",
+						"value": "Sessions are stored as JSONL (JSON Lines) files. Each line is a JSON object with a `type` field. Session entries form a tree structure via `id`/`parentId` fields, enabling in-place branching without creating new files."
+					},
+					"quote": "Sessions are stored as JSONL (JSON Lines) files. Each line is a JSON object with a `type` field. Session entries form a tree structure via `id`/`parentId` fields, enabling in-place branching without creating new files.",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/session-format.md",
+					"locator": {
+						"kind": "text",
+						"value": "### SessionHeader"
+					},
+					"quote": "### SessionHeader",
+					"hintLine": 64,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/session-format.md",
+					"locator": {
+						"kind": "text",
+						"value": "Sessions have a version field in the header:"
+					},
+					"quote": "Sessions have a version field in the header:",
+					"hintLine": 24,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/session-format.md",
+					"locator": {
+						"kind": "text",
+						"value": "A message in the conversation. The `message` field contains an `AgentMessage`. System messages carry the prompt and tool loadout: the first request of a session persists one with every prompt section and tool declaration, and later changes persist as system messages that patch `sections` by name (`null` removes one) and list `toolsAdded`/`toolsRemoved`. Replaying them in order yields the current prompt and tools; there is no separate prompt state entry."
+					},
+					"quote": "A message in the conversation. The `message` field contains an `AgentMessage`. System messages carry the prompt and tool loadout: the first request of a session persists one with every prompt section and tool declaration, and later changes persist as system messages that patch `sections` by name (`null` removes one) and list `toolsAdded`/`toolsRemoved`. Replaying them in order yields the current prompt and tools; there is no separate prompt state entry.",
+					"hintLine": 80,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/session-format.md",
+					"locator": {
+						"kind": "text",
+						"value": "### CompactionEntry"
+					},
+					"quote": "### CompactionEntry",
+					"hintLine": 123,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/05-session-inspectability.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E089",
+			"claim": "接续命令面：--continue/--resume、/resume /new、/tree /fork /clone、/compact、/import /export、/share；--no-session 与 --session-dir",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/sessions.md",
+					"locator": {
+						"kind": "text",
+						"value": "pi --continue"
+					},
+					"quote": "pi --continue",
+					"hintLine": 10,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/sessions.md",
+					"locator": {
+						"kind": "text",
+						"value": "| `/tree` | Moves within the current session file | Related alternatives should stay together |"
+					},
+					"quote": "| `/tree` | Moves within the current session file | Related alternatives should stay together |",
+					"hintLine": 26,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/sessions.md",
+					"locator": {
+						"kind": "text",
+						"value": "Use `/export` to write the current session as HTML or JSONL. Use `/share` to upload it and get a viewer link. By default, Pi uses a Radius artifact when Radius authentication is configured; otherwise, it uses a private GitHub gist. Set [`sessionShareDestination`](settings.md#sessions-and-context) to `gist` or `radius` to force one destination."
+					},
+					"quote": "Use `/export` to write the current session as HTML or JSONL. Use `/share` to upload it and get a viewer link. By default, Pi uses a Radius artifact when Radius authentication is configured; otherwise, it uses a private GitHub gist. Set [`sessionShareDestination`](settings.md#sessions-and-context) to `gist` or `radius` to force one destination.",
+					"hintLine": 58,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/sessions.md",
+					"locator": {
+						"kind": "text",
+						"value": "By default, Pi stores sessions under `~/.pi/agent/sessions/`, grouped by working directory. Use `--session-dir`, `PI_CODING_AGENT_SESSION_DIR`, or the `sessionDir` setting to choose another location. The CLI option has highest precedence."
+					},
+					"quote": "By default, Pi stores sessions under `~/.pi/agent/sessions/`, grouped by working directory. Use `--session-dir`, `PI_CODING_AGENT_SESSION_DIR`, or the `sessionDir` setting to choose another location. The CLI option has highest precedence.",
+					"hintLine": 50,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/slash-commands.md",
+					"locator": {
+						"kind": "text",
+						"value": "| `/compact [instructions]` | Compact the current context, optionally with custom instructions |"
+					},
+					"quote": "| `/compact [instructions]` | Compact the current context, optionally with custom instructions |",
+					"hintLine": 30,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/slash-commands.md",
+					"locator": {
+						"kind": "text",
+						"value": "| `/import <path>` | Import and resume a JSONL session |"
+					},
+					"quote": "| `/import <path>` | Import and resume a JSONL session |",
+					"hintLine": 31,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/05-session-inspectability.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E090",
+			"claim": "/ir 把 CI 高熵目录的会话取回，重写 cwd、装入当前 session 目录并切换；跨平台时注入说明消息",
+			"sources": [
+				{
+					"path": ".pi/extensions/import-repro.ts",
+					"locator": {
+						"kind": "text",
+						"value": "* The CI job runs in a high-entropy checkout directory; this command rewrites"
+					},
+					"quote": "* The CI job runs in a high-entropy checkout directory; this command rewrites",
+					"hintLine": 5,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/extensions/import-repro.ts",
+					"locator": {
+						"kind": "text",
+						"value": "return \"This session was continued on a non-Windows machine; paths are now Unix style.\";"
+					},
+					"quote": "return \"This session was continued on a non-Windows machine; paths are now Unix style.\";",
+					"hintLine": 192,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/05-session-inspectability.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E091",
+			"claim": "作者把日常工作会话发布为公开数据集，README 邀请 OSS 工作者同样分享",
+			"sources": [
+				{
+					"path": "README.md",
+					"locator": {
+						"kind": "text",
+						"value": "I regularly publish my own `pi-mono` work sessions here:"
+					},
+					"quote": "I regularly publish my own `pi-mono` work sessions here:",
+					"hintLine": 194,
+					"volatility": "medium"
+				},
+				{
+					"path": "README.md",
+					"locator": {
+						"kind": "text",
+						"value": "- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)"
+					},
+					"quote": "- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)",
+					"hintLine": 196,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/05-session-inspectability.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

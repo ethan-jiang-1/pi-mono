@@ -2126,3 +2126,119 @@ themes 是最轻的 JSON 配色面；package 是四类资源+主题的运输容�
   ```
 
 核验：`v1.4.0`
+
+## repo-harness/05-session-inspectability.md
+
+### E088
+
+JSONL 合同：每行一个对象、id/parentId 成树；header 带版本与 cwd，当前版本 3 且旧版自动迁移；prompt/工具变化走 system 消息；compaction 存摘要与 firstKeptEntryId
+
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `Sessions are stored as JSONL (JSON Lines) files. Each line is a JSON object with a `type` field. Session entries form a tree structure via `id`/`parentId` fields, enabling in-place branching without creating new files.`，提示行 3
+
+  ```text
+  Sessions are stored as JSONL (JSON Lines) files. Each line is a JSON object with a `type` field. Session entries form a tree structure via `id`/`parentId` fields, enabling in-place branching without creating new files.
+  ```
+
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `### SessionHeader`，提示行 64
+
+  ```text
+  ### SessionHeader
+  ```
+
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `Sessions have a version field in the header:`，提示行 24
+
+  ```text
+  Sessions have a version field in the header:
+  ```
+
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `A message in the conversation. The `message` field contains an `AgentMessage`. System messages carry the prompt and tool loadout: the first request of a session persists one with every prompt section and tool declaration, and later changes persist as system messages that patch `sections` by name (`null` removes one) and list `toolsAdded`/`toolsRemoved`. Replaying them in order yields the current prompt and tools; there is no separate prompt state entry.`，提示行 80
+
+  ```text
+  A message in the conversation. The `message` field contains an `AgentMessage`. System messages carry the prompt and tool loadout: the first request of a session persists one with every prompt section and tool declaration, and later changes persist as system messages that patch `sections` by name (`null` removes one) and list `toolsAdded`/`toolsRemoved`. Replaying them in order yields the current prompt and tools; there is no separate prompt state entry.
+  ```
+
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `### CompactionEntry`，提示行 123
+
+  ```text
+  ### CompactionEntry
+  ```
+
+核验：`v1.4.0`
+
+### E089
+
+接续命令面：--continue/--resume、/resume /new、/tree /fork /clone、/compact、/import /export、/share；--no-session 与 --session-dir
+
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `pi --continue`，提示行 10
+
+  ```text
+  pi --continue
+  ```
+
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `| `/tree` | Moves within the current session file | Related alternatives should stay together |`，提示行 26
+
+  ```text
+  | `/tree` | Moves within the current session file | Related alternatives should stay together |
+  ```
+
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `Use `/export` to write the current session as HTML or JSONL. Use `/share` to upload it and get a viewer link. By default, Pi uses a Radius artifact when Radius authentication is configured; otherwise, it uses a private GitHub gist. Set ［`sessionShareDestination`］(settings.md#sessions-and-context) to `gist` or `radius` to force one destination.`，提示行 58
+
+  ```text
+  Use `/export` to write the current session as HTML or JSONL. Use `/share` to upload it and get a viewer link. By default, Pi uses a Radius artifact when Radius authentication is configured; otherwise, it uses a private GitHub gist. Set [`sessionShareDestination`](settings.md#sessions-and-context) to `gist` or `radius` to force one destination.
+  ```
+
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `By default, Pi stores sessions under `~/.pi/agent/sessions/`, grouped by working directory. Use `--session-dir`, `PI_CODING_AGENT_SESSION_DIR`, or the `sessionDir` setting to choose another location. The CLI option has highest precedence.`，提示行 50
+
+  ```text
+  By default, Pi stores sessions under `~/.pi/agent/sessions/`, grouped by working directory. Use `--session-dir`, `PI_CODING_AGENT_SESSION_DIR`, or the `sessionDir` setting to choose another location. The CLI option has highest precedence.
+  ```
+
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/compact ［instructions］` | Compact the current context, optionally with custom instructions |`，提示行 30
+
+  ```text
+  | `/compact [instructions]` | Compact the current context, optionally with custom instructions |
+  ```
+
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/import <path>` | Import and resume a JSONL session |`，提示行 31
+
+  ```text
+  | `/import <path>` | Import and resume a JSONL session |
+  ```
+
+核验：`v1.4.0`
+
+### E090
+
+/ir 把 CI 高熵目录的会话取回，重写 cwd、装入当前 session 目录并切换；跨平台时注入说明消息
+
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `* The CI job runs in a high-entropy checkout directory; this command rewrites`，提示行 5
+
+  ```text
+  * The CI job runs in a high-entropy checkout directory; this command rewrites
+  ```
+
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `return "This session was continued on a non-Windows machine; paths are now Unix style.";`，提示行 192
+
+  ```text
+  return "This session was continued on a non-Windows machine; paths are now Unix style.";
+  ```
+
+核验：`v1.4.0`
+
+### E091
+
+作者把日常工作会话发布为公开数据集，README 邀请 OSS 工作者同样分享
+
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `I regularly publish my own `pi-mono` work sessions here:`，提示行 194
+
+  ```text
+  I regularly publish my own `pi-mono` work sessions here:
+  ```
+
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `- ［badlogicgames/pi-mono on Hugging Face］(https://huggingface.co/datasets/badlogicgames/pi-mono)`，提示行 196
+
+  ```text
+  - [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)
+  ```
+
+核验：`v1.4.0`

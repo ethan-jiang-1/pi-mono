@@ -171,7 +171,7 @@ const { session } = await createAgentSession({
 - `_digested/`：[integration/03-runtime-api.md(../../_digested/integration/03-runtime-api.md) — SDK/RPC 模型管理 API
 
 
-## sync-0010 增量（v1.4.0）
+## sync-0010 增量（本基线）
 
 - **默认模型更换**（`core/model-resolver.ts:28,32,58-61`）：GitHub Copilot `gpt-5.4` → **`gpt-6.1-sol`**（5.4 已退役）；NVIDIA → **`nvidia/nemotron-3.5-super-vl-120b-a12b`**；Xiaomi 与三个 Token Plan → **`mimo-v2.6-pro`**（`mimo-v2.5-pro` 已离开目录）。
 - **`--model` 的 provider 选择规则变了**：不再按 catalog 顺序取第一个；先收集候选，具名 provider 可用则胜出，否则"唯一有凭据的候选"胜出，否则若具名匹配存在（哪怕不可用）就用它（`--api-key` 可给它补凭据），都没有才报歧义要求 `--provider`（`model-resolver.ts:227-259`）。`--api-key` 不参与选择。

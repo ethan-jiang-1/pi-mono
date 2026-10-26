@@ -53,7 +53,7 @@
 
 > **证据基础已变更**：本节此前引用 `packages/chord/PLANNING.md`（工作包拆分、迁移顺序、完成定义、精确交错点控制）。该文件在本区间被 chord2 重写（`0104fef1e`，facet/service runtime → typed host runtime）**删除**，上述内容没有等价替代文档——workpackage 与 definition-of-done 的叙述在 v1.2.0 的 chord 文档中不存在。现引用 `docs/{guide,spec,tutorial}.md`（本区间新增），结论相应收窄为"规格内的合同与已知限制 + 测试覆盖清单"。
 
-本卷不能声称全仓库统一实行某种正式方法。chord 的规格是**单个包**的设计文档，其"硬约束"节（`:5-9`）声明运行时只依赖自身 `delta` 模块与 `typebox`、不依赖其它 Pi 包——**这条自述在 v1.4.0 已不成立**（chord 依赖 `@earendil-works/pi-telemetry`，`package.json:89`）；它只能作为历史自述，不是全仓制度的证明。
+本卷不能声称全仓库统一实行某种正式方法。chord 的规格是**单个包**的设计文档，其"硬约束"节（`:5-9`）声明运行时只依赖自身 `delta` 模块与 `typebox`、不依赖其它 Pi 包——**这条自述在 本基线 已不成立**（chord 依赖 `@earendil-works/pi-telemetry`，`package.json:89`）；它只能作为历史自述，不是全仓制度的证明。
 
 ### 3.4 公开入口承担依赖成本合同
 

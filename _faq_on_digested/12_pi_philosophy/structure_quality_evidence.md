@@ -54,7 +54,7 @@
 
 ## 6. Chord、telemetry、durable 说明“极简”是分层，而非全仓库无复杂度
 
-**Chord 的边界。** Chord 是独立的 application-composition runtime，可供无关应用使用；**v1.4.0 起它依赖 `@earendil-works/pi-telemetry`**（`package.json:89`，`test/boundary.test.ts` 显式放行），README 里"不依赖其它 Pi 包"的旧话已不成立。[E166](../_evidence/render.md#e166) 它把 strict-JSON remote boundary、服务 grammar、replicated state、delta reset/order 和 context cancellation 作为通用机制，但不规定 framing/routing/outer envelope。[E167](../_evidence/render.md#e167)、[E168](../_evidence/render.md#e168) package boundary 测试自动拒绝依赖 Pi 包和越出 Chord source root 的相对 import。[E169](../_evidence/render.md#e169)
+**Chord 的边界。** Chord 是独立的 application-composition runtime，可供无关应用使用；**本基线 起它依赖 `@earendil-works/pi-telemetry`**（`package.json:89`，`test/boundary.test.ts` 显式放行），README 里"不依赖其它 Pi 包"的旧话已不成立。[E166](../_evidence/render.md#e166) 它把 strict-JSON remote boundary、服务 grammar、replicated state、delta reset/order 和 context cancellation 作为通用机制，但不规定 framing/routing/outer envelope。[E167](../_evidence/render.md#e167)、[E168](../_evidence/render.md#e168) package boundary 测试自动拒绝依赖 Pi 包和越出 Chord source root 的相对 import。[E169](../_evidence/render.md#e169)
 
 这支持一个有限结论：Pi 可以把 composition/RPC/replication 复杂度放在可复用的独立层，降低 agent core 的职责；但不能把“agent core minimal”改写为“整个仓库的运行语义简单”。Chord 的通用边界仍要求 adapter、strict JSON、队列/reset 和 replica 生命周期正确。
 

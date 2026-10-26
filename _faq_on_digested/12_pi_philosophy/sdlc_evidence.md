@@ -129,7 +129,7 @@ coding-agent 安装锁从根 lockfile 提取生产依赖，删除 dev/devOptiona
 
 模型目录不是 npm 代码发布的同一条链。`publish-model-catalog.yml` 既由 CI 成功后的 `workflow_run`、工作日 schedule、相关 PR 路径和手动 dispatch 触发，又把 generate/validate artifact 与 production publish 分成两个 job；manual publish 必须显式 `inputs.publish=true`（[E116](../_evidence/render.md#e116)、[E117](../_evidence/render.md#e117)）。
 
-生成 job 做 `npm ci --ignore-scripts`、生成 JSON、`check:model-catalog`、**`check:model-catalog-compat`（v1.4.0 新增，用最新 release 的 pi-ai 对目录跑 tsc）** 并上传 artifact（[E118](../_evidence/render.md#e118)）。发布脚本拒绝缺少 anthropic/openai/openrouter、provider shard 不一致、重复 model identity、chat projection 不一致或 chat model 数少于 500；以 full catalog SHA-256 作为 revision（[E119](../_evidence/render.md#e119)）。它先上传 revision immutable objects，最后上传 no-store index；已有相同 revision 时不上传，失败不会伪装为成功（[E120](../_evidence/render.md#e120)）。
+生成 job 做 `npm ci --ignore-scripts`、生成 JSON、`check:model-catalog`、**`check:model-catalog-compat`（本基线 新增，用最新 release 的 pi-ai 对目录跑 tsc）** 并上传 artifact（[E118](../_evidence/render.md#e118)）。发布脚本拒绝缺少 anthropic/openai/openrouter、provider shard 不一致、重复 model identity、chat projection 不一致或 chat model 数少于 500；以 full catalog SHA-256 作为 revision（[E119](../_evidence/render.md#e119)）。它先上传 revision immutable objects，最后上传 no-store index；已有相同 revision 时不上传，失败不会伪装为成功（[E120](../_evidence/render.md#e120)）。
 
 - **重要边界**：生产模型目录发布操作不由普通 `npm run check` 或 `npm test` 触发；其发布是 workflow/schedule/manual 条件化的数据供应链。这不表示发布脚本没有单元测试。
 - **审阅推断**：若理念专题只讨论代码扩展和 release tag，会漏掉“代码发布后由独立数据目录改变运行时可见模型”的交付面；它至少应记录 source commit、revision、最低客户端版本和 provider/model-count 校验。

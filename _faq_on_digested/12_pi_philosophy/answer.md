@@ -125,7 +125,7 @@ Pi 也会自动管理状态：会话持久化、上下文压缩、请求恢复�
 3. **使用者能塑造工作流，也要理解改动、审计扩展并承担维护与安全责任。**
 
 
-## sync-0010 增量（v1.4.0）
+## sync-0010 增量（本基线）
 
 - **依赖规则扩展到内部包**：`AGENTS.md:45` 从 "Direct external deps" 改为 "Direct **registry** deps, **including internal workspace deps**"；`scripts/check-pinned-deps.mjs` 删除了内部包豁免，所有 registry 依赖必须是精确版本（实测仓库内已无 `^`）。
 - **发布前多了一道数据兼容门禁**：模型目录会直接服务已发布的 pi，发布前用 `check-model-catalog-compat.mjs` 对最新 release 的 pi-ai 做类型校验；不兼容时先升 `MINIMUM_PI_VERSION`（当前 1.2.1）。

@@ -7,7 +7,7 @@
 - 共享台账：`_digested/_evidence/`（`_digested` 与 `_faq_on_digested` 共用；FAQ 先保留自己的条目，不依赖 `_digested` 的 claim id）。
 - 独立台账：`_pi_extension_agent_ready_development/_evidence/`（该语料要求可整目录拷走）。
 - `_digested`：不做全量迁移，只"新增止血 + 增量改写"；新行禁止裸 `path:NNN`。
-- 正文写法：`[E###](../_evidence/render.md#e###)`；不写 `#L`、不写版本号、不写行数。
+- 正文写法：``[E###]`（指向 render.md 的对应标题）`；不写 `#L`、不写版本号、不写行数。
 - 校验：`verify-evidence.mjs`（维护者，需 git tag）；`verify.mjs`（读者，离线结构校验）。
 
 ## 状态
@@ -23,6 +23,7 @@
 | P3.5 | FAQ 六个热点页（404 锚点）迁移 | 待开始 |
 | P4 | 流程切换 + lint（正文禁 `#L`/版本） | 待开始 |
 | P5 | v1.2.0→v1.4.0 重放度量 | **完成**：bump 到 v1.3.0 时正文 0 文件变化；stale 仅 9（extension）/29（FAQ）条真实变更 |
+| 加项 | `_digested` 正文 `#L` 清零（34 条，地址解析到各自 render） | 完成 |
 
 ## P3：extension 语料逐页清单
 
@@ -52,7 +53,7 @@
 1. `node _digested/_evidence/tools/migrate-anchors.mjs <page> --tag v1.4.0 --repo . > /tmp/candidates.json`
 2. 审阅候选，合并同段锚点，写 `claim`（一句中文），必要时改 `locator.kind`。
 3. 写入 `_pi_.../_evidence/claims.json`（续号）。
-4. 改写正文：`[..](#L..)` → `[E###](../_evidence/render.md#e###)`；删除版本与行数断言。
+4. 改写正文：`[..](#L..)` → ``[E###]`（指向 render.md 的对应标题）`；删除版本与行数断言。
 5. `node _digested/_evidence/tools/render-evidence.mjs --corpus _pi_...`
 6. `node _digested/_evidence/tools/verify-evidence.mjs --corpus _pi_... --repo .`
 7. `cd _pi_... && node verify.mjs`
@@ -68,7 +69,7 @@
 - [ ] `12_pi_philosophy/research.md`（9）
 - 其余 68 页：只清基线句与失效锚点。
 
-FAQ 正文引用：`[E###](../../_digested/_evidence/render/faq.md#e###)`；render 输出到 `_digested/_evidence/render/faq.md`。
+FAQ 正文引用：``[E###]`（指向 FAQ render 的对应标题）`；render 输出到 `_digested/_evidence/render/faq.md`。
 
 ## P4：流程与 lint
 

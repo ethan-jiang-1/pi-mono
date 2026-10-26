@@ -296,3 +296,17 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 **验证**：`node verify.mjs` 40 文件全部规则通过；`node --test verify.test.mjs` 通过。
 
 **残留**：语料未覆盖 `AGENTS.md:28` 的 `providers/data` gitignore 规则本身（只在 01 页补了一句）；`_digested` 与本语料无关的存量锚点债务不在本轮范围。
+
+## 0016 轮：claim-first 重构与证据台账
+
+正文不再携带版本号与行号；引用统一为 `[E###]`，指向 `_evidence/render.md` 的对应标题。坐标、引文与核验时间在 `_evidence/claims.json`。
+
+**同步流程（本目录）**
+
+1. 改 `_evidence/corpus.json` 的基线 tag/commit。
+2. `node _digested/_evidence/tools/verify-evidence.mjs --corpus _pi_extension_agent_ready_development --repo .`：失败项 = 该 tag 里 locator 或引文变了，逐条改台账。
+3. `node _digested/_evidence/tools/render-evidence.mjs --corpus _pi_extension_agent_ready_development` 重生成附录。
+4. 正文**只在某条 claim 被证伪时**才改；纯坐标移动不产生正文 diff。
+5. `node _digested/_evidence/tools/check-prose.mjs --repo .` 与 `node verify.mjs` 收尾。
+
+`_faq_on_digested` 同构（`--corpus _faq_on_digested`，台账在 `_faq_on_digested/_evidence/`）。`_digested` 仍按“增量改写”处理：正文 `#L` 已清零，但不强制去除历史版本号。

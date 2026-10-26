@@ -44,16 +44,16 @@ convertToLlm() → Provider 请求（before_provider_request 是最后一站）
 
 ### 3. 一致性：agent loop 把差量算到"重放必相等"为止
 
-[agent-loop.ts:332-342](../../packages/agent/src/agent-loop.ts#L332-L342) 的 `declareToolChanges()` 把 pending system message 的工具字段替换为「已提交 transcript 重放出的工具状态」与「可执行集 `context.tools`」的差量。注释原话即合同：**"so replay always yields exactly `context.tools`"**。扩展想在请求里改工具，改的是声明面；运行时可执行的集合永远以重放结果为准。
+[E013](../_evidence/render.md#e013) 的 `declareToolChanges()` 把 pending system message 的工具字段替换为「已提交 transcript 重放出的工具状态」与「可执行集 `context.tools`」的差量。注释原话即合同：**"so replay always yields exactly `context.tools`"**。扩展想在请求里改工具，改的是声明面；运行时可执行的集合永远以重放结果为准。
 
 ### 4. 压缩与恢复不破坏它
 
-- 压缩：compaction entry 携带压缩边界处的**完整** prompt/tool checkpoint，成为压缩后上下文的 leading system message；被保留区间里的旧 system message 以它为准丢弃（[session-format.md](../../packages/coding-agent/docs/session-format.md) compaction 节；[compaction.ts:100](../../packages/coding-agent/src/core/compaction/compaction.ts#L100)："System messages are prompt state, not conversation; the compaction entry carries their replay."）。
-- 恢复：SDK resume 时 `buildSessionContext()` 折叠出的消息直接灌进 Agent 的 `initialState.messages`（[sdk.ts:403-409](../../packages/coding-agent/src/core/sdk.ts#L403-L409)，`initialState.messages` 在 :409）；`AgentSession._refreshFinalizedContext()`（[agent-session.ts:938-944](../../packages/coding-agent/src/core/agent-session.ts#L938-L944)）在边界提交、压缩等时机把 `agent.state.messages` 与投影重新对齐。
+- 压缩：compaction entry 携带压缩边界处的**完整** prompt/tool checkpoint，成为压缩后上下文的 leading system message；被保留区间里的旧 system message 以它为准丢弃（[session-format.md](../../packages/coding-agent/docs/session-format.md) compaction 节；[E014](../_evidence/render.md#e014)："System messages are prompt state, not conversation; the compaction entry carries their replay."）。
+- 恢复：SDK resume 时 `buildSessionContext()` 折叠出的消息直接灌进 Agent 的 `initialState.messages`（[E015](../_evidence/render.md#e015)，`initialState.messages` 在 :409）；`AgentSession._refreshFinalizedContext()`（[E016](../_evidence/render.md#e016)）在边界提交、压缩等时机把 `agent.state.messages` 与投影重新对齐。
 
 ## 这条不变量被当作测试合同，而不是希望
 
-[system-prompt-updates.test.ts:276-302](../../packages/coding-agent/test/system-prompt-updates.test.ts#L276-L302)："keeps tool declarations stable across a session JSON round-trip"——把 transcript `JSON.parse(JSON.stringify(...))` 往返后断言重放出的声明不变，:295 注释原话 "Simulate a resume: the persisted JSON must replay to the same declarations."
+[E017](../_evidence/render.md#e017)："keeps tool declarations stable across a session JSON round-trip"——把 transcript `JSON.parse(JSON.stringify(...))` 往返后断言重放出的声明不变，:295 注释原话 "Simulate a resume: the persisted JSON must replay to the same declarations."
 
 这是 Pi 版的"快照测试"：**不冻结某一次装配的字节，而是冻结"往返后重放相等"这个性质。** DSH 的快照 diff 抓的是"装配结果变了没"；Pi 的 round-trip 抓的是"日志还能不能忠实重建装配"。
 

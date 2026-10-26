@@ -2388,3 +2388,116 @@ prompt template 机制：文件名即命令名，支持 $ARGUMENTS/$@ 等替换
   ```
 
 核验：`v1.4.0`
+
+## repo-harness/07-monorepo-taxonomy.md
+
+### E100
+
+README 包表列 7 个包；chord 是 typed host runtime，durable 是可重开续接的持久运行时
+
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `| **［@earendil-works/chord］(packages/chord)** | Typed host runtime for hot-reloadable plugins, contracts, replicated state, and RPC over JSON links |`，提示行 78
+
+  ```text
+  | **[@earendil-works/chord](packages/chord)** | Typed host runtime for hot-reloadable plugins, contracts, replicated state, and RPC over JSON links |
+  ```
+
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `| **［@earendil-works/pi-tui］(packages/tui)** | Terminal UI library with differential rendering |`，提示行 84
+
+  ```text
+  | **[@earendil-works/pi-tui](packages/tui)** | Terminal UI library with differential rendering |
+  ```
+
+- [`packages/chord/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/chord/README.md) — text: `Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run.`，提示行 3
+
+  ```text
+  Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run.
+  ```
+
+- [`packages/durable/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/durable/README.md) — text: `> **Experimental.** The API changes without notice between releases.`，提示行 3
+
+  ```text
+  > **Experimental.** The API changes without notice between releases.
+  ```
+
+核验：`v1.4.0`
+
+### E101
+
+chord 依赖 pi-telemetry；durable 依赖 chord
+
+- [`packages/chord/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/chord/package.json) — text: `"@earendil-works/pi-telemetry": "1.4.0",`，提示行 88
+
+  ```text
+  "@earendil-works/pi-telemetry": "1.4.0",
+  ```
+
+- [`packages/durable/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/durable/package.json) — text: `"@earendil-works/chord": "1.4.0",`，提示行 153
+
+  ```text
+  "@earendil-works/chord": "1.4.0",
+  ```
+
+核验：`v1.4.0`
+
+### E102
+
+codemode/mcp/env/evals 不在 README 表：前三个是发布包，evals 私有
+
+- [`packages/codemode/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/codemode/README.md) — text: `Runs model-written JavaScript in a QuickJS VM (compiled to WebAssembly) where the only capability is calling injected tools. Nested tool calls never enter the LLM context; only the script's output and return value do.`，提示行 3
+
+  ```text
+  Runs model-written JavaScript in a QuickJS VM (compiled to WebAssembly) where the only capability is calling injected tools. Nested tool calls never enter the LLM context; only the script's output and return value do.
+  ```
+
+- [`packages/mcp/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/mcp/README.md) — text: `A small, standalone Model Context Protocol client. It does not depend on the official MCP SDK or other pi packages.`，提示行 3
+
+  ```text
+  A small, standalone Model Context Protocol client. It does not depend on the official MCP SDK or other pi packages.
+  ```
+
+- [`packages/env/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/env/README.md) — text: `Remote execution environments for ［Pi Durable］(../durable): an agent's tools run on another machine, usually over SSH,`，提示行 3
+
+  ```text
+  Remote execution environments for [Pi Durable](../durable): an agent's tools run on another machine, usually over SSH,
+  ```
+
+- [`packages/evals/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/package.json) — text: `"private": true,`，提示行 4
+
+  ```text
+  "private": true,
+  ```
+
+核验：`v1.4.0`
+
+### E103
+
+client/protocol/server 三包已删除，不再发布
+
+- `packages/client`：**v1.4.0 起不存在**
+- `packages/protocol`：**v1.4.0 起不存在**
+- `packages/server`：**v1.4.0 起不存在**
+核验：`v1.4.0`
+
+### E104
+
+宿主向扩展提供五个包，扩展须声明为 peerDependencies 且不打包
+
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
+
+  ```text
+  Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.
+  ```
+
+核验：`v1.4.0`
+
+### E105
+
+lockstep：所有公开包同一版本，sync-versions 校验集合唯一
+
+- [`scripts/sync-versions.js`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/sync-versions.js) — text: `const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));`，提示行 29
+
+  ```text
+  const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));
+  ```
+
+核验：`v1.4.0`

@@ -3731,6 +3731,186 @@
 			],
 			"page": "repo-harness/02-prompts-as-procedural-contracts.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E100",
+			"claim": "README 包表列 7 个包；chord 是 typed host runtime，durable 是可重开续接的持久运行时",
+			"sources": [
+				{
+					"path": "README.md",
+					"locator": {
+						"kind": "text",
+						"value": "| **[@earendil-works/chord](packages/chord)** | Typed host runtime for hot-reloadable plugins, contracts, replicated state, and RPC over JSON links |"
+					},
+					"quote": "| **[@earendil-works/chord](packages/chord)** | Typed host runtime for hot-reloadable plugins, contracts, replicated state, and RPC over JSON links |",
+					"hintLine": 78,
+					"volatility": "medium"
+				},
+				{
+					"path": "README.md",
+					"locator": {
+						"kind": "text",
+						"value": "| **[@earendil-works/pi-tui](packages/tui)** | Terminal UI library with differential rendering |"
+					},
+					"quote": "| **[@earendil-works/pi-tui](packages/tui)** | Terminal UI library with differential rendering |",
+					"hintLine": 84,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/chord/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run."
+					},
+					"quote": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run.",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/durable/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "> **Experimental.** The API changes without notice between releases."
+					},
+					"quote": "> **Experimental.** The API changes without notice between releases.",
+					"hintLine": 3,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/07-monorepo-taxonomy.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E101",
+			"claim": "chord 依赖 pi-telemetry；durable 依赖 chord",
+			"sources": [
+				{
+					"path": "packages/chord/package.json",
+					"locator": {
+						"kind": "text",
+						"value": "\"@earendil-works/pi-telemetry\": \"1.4.0\","
+					},
+					"quote": "\"@earendil-works/pi-telemetry\": \"1.4.0\",",
+					"hintLine": 88,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/durable/package.json",
+					"locator": {
+						"kind": "text",
+						"value": "\"@earendil-works/chord\": \"1.4.0\","
+					},
+					"quote": "\"@earendil-works/chord\": \"1.4.0\",",
+					"hintLine": 153,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/07-monorepo-taxonomy.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E102",
+			"claim": "codemode/mcp/env/evals 不在 README 表：前三个是发布包，evals 私有",
+			"sources": [
+				{
+					"path": "packages/codemode/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "Runs model-written JavaScript in a QuickJS VM (compiled to WebAssembly) where the only capability is calling injected tools. Nested tool calls never enter the LLM context; only the script's output and return value do."
+					},
+					"quote": "Runs model-written JavaScript in a QuickJS VM (compiled to WebAssembly) where the only capability is calling injected tools. Nested tool calls never enter the LLM context; only the script's output and return value do.",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/mcp/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "A small, standalone Model Context Protocol client. It does not depend on the official MCP SDK or other pi packages."
+					},
+					"quote": "A small, standalone Model Context Protocol client. It does not depend on the official MCP SDK or other pi packages.",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/env/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "Remote execution environments for [Pi Durable](../durable): an agent's tools run on another machine, usually over SSH,"
+					},
+					"quote": "Remote execution environments for [Pi Durable](../durable): an agent's tools run on another machine, usually over SSH,",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/evals/package.json",
+					"locator": {
+						"kind": "text",
+						"value": "\"private\": true,"
+					},
+					"quote": "\"private\": true,",
+					"hintLine": 4,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/07-monorepo-taxonomy.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E103",
+			"claim": "client/protocol/server 三包已删除，不再发布",
+			"sources": [
+				{
+					"path": "packages/client",
+					"expect": "absent"
+				},
+				{
+					"path": "packages/protocol",
+					"expect": "absent"
+				},
+				{
+					"path": "packages/server",
+					"expect": "absent"
+				}
+			],
+			"page": "repo-harness/07-monorepo-taxonomy.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E104",
+			"claim": "宿主向扩展提供五个包，扩展须声明为 peerDependencies 且不打包",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/packages.md",
+					"locator": {
+						"kind": "text",
+						"value": "Declare the host-provided packages listed above in `peerDependencies` with a `\"*\"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility."
+					},
+					"quote": "Declare the host-provided packages listed above in `peerDependencies` with a `\"*\"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.",
+					"hintLine": 88,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/07-monorepo-taxonomy.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E105",
+			"claim": "lockstep：所有公开包同一版本，sync-versions 校验集合唯一",
+			"sources": [
+				{
+					"path": "scripts/sync-versions.js",
+					"locator": {
+						"kind": "text",
+						"value": "const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));"
+					},
+					"quote": "const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));",
+					"hintLine": 29,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/07-monorepo-taxonomy.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

@@ -1013,6 +1013,390 @@
 			],
 			"page": "sdlc-reference/07-release-and-recovery.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E034",
+			"claim": "主 CI 触发 push/PR main；build-check-test 依次 build、check、env daemon 构建、npm test",
+			"sources": [
+				{
+					"path": ".github/workflows/ci.yml",
+					"locator": {
+						"kind": "text",
+						"value": "on:"
+					},
+					"quote": "on:",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/ci.yml",
+					"locator": {
+						"kind": "text",
+						"value": "build-check-test:"
+					},
+					"quote": "build-check-test:",
+					"hintLine": 14,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/ci.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Build the pi-env daemon"
+					},
+					"quote": "- name: Build the pi-env daemon",
+					"hintLine": 41,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/04-ci-matrix.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E035",
+			"claim": "mcp-conformance 是独立 job，用官方 conformance 套件对 baseline.json 锁协议兼容",
+			"sources": [
+				{
+					"path": ".github/workflows/ci.yml",
+					"locator": {
+						"kind": "text",
+						"value": "mcp-conformance:"
+					},
+					"quote": "mcp-conformance:",
+					"hintLine": 47,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/ci.yml",
+					"locator": {
+						"kind": "text",
+						"value": "# Runs pi's MCP client from source against the pinned official conformance suite and fails on"
+					},
+					"quote": "# Runs pi's MCP client from source against the pinned official conformance suite and fails on",
+					"hintLine": 62,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/04-ci-matrix.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E036",
+			"claim": "根 npm test = 脚本单测 + 各 workspace test；evals 的普通单测在 CI 内，真实模型 eval 不在",
+			"sources": [
+				{
+					"path": "package.json",
+					"locator": {
+						"kind": "text",
+						"value": "\"test\": \"npm run test:scripts && npm run test --workspaces --if-present\","
+					},
+					"quote": "\"test\": \"npm run test:scripts && npm run test --workspaces --if-present\",",
+					"hintLine": 40,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/evals/package.json",
+					"locator": {
+						"kind": "text",
+						"value": "\"test\": \"vitest run --config vitest.test.config.ts\""
+					},
+					"quote": "\"test\": \"vitest run --config vitest.test.config.ts\"",
+					"hintLine": 11,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/evals/package.json",
+					"locator": {
+						"kind": "text",
+						"value": "\"eval\": \"npm run eval:host && npm run eval:docs --\","
+					},
+					"quote": "\"eval\": \"npm run eval:host && npm run eval:docs --\",",
+					"hintLine": 8,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/04-ci-matrix.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E037",
+			"claim": "env.yml 路径门控的 PR 检查，四个 job：daemons / check / release-daemons（六平台）/ tests（五 OS）",
+			"sources": [
+				{
+					"path": ".github/workflows/env.yml",
+					"locator": {
+						"kind": "text",
+						"value": "on:"
+					},
+					"quote": "on:",
+					"hintLine": 6,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/env.yml",
+					"locator": {
+						"kind": "text",
+						"value": "check:"
+					},
+					"quote": "check:",
+					"hintLine": 25,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/env.yml",
+					"locator": {
+						"kind": "text",
+						"value": "if (missing.length || unexpected.length) { console.error({ missing, unexpected }); process.exit(1); }"
+					},
+					"quote": "if (missing.length || unexpected.length) { console.error({ missing, unexpected }); process.exit(1); }",
+					"hintLine": 70,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/env.yml",
+					"locator": {
+						"kind": "text",
+						"value": "tests:"
+					},
+					"quote": "tests:",
+					"hintLine": 128,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/env-daemons.yml",
+					"locator": {
+						"kind": "text",
+						"value": "name: pi-env daemons"
+					},
+					"quote": "name: pi-env daemons",
+					"hintLine": 1,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/04-ci-matrix.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E038",
+			"claim": "nix.yml 五类触发；pin 刷新按 provider/type/api 判 stale；三系统 build；stable fast-forward；bot 回写 pin",
+			"sources": [
+				{
+					"path": ".github/workflows/nix.yml",
+					"locator": {
+						"kind": "text",
+						"value": "on:"
+					},
+					"quote": "on:",
+					"hintLine": 16,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/nix.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Refresh the model catalog pin if stale"
+					},
+					"quote": "- name: Refresh the model catalog pin if stale",
+					"hintLine": 68,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/nix.yml",
+					"locator": {
+						"kind": "text",
+						"value": "build:"
+					},
+					"quote": "build:",
+					"hintLine": 87,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/nix.yml",
+					"locator": {
+						"kind": "text",
+						"value": "update-stable:"
+					},
+					"quote": "update-stable:",
+					"hintLine": 136,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/nix.yml",
+					"locator": {
+						"kind": "text",
+						"value": "commit-pin:"
+					},
+					"quote": "commit-pin:",
+					"hintLine": 154,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/04-ci-matrix.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E039",
+			"claim": "npm-audit 每日/手动运行，production-only，moderate 及以上未接受即失败",
+			"sources": [
+				{
+					"path": ".github/workflows/npm-audit.yml",
+					"locator": {
+						"kind": "text",
+						"value": "on:"
+					},
+					"quote": "on:",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/npm-audit.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Install dependencies without lifecycle scripts"
+					},
+					"quote": "- name: Install dependencies without lifecycle scripts",
+					"hintLine": 24,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/npm-audit.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "// Runs `npm audit --omit=dev` and fails on advisories at or above the audit"
+					},
+					"quote": "// Runs `npm audit --omit=dev` and fails on advisories at or above the audit",
+					"hintLine": 1,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/npm-audit.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "for (const id of Object.keys(acceptedAdvisories)) {"
+					},
+					"quote": "for (const id of Object.keys(acceptedAdvisories)) {",
+					"hintLine": 69,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/04-ci-matrix.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E040",
+			"claim": "模型目录数据链：generate 校验并做兼容检查；publish 有窗口限制；脚本拒绝不一致目录、用 SHA-256 作 revision、已当前则跳过",
+			"sources": [
+				{
+					"path": ".github/workflows/publish-model-catalog.yml",
+					"locator": {
+						"kind": "text",
+						"value": "on:"
+					},
+					"quote": "on:",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/publish-model-catalog.yml",
+					"locator": {
+						"kind": "text",
+						"value": "generate:"
+					},
+					"quote": "generate:",
+					"hintLine": 41,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/publish-model-catalog.yml",
+					"locator": {
+						"kind": "text",
+						"value": "# The compatibility check reads the latest release's source from its git tag."
+					},
+					"quote": "# The compatibility check reads the latest release's source from its git tag.",
+					"hintLine": 52,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/publish-model-catalog.yml",
+					"locator": {
+						"kind": "text",
+						"value": "publish:"
+					},
+					"quote": "publish:",
+					"hintLine": 83,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/publish-model-catalog.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Check publication window"
+					},
+					"quote": "- name: Check publication window",
+					"hintLine": 119,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish-model-catalog.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const JSON_CONTENT_TYPE = \"application/json; charset=utf-8\";"
+					},
+					"quote": "const JSON_CONTENT_TYPE = \"application/json; charset=utf-8\";",
+					"hintLine": 28,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish-model-catalog.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const providersDir = join(inputDir, \"providers\");"
+					},
+					"quote": "const providersDir = join(inputDir, \"providers\");",
+					"hintLine": 88,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish-model-catalog.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const digest = createHash(\"sha256\").update(allModelsBytes).digest(\"hex\");"
+					},
+					"quote": "const digest = createHash(\"sha256\").update(allModelsBytes).digest(\"hex\");",
+					"hintLine": 160,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish-model-catalog.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "...bundle.providerIds.flatMap((providerId) => ["
+					},
+					"quote": "...bundle.providerIds.flatMap((providerId) => [",
+					"hintLine": 307,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/04-ci-matrix.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E041",
+			"claim": "真实模型评估（eval/eval:host/eval:docs）需要 PI_PROVIDER/PI_MODEL，不在主 CI 命令内",
+			"sources": [
+				{
+					"path": "packages/evals/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`."
+					},
+					"quote": "Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.",
+					"hintLine": 24,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/04-ci-matrix.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

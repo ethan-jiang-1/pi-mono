@@ -510,3 +510,181 @@ Nix 线：tag 构建要求版本等于 tag；stable 只 fast-forward 不回退
   > description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'
 
 核验：`v1.4.0`
+
+## sdlc-reference/04-ci-matrix.md
+
+### E034
+
+主 CI 触发 push/PR main；build-check-test 依次 build、check、env daemon 构建、npm test
+
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `on:`，提示行 3
+
+  > on:
+
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `build-check-test:`，提示行 14
+
+  > build-check-test:
+
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `- name: Build the pi-env daemon`，提示行 41
+
+  > - name: Build the pi-env daemon
+
+核验：`v1.4.0`
+
+### E035
+
+mcp-conformance 是独立 job，用官方 conformance 套件对 baseline.json 锁协议兼容
+
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `mcp-conformance:`，提示行 47
+
+  > mcp-conformance:
+
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `# Runs pi's MCP client from source against the pinned official conformance suite and fails on`，提示行 62
+
+  > # Runs pi's MCP client from source against the pinned official conformance suite and fails on
+
+核验：`v1.4.0`
+
+### E036
+
+根 npm test = 脚本单测 + 各 workspace test；evals 的普通单测在 CI 内，真实模型 eval 不在
+
+- [`package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/package.json) — text: `"test": "npm run test:scripts && npm run test --workspaces --if-present",`，提示行 40
+
+  > "test": "npm run test:scripts && npm run test --workspaces --if-present",
+
+- [`packages/evals/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/package.json) — text: `"test": "vitest run --config vitest.test.config.ts"`，提示行 11
+
+  > "test": "vitest run --config vitest.test.config.ts"
+
+- [`packages/evals/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/package.json) — text: `"eval": "npm run eval:host && npm run eval:docs --",`，提示行 8
+
+  > "eval": "npm run eval:host && npm run eval:docs --",
+
+核验：`v1.4.0`
+
+### E037
+
+env.yml 路径门控的 PR 检查，四个 job：daemons / check / release-daemons（六平台）/ tests（五 OS）
+
+- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env.yml) — text: `on:`，提示行 6
+
+  > on:
+
+- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env.yml) — text: `check:`，提示行 25
+
+  > check:
+
+- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env.yml) — text: `if (missing.length || unexpected.length) { console.error({ missing, unexpected }); process.exit(1); }`，提示行 70
+
+  > if (missing.length || unexpected.length) { console.error({ missing, unexpected }); process.exit(1); }
+
+- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env.yml) — text: `tests:`，提示行 128
+
+  > tests:
+
+- [`.github/workflows/env-daemons.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env-daemons.yml) — text: `name: pi-env daemons`，提示行 1
+
+  > name: pi-env daemons
+
+核验：`v1.4.0`
+
+### E038
+
+nix.yml 五类触发；pin 刷新按 provider/type/api 判 stale；三系统 build；stable fast-forward；bot 回写 pin
+
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `on:`，提示行 16
+
+  > on:
+
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `- name: Refresh the model catalog pin if stale`，提示行 68
+
+  > - name: Refresh the model catalog pin if stale
+
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `build:`，提示行 87
+
+  > build:
+
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `update-stable:`，提示行 136
+
+  > update-stable:
+
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `commit-pin:`，提示行 154
+
+  > commit-pin:
+
+核验：`v1.4.0`
+
+### E039
+
+npm-audit 每日/手动运行，production-only，moderate 及以上未接受即失败
+
+- [`.github/workflows/npm-audit.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/npm-audit.yml) — text: `on:`，提示行 3
+
+  > on:
+
+- [`.github/workflows/npm-audit.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/npm-audit.yml) — text: `- name: Install dependencies without lifecycle scripts`，提示行 24
+
+  > - name: Install dependencies without lifecycle scripts
+
+- [`scripts/npm-audit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/npm-audit.mjs) — text: `// Runs `npm audit --omit=dev` and fails on advisories at or above the audit`，提示行 1
+
+  > // Runs `npm audit --omit=dev` and fails on advisories at or above the audit
+
+- [`scripts/npm-audit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/npm-audit.mjs) — text: `for (const id of Object.keys(acceptedAdvisories)) {`，提示行 69
+
+  > for (const id of Object.keys(acceptedAdvisories)) {
+
+核验：`v1.4.0`
+
+### E040
+
+模型目录数据链：generate 校验并做兼容检查；publish 有窗口限制；脚本拒绝不一致目录、用 SHA-256 作 revision、已当前则跳过
+
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `on:`，提示行 3
+
+  > on:
+
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `generate:`，提示行 41
+
+  > generate:
+
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `# The compatibility check reads the latest release's source from its git tag.`，提示行 52
+
+  > # The compatibility check reads the latest release's source from its git tag.
+
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `publish:`，提示行 83
+
+  > publish:
+
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `- name: Check publication window`，提示行 119
+
+  > - name: Check publication window
+
+- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-model-catalog.mjs) — text: `const JSON_CONTENT_TYPE = "application/json; charset=utf-8";`，提示行 28
+
+  > const JSON_CONTENT_TYPE = "application/json; charset=utf-8";
+
+- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-model-catalog.mjs) — text: `const providersDir = join(inputDir, "providers");`，提示行 88
+
+  > const providersDir = join(inputDir, "providers");
+
+- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-model-catalog.mjs) — text: `const digest = createHash("sha256").update(allModelsBytes).digest("hex");`，提示行 160
+
+  > const digest = createHash("sha256").update(allModelsBytes).digest("hex");
+
+- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-model-catalog.mjs) — text: `...bundle.providerIds.flatMap((providerId) => [`，提示行 307
+
+  > ...bundle.providerIds.flatMap((providerId) => [
+
+核验：`v1.4.0`
+
+### E041
+
+真实模型评估（eval/eval:host/eval:docs）需要 PI_PROVIDER/PI_MODEL，不在主 CI 命令内
+
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.`，提示行 24
+
+  > Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.
+
+核验：`v1.4.0`

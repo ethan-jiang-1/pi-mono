@@ -29,7 +29,7 @@
 按锚点密度排序（括号内为 `#L` 数）：
 
 - [x] `sdlc-reference/07-release-and-recovery.md`（48）→ E023–E033
-- [ ] `sdlc-reference/04-ci-matrix.md`（33）
+- [x] `sdlc-reference/04-ci-matrix.md`（33）→ E034–E041
 - [ ] `sdlc-reference/05-testing-layers.md`（28）
 - [ ] `sdlc-reference/03-check-pipeline.md`（26）
 - [ ] `sdlc-reference/02-issue-diagnosis-and-session-import.md`（25）

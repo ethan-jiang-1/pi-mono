@@ -1,0 +1,500 @@
+{
+	"entries": [
+		{
+			"id": "E001",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "agent 必须从仓库根运行，才会自动拾取 AGENTS.md 并遵守其规则",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "The One Rule"
+					},
+					"quote": "If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.",
+					"hintLine": 19,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E002",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "提问先答后改；散文直接、简洁、无套话",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Conversational Style"
+					},
+					"quote": "- Technical prose only, be direct",
+					"hintLine": 8,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Conversational Style"
+					},
+					"quote": "- When the user asks a question, answer it first before making edits or running implementation commands.",
+					"hintLine": 12,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E003",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "改代码后跑 npm run check，全量输出、不允许只截尾；check 不跑测试",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Commands"
+					},
+					"quote": "- After code changes (not docs): `npm run check` (full output, no tail). Fix all errors, warnings, and infos before committing. Does not run tests.",
+					"hintLine": 32,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E004",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "未经用户请求不得运行 npm run build 或 npm test",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Commands"
+					},
+					"quote": "- Never run `npm run build` or `npm test` unless requested by the user.",
+					"hintLine": 33,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E005",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "不得直接跑全量 vitest（含 e2e）；非 e2e 用 ./test.sh，或从包根跑单文件",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Commands"
+					},
+					"quote": "- Never run the full vitest suite directly: it includes e2e tests that activate when endpoint/auth env vars are present. For all non-e2e tests, run `./test.sh` from the repo root. Otherwise run specific tests from the package root:",
+					"hintLine": 34,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E006",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "coding-agent test/suite 必须用 test/suite/harness.ts + faux provider，禁止真实 key",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Commands"
+					},
+					"quote": "- For `packages/coding-agent/test/suite/`, use `test/suite/harness.ts` + the faux provider. No real provider APIs, keys, or paid tokens.",
+					"hintLine": 38,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E007",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "修 issue 的回归测试旁必须写 issue 号注释",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Commands"
+					},
+					"quote": "- When regressions tests for fixing a github issue, add a comment with the github issue number next to the test.",
+					"hintLine": 39,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E008",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "临时脚本写入 /tmp 文件再跑，不内嵌多行脚本",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Commands"
+					},
+					"quote": "- For ad-hoc scripts, `write` them to a temp file (e.g. `/tmp`), run, edit if needed, remove when done. Don't embed multi-line scripts in `bash` commands.",
+					"hintLine": 40,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E009",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "直接 registry 依赖（含内部 workspace 包）必须精确版本",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Dependency and Install Security"
+					},
+					"quote": "- Treat npm dep and lockfile changes as reviewed code. Direct registry deps, including internal workspace deps, stay pinned to exact versions.",
+					"hintLine": 45,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E010",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "本地用 npm install --ignore-scripts 水合，CI 用 npm ci；不得擅自跑 lifecycle 脚本",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Dependency and Install Security"
+					},
+					"quote": "- Hydrate/update locally with `npm install --ignore-scripts`; clean/CI-style with `npm ci --ignore-scripts`. Don't run lifecycle scripts unless the user asks.",
+					"hintLine": 47,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E011",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "带安装脚本的新依赖须评审并进显式 allowlist；lockfile 提交被 pre-commit 拦截",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Dependency and Install Security"
+					},
+					"quote": "- If `packages/coding-agent/install-lock/` needs regen, run `node scripts/generate-coding-agent-install-lock.mjs` (verify with `--check` or `npm run check`). New deps with lifecycle scripts require review and an explicit allowlist entry in that script; never add one silently.",
+					"hintLine": 49,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Dependency and Install Security"
+					},
+					"quote": "- Pre-commit blocks lockfile commits unless `PI_ALLOW_LOCKFILE_CHANGE=1`. Don't bypass unless the user wants the lockfile change committed.",
+					"hintLine": 50,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E012",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "除非用户要求，否则不提交",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Git"
+					},
+					"quote": "- Never commit unless the user asks.",
+					"hintLine": 41,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E013",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "只提交本次自己改的文件；显式暂存路径，禁止 git add -A/.",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Git"
+					},
+					"quote": "- Only commit files YOU changed in THIS session.",
+					"hintLine": 58,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Git"
+					},
+					"quote": "- Stage explicit paths (`git add <path1> <path2>`); never `git add -A` / `git add .`.",
+					"hintLine": 59,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E014",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "禁止 reset --hard、checkout .、clean -fd、stash 与 --no-verify；永不 force push",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Git"
+					},
+					"quote": "- `git reset --hard`, `git checkout .`, `git clean -fd`, `git stash`, `git add -A`, `git add .`, `git commit --no-verify`.",
+					"hintLine": 66,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Git"
+					},
+					"quote": "- Never force push.",
+					"hintLine": 72,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E015",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "commit message 格式固定为 {feat,fix,docs}[(scope)]: <message>",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Git"
+					},
+					"quote": "- Message format: `{feat,fix,docs}[(ai,tui,agent,coding-agent)]: <commit message> (optionally multiple lines)`. Message is informative and concise.",
+					"hintLine": 62,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E016",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "pi 的核保持最小；不属于核的功能应做成扩展，膨胀核的 PR 会被拒",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Philosophy"
+					},
+					"quote": "First things first: **pi's core is minimal**.",
+					"hintLine": 7,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Philosophy"
+					},
+					"quote": "If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.",
+					"hintLine": 9,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E017",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "提交者必须理解自己的代码；不理解而提交 AI 产物会被关闭",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "The One Rule"
+					},
+					"quote": "**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.",
+					"hintLine": 15,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "The One Rule"
+					},
+					"quote": "Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.",
+					"hintLine": 17,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E018",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "新贡献者的 issue 与 PR 默认自动关闭",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Contribution Gate"
+					},
+					"quote": "All issues and PRs from new contributors are auto-closed by default.",
+					"hintLine": 23,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E019",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "lgtmi/lgtm 解锁贡献资格，命令须在回复开头或结尾；只有 lgtm 允许开 PR",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Contribution Gate"
+					},
+					"quote": "- `lgtmi`: your future issues will not be auto-closed",
+					"hintLine": 31,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Contribution Gate"
+					},
+					"quote": "- `lgtm`: your future issues and PRs will not be auto-closed",
+					"hintLine": 32,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Contribution Gate"
+					},
+					"quote": "The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.",
+					"hintLine": 34,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E020",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "开 PR 前必须已获 lgtm；npm run check 与 ./test.sh 都必须通过",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Before Submitting a PR"
+					},
+					"quote": "Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.",
+					"hintLine": 58,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Before Submitting a PR"
+					},
+					"quote": "npm run check",
+					"hintLine": 63,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Before Submitting a PR"
+					},
+					"quote": "Both must pass.",
+					"hintLine": 67,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E021",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "贡献者不得改 CHANGELOG.md，条目由维护者添加",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Before Submitting a PR"
+					},
+					"quote": "Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.",
+					"hintLine": 69,
+					"volatility": "medium"
+				}
+			]
+		},
+		{
+			"id": "E022",
+			"page": "repo-harness/01-agent-entry-rules.md",
+			"claim": "生成模型数据目录被 gitignore：不得暂存，也不要从 git 历史里找",
+			"checkedAt": "v1.4.0",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "heading",
+						"value": "Code Quality"
+					},
+					"quote": "- Never modify `packages/ai/src/models.generated.ts` directly; update `packages/ai/scripts/generate-models.ts` instead, then regenerate. Including the resulting `models.generated.ts` diff is always OK, even if regeneration includes unrelated upstream model metadata changes. The generated model data in `packages/ai/src/providers/data/` is gitignored: never stage it, and don't look for it in git history.",
+					"hintLine": 28,
+					"volatility": "medium"
+				}
+			]
+		}
+	]
+}

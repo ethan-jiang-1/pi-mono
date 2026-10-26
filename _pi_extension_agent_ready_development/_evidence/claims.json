@@ -3507,6 +3507,230 @@
 			],
 			"page": "repo-harness/05-session-inspectability.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E092",
+			"claim": "prompt template 机制：文件名即命令名，支持 $ARGUMENTS/$@ 等替换",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/prompt-templates.md",
+					"locator": {
+						"kind": "text",
+						"value": "The filename becomes the command name, so this template is available as `/review`. The `description` appears in command completion. If it is omitted, Pi uses the first non-empty line."
+					},
+					"quote": "The filename becomes the command name, so this template is available as `/review`. The `description` appears in command completion. If it is omitted, Pi uses the first non-empty line.",
+					"hintLine": 19,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/prompt-templates.md",
+					"locator": {
+						"kind": "text",
+						"value": "Templates support these substitutions:"
+					},
+					"quote": "Templates support these substitutions:",
+					"hintLine": 38,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/02-prompts-as-procedural-contracts.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E093",
+			"claim": "/is：不信 issue 分析、只提议不实现；CI 下不加标签不认领",
+			"sources": [
+				{
+					"path": ".pi/prompts/is.md",
+					"locator": {
+						"kind": "text",
+						"value": "3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path."
+					},
+					"quote": "3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.",
+					"hintLine": 14,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/is.md",
+					"locator": {
+						"kind": "text",
+						"value": "Do NOT implement unless explicitly asked. Analyze and propose only."
+					},
+					"quote": "Do NOT implement unless explicitly asked. Analyze and propose only.",
+					"hintLine": 28,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/is.md",
+					"locator": {
+						"kind": "text",
+						"value": "1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue."
+					},
+					"quote": "1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.",
+					"hintLine": 9,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/02-prompts-as-procedural-contracts.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E094",
+			"claim": "/pr：不切分支、不 checkout，只读 diff 与相关文件；不检查 changelog",
+			"sources": [
+				{
+					"path": ".pi/prompts/pr.md",
+					"locator": {
+						"kind": "text",
+						"value": "4. Analyze the PR diff without checking out or switching to the PR branch. Use `gh pr diff`, `gh pr view`, `gh api`, and local main-branch files; if PR file contents are needed, use fetched refs with `git show <ref>:<path>` or temporary files. Read all relevant code files in full with no truncation and compare against the diff. Do not fetch PR file blobs unless a file is missing on main or the diff context is insufficient. Include related code paths that are not in the diff but are required to validate behavior."
+					},
+					"quote": "4. Analyze the PR diff without checking out or switching to the PR branch. Use `gh pr diff`, `gh pr view`, `gh api`, and local main-branch files; if PR file contents are needed, use fetched refs with `git show <ref>:<path>` or temporary files. Read all relevant code files in full with no truncation and compare against the diff. Do not fetch PR file blobs unless a file is missing on main or the diff context is insufficient. Include related code paths that are not in the diff but are required to validate behavior.",
+					"hintLine": 11,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/pr.md",
+					"locator": {
+						"kind": "text",
+						"value": "5. Do not check for a changelog entry. Per CONTRIBUTING.md, contributor PRs must not edit `CHANGELOG.md` — the maintainer adds the entry when merging."
+					},
+					"quote": "5. Do not check for a changelog entry. Per CONTRIBUTING.md, contributor PRs must not edit `CHANGELOG.md` — the maintainer adds the entry when merging.",
+					"hintLine": 12,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/02-prompts-as-procedural-contracts.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E095",
+			"claim": "/wr：固定免责行；单 issue 时 push 后以 completed 关闭，使 issue-close 工作流运行",
+			"sources": [
+				{
+					"path": ".pi/prompts/wr.md",
+					"locator": {
+						"kind": "text",
+						"value": "This comment is AI-generated by `/wr`"
+					},
+					"quote": "This comment is AI-generated by `/wr`",
+					"hintLine": 22,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/wr.md",
+					"locator": {
+						"kind": "text",
+						"value": "7. If this task is tied to exactly one GitHub issue, explicitly close that issue with reason `completed` after the push so the issue-close workflows in `.github/` run. This applies to issues only, not PRs."
+					},
+					"quote": "7. If this task is tied to exactly one GitHub issue, explicitly close that issue with reason `completed` after the push so the issue-close workflows in `.github/` run. This applies to issues only, not PRs.",
+					"hintLine": 28,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/02-prompts-as-procedural-contracts.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E096",
+			"claim": "/deslop：删除无当前需求的推测性抽象",
+			"sources": [
+				{
+					"path": ".pi/prompts/deslop.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement."
+					},
+					"quote": "- Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.",
+					"hintLine": 19,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/02-prompts-as-procedural-contracts.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E097",
+			"claim": "/sa：不发布/不改状态/不请求 CVE 除非用户同意或草稿 request_cve；评论不可得时明说、绝不假装读过",
+			"sources": [
+				{
+					"path": ".pi/prompts/sa.md",
+					"locator": {
+						"kind": "text",
+						"value": "Use `gh` for all GitHub operations. Do not publish the advisory, change its state, or request a CVE unless the user explicitly agrees or the draft markdown explicitly says `request_cve: true`."
+					},
+					"quote": "Use `gh` for all GitHub operations. Do not publish the advisory, change its state, or request a CVE unless the user explicitly agrees or the draft markdown explicitly says `request_cve: true`.",
+					"hintLine": 7,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/sa.md",
+					"locator": {
+						"kind": "text",
+						"value": "GitHub does not expose repository security advisory comments/discussion through the documented REST OpenAPI schema or public GraphQL schema. A 404 from guessed API endpoints such as `api.github.com/repos/.../security-advisories/<GHSA>/comments`, `.../timeline`, or `.../events` is expected and is not, by itself, an auth failure. Do not use a browser session, browser cookies, or cookie extraction to fetch advisory comments. Instead, clearly tell the user that advisory comments were not included and that they can paste any relevant comments if they want them considered."
+					},
+					"quote": "GitHub does not expose repository security advisory comments/discussion through the documented REST OpenAPI schema or public GraphQL schema. A 404 from guessed API endpoints such as `api.github.com/repos/.../security-advisories/<GHSA>/comments`, `.../timeline`, or `.../events` is expected and is not, by itself, an auth failure. Do not use a browser session, browser cookies, or cookie extraction to fetch advisory comments. Instead, clearly tell the user that advisory comments were not included and that they can paste any relevant comments if they want them considered.",
+					"hintLine": 9,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/sa.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Never pretend comments were read."
+					},
+					"quote": "- Never pretend comments were read.",
+					"hintLine": 32,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/02-prompts-as-procedural-contracts.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E098",
+			"claim": "/cl：跨包把 ai/agent/tui 的用户可见变更复制到 coding-agent；在 [Unreleased] 顶部插入 New Features",
+			"sources": [
+				{
+					"path": ".pi/prompts/cl.md",
+					"locator": {
+						"kind": "text",
+						"value": "Changes in `ai`, `agent` or `tui` that affect end users should be duplicated to `coding-agent` changelog, since coding-agent is the user-facing package that depends on them."
+					},
+					"quote": "Changes in `ai`, `agent` or `tui` that affect end users should be duplicated to `coding-agent` changelog, since coding-agent is the user-facing package that depends on them.",
+					"hintLine": 31,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/cl.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Insert a `### New Features` section at the start of `## [Unreleased]` in `packages/coding-agent/CHANGELOG.md`."
+					},
+					"quote": "- Insert a `### New Features` section at the start of `## [Unreleased]` in `packages/coding-agent/CHANGELOG.md`.",
+					"hintLine": 34,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/02-prompts-as-procedural-contracts.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E099",
+			"claim": "/dup：查重复的三步检索、同症状同因判据、草稿评论与 AI 披露、禁止 post/label/close",
+			"sources": [
+				{
+					"path": ".pi/prompts/dup.md",
+					"locator": {
+						"kind": "text",
+						"value": "description: Find potential duplicates of a GitHub issue"
+					},
+					"quote": "description: Find potential duplicates of a GitHub issue",
+					"hintLine": 2,
+					"volatility": "medium"
+				}
+			],
+			"page": "repo-harness/02-prompts-as-procedural-contracts.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

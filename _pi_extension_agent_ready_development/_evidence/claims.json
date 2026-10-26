@@ -495,6 +495,524 @@
 					"volatility": "medium"
 				}
 			]
+		},
+		{
+			"id": "E023",
+			"claim": "lockstep 版本：所有包同一版本、一起发布；sync-versions 与 publish 各断言一次",
+			"sources": [
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases."
+					},
+					"quote": "**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.",
+					"hintLine": 10,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/sync-versions.js",
+					"locator": {
+						"kind": "text",
+						"value": "const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));"
+					},
+					"quote": "const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));",
+					"hintLine": 29,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const versions = [...new Set(packages.map((pkg) => pkg.version))];"
+					},
+					"quote": "const versions = [...new Set(packages.map((pkg) => pkg.version))];",
+					"hintLine": 33,
+					"volatility": "medium"
+				},
+				{
+					"path": "package.json",
+					"locator": {
+						"kind": "text",
+						"value": "\"version:patch\": \"npm version patch --workspaces --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts\","
+					},
+					"quote": "\"version:patch\": \"npm version patch --workspaces --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts\",",
+					"hintLine": 43,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E024",
+			"claim": "两个发布入口：release:local 只做仓外 tarball smoke；真实发布推 main 与 tag",
+			"sources": [
+				{
+					"path": "scripts/local-release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from \"node:fs\";"
+					},
+					"quote": "import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from \"node:fs\";",
+					"hintLine": 4,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "3. **Run the release script**:"
+					},
+					"quote": "3. **Run the release script**:",
+					"hintLine": 37,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E025",
+			"claim": "发布前：先审 changelog、仓外本地 smoke、再跑发布脚本",
+			"sources": [
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "1. **Update CHANGELOGs**: ask the user whether they ran the `/cl` prompt on the latest commit on `main`. If not, they must run `/cl` first to audit and update each package's `[Unreleased]` section before releasing."
+					},
+					"quote": "1. **Update CHANGELOGs**: ask the user whether they ran the `/cl` prompt on the latest commit on `main`. If not, they must run `/cl` first to audit and update each package's `[Unreleased]` section before releasing.",
+					"hintLine": 12,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):"
+					},
+					"quote": "2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):",
+					"hintLine": 14,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E026",
+			"claim": "release.mjs 的十步：干净树 → npm 注册 → catalog pin+build → bump → changelog → 产物 → 检查 → commit/tag → 下周期段 → push",
+			"sources": [
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "* 1. Check for uncommitted changes"
+					},
+					"quote": "* 1. Check for uncommitted changes",
+					"hintLine": 10,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "// 1. Check for uncommitted changes"
+					},
+					"quote": "// 1. Check for uncommitted changes",
+					"hintLine": 258,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function assertPackagesAreRegisteredWithNpm() {"
+					},
+					"quote": "function assertPackagesAreRegisteredWithNpm() {",
+					"hintLine": 57,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "// Pin and verify the Nix model catalog before modifying versions, so the pin"
+					},
+					"quote": "// Pin and verify the Nix model catalog before modifying versions, so the pin",
+					"hintLine": 271,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function bumpOrSetVersion(target) {"
+					},
+					"quote": "function bumpOrSetVersion(target) {",
+					"hintLine": 186,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function updateChangelogsForRelease(version) {"
+					},
+					"quote": "function updateChangelogsForRelease(version) {",
+					"hintLine": 217,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "// 5. Regenerate release artifacts"
+					},
+					"quote": "// 5. Regenerate release artifacts",
+					"hintLine": 286,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "// 6. Run checks and tests"
+					},
+					"quote": "// 6. Run checks and tests",
+					"hintLine": 293,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function stageChangedFiles() {"
+					},
+					"quote": "function stageChangedFiles() {",
+					"hintLine": 176,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function addUnreleasedSection() {"
+					},
+					"quote": "function addUnreleasedSection() {",
+					"hintLine": 238,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/release.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "run(\"git push origin main\");"
+					},
+					"quote": "run(\"git push origin main\");",
+					"hintLine": 336,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E027",
+			"claim": "tag 推出后不得重跑 release 脚本",
+			"sources": [
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## [Unreleased]` changelog sections, commits `Add [Unreleased] section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed."
+					},
+					"quote": "The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## [Unreleased]` changelog sections, commits `Add [Unreleased] section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.",
+					"hintLine": 46,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E028",
+			"claim": "公开放最后：二进制先入 draft，后续失败由 cleanup 删除草稿",
+			"sources": [
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'"
+					},
+					"quote": "description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'",
+					"hintLine": 14,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "# Keep the public GitHub Release publication last. Binary assets are staged in"
+					},
+					"quote": "# Keep the public GitHub Release publication last. Binary assets are staged in",
+					"hintLine": 25,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E029",
+			"claim": "六个阶段 + 并行 3b env-daemons；publish-npm 的 needs 含两者",
+			"sources": [
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "build:"
+					},
+					"quote": "build:",
+					"hintLine": 27,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "smoke-test-binaries:"
+					},
+					"quote": "smoke-test-binaries:",
+					"hintLine": 131,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "stage-github-release:"
+					},
+					"quote": "stage-github-release:",
+					"hintLine": 210,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "# The pi-env daemon for every remote system @earendil-works/pi-env supports; the npm package ships them all."
+					},
+					"quote": "# The pi-env daemon for every remote system @earendil-works/pi-env supports; the npm package ships them all.",
+					"hintLine": 304,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "publish-npm:"
+					},
+					"quote": "publish-npm:",
+					"hintLine": 312,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "announce-pi-dev-release:"
+					},
+					"quote": "announce-pi-dev-release:",
+					"hintLine": 389,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "publish-github-release:"
+					},
+					"quote": "publish-github-release:",
+					"hintLine": 430,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E030",
+			"claim": "公告：逐包校验 npm 版本与 tarball；release record 与 installer 用 if-none-match；latest 指针乐观锁且不降级",
+			"sources": [
+				{
+					"path": "scripts/publish-release-announcement.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "for (const pkg of packages) {"
+					},
+					"quote": "for (const pkg of packages) {",
+					"hintLine": 272,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish-release-announcement.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "async function resolvePackageFromNpm(pkg) {"
+					},
+					"quote": "async function resolvePackageFromNpm(pkg) {",
+					"hintLine": 70,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish-release-announcement.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "export async function advanceLatestRelease(version, readLatest, writeLatest) {"
+					},
+					"quote": "export async function advanceLatestRelease(version, readLatest, writeLatest) {",
+					"hintLine": 254,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish-release-announcement.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const current = await readLatest();"
+					},
+					"quote": "const current = await readLatest();",
+					"hintLine": 256,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish-release-announcement.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "\"public, max-age=31536000, immutable\","
+					},
+					"quote": "\"public, max-age=31536000, immutable\",",
+					"hintLine": 297,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish-release-announcement.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "\"no-store\","
+					},
+					"quote": "\"no-store\",",
+					"hintLine": 346,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E031",
+			"claim": "Nix 线：tag 构建要求版本等于 tag；stable 只 fast-forward 不回退",
+			"sources": [
+				{
+					"path": ".github/workflows/nix.yml",
+					"locator": {
+						"kind": "text",
+						"value": "build:"
+					},
+					"quote": "build:",
+					"hintLine": 87,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E032",
+			"claim": "三处幂等：npm 已发布则跳过；公告对象 if-none-match；草稿 Release 由 cleanup job 兜底",
+			"sources": [
+				{
+					"path": "scripts/publish.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "function isPublished(name, version) {"
+					},
+					"quote": "function isPublished(name, version) {",
+					"hintLine": 13,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "if (pkg.published) {"
+					},
+					"quote": "if (pkg.published) {",
+					"hintLine": 50,
+					"volatility": "medium"
+				},
+				{
+					"path": "scripts/publish.mjs",
+					"locator": {
+						"kind": "text",
+						"value": "const args = [\"publish\", pkg.tarballPath, \"--access\", \"public\", \"--provenance\", \"--ignore-scripts\"];"
+					},
+					"quote": "const args = [\"publish\", pkg.tarballPath, \"--access\", \"public\", \"--provenance\", \"--ignore-scripts\"];",
+					"hintLine": 54,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "cleanup-draft-github-release:"
+					},
+					"quote": "cleanup-draft-github-release:",
+					"hintLine": 460,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E033",
+			"claim": "恢复动作：修好重跑失败 job，不重跑 release；Nix 的 tag 不能修，source_ref 仅供恢复",
+			"sources": [
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "6. **If CI publish or announcement fails**: inspect the failed job. The publish helper is idempotent and skips package versions already present on npm; the announcement job rechecks availability before updating the R2 marker. Rerun the failed job or workflow after fixing CI or transient npm issues. Do not rerun `npm run release:patch` or `npm run release:minor` for the same version."
+					},
+					"quote": "6. **If CI publish or announcement fails**: inspect the failed job. The publish helper is idempotent and skips package versions already present on npm; the announcement job rechecks availability before updating the R2 marker. Rerun the failed job or workflow after fixing CI or transient npm issues. Do not rerun `npm run release:patch` or `npm run release:minor` for the same version.",
+					"hintLine": 52,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/skills/release.md",
+					"locator": {
+						"kind": "text",
+						"value": "5. **CI builds the Nix release**: the tag push also triggers `.github/workflows/nix.yml`, which builds the tagged flake on Linux and macOS and then fast-forwards the `stable` branch to the release commit. `nix run github:earendil-works/pi/stable` runs the latest release. If the Nix build fails, `stable` stays on the previous release; the tag cannot be fixed, so fix `main` and ship the fix in the next release."
+					},
+					"quote": "5. **CI builds the Nix release**: the tag push also triggers `.github/workflows/nix.yml`, which builds the tagged flake on Linux and macOS and then fast-forwards the `stable` branch to the release commit. `nix run github:earendil-works/pi/stable` runs the latest release. If the Nix build fails, `stable` stays on the previous release; the tag cannot be fixed, so fix `main` and ship the fix in the next release.",
+					"hintLine": 50,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/build-binaries.yml",
+					"locator": {
+						"kind": "text",
+						"value": "description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'"
+					},
+					"quote": "description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'",
+					"hintLine": 14,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/07-release-and-recovery.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

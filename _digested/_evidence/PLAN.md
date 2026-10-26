@@ -12,6 +12,8 @@
 
 ## 状态
 
+计划文件位置：`_digested/_evidence/PLAN.md`（不在 extension 语料内，避免 verify.mjs 把示例锚点当真链接）。
+
 | 阶段 | 内容 | 状态 |
 |---|---|---|
 | P0 | 提交 v1.4.0 同步为回滚点（`c5a3938a7`） | 完成 |
@@ -26,7 +28,7 @@
 
 按锚点密度排序（括号内为 `#L` 数）：
 
-- [ ] `sdlc-reference/07-release-and-recovery.md`（48）
+- [x] `sdlc-reference/07-release-and-recovery.md`（48）→ E023–E033
 - [ ] `sdlc-reference/04-ci-matrix.md`（33）
 - [ ] `sdlc-reference/05-testing-layers.md`（28）
 - [ ] `sdlc-reference/03-check-pipeline.md`（26）

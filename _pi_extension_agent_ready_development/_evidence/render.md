@@ -270,3 +270,243 @@ lgtmi/lgtm 解锁贡献资格，命令须在回复开头或结尾；只有 lgtm 
   > - Never modify `packages/ai/src/models.generated.ts` directly; update `packages/ai/scripts/generate-models.ts` instead, then regenerate. Including the resulting `models.generated.ts` diff is always OK, even if regeneration includes unrelated upstream model metadata changes. The generated model data in `packages/ai/src/providers/data/` is gitignored: never stage it, and don't look for it in git history.
 
 核验：`v1.4.0`
+
+## sdlc-reference/07-release-and-recovery.md
+
+### E023
+
+lockstep 版本：所有包同一版本、一起发布；sync-versions 与 publish 各断言一次
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.`，提示行 10
+
+  > **Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.
+
+- [`scripts/sync-versions.js`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/sync-versions.js) — text: `const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));`，提示行 29
+
+  > const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));
+
+- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish.mjs) — text: `const versions = [...new Set(packages.map((pkg) => pkg.version))];`，提示行 33
+
+  > const versions = [...new Set(packages.map((pkg) => pkg.version))];
+
+- [`package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/package.json) — text: `"version:patch": "npm version patch --workspaces --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts",`，提示行 43
+
+  > "version:patch": "npm version patch --workspaces --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts",
+
+核验：`v1.4.0`
+
+### E024
+
+两个发布入口：release:local 只做仓外 tarball smoke；真实发布推 main 与 tag
+
+- [`scripts/local-release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/local-release.mjs) — text: `import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";`，提示行 4
+
+  > import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `3. **Run the release script**:`，提示行 37
+
+  > 3. **Run the release script**:
+
+核验：`v1.4.0`
+
+### E025
+
+发布前：先审 changelog、仓外本地 smoke、再跑发布脚本
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `1. **Update CHANGELOGs**: ask the user whether they ran the `/cl` prompt on the latest commit on `main`. If not, they must run `/cl` first to audit and update each package's `[Unreleased]` section before releasing.`，提示行 12
+
+  > 1. **Update CHANGELOGs**: ask the user whether they ran the `/cl` prompt on the latest commit on `main`. If not, they must run `/cl` first to audit and update each package's `[Unreleased]` section before releasing.
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):`，提示行 14
+
+  > 2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):
+
+核验：`v1.4.0`
+
+### E026
+
+release.mjs 的十步：干净树 → npm 注册 → catalog pin+build → bump → changelog → 产物 → 检查 → commit/tag → 下周期段 → push
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `* 1. Check for uncommitted changes`，提示行 10
+
+  > * 1. Check for uncommitted changes
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `// 1. Check for uncommitted changes`，提示行 258
+
+  > // 1. Check for uncommitted changes
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function assertPackagesAreRegisteredWithNpm() {`，提示行 57
+
+  > function assertPackagesAreRegisteredWithNpm() {
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `// Pin and verify the Nix model catalog before modifying versions, so the pin`，提示行 271
+
+  > // Pin and verify the Nix model catalog before modifying versions, so the pin
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function bumpOrSetVersion(target) {`，提示行 186
+
+  > function bumpOrSetVersion(target) {
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function updateChangelogsForRelease(version) {`，提示行 217
+
+  > function updateChangelogsForRelease(version) {
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `// 5. Regenerate release artifacts`，提示行 286
+
+  > // 5. Regenerate release artifacts
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `// 6. Run checks and tests`，提示行 293
+
+  > // 6. Run checks and tests
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function stageChangedFiles() {`，提示行 176
+
+  > function stageChangedFiles() {
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function addUnreleasedSection() {`，提示行 238
+
+  > function addUnreleasedSection() {
+
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `run("git push origin main");`，提示行 336
+
+  > run("git push origin main");
+
+核验：`v1.4.0`
+
+### E027
+
+tag 推出后不得重跑 release 脚本
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## [Unreleased]` changelog sections, commits `Add [Unreleased] section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.`，提示行 46
+
+  > The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## [Unreleased]` changelog sections, commits `Add [Unreleased] section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.
+
+核验：`v1.4.0`
+
+### E028
+
+公开放最后：二进制先入 draft，后续失败由 cleanup 删除草稿
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'`，提示行 14
+
+  > description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `# Keep the public GitHub Release publication last. Binary assets are staged in`，提示行 25
+
+  > # Keep the public GitHub Release publication last. Binary assets are staged in
+
+核验：`v1.4.0`
+
+### E029
+
+六个阶段 + 并行 3b env-daemons；publish-npm 的 needs 含两者
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `build:`，提示行 27
+
+  > build:
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `smoke-test-binaries:`，提示行 131
+
+  > smoke-test-binaries:
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `stage-github-release:`，提示行 210
+
+  > stage-github-release:
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `# The pi-env daemon for every remote system @earendil-works/pi-env supports; the npm package ships them all.`，提示行 304
+
+  > # The pi-env daemon for every remote system @earendil-works/pi-env supports; the npm package ships them all.
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `publish-npm:`，提示行 312
+
+  > publish-npm:
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `announce-pi-dev-release:`，提示行 389
+
+  > announce-pi-dev-release:
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `publish-github-release:`，提示行 430
+
+  > publish-github-release:
+
+核验：`v1.4.0`
+
+### E030
+
+公告：逐包校验 npm 版本与 tarball；release record 与 installer 用 if-none-match；latest 指针乐观锁且不降级
+
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `for (const pkg of packages) {`，提示行 272
+
+  > for (const pkg of packages) {
+
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `async function resolvePackageFromNpm(pkg) {`，提示行 70
+
+  > async function resolvePackageFromNpm(pkg) {
+
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `export async function advanceLatestRelease(version, readLatest, writeLatest) {`，提示行 254
+
+  > export async function advanceLatestRelease(version, readLatest, writeLatest) {
+
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `const current = await readLatest();`，提示行 256
+
+  > const current = await readLatest();
+
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `"public, max-age=31536000, immutable",`，提示行 297
+
+  > "public, max-age=31536000, immutable",
+
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `"no-store",`，提示行 346
+
+  > "no-store",
+
+核验：`v1.4.0`
+
+### E031
+
+Nix 线：tag 构建要求版本等于 tag；stable 只 fast-forward 不回退
+
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `build:`，提示行 87
+
+  > build:
+
+核验：`v1.4.0`
+
+### E032
+
+三处幂等：npm 已发布则跳过；公告对象 if-none-match；草稿 Release 由 cleanup job 兜底
+
+- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish.mjs) — text: `function isPublished(name, version) {`，提示行 13
+
+  > function isPublished(name, version) {
+
+- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish.mjs) — text: `if (pkg.published) {`，提示行 50
+
+  > if (pkg.published) {
+
+- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish.mjs) — text: `const args = ["publish", pkg.tarballPath, "--access", "public", "--provenance", "--ignore-scripts"];`，提示行 54
+
+  > const args = ["publish", pkg.tarballPath, "--access", "public", "--provenance", "--ignore-scripts"];
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `cleanup-draft-github-release:`，提示行 460
+
+  > cleanup-draft-github-release:
+
+核验：`v1.4.0`
+
+### E033
+
+恢复动作：修好重跑失败 job，不重跑 release；Nix 的 tag 不能修，source_ref 仅供恢复
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `6. **If CI publish or announcement fails**: inspect the failed job. The publish helper is idempotent and skips package versions already present on npm; the announcement job rechecks availability before updating the R2 marker. Rerun the failed job or workflow after fixing CI or transient npm issues. Do not rerun `npm run release:patch` or `npm run release:minor` for the same version.`，提示行 52
+
+  > 6. **If CI publish or announcement fails**: inspect the failed job. The publish helper is idempotent and skips package versions already present on npm; the announcement job rechecks availability before updating the R2 marker. Rerun the failed job or workflow after fixing CI or transient npm issues. Do not rerun `npm run release:patch` or `npm run release:minor` for the same version.
+
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `5. **CI builds the Nix release**: the tag push also triggers `.github/workflows/nix.yml`, which builds the tagged flake on Linux and macOS and then fast-forwards the `stable` branch to the release commit. `nix run github:earendil-works/pi/stable` runs the latest release. If the Nix build fails, `stable` stays on the previous release; the tag cannot be fixed, so fix `main` and ship the fix in the next release.`，提示行 50
+
+  > 5. **CI builds the Nix release**: the tag push also triggers `.github/workflows/nix.yml`, which builds the tagged flake on Linux and macOS and then fast-forwards the `stable` branch to the release commit. `nix run github:earendil-works/pi/stable` runs the latest release. If the Nix build fails, `stable` stays on the previous release; the tag cannot be fixed, so fix `main` and ship the fix in the next release.
+
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'`，提示行 14
+
+  > description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'
+
+核验：`v1.4.0`

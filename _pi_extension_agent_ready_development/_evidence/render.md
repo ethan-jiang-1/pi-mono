@@ -2691,3 +2691,119 @@ release：lockstep、仓外本地 smoke、tag 后不重跑脚本；smoke 未过�
   ```
 
 核验：`v1.4.0`
+
+## extension-development-model/02-terms-and-mental-models.md
+
+### E115
+
+运行时三层：agent core / coding-agent / 扩展运行时；/reload 会计数重载；会话持有模型、工具、队列、压缩与扩展运行时
+
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/reload` | Reload keybindings, extensions, skills, templates, themes, and context files |`，提示行 49
+
+  ```text
+  | `/reload` | Reload keybindings, extensions, skills, templates, themes, and context files |
+  ```
+
+- [`packages/coding-agent/docs/sdk.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sdk.md) — text: `## Session lifecycle`，提示行 26
+
+  ```text
+  ## Session lifecycle
+  ```
+
+- [`packages/coding-agent/docs/how-pi-works.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/how-pi-works.md) — text: `Pi coordinates model requests, tool execution, context assembly, and session storage. A session is Pi's record of a conversation, including messages, tool calls and results, model changes, compactions, and other events.`，提示行 3
+
+  ```text
+  Pi coordinates model requests, tool execution, context assembly, and session storage. A session is Pi's record of a conversation, including messages, tool calls and results, model changes, compactions, and other events.
+  ```
+
+- [`packages/coding-agent/docs/how-pi-works.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/how-pi-works.md) — text: `## Interfaces`，提示行 33
+
+  ```text
+  ## Interfaces
+  ```
+
+核验：`v1.4.0`
+
+### E116
+
+skill 可以是单文件 Markdown，也可以是含 SKILL.md 的目录；启动只注入 name/description/path
+
+- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md) — text: `Pi accepts some standalone Markdown skills, but a directory containing `SKILL.md` is the portable form and should be preferred. See ［Settings］(settings.md#resources) and ［Pi Packages］(packages.md) for additional locations.`，提示行 63
+
+  ```text
+  Pi accepts some standalone Markdown skills, but a directory containing `SKILL.md` is the portable form and should be preferred. See [Settings](settings.md#resources) and [Pi Packages](packages.md) for additional locations.
+  ```
+
+核验：`v1.4.0`
+
+### E117
+
+生命周期：before_agent_start → 事件 → agent_end；agent_before_settle 是最后可行动边界，agent_settled 仅通知
+
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `## Understand the runtime lifecycle`，提示行 54
+
+  ```text
+  ## Understand the runtime lifecycle
+  ```
+
+核验：`v1.4.0`
+
+### E118
+
+session_before_compact：扩展可提供自定义摘要（fromHook）并把 usage 计入会话统计
+
+- [`packages/coding-agent/docs/compaction.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/compaction.md) — text: `### session_before_compact`，提示行 297
+
+  ```text
+  ### session_before_compact
+  ```
+
+核验：`v1.4.0`
+
+### E119
+
+SessionManager 拥有条目树与叶子；分支敏感状态从 getBranch() 重建，不重放文件
+
+- [`packages/coding-agent/docs/sdk.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sdk.md) — text: `## Session lifecycle`，提示行 26
+
+  ```text
+  ## Session lifecycle
+  ```
+
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `Reconstruct branch-sensitive state from `ctx.sessionManager.getBranch()` during `session_start`.`，提示行 348
+
+  ```text
+  Reconstruct branch-sensitive state from `ctx.sessionManager.getBranch()` during `session_start`.
+  ```
+
+核验：`v1.4.0`
+
+### E120
+
+接续命令：--continue/--resume、/resume /new、/tree /fork /clone、/import、/export /share
+
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `Pi saves a conversation as a session. The active branch of that session supplies conversation history for the next model request. Use session commands to continue work, explore another branch, or reduce the amount of history sent to the model.`，提示行 3
+
+  ```text
+  Pi saves a conversation as a session. The active branch of that session supplies conversation history for the next model request. Use session commands to continue work, explore another branch, or reduce the amount of history sent to the model.
+  ```
+
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/export ［path］` | Export the session as HTML or JSONL |`，提示行 38
+
+  ```text
+  | `/export [path]` | Export the session as HTML or JSONL |
+  ```
+
+核验：`v1.4.0`
+
+### E121
+
+RPC 模式下部分 UI 方法降级：custom() 等需终端直连的方法不可用
+
+- [`packages/coding-agent/docs/rpc-extension-ui.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/rpc-extension-ui.md) — text: `Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:`，提示行 14
+
+  ```text
+  Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:
+  ```
+
+核验：`v1.4.0`

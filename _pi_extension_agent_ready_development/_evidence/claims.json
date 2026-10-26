@@ -4203,6 +4203,182 @@
 			],
 			"page": "repo-harness/06-scope-discipline-and-cost-contracts.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E115",
+			"claim": "运行时三层：agent core / coding-agent / 扩展运行时；/reload 会计数重载；会话持有模型、工具、队列、压缩与扩展运行时",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/slash-commands.md",
+					"locator": {
+						"kind": "text",
+						"value": "| `/reload` | Reload keybindings, extensions, skills, templates, themes, and context files |"
+					},
+					"quote": "| `/reload` | Reload keybindings, extensions, skills, templates, themes, and context files |",
+					"hintLine": 49,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/sdk.md",
+					"locator": {
+						"kind": "text",
+						"value": "## Session lifecycle"
+					},
+					"quote": "## Session lifecycle",
+					"hintLine": 26,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/how-pi-works.md",
+					"locator": {
+						"kind": "text",
+						"value": "Pi coordinates model requests, tool execution, context assembly, and session storage. A session is Pi's record of a conversation, including messages, tool calls and results, model changes, compactions, and other events."
+					},
+					"quote": "Pi coordinates model requests, tool execution, context assembly, and session storage. A session is Pi's record of a conversation, including messages, tool calls and results, model changes, compactions, and other events.",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/how-pi-works.md",
+					"locator": {
+						"kind": "text",
+						"value": "## Interfaces"
+					},
+					"quote": "## Interfaces",
+					"hintLine": 33,
+					"volatility": "medium"
+				}
+			],
+			"page": "extension-development-model/02-terms-and-mental-models.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E116",
+			"claim": "skill 可以是单文件 Markdown，也可以是含 SKILL.md 的目录；启动只注入 name/description/path",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/skills.md",
+					"locator": {
+						"kind": "text",
+						"value": "Pi accepts some standalone Markdown skills, but a directory containing `SKILL.md` is the portable form and should be preferred. See [Settings](settings.md#resources) and [Pi Packages](packages.md) for additional locations."
+					},
+					"quote": "Pi accepts some standalone Markdown skills, but a directory containing `SKILL.md` is the portable form and should be preferred. See [Settings](settings.md#resources) and [Pi Packages](packages.md) for additional locations.",
+					"hintLine": 63,
+					"volatility": "medium"
+				}
+			],
+			"page": "extension-development-model/02-terms-and-mental-models.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E117",
+			"claim": "生命周期：before_agent_start → 事件 → agent_end；agent_before_settle 是最后可行动边界，agent_settled 仅通知",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/extensions.md",
+					"locator": {
+						"kind": "text",
+						"value": "## Understand the runtime lifecycle"
+					},
+					"quote": "## Understand the runtime lifecycle",
+					"hintLine": 54,
+					"volatility": "medium"
+				}
+			],
+			"page": "extension-development-model/02-terms-and-mental-models.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E118",
+			"claim": "session_before_compact：扩展可提供自定义摘要（fromHook）并把 usage 计入会话统计",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/compaction.md",
+					"locator": {
+						"kind": "text",
+						"value": "### session_before_compact"
+					},
+					"quote": "### session_before_compact",
+					"hintLine": 297,
+					"volatility": "medium"
+				}
+			],
+			"page": "extension-development-model/02-terms-and-mental-models.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E119",
+			"claim": "SessionManager 拥有条目树与叶子；分支敏感状态从 getBranch() 重建，不重放文件",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/sdk.md",
+					"locator": {
+						"kind": "text",
+						"value": "## Session lifecycle"
+					},
+					"quote": "## Session lifecycle",
+					"hintLine": 26,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/extensions.md",
+					"locator": {
+						"kind": "text",
+						"value": "Reconstruct branch-sensitive state from `ctx.sessionManager.getBranch()` during `session_start`."
+					},
+					"quote": "Reconstruct branch-sensitive state from `ctx.sessionManager.getBranch()` during `session_start`.",
+					"hintLine": 348,
+					"volatility": "medium"
+				}
+			],
+			"page": "extension-development-model/02-terms-and-mental-models.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E120",
+			"claim": "接续命令：--continue/--resume、/resume /new、/tree /fork /clone、/import、/export /share",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/sessions.md",
+					"locator": {
+						"kind": "text",
+						"value": "Pi saves a conversation as a session. The active branch of that session supplies conversation history for the next model request. Use session commands to continue work, explore another branch, or reduce the amount of history sent to the model."
+					},
+					"quote": "Pi saves a conversation as a session. The active branch of that session supplies conversation history for the next model request. Use session commands to continue work, explore another branch, or reduce the amount of history sent to the model.",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/slash-commands.md",
+					"locator": {
+						"kind": "text",
+						"value": "| `/export [path]` | Export the session as HTML or JSONL |"
+					},
+					"quote": "| `/export [path]` | Export the session as HTML or JSONL |",
+					"hintLine": 38,
+					"volatility": "medium"
+				}
+			],
+			"page": "extension-development-model/02-terms-and-mental-models.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E121",
+			"claim": "RPC 模式下部分 UI 方法降级：custom() 等需终端直连的方法不可用",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/rpc-extension-ui.md",
+					"locator": {
+						"kind": "text",
+						"value": "Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:"
+					},
+					"quote": "Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:",
+					"hintLine": 14,
+					"volatility": "medium"
+				}
+			],
+			"page": "extension-development-model/02-terms-and-mental-models.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

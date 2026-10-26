@@ -42,7 +42,7 @@
 - [x] `repo-harness/07-monorepo-taxonomy.md`（11）→ E100–E105
 - [x] `repo-harness/03-repo-skills.md`（10）→ E106–E110
 - [x] `repo-harness/06-scope-discipline-and-cost-contracts.md`（9）→ E111–E114
-- [ ] `extension-development-model/02-terms-and-mental-models.md`（11）
+- [x] `extension-development-model/02-terms-and-mental-models.md`（11）→ E115–E121
 - [ ] `extension-development-model/01-new-extension-repository.md`（9）
 - [ ] `extension-development-model/00-index.md`（8）
 - [ ] 其余无锚点页：清版本句与 `_evidence` 指针

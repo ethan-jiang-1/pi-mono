@@ -11,7 +11,7 @@
 一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.4.0) tag `v1.4.0`（commit `4a080252f`）核对。关键规则以 blockquote 摘录仓库原文，并附该 tag 的钉版链接（行号锚点以 tag 实际行号为准）。当前工作树的 HEAD 在该 tag 之后，个别文件已漂移；本卷不引用工作树版本。需要自行核对时使用：
 
 ```sh
-git show v1.4.0:<path>
+git show <baseline>:<path>
 ```
 
 ## 主入口
@@ -37,10 +37,10 @@ git show v1.4.0:<path>
 
 ## 引用与核对约定
 
-关键规则以 Markdown blockquote 摘录仓库英文原文，随后给出钉版链接（`blob/v1.4.0` 路径加 `#L` 行号锚点，行号以 `git show v1.4.0:<path>` 的实际行号为准）。语料内链接一律相对路径且目标存在；外部链接只指向该 tag 的 Pi 仓库路径。核对任一引用：
+关键规则以 Markdown blockquote 摘录仓库英文原文，随后给出钉版链接（`blob/<baseline>` 路径，不带行号；符号/小节定位见 `_evidence/render.md`）。语料内链接一律相对路径且目标存在；外部链接只指向该 tag 的 Pi 仓库路径。核对任一引用：
 
 ```sh
-git show v1.4.0:<path> | sed -n '<N>p'
+git show <baseline>:<path> | sed -n '<N>p'
 ```
 
 ## 本卷不做什么

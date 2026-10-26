@@ -2807,3 +2807,145 @@ RPC 模式下部分 UI 方法降级：custom() 等需终端直连的方法不可
   ```
 
 核验：`v1.4.0`
+
+## repo-harness/00-index.md
+
+### E122
+
+agent 从仓库根运行并遵守 AGENTS；CONTRIBUTING 对 AI 生成代码要求理解
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.`，提示行 19
+
+  ```text
+  If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
+  ```
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `Multiple pi sessions may be running in this cwd at the same time, each modifying different files. Git operations that touch unstaged, staged, or untracked files outside your own changes will stomp on other sessions' work. Follow these rules:`，提示行 54
+
+  ```text
+  Multiple pi sessions may be running in this cwd at the same time, each modifying different files. Git operations that touch unstaged, staged, or untracked files outside your own changes will stomp on other sessions' work. Follow these rules:
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.`，提示行 15
+
+  ```text
+  **You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.
+  ```
+
+核验：`v1.4.0`
+
+## sdlc-reference/00-index.md
+
+### E123
+
+主仓权威位置表：批准文件、nix pin、changelog、MCP baseline 与各 workflow
+
+- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/approve-contributor.yml) — text: `on:`，提示行 3
+
+  ```text
+  on:
+  ```
+
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `# The flake builds with the model catalog revision pinned in`，提示行 3
+
+  ```text
+  # The flake builds with the model catalog revision pinned in
+  ```
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `## Changelog`，提示行 102
+
+  ```text
+  ## Changelog
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.`，提示行 69
+
+  ```text
+  Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.
+  ```
+
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `- name: Install dependencies`，提示行 59
+
+  ```text
+  - name: Install dependencies
+  ```
+
+核验：`v1.4.0`
+
+## sdlc-reference/08-applicability-boundary.md
+
+### E124
+
+宿主提供包放 peerDependencies 用 "*"，不打包
+
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
+
+  ```text
+  Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.
+  ```
+
+核验：`v1.4.0`
+
+## extension-development-model/00-index.md
+
+### E125
+
+资源判别（扩展/skill/template）、压缩钩子、host 包合同、RPC UI 降级
+
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.`，提示行 3
+
+  ```text
+  Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.
+  ```
+
+- [`packages/coding-agent/docs/compaction.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/compaction.md) — text: `### session_before_compact`，提示行 297
+
+  ```text
+  ### session_before_compact
+  ```
+
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
+
+  ```text
+  Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.
+  ```
+
+- [`packages/coding-agent/docs/rpc-extension-ui.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/rpc-extension-ui.md) — text: `Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:`，提示行 14
+
+  ```text
+  Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:
+  ```
+
+核验：`v1.4.0`
+
+## extension-development-model/01-new-extension-repository.md
+
+### E126
+
+jiti 加载、agent dir 与 project trust、工具合同、faux 测试、package 分发与干净安装验证
+
+- [`packages/coding-agent/docs/cli.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/cli.md) — text: `- `-ne`, `--no-extensions`<br>`，提示行 196
+
+  ```text
+  - `-ne`, `--no-extensions`<br>
+  ```
+
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/trust` | Save a project trust decision for future Pi processes |`，提示行 48
+
+  ```text
+  | `/trust` | Save a project trust decision for future Pi processes |
+  ```
+
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `### Tools`，提示行 245
+
+  ```text
+  ### Tools
+  ```
+
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.`，提示行 3
+
+  ```text
+  Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.
+  ```
+
+核验：`v1.4.0`

@@ -1,6 +1,6 @@
 # 新仓起步：从最小扩展到 package 交付
 
-这条路径从零建到第一笔完整交付。每一步都标注它覆盖完成度阶梯的哪一级（见[总览](./00-index.md#pi-native-完成度阶梯)）。命令与合同依据 Pi `v1.4.0` 的 [Extensions](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md)、[Packages](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md)、[Skills](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md) 文档与 SDK 示例。
+这条路径从零建到第一笔完整交付。每一步都标注它覆盖完成度阶梯的哪一级（见[总览](./00-index.md#pi-native-完成度阶梯)）。命令与合同依据 Pi 的 、、 文档与 SDK 示例。
 
 ## 1. 最小扩展（阶梯 1）
 
@@ -25,17 +25,17 @@ export default function (pi: ExtensionAPI) {
 pi --extension ./hello.ts
 ```
 
-Pi 用 `jiti` 加载本地 TypeScript 扩展，不需要单独编译步骤（运行时事实）。`-e`/`--extension` 也可加载内建扩展（如 `builtin:mcp`）；`-ne` 禁用发现、配置与内建扩展，但显式 `-e` 路径仍生效（见 [CLI 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/cli.md#L195-L197)）。跑 `/hello` 有输出，覆盖阶梯 1：文件被加载、factory 执行、命令注册。
+Pi 用 `jiti` 加载本地 TypeScript 扩展，不需要单独编译步骤（运行时事实）。`-e`/`--extension` 也可加载内建扩展（如 `builtin:mcp`）；`-ne` 禁用发现、配置与内建扩展，但显式 `-e` 路径仍生效（见 ）。跑 `/hello` 有输出，覆盖阶梯 1：文件被加载、factory 执行、命令注册。
 
 ## 2. 落位与信任边界
 
-固定使用时放入 agent dir：个人的放 `~/.pi/agent/extensions/`，项目的放仓库内 `.pi/extensions/`。项目资源在 project trust 授予前不加载——这是安全边界，不是缺陷；信任决定可经 `/trust` 命令保存供后续 Pi 进程使用（[slash-commands.md L48](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md#L48)）。交付验证时确认你的包在两种位置的行为预期（运行时事实，见 [Extensions 的加载位置](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md#L40-L50)与 [Configuration 的位置与信任说明](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/configuration.md#L3)）。
+固定使用时放入 agent dir：个人的放 `~/.pi/agent/extensions/`，项目的放仓库内 `.pi/extensions/`。项目资源在 project trust 授予前不加载——这是安全边界，不是缺陷；信任决定可经 `/trust` 命令保存供后续 Pi 进程使用。交付验证时确认你的包在两种位置的行为预期（运行时事实，见 与 ）。
 
 小扩展用单文件，多文件实现用含 `index.ts`（或 `index.js`）的目录；npm 依赖放旁边的 `package.json`。
 
 ## 3. 加一个工具（阶梯 2-3）
 
-工具定义 name、model-facing description、TypeBox 参数 schema 和 `execute()`；结果必须有模型可见的 `content` 和用于渲染/状态重建的 `details`（没有结构化数据时 `details: undefined`）。三个容易做错的合同（运行时事实，见 [Extensions 的工具节](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md#L245-L264)；底层消息与 content 块的类型权威在 [Message Types 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/message-types.md#L3)）：
+工具定义 name、model-facing description、TypeBox 参数 schema 和 `execute()`；结果必须有模型可见的 `content` 和用于渲染/状态重建的 `details`（没有结构化数据时 `details: undefined`）。三个容易做错的合同（运行时事实，见 ；底层消息与 content 块的类型权威在 ）：
 
 - 抛出 `execute()` 产生失败的工具结果；返回对象不会自动标记为错误。要让模型看到错误而程序调用者仍收到数据，用 `isError: true`。
 - 嵌套模型调用的 `usage` 要并入结果，会话统计才准确。
@@ -47,15 +47,15 @@ Pi 用 `jiti` 加载本地 TypeScript 扩展，不需要单独编译步骤（运
 
 ![验证分层：每种验证只证明它观察的对象](./figures/verification-layers.svg)
 
-为扩展写不依赖真实 API 的语义测试。Pi 的发布包提供了所需的部件：`@earendil-works/pi-ai/compat` 导出 faux provider（`registerFauxProvider`、`streamSimple`），SDK 的 `createAgentSession` 允许注入 `modelRuntime`、`resourceLoader` 与 in-memory `SessionManager`（运行时事实，见 [SDK 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sdk.md#L96-L118)）。
+为扩展写不依赖真实 API 的语义测试。Pi 的发布包提供了所需的部件：`@earendil-works/pi-ai/compat` 导出 faux provider（`registerFauxProvider`、`streamSimple`），SDK 的 `createAgentSession` 允许注入 `modelRuntime`、`resourceLoader` 与 in-memory `SessionManager`（运行时事实，见 ）。
 
-pi-mono 的测试套件是参考实现：真实 `AgentSession`、经真实 factory 加载的扩展与脚本化 provider 响应，断言公开事件序列（例如自动重试后恰好一次 `agent_settled` 且 `isIdle()` 为 true）。注意 `harness.ts` 的 ResourceLoader 默认是轻量测试替身（不做文件系统发现）；需要真实发现路径的测试（如 skill 优先级回归）另行使用 `DefaultResourceLoader`。在 [test/suite/harness.ts](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) 读它的组装方式，在自己的仓库用发布的包复刻同样的分层。
+pi-mono 的测试套件是参考实现：真实 `AgentSession`、经真实 factory 加载的扩展与脚本化 provider 响应，断言公开事件序列（例如自动重试后恰好一次 `agent_settled` 且 `isIdle()` 为 true）。注意 `harness.ts` 的 ResourceLoader 默认是轻量测试替身（不做文件系统发现）；需要真实发现路径的测试（如 skill 优先级回归）另行使用 `DefaultResourceLoader`。在  读它的组装方式，在自己的仓库用发布的包复刻同样的分层。
 
 扩展仓建议：每个行为变化配一条「回归时会失败」的最小断言。断言目标选公开事件与工具结果形状，不选内部私有状态。
 
 ## 5. 组成 package（阶梯 6 的前置）
 
-一个 package 是普通目录或 npm 包，把 extensions、skills、prompt templates、themes 作为一个单位分发（运行时事实，见 [Packages 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md#L3-L5)）。最简形态用约定目录：
+一个 package 是普通目录或 npm 包，把 extensions、skills、prompt templates、themes 作为一个单位分发（运行时事实，见 ）。最简形态用约定目录：
 
 ```text
 my-pi-package/
@@ -81,7 +81,9 @@ pi install ./my-pi-package     # 或 npm:/git: 源
 pi list
 ```
 
-然后用一个真实 prompt 复验第 3 级行为，用 `pi config` 确认包资源的加载配置符合预期。开发目录能跑不证明声明完整：漏掉的 manifest 条目、错误的依赖位置、依赖 undeclared import 的模块，都只在干净安装时暴露。settings 的对象形式可以按资源类型过滤包内容——项目设置覆盖 agent 目录设置、资源列表合并（运行时事实，见 [Settings 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/settings.md#L3)）——用户会这样裁剪你的包，交付前至少试一次「只留 extensions、关掉 skills」的组合。
+然后用一个真实 prompt 复验第 3 级行为，用 `pi config` 确认包资源的加载配置符合预期。开发目录能跑不证明声明完整：漏掉的 manifest 条目、错误的依赖位置、依赖 undeclared import 的模块，都只在干净安装时暴露。settings 的对象形式可以按资源类型过滤包内容——项目设置覆盖 agent 目录设置、资源列表合并（运行时事实，见 ）——用户会这样裁剪你的包，交付前至少试一次「只留 extensions、关掉 skills」的组合。
+
+[E126](../_evidence/render.md#e126)
 
 ## 7. 交付判断（阶梯 7）
 

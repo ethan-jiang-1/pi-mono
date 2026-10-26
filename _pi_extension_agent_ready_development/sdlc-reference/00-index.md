@@ -23,7 +23,7 @@
 
 ### (a) agent 是一等参与者
 
-主仓不只允许 agent 参与，还为其定义了可执行的角色合同：`.pi/prompts/is.md` 规定诊断 agent 的行为边界（不信 issue 内分析、完整读代码、只提议不实现、CI 下不加 `inprogress` 标签）；`.github/workflows/issue-analysis.yml` 在 CI 中以真实模型运行 `pi /is`、导出 session 到 secret gist，并给出 `/ir` 本地接续指令；`.pi/extensions/import-repro.ts` 把跨机器接续实现为 cwd 重写；`.github/workflows/remove-inprogress-on-close.yml` 保证 issue 关闭时清理 `inprogress` 标签。关键证据：[is.md](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md#L9-L28)、issue-analysis.yml 的[运行步](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml#L355-L416)、[导出与 gist 上传](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml#L487-L569)与[接续评论](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml#L571-L648)、[import-repro.ts](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts#L1-L16)。详见 [02 页](02-issue-diagnosis-and-session-import.md)。
+主仓不只允许 agent 参与，还为其定义了可执行的角色合同：`.pi/prompts/is.md` 规定诊断 agent 的行为边界（不信 issue 内分析、完整读代码、只提议不实现、CI 下不加 `inprogress` 标签）；`.github/workflows/issue-analysis.yml` 在 CI 中以真实模型运行 `pi /is`、导出 session 到 secret gist，并给出 `/ir` 本地接续指令；`.pi/extensions/import-repro.ts` 把跨机器接续实现为 cwd 重写；`.github/workflows/remove-inprogress-on-close.yml` 保证 issue 关闭时清理 `inprogress` 标签。关键证据：、issue-analysis.yml 的、与、。详见 [02 页](02-issue-diagnosis-and-session-import.md)。
 
 ### (b) 可机械判断的规则接入可执行检查
 
@@ -33,11 +33,13 @@
 
 | 事实 | v1.4.0 上的权威位置 |
 |---|---|
-| 贡献者资格（谁可发 issue/PR） | `.github/APPROVED_CONTRIBUTORS`，由 [approve-contributor.yml](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/approve-contributor.yml#L33-L43) 在维护者 `lgtmi`/`lgtm` 评论后自动改写，以 `github-actions[bot]` 身份提交（[L176-L183](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/approve-contributor.yml#L176-L183)） |
+| 贡献者资格（谁可发 issue/PR） | `.github/APPROVED_CONTRIBUTORS`，由  在维护者 `lgtmi`/`lgtm` 评论后自动改写，以 `github-actions[bot]` 身份提交 |
 | coding-agent 安装依赖树 | `packages/coding-agent/install-lock/`，由生成器校验（[03 页](03-check-pipeline.md)） |
-| Nix 模型目录 pin | `nix/model-catalog.json`（[nix.yml](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml#L3-L14) 注释声明 tag 不可改 pin） |
-| 每包变更记录 | `packages/*/CHANGELOG.md` 的 `[Unreleased]` 段，贡献者不得编辑（位置与段落结构见 [AGENTS.md](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md#L102-L106)；编辑禁令见 [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md#L69)） |
-| MCP 兼容基线 | `packages/coding-agent/test/mcp-conformance/baseline.json`（[ci.yml](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml#L59-L62)） |
+| Nix 模型目录 pin | `nix/model-catalog.json`（ 注释声明 tag 不可改 pin） |
+| 每包变更记录 | `packages/*/CHANGELOG.md` 的 `[Unreleased]` 段，贡献者不得编辑（位置与段落结构见 ；编辑禁令见 ） |
+| MCP 兼容基线 | `packages/coding-agent/test/mcp-conformance/baseline.json` |
+
+[E123](../_evidence/render.md#e123)
 | 已发布版本与 latest 指针 | npm registry 与 R2 上的 `releases/v1/latest.json`（[07 页](07-release-and-recovery.md)） |
 
 一条事实只在一个位置维护，其它地方引用或派生；这使「谁改了什么」可以机械审计。

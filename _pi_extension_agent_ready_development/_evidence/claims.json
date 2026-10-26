@@ -4379,6 +4379,216 @@
 			],
 			"page": "extension-development-model/02-terms-and-mental-models.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E122",
+			"page": "repo-harness/00-index.md",
+			"claim": "agent 从仓库根运行并遵守 AGENTS；CONTRIBUTING 对 AI 生成代码要求理解",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file."
+					},
+					"quote": "If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.",
+					"hintLine": 19,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "Multiple pi sessions may be running in this cwd at the same time, each modifying different files. Git operations that touch unstaged, staged, or untracked files outside your own changes will stomp on other sessions' work. Follow these rules:"
+					},
+					"quote": "Multiple pi sessions may be running in this cwd at the same time, each modifying different files. Git operations that touch unstaged, staged, or untracked files outside your own changes will stomp on other sessions' work. Follow these rules:",
+					"hintLine": 54,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed."
+					},
+					"quote": "**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.",
+					"hintLine": 15,
+					"volatility": "medium"
+				}
+			],
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E123",
+			"page": "sdlc-reference/00-index.md",
+			"claim": "主仓权威位置表：批准文件、nix pin、changelog、MCP baseline 与各 workflow",
+			"sources": [
+				{
+					"path": ".github/workflows/approve-contributor.yml",
+					"locator": {
+						"kind": "text",
+						"value": "on:"
+					},
+					"quote": "on:",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/nix.yml",
+					"locator": {
+						"kind": "text",
+						"value": "# The flake builds with the model catalog revision pinned in"
+					},
+					"quote": "# The flake builds with the model catalog revision pinned in",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "## Changelog"
+					},
+					"quote": "## Changelog",
+					"hintLine": 102,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers."
+					},
+					"quote": "Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.",
+					"hintLine": 69,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/ci.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Install dependencies"
+					},
+					"quote": "- name: Install dependencies",
+					"hintLine": 59,
+					"volatility": "medium"
+				}
+			],
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E124",
+			"page": "sdlc-reference/08-applicability-boundary.md",
+			"claim": "宿主提供包放 peerDependencies 用 \"*\"，不打包",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/packages.md",
+					"locator": {
+						"kind": "text",
+						"value": "Declare the host-provided packages listed above in `peerDependencies` with a `\"*\"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility."
+					},
+					"quote": "Declare the host-provided packages listed above in `peerDependencies` with a `\"*\"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.",
+					"hintLine": 88,
+					"volatility": "medium"
+				}
+			],
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E125",
+			"page": "extension-development-model/00-index.md",
+			"claim": "资源判别（扩展/skill/template）、压缩钩子、host 包合同、RPC UI 降级",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/extensions.md",
+					"locator": {
+						"kind": "text",
+						"value": "Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone."
+					},
+					"quote": "Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/compaction.md",
+					"locator": {
+						"kind": "text",
+						"value": "### session_before_compact"
+					},
+					"quote": "### session_before_compact",
+					"hintLine": 297,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/packages.md",
+					"locator": {
+						"kind": "text",
+						"value": "Declare the host-provided packages listed above in `peerDependencies` with a `\"*\"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility."
+					},
+					"quote": "Declare the host-provided packages listed above in `peerDependencies` with a `\"*\"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.",
+					"hintLine": 88,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/rpc-extension-ui.md",
+					"locator": {
+						"kind": "text",
+						"value": "Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:"
+					},
+					"quote": "Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:",
+					"hintLine": 14,
+					"volatility": "medium"
+				}
+			],
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E126",
+			"page": "extension-development-model/01-new-extension-repository.md",
+			"claim": "jiti 加载、agent dir 与 project trust、工具合同、faux 测试、package 分发与干净安装验证",
+			"sources": [
+				{
+					"path": "packages/coding-agent/docs/cli.md",
+					"locator": {
+						"kind": "text",
+						"value": "- `-ne`, `--no-extensions`<br>"
+					},
+					"quote": "- `-ne`, `--no-extensions`<br>",
+					"hintLine": 196,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/slash-commands.md",
+					"locator": {
+						"kind": "text",
+						"value": "| `/trust` | Save a project trust decision for future Pi processes |"
+					},
+					"quote": "| `/trust` | Save a project trust decision for future Pi processes |",
+					"hintLine": 48,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/extensions.md",
+					"locator": {
+						"kind": "text",
+						"value": "### Tools"
+					},
+					"quote": "### Tools",
+					"hintLine": 245,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/docs/packages.md",
+					"locator": {
+						"kind": "text",
+						"value": "Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together."
+					},
+					"quote": "Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.",
+					"hintLine": 3,
+					"volatility": "medium"
+				}
+			],
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

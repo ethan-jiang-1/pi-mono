@@ -4,6 +4,8 @@
 
 本卷只回答「在 pi-mono 中事实是什么」。结论如何移用由 [08-applicability-boundary.md](08-applicability-boundary.md) 统一划界；扩展仓自身的开发组织方式见语料卷一（[extension-development-model](../extension-development-model/README.md)），主仓作为 harness 的组织方式见卷三（[repo-harness](../repo-harness/README.md)）。三卷彼此不构成前置阅读顺序。
 
+> **本卷定位：版本化参考卷。** 它描述 pi-mono 在某一基线 tag 上的精确条件、顺序与例外，因此会随上游变化。正文只写论断与 `[E###]` 引用，不携带行号或基线版本号；所有坐标、引文与核验时间在 `../_evidence/claims.json`，人读版在 [`../_evidence/render.md`](../_evidence/render.md)。升级基线时只改台账与 `corpus.json`，正文只在某条论断被证伪时才改。
+
 ## 证据基线
 
 一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.4.0) git tag `v1.4.0`（commit `4a080252f`）核对。引用任何 workflow、脚本或 `package.json` 行为时，均以该 tag 的文件版本与行号为准；正文链接钉在 `v1.4.0` 的 blob 路径上。

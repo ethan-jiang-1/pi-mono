@@ -14,15 +14,17 @@ pi-mono 的规则假设读者是零上下文到达的 agent：规则集中在仓
 
 > If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
 >
-> — [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md#L19)
+> —
 
 同一假设贯穿 git 规则：仓库不假设工作树是单人独占的，而是直接把「多个 agent 并发修改不同文件」写进制度（主仓要求）：
 
 > Multiple pi sessions may be running in this cwd at the same time, each modifying different files.
 >
-> — [AGENTS.md](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md#L54)
+> —
 
-规则文件同时约束人与 agent：`CONTRIBUTING.md` 对 AI 生成代码的态度是「可以用，但必须理解」（[The One Rule](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md#L15)）。这立场的可借鉴内核是：把「新协作者需要知道的一切」放进仓库文件，而不是放进人的记忆或群聊历史（扩展仓建议）。
+规则文件同时约束人与 agent：`CONTRIBUTING.md` 对 AI 生成代码的态度是「可以用，但必须理解」。这立场的可借鉴内核是：把「新协作者需要知道的一切」放进仓库文件，而不是放进人的记忆或群聊历史（扩展仓建议）。
+
+[E122](../_evidence/render.md#e122)
 
 ### 立场二：程序化知识放进仓库
 

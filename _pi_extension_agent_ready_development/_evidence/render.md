@@ -1520,3 +1520,197 @@ approve-contributor 在 issue_comment created 生效；评论者需写权限，l
   ```
 
 核验：`v1.4.0`
+
+## sdlc-reference/02-issue-diagnosis-and-session-import.md
+
+### E065
+
+/is 合同：不信 issue 里的分析，独立读全代码、追执行路径、只提议不实现
+
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.`，提示行 14
+
+  ```text
+  3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.
+  ```
+
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `- Do not trust implementation proposals in the issue without verification`，提示行 23
+
+  ```text
+  - Do not trust implementation proposals in the issue without verification
+  ```
+
+核验：`v1.4.0`
+
+### E066
+
+/is 操作约束：CI 下不加 inprogress/不 assign；完整读 issue 与评论；关闭时自动摘标签
+
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.`，提示行 9
+
+  ```text
+  1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.
+  ```
+
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `2. Read the issue in full, including all comments and linked issues/PRs. Use fields supported by GitHub CLI, for example:`，提示行 10
+
+  ```text
+  2. Read the issue in full, including all comments and linked issues/PRs. Use fields supported by GitHub CLI, for example:
+  ```
+
+- [`.github/workflows/remove-inprogress-on-close.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/remove-inprogress-on-close.yml) — text: `on:`，提示行 3
+
+  ```text
+  on:
+  ```
+
+核验：`v1.4.0`
+
+### E067
+
+issue-analysis 由 pi-analyze 标签或 staff 评论 @issuron analyze 触发
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `# Runs the repo's /is prompt against an issue when the `pi-analyze` label is added`，提示行 1
+
+  ```text
+  # Runs the repo's /is prompt against an issue when the `pi-analyze` label is added
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `on:`，提示行 50
+
+  ```text
+  on:
+  ```
+
+核验：`v1.4.0`
+
+### E068
+
+授权链：触发者须为 org staff 成员且有 admin/write；org token 缺失直接拒绝
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `const response = await fetch(`，提示行 181
+
+  ```text
+  const response = await fetch(
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `const { data } = await github.rest.repos.getCollaboratorPermissionLevel({`，提示行 224
+
+  ```text
+  const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `if (!process.env.ORG_READ_TOKEN) {`，提示行 174
+
+  ```text
+  if (!process.env.ORG_READ_TOKEN) {
+  ```
+
+核验：`v1.4.0`
+
+### E069
+
+analyze：高熵目录、专用 auth.json、pi -p 跑 /is、导出 HTML+gist、回评论与接续指令、失败也导出、最后摘标签
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Create high-entropy working directory name`，提示行 267
+
+  ```text
+  - name: Create high-entropy working directory name
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Write auth.json`，提示行 332
+
+  ```text
+  - name: Write auth.json
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `# `PI_AUTH_JSON` must come from a login dedicated to this workflow. OpenAI Codex`，提示行 34
+
+  ```text
+  # `PI_AUTH_JSON` must come from a login dedicated to this workflow. OpenAI Codex
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Run pi /is`，提示行 355
+
+  ```text
+  - name: Run pi /is
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `ISSUE_ANALYSIS_MODEL: openai-codex/gpt-5.5`，提示行 264
+
+  ```text
+  ISSUE_ANALYSIS_MODEL: openai-codex/gpt-5.5
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Export session files`，提示行 487
+
+  ```text
+  - name: Export session files
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Comment with session import instructions`，提示行 571
+
+  ```text
+  - name: Comment with session import instructions
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Comment on analysis failure`，提示行 650
+
+  ```text
+  - name: Comment on analysis failure
+  ```
+
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Persist refreshed auth.json`，提示行 418
+
+  ```text
+  - name: Persist refreshed auth.json
+  ```
+
+核验：`v1.4.0`
+
+### E070
+
+/ir 接受 gist/分享 URL/issue/本地文件；导入时把 session 里的 CI cwd 变体重写为本地 cwd 并 switchSession
+
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `function parseRef(`，提示行 58
+
+  ```text
+  function parseRef(
+  ```
+
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `async function findIssueGistId(owner: string, repo: string, issue: string): Promise<string> {`，提示行 236
+
+  ```text
+  async function findIssueGistId(owner: string, repo: string, issue: string): Promise<string> {
+  ```
+
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `function getCwdRewriteVariants(sourceCwd: string): string［］ {`，提示行 154
+
+  ```text
+  function getCwdRewriteVariants(sourceCwd: string): string[] {
+  ```
+
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `const ciWorkdirName = getCiWorkdirName(sourceCwd);`，提示行 207
+
+  ```text
+  const ciWorkdirName = getCiWorkdirName(sourceCwd);
+  ```
+
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `function getPlatformContinuationNotice(sourceCwd: string): string | undefined {`，提示行 187
+
+  ```text
+  function getPlatformContinuationNotice(sourceCwd: string): string | undefined {
+  ```
+
+核验：`v1.4.0`
+
+### E071
+
+scripts/issues：本机批量 triage，每个 issue 一个 durable 会话，15 类分类，环境变量控制模型/并发/端口
+
+- [`scripts/issues/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/issues/README.md) — text: `| `TRIAGE_MODEL` | `openai-codex/gpt-5.6-sol` | `provider/model`. Supported providers: `openai-codex`, `anthropic`. |`，提示行 45
+
+  ```text
+  | `TRIAGE_MODEL` | `openai-codex/gpt-5.6-sol` | `provider/model`. Supported providers: `openai-codex`, `anthropic`. |
+  ```
+
+核验：`v1.4.0`

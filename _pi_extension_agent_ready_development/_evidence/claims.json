@@ -2371,6 +2371,312 @@
 			],
 			"page": "sdlc-reference/01-contribution-gates.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E065",
+			"claim": "/is 合同：不信 issue 里的分析，独立读全代码、追执行路径、只提议不实现",
+			"sources": [
+				{
+					"path": ".pi/prompts/is.md",
+					"locator": {
+						"kind": "text",
+						"value": "3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path."
+					},
+					"quote": "3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.",
+					"hintLine": 14,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/is.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Do not trust implementation proposals in the issue without verification"
+					},
+					"quote": "- Do not trust implementation proposals in the issue without verification",
+					"hintLine": 23,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E066",
+			"claim": "/is 操作约束：CI 下不加 inprogress/不 assign；完整读 issue 与评论；关闭时自动摘标签",
+			"sources": [
+				{
+					"path": ".pi/prompts/is.md",
+					"locator": {
+						"kind": "text",
+						"value": "1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue."
+					},
+					"quote": "1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.",
+					"hintLine": 9,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/is.md",
+					"locator": {
+						"kind": "text",
+						"value": "2. Read the issue in full, including all comments and linked issues/PRs. Use fields supported by GitHub CLI, for example:"
+					},
+					"quote": "2. Read the issue in full, including all comments and linked issues/PRs. Use fields supported by GitHub CLI, for example:",
+					"hintLine": 10,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/remove-inprogress-on-close.yml",
+					"locator": {
+						"kind": "text",
+						"value": "on:"
+					},
+					"quote": "on:",
+					"hintLine": 3,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E067",
+			"claim": "issue-analysis 由 pi-analyze 标签或 staff 评论 @issuron analyze 触发",
+			"sources": [
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "# Runs the repo's /is prompt against an issue when the `pi-analyze` label is added"
+					},
+					"quote": "# Runs the repo's /is prompt against an issue when the `pi-analyze` label is added",
+					"hintLine": 1,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "on:"
+					},
+					"quote": "on:",
+					"hintLine": 50,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E068",
+			"claim": "授权链：触发者须为 org staff 成员且有 admin/write；org token 缺失直接拒绝",
+			"sources": [
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const response = await fetch("
+					},
+					"quote": "const response = await fetch(",
+					"hintLine": 181,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "const { data } = await github.rest.repos.getCollaboratorPermissionLevel({"
+					},
+					"quote": "const { data } = await github.rest.repos.getCollaboratorPermissionLevel({",
+					"hintLine": 224,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "if (!process.env.ORG_READ_TOKEN) {"
+					},
+					"quote": "if (!process.env.ORG_READ_TOKEN) {",
+					"hintLine": 174,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E069",
+			"claim": "analyze：高熵目录、专用 auth.json、pi -p 跑 /is、导出 HTML+gist、回评论与接续指令、失败也导出、最后摘标签",
+			"sources": [
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Create high-entropy working directory name"
+					},
+					"quote": "- name: Create high-entropy working directory name",
+					"hintLine": 267,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Write auth.json"
+					},
+					"quote": "- name: Write auth.json",
+					"hintLine": 332,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "# `PI_AUTH_JSON` must come from a login dedicated to this workflow. OpenAI Codex"
+					},
+					"quote": "# `PI_AUTH_JSON` must come from a login dedicated to this workflow. OpenAI Codex",
+					"hintLine": 34,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Run pi /is"
+					},
+					"quote": "- name: Run pi /is",
+					"hintLine": 355,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "ISSUE_ANALYSIS_MODEL: openai-codex/gpt-5.5"
+					},
+					"quote": "ISSUE_ANALYSIS_MODEL: openai-codex/gpt-5.5",
+					"hintLine": 264,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Export session files"
+					},
+					"quote": "- name: Export session files",
+					"hintLine": 487,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Comment with session import instructions"
+					},
+					"quote": "- name: Comment with session import instructions",
+					"hintLine": 571,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Comment on analysis failure"
+					},
+					"quote": "- name: Comment on analysis failure",
+					"hintLine": 650,
+					"volatility": "medium"
+				},
+				{
+					"path": ".github/workflows/issue-analysis.yml",
+					"locator": {
+						"kind": "text",
+						"value": "- name: Persist refreshed auth.json"
+					},
+					"quote": "- name: Persist refreshed auth.json",
+					"hintLine": 418,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E070",
+			"claim": "/ir 接受 gist/分享 URL/issue/本地文件；导入时把 session 里的 CI cwd 变体重写为本地 cwd 并 switchSession",
+			"sources": [
+				{
+					"path": ".pi/extensions/import-repro.ts",
+					"locator": {
+						"kind": "text",
+						"value": "function parseRef("
+					},
+					"quote": "function parseRef(",
+					"hintLine": 58,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/extensions/import-repro.ts",
+					"locator": {
+						"kind": "text",
+						"value": "async function findIssueGistId(owner: string, repo: string, issue: string): Promise<string> {"
+					},
+					"quote": "async function findIssueGistId(owner: string, repo: string, issue: string): Promise<string> {",
+					"hintLine": 236,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/extensions/import-repro.ts",
+					"locator": {
+						"kind": "text",
+						"value": "function getCwdRewriteVariants(sourceCwd: string): string[] {"
+					},
+					"quote": "function getCwdRewriteVariants(sourceCwd: string): string[] {",
+					"hintLine": 154,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/extensions/import-repro.ts",
+					"locator": {
+						"kind": "text",
+						"value": "const ciWorkdirName = getCiWorkdirName(sourceCwd);"
+					},
+					"quote": "const ciWorkdirName = getCiWorkdirName(sourceCwd);",
+					"hintLine": 207,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/extensions/import-repro.ts",
+					"locator": {
+						"kind": "text",
+						"value": "function getPlatformContinuationNotice(sourceCwd: string): string | undefined {"
+					},
+					"quote": "function getPlatformContinuationNotice(sourceCwd: string): string | undefined {",
+					"hintLine": 187,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E071",
+			"claim": "scripts/issues：本机批量 triage，每个 issue 一个 durable 会话，15 类分类，环境变量控制模型/并发/端口",
+			"sources": [
+				{
+					"path": "scripts/issues/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "| `TRIAGE_MODEL` | `openai-codex/gpt-5.6-sol` | `provider/model`. Supported providers: `openai-codex`, `anthropic`. |"
+					},
+					"quote": "| `TRIAGE_MODEL` | `openai-codex/gpt-5.6-sol` | `provider/model`. Supported providers: `openai-codex`, `anthropic`. |",
+					"hintLine": 45,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

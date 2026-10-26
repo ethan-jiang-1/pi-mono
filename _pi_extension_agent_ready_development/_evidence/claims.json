@@ -1397,6 +1397,314 @@
 			],
 			"page": "sdlc-reference/04-ci-matrix.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E042",
+			"claim": "test.sh 构造隔离 home/npm 配置，只删带 marker 的 pi-test.* 目录，用 env -i 白名单跑测试",
+			"sources": [
+				{
+					"path": "test.sh",
+					"locator": {
+						"kind": "text",
+						"value": "# Isolate user resources, credentials, temporary files, and tool configuration."
+					},
+					"quote": "# Isolate user resources, credentials, temporary files, and tool configuration.",
+					"hintLine": 4,
+					"volatility": "medium"
+				},
+				{
+					"path": "test.sh",
+					"locator": {
+						"kind": "text",
+						"value": "# Only remove the marked directory created above, never an unverified path."
+					},
+					"quote": "# Only remove the marked directory created above, never an unverified path.",
+					"hintLine": 15,
+					"volatility": "medium"
+				},
+				{
+					"path": "test.sh",
+					"locator": {
+						"kind": "text",
+						"value": "# Start from an empty environment and allow only required platform and test settings."
+					},
+					"quote": "# Start from an empty environment and allow only required platform and test settings.",
+					"hintLine": 39,
+					"volatility": "medium"
+				},
+				{
+					"path": "test.sh",
+					"locator": {
+						"kind": "text",
+						"value": "# Preserve CI detection only for runner behavior and test reporting."
+					},
+					"quote": "# Preserve CI detection only for runner behavior and test reporting.",
+					"hintLine": 77,
+					"volatility": "medium"
+				},
+				{
+					"path": "test.sh",
+					"locator": {
+						"kind": "text",
+						"value": "env -i \"${test_env[@]}\" npm test"
+					},
+					"quote": "env -i \"${test_env[@]}\" npm test",
+					"hintLine": 84,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/05-testing-layers.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E043",
+			"claim": "suite 规则：用 harness.ts 与 faux provider，不用真实 key/网络，保持 CI 安全",
+			"sources": [
+				{
+					"path": "packages/coding-agent/test/suite/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Use `test/suite/harness.ts`"
+					},
+					"quote": "- Use `test/suite/harness.ts`",
+					"hintLine": 6,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/test/suite/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Do not use real provider APIs, real API keys, network calls, or paid tokens"
+					},
+					"quote": "- Do not use real provider APIs, real API keys, network calls, or paid tokens",
+					"hintLine": 8,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/05-testing-layers.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E044",
+			"claim": "harness 用假 provider + 假 key，但 Agent/AgentSession 是真实实现，资源加载默认替身，响应脚本化、事件收集",
+			"sources": [
+				{
+					"path": "packages/coding-agent/test/suite/harness.ts",
+					"locator": {
+						"kind": "text",
+						"value": "const fauxProvider: FauxProviderRegistration = registerFauxProvider({"
+					},
+					"quote": "const fauxProvider: FauxProviderRegistration = registerFauxProvider({",
+					"hintLine": 153,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/test/suite/harness.ts",
+					"locator": {
+						"kind": "text",
+						"value": "await authStorage.modify(model.provider, async () => ({ type: \"api_key\", key: \"faux-key\" }));"
+					},
+					"quote": "await authStorage.modify(model.provider, async () => ({ type: \"api_key\", key: \"faux-key\" }));",
+					"hintLine": 168,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/test/suite/harness.ts",
+					"locator": {
+						"kind": "text",
+						"value": "const agent = new Agent({"
+					},
+					"quote": "const agent = new Agent({",
+					"hintLine": 195,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/test/suite/harness.ts",
+					"locator": {
+						"kind": "text",
+						"value": "? await createTestExtensionsResult(options.extensionFactories, tempDir)"
+					},
+					"quote": "? await createTestExtensionsResult(options.extensionFactories, tempDir)",
+					"hintLine": 229,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/test/suite/harness.ts",
+					"locator": {
+						"kind": "text",
+						"value": "session.subscribe((event) => {"
+					},
+					"quote": "session.subscribe((event) => {",
+					"hintLine": 250,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/test/suite/harness.ts",
+					"locator": {
+						"kind": "text",
+						"value": "setResponses: fauxProvider.setResponses,"
+					},
+					"quote": "setResponses: fauxProvider.setResponses,",
+					"hintLine": 262,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/test/suite/harness.ts",
+					"locator": {
+						"kind": "text",
+						"value": "return events.filter((event): event is Extract<AgentSessionEvent, { type: T }> => event.type === type);"
+					},
+					"quote": "return events.filter((event): event is Extract<AgentSessionEvent, { type: T }> => event.type === type);",
+					"hintLine": 267,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/05-testing-layers.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E045",
+			"claim": "faux provider 经 pi-ai 的 ./compat 子路径公开导出，宿主 harness 自身也这样导入",
+			"sources": [
+				{
+					"path": "packages/ai/package.json",
+					"locator": {
+						"kind": "text",
+						"value": "\"./compat\": {"
+					},
+					"quote": "\"./compat\": {",
+					"hintLine": 22,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/ai/src/compat.ts",
+					"locator": {
+						"kind": "text",
+						"value": "export function registerFauxProvider(options: RegisterFauxProviderOptions = {}): FauxProviderRegistration {"
+					},
+					"quote": "export function registerFauxProvider(options: RegisterFauxProviderOptions = {}): FauxProviderRegistration {",
+					"hintLine": 162,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/ai/src/compat.ts",
+					"locator": {
+						"kind": "text",
+						"value": "export function streamSimple<TApi extends Api>("
+					},
+					"quote": "export function streamSimple<TApi extends Api>(",
+					"hintLine": 278,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/coding-agent/test/suite/harness.ts",
+					"locator": {
+						"kind": "text",
+						"value": "import { registerFauxProvider, streamSimple } from \"@earendil-works/pi-ai/compat\";"
+					},
+					"quote": "import { registerFauxProvider, streamSimple } from \"@earendil-works/pi-ai/compat\";",
+					"hintLine": 18,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/05-testing-layers.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E046",
+			"claim": "release smoke 标准：Node 与 Bun 各跑一次真实 prompt 并等模型回复，启动不算通过",
+			"sources": [
+				{
+					"path": ".pi/skills/interactive-testing.md",
+					"locator": {
+						"kind": "text",
+						"value": "For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test."
+					},
+					"quote": "For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.",
+					"hintLine": 19,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/05-testing-layers.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E047",
+			"claim": "evals 文档评估：Docker 配对 with/without docs，两臂各一分数才计入 lift，需要 PI_PROVIDER/PI_MODEL，单次不能证明稳定性",
+			"sources": [
+				{
+					"path": "packages/evals/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "- `*.docs.eval.ts` is a documentation-lift eval. `eval:docs` runs each case in isolated `without_docs` and `with_docs` containers and reports lift."
+					},
+					"quote": "- `*.docs.eval.ts` is a documentation-lift eval. `eval:docs` runs each case in isolated `without_docs` and `with_docs` containers and reports lift.",
+					"hintLine": 9,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/evals/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "`without_docs` omits the coding-agent `README.md`, `CHANGELOG.md`, `docs/`, and `examples/`, then removes the Pi documentation-routing section from the default system prompt."
+					},
+					"quote": "`without_docs` omits the coding-agent `README.md`, `CHANGELOG.md`, `docs/`, and `examples/`, then removes the Pi documentation-routing section from the default system prompt.",
+					"hintLine": 84,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/evals/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "1. Mounts the repository ephemerally for a Docker build, packs the current workspace packages using the repository's consumer-install machinery, then creates separate `without_docs` and `with_docs` images from the staged runtime."
+					},
+					"quote": "1. Mounts the repository ephemerally for a Docker build, packs the current workspace packages using the repository's consumer-install machinery, then creates separate `without_docs` and `with_docs` images from the staged runtime.",
+					"hintLine": 73,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/evals/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "A pair contributes to pass-rate lift only when both arms produce exactly one score. Missing, duplicate, skipped, pending, unscored, or errored arms block the pair. If any pair in an eval set is blocked, headline pass rates are withheld. Missing telemetry remains unavailable rather than being treated as zero."
+					},
+					"quote": "A pair contributes to pass-rate lift only when both arms produce exactly one score. Missing, duplicate, skipped, pending, unscored, or errored arms block the pair. If any pair in an eval set is blocked, headline pass rates are withheld. Missing telemetry remains unavailable rather than being treated as zero.",
+					"hintLine": 103,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/evals/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "Documentation evals allow only `read`, `write`, `edit`, `grep`, `find`, and `ls` by default. They do not expose shell or web-search tools. Provider traffic still requires container network access, so Docker alone cannot prove that arbitrary code written by an agent never uses the network."
+					},
+					"quote": "Documentation evals allow only `read`, `write`, `edit`, `grep`, `find`, and `ls` by default. They do not expose shell or web-search tools. Provider traffic still requires container network access, so Docker alone cannot prove that arbitrary code written by an agent never uses the network.",
+					"hintLine": 90,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/evals/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`."
+					},
+					"quote": "Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.",
+					"hintLine": 24,
+					"volatility": "medium"
+				},
+				{
+					"path": "packages/evals/README.md",
+					"locator": {
+						"kind": "text",
+						"value": "The report flags no lift, negative deltas, saturated controls or treatments, and observed flakiness. One repetition cannot establish stability."
+					},
+					"quote": "The report flags no lift, negative deltas, saturated controls or treatments, and observed flakiness. One repetition cannot establish stability.",
+					"hintLine": 105,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/05-testing-layers.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

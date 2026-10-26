@@ -688,3 +688,145 @@ npm-audit 每日/手动运行，production-only，moderate 及以上未接受即
   > Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.
 
 核验：`v1.4.0`
+
+## sdlc-reference/05-testing-layers.md
+
+### E042
+
+test.sh 构造隔离 home/npm 配置，只删带 marker 的 pi-test.* 目录，用 env -i 白名单跑测试
+
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `# Isolate user resources, credentials, temporary files, and tool configuration.`，提示行 4
+
+  > # Isolate user resources, credentials, temporary files, and tool configuration.
+
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `# Only remove the marked directory created above, never an unverified path.`，提示行 15
+
+  > # Only remove the marked directory created above, never an unverified path.
+
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `# Start from an empty environment and allow only required platform and test settings.`，提示行 39
+
+  > # Start from an empty environment and allow only required platform and test settings.
+
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `# Preserve CI detection only for runner behavior and test reporting.`，提示行 77
+
+  > # Preserve CI detection only for runner behavior and test reporting.
+
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `env -i "${test_env[@]}" npm test`，提示行 84
+
+  > env -i "${test_env[@]}" npm test
+
+核验：`v1.4.0`
+
+### E043
+
+suite 规则：用 harness.ts 与 faux provider，不用真实 key/网络，保持 CI 安全
+
+- [`packages/coding-agent/test/suite/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/README.md) — text: `- Use `test/suite/harness.ts``，提示行 6
+
+  > - Use `test/suite/harness.ts`
+
+- [`packages/coding-agent/test/suite/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/README.md) — text: `- Do not use real provider APIs, real API keys, network calls, or paid tokens`，提示行 8
+
+  > - Do not use real provider APIs, real API keys, network calls, or paid tokens
+
+核验：`v1.4.0`
+
+### E044
+
+harness 用假 provider + 假 key，但 Agent/AgentSession 是真实实现，资源加载默认替身，响应脚本化、事件收集
+
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `const fauxProvider: FauxProviderRegistration = registerFauxProvider({`，提示行 153
+
+  > const fauxProvider: FauxProviderRegistration = registerFauxProvider({
+
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `await authStorage.modify(model.provider, async () => ({ type: "api_key", key: "faux-key" }));`，提示行 168
+
+  > await authStorage.modify(model.provider, async () => ({ type: "api_key", key: "faux-key" }));
+
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `const agent = new Agent({`，提示行 195
+
+  > const agent = new Agent({
+
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `? await createTestExtensionsResult(options.extensionFactories, tempDir)`，提示行 229
+
+  > ? await createTestExtensionsResult(options.extensionFactories, tempDir)
+
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `session.subscribe((event) => {`，提示行 250
+
+  > session.subscribe((event) => {
+
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `setResponses: fauxProvider.setResponses,`，提示行 262
+
+  > setResponses: fauxProvider.setResponses,
+
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `return events.filter((event): event is Extract<AgentSessionEvent, { type: T }> => event.type === type);`，提示行 267
+
+  > return events.filter((event): event is Extract<AgentSessionEvent, { type: T }> => event.type === type);
+
+核验：`v1.4.0`
+
+### E045
+
+faux provider 经 pi-ai 的 ./compat 子路径公开导出，宿主 harness 自身也这样导入
+
+- [`packages/ai/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/package.json) — text: `"./compat": {`，提示行 22
+
+  > "./compat": {
+
+- [`packages/ai/src/compat.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/compat.ts) — text: `export function registerFauxProvider(options: RegisterFauxProviderOptions = {}): FauxProviderRegistration {`，提示行 162
+
+  > export function registerFauxProvider(options: RegisterFauxProviderOptions = {}): FauxProviderRegistration {
+
+- [`packages/ai/src/compat.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/compat.ts) — text: `export function streamSimple<TApi extends Api>(`，提示行 278
+
+  > export function streamSimple<TApi extends Api>(
+
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `import { registerFauxProvider, streamSimple } from "@earendil-works/pi-ai/compat";`，提示行 18
+
+  > import { registerFauxProvider, streamSimple } from "@earendil-works/pi-ai/compat";
+
+核验：`v1.4.0`
+
+### E046
+
+release smoke 标准：Node 与 Bun 各跑一次真实 prompt 并等模型回复，启动不算通过
+
+- [`.pi/skills/interactive-testing.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/interactive-testing.md) — text: `For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.`，提示行 19
+
+  > For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.
+
+核验：`v1.4.0`
+
+### E047
+
+evals 文档评估：Docker 配对 with/without docs，两臂各一分数才计入 lift，需要 PI_PROVIDER/PI_MODEL，单次不能证明稳定性
+
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `- `*.docs.eval.ts` is a documentation-lift eval. `eval:docs` runs each case in isolated `without_docs` and `with_docs` containers and reports lift.`，提示行 9
+
+  > - `*.docs.eval.ts` is a documentation-lift eval. `eval:docs` runs each case in isolated `without_docs` and `with_docs` containers and reports lift.
+
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: ``without_docs` omits the coding-agent `README.md`, `CHANGELOG.md`, `docs/`, and `examples/`, then removes the Pi documentation-routing section from the default system prompt.`，提示行 84
+
+  > `without_docs` omits the coding-agent `README.md`, `CHANGELOG.md`, `docs/`, and `examples/`, then removes the Pi documentation-routing section from the default system prompt.
+
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `1. Mounts the repository ephemerally for a Docker build, packs the current workspace packages using the repository's consumer-install machinery, then creates separate `without_docs` and `with_docs` images from the staged runtime.`，提示行 73
+
+  > 1. Mounts the repository ephemerally for a Docker build, packs the current workspace packages using the repository's consumer-install machinery, then creates separate `without_docs` and `with_docs` images from the staged runtime.
+
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `A pair contributes to pass-rate lift only when both arms produce exactly one score. Missing, duplicate, skipped, pending, unscored, or errored arms block the pair. If any pair in an eval set is blocked, headline pass rates are withheld. Missing telemetry remains unavailable rather than being treated as zero.`，提示行 103
+
+  > A pair contributes to pass-rate lift only when both arms produce exactly one score. Missing, duplicate, skipped, pending, unscored, or errored arms block the pair. If any pair in an eval set is blocked, headline pass rates are withheld. Missing telemetry remains unavailable rather than being treated as zero.
+
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `Documentation evals allow only `read`, `write`, `edit`, `grep`, `find`, and `ls` by default. They do not expose shell or web-search tools. Provider traffic still requires container network access, so Docker alone cannot prove that arbitrary code written by an agent never uses the network.`，提示行 90
+
+  > Documentation evals allow only `read`, `write`, `edit`, `grep`, `find`, and `ls` by default. They do not expose shell or web-search tools. Provider traffic still requires container network access, so Docker alone cannot prove that arbitrary code written by an agent never uses the network.
+
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.`，提示行 24
+
+  > Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.
+
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `The report flags no lift, negative deltas, saturated controls or treatments, and observed flakiness. One repetition cannot establish stability.`，提示行 105
+
+  > The report flags no lift, negative deltas, saturated controls or treatments, and observed flakiness. One repetition cannot establish stability.
+
+核验：`v1.4.0`

@@ -9,7 +9,7 @@
 > - 安装锁生成与生命周期脚本 allowlist：`scripts/generate-coding-agent-install-lock.mjs`
 > - 消费者真实打包冒烟：`scripts/check-package-install.mjs`（编排）+ `package-artifacts.mjs` + `local-package-install.mjs` + `coding-agent-smoke.mjs`
 > - 跨平台同构打包冒烟：`scripts/check-browser-smoke.mjs`
-> - 跨后端等价性测试套件：`packages/durable/src/testing/storage-conformance.ts`（1,663 行）
+> - 跨后端等价性测试套件：`packages/durable/src/testing/storage-conformance.ts`（1,682 行）
 > - 跨环境等价性测试套件：`packages/durable/src/testing/env-conformance.ts`（633 行）
 
 ---
@@ -90,17 +90,25 @@ function visit(node) {
 const BUDGETS = {
   "packages/ai": {
     "./models": {
-      maxFiles: 15,
-      forbid: ["providers/", "models.generated.ts", "index.ts", "utils/validation.ts"],
+      // Request telemetry reaches pi-telemetry's root; identity reaches utils/identity.ts.
+      maxFiles: 20,
+      forbid: ["providers/", "models.generated.ts", "index.ts", "utils/validation.ts", "utils/typebox-helpers.ts"],
+      allow: ["packages/telemetry/src/index.ts"],
     },
     "./utils/*": { maxFiles: 3, forbid: ["providers/", "api/", "index.ts"] },
   },
   "packages/durable": {
-    ".": { maxFiles: 60, forbid: ["packages/ai/src/index.ts"] },
+    ".": { maxFiles: 73, forbid: ["packages/ai/src/index.ts", "packages/ai/src/utils/typebox-helpers.ts", "packages/durable/src/images/"] },
+    "./tools": { maxFiles: 17, forbid: ["packages/durable/src/images/"] },
   },
 };
 ```
-当开发者引入了一个新的模块依赖，使得 `./models` 遍历到的文件数突破了 15 个上限，或者触碰了 `providers/` 黑名单，门禁立即熔断，强制开发者重构解耦。
+当开发者引入了一个新的模块依赖，使得 `./models` 遍历到的文件数突破了上限（v1.4.0 为 20；v1.2.0 为 15，v1.0.x 为 15 且配置代码里写的是更旧的 60/62），或者触碰了 `providers/` 黑名单，门禁立即熔断，强制开发者重构解耦。
+
+**v1.4.0 的两处新语义**：
+
+- `allow` 例外：`forbid` 命中后，如果路径以 `allow` 里的条目结尾就放行——`packages/ai` 的 `./models` 因此可以触达 `packages/telemetry/src/index.ts`（请求 telemetry 需要），而不再被迫把 telemetry 类型复制进 ai。
+- 预算上调的原因是**真实新增的依赖边**：ai 的请求 telemetry 与 identity、durable 的 chord context → telemetry、Harness → pi-ai identity。调预算是显式动作，注释里逐条写明理由——这正是"成本合同"的含义：数字可以变，但必须有人解释为什么。
 
 ### 3. npm audit 的显式豁免机制（`scripts/npm-audit.mjs` + node-forge 案例）
 
@@ -111,6 +119,14 @@ const BUDGETS = {
 v1.0.1 起（`581e7ba78`，closes #5653）仓库删除了 `npm-shrinkwrap.json`，钉依赖安装改由 `packages/coding-agent/install-lock/` 承接：由 `scripts/generate-coding-agent-install-lock.mjs` 生成、`--check`（并入 `npm run check`）校验，核心守卫是**生命周期脚本 allowlist**——任何带 install/postinstall 等生命周期脚本的新依赖都必须经人工审查并显式加入 allowlist 条目才能通过，"never add one silently"（`AGENTS.md` Dependency and Install Security 节）。机制与旧 shrinkwrap 门禁同形（pre-commit 门禁 + 生命周期脚本审核），但从"锁文件快照"升级为"安装锁 + 脚本 allowlist"双口径。
 
 ---
+
+### 5. 模型目录的发布前兼容门禁（v1.4.0 新增）
+
+模型数据是**独立于代码发布的数据产物**：`pi.dev` 把 catalog 直接服务给已发布的 pi 客户端（`?pi-version=` 按 `MINIMUM_PI_VERSION` 分档）。这意味着一份新 catalog 可能要求旧客户端没有的代码——kimi-coding 从 `anthropic-messages` 切到 `openai-completions` 后，1.2.0 客户端仍按旧 API 发请求而失败，`MINIMUM_PI_VERSION` 因此升到 **1.2.1**。
+
+防线是 `scripts/check-model-catalog-compat.mjs`（`publish-model-catalog.yml` 的 generate job 在发布前调用）：取**最新 npm release** 的 tag 源码与该 release tarball 的 `dist/providers/data`，叠上准备发布的新 catalog，再对那版 pi-ai 跑 `tsc --noEmit`。pi-ai 的类型把 provider 与它实现的 API 绑定，所以"模型用了该 provider 不支持的 API"是类型错误，构建期就会失败；release 早于 `MINIMUM_PI_VERSION` 时跳过。
+
+它体现的模式与 MCP conformance 同构：**把"外部消费者读到的数据"当成合同来测**，而不是只测本仓库的源码。
 
 ## 四、真实消费者打包冒烟（Consumer Smoke Testing）
 
@@ -153,20 +169,21 @@ for (const pkg of artifactSet.packages) {
 
 ## 五、跨后端等价性测试套件（Storage Conformance Suite）
 
-在 `packages/durable/src/testing/storage-conformance.ts` 中，Pi 沉淀了一套长达 **1,663 行** 的通用存储规范测试集。
+在 `packages/durable/src/testing/storage-conformance.ts` 中，Pi 沉淀了一套长达 **1,682 行** 的通用存储规范测试集。
 
 ### 为什么需要统一 Conformance Suite？
-`packages/durable` 同时支持三种存储后端：
-- `sqlite-storage`（生产默认，支持 ACID 事务与磁盘恢复）；
-- `jsonl-storage`（纯文本流追加，便于调试与审计）；
-- `memory-storage`（纯内存，用于高速单测）。
+`packages/durable` 有四个存储后端：
+- `sqlite`（ACID 事务与磁盘恢复；v1.4.0 驱动在 `@earendil-works/chord/sqlite`）；
+- `jsonl`（纯文本流追加，便于调试与审计）；
+- `memory`（纯内存，用于高速单测）；
+- `indexeddb`（v1.4.0 新增，浏览器）。
 
-如果分别为三个后端编写各自的测试，很容易出现“SQLite 支持某种复合查询边界，而 JSONL 行为略有偏差”的隐蔽缺陷。
+如果分别为四个后端编写各自的测试，很容易出现“SQLite 支持某种复合查询边界，而 JSONL 行为略有偏差”的隐蔽缺陷。
 
 ### 参数化断言架构
 Pi 的解法是将全量的状态机行为抽象为参数化的 `runStorageConformanceTests(factory)`：
 1. **统一生命周期**：测试套件统一覆盖根会话创建、多分支分叉、任务拓扑挂载、游标回放、快照压缩与脏读防御；
-2. **多包复用**：`test/sqlite-storage.test.ts`、`test/jsonl-storage.test.ts` 与 `test/memory-storage.test.ts` 仅仅负责提供各自的数据库实例工厂，随后直接挂入这套 1,663 行的断言套件；
+2. **多包复用**：`test/sqlite-storage.test.ts`、`test/jsonl-storage.test.ts`、`test/memory-storage.test.ts` 与 `indexeddb-storage.test.ts` 仅仅负责提供各自的数据库实例工厂，随后直接挂入这套 1,682 行的断言套件；
 3. **行为完全等价**：保证任何第三方或者未来新增的存储驱动，只要能跑通这套 Conformance Suite，就能 100% 无缝替换生产环境的底层存储。
 
 ### 第二条线：env-conformance（执行环境契约，v1.0.3 起）
@@ -183,7 +200,6 @@ v1.0.3 起 durable 有了第二条同构套件：`packages/durable/src/testing/e
 在整个代码库的测试文件中，随处可见精准关联 Issue 的用例注释：
 - `// Regression test for #9099: released clients before 0.85.0 cannot use the mixed-API catalog.`
 - `// #9132: workspace resolution and installing every release package masked a missing runtime dependency.`
-- `// Regression test for #8841: alt-screen restore on uncaughtException.`
 
 ### 架构价值
 1. **测试用例即“可执行的事故复盘报告（Executable Postmortems）”**：代码可能经过多次重构，但只要带着 Issue 编号，任何开发者或 Coding Agent 在阅读测试时，都能瞬间定位到当年的故障现场与真实上下文；
@@ -198,6 +214,6 @@ v1.0.3 起 durable 有了第二条同构套件：`packages/durable/src/testing/e
 | 支柱维度 | 核心代表 | 解决的本质工程问题 |
 |---|---|---|
 | **物理环境真空** | `test.sh`（`env -i`、`.pi-test-owned`） | 消除宿主配置泄漏与磁盘脏残留 |
-| **全真状态机仿真** | `faux.ts`（710 行）+ `harness.ts` | 0 Token、毫秒级驱动 Agentic Loop 闭环 |
+| **全真状态机仿真** | `faux.ts`（727 行）+ `harness.ts` | 0 Token、毫秒级驱动 Agentic Loop 闭环 |
 | **发布与供应链守卫** | `check-runtime-deps` + `check:package-install`（逐包隔离消费者冒烟）+ `npm-audit.mjs` 豁免 + install-lock allowlist + pi-env daemon（SHA-256 部署/npm pack 校验/release 实测） | 消除 Monorepo 幽灵依赖与发包不可用 |
 | **标准契约证据锁** | MCP `baseline.json` + `storage-conformance.ts` + `env-conformance.ts` | 跨外部协议、跨后端存储、跨执行环境的长周期防退化 |

@@ -13,7 +13,7 @@ pi-mono **没有 HTTP server**。源码里没有 `opencode serve` 等价物。�
 
 ## 你真正接到的是什么
 
-pi-mono 分为三个包，集成时按需选择深度：
+pi-mono 由 11 个包组成，其中三个是核心层，集成时按需选择深度：
 
 ```
 pi-ai            ← 纯 LLM 抽象层（`@earendil-works/pi-ai`）。一般不需要直接集成

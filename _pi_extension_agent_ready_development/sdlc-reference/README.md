@@ -6,11 +6,11 @@
 
 ## 证据基线
 
-一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.2.0) git tag `v1.2.0`（commit `06a466935`）核对。引用任何 workflow、脚本或 `package.json` 行为时，均以该 tag 的文件版本与行号为准；正文链接钉在 `v1.2.0` 的 blob 路径上。
+一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.4.0) git tag `v1.4.0`（commit `4a080252f`）核对。引用任何 workflow、脚本或 `package.json` 行为时，均以该 tag 的文件版本与行号为准；正文链接钉在 `v1.4.0` 的 blob 路径上。
 
-本卷不运行任何 build、test 或发布命令；全部结论来自对 tag 版本配置与代码的静态核对。需要自行核对时，用 `git show v1.2.0:<路径>` 读取 tag 版本（行号与正文锚点一致），不要直接读工作树文件。
+本卷不运行任何 build、test 或发布命令；全部结论来自对 tag 版本配置与代码的静态核对。需要自行核对时，用 `git show v1.4.0:<路径>` 读取 tag 版本（行号与正文锚点一致），不要直接读工作树文件。
 
-> **基线变更说明**：本卷此前钉 `v1.0.3`（`d78dc83d6`），已在 v1.2.0 同步轮改钉 `v1.2.0`（`06a466935`）。这不是纯改名——相对 v1.0.3，本卷覆盖面有几处实质变化：环境工作流由 `durable-env.yml` 改名为 `env.yml`，**触发器模型从「工作分支」改为「路径门控的 PR」**，job 由 `check`+`env-tests` 变为 `daemons`+`check`+`release-daemons`（五 OS → 六平台）；`ci.yml` 增加 pi-env daemon 构建步骤；`packages/` 由 13 个包减为 11 个（`client`/`protocol`/`server` 删除）；`scripts/coding-agent-consumer.mjs` 被删除，职能拆入 `check-package-install.mjs` 等四个新脚本。逐条差异与处置见 [`_coverage/01-repin-v1.2.0-survey.md`](../_coverage/01-repin-v1.2.0-survey.md)。
+> **基线变更说明**：本卷此前钉 `v1.0.3`（`d78dc83d6`），已在 v1.2.0 同步轮改钉 `v1.2.0`（`06a466935`）。这不是纯改名——相对 v1.0.3，本卷覆盖面有几处实质变化：环境工作流由 `durable-env.yml` 改名为 `env.yml`，**触发器模型从「工作分支」改为「路径门控的 PR」**，job 由 `check`+`env-tests` 变为 `daemons`+`check`+`release-daemons`（五 OS → 六平台）；`ci.yml` 增加 pi-env daemon 构建步骤；`packages/` 由 13 个包减为 11 个（`client`/`protocol`/`server` 删除）；`scripts/coding-agent-consumer.mjs` 被删除，职能拆入 `check-package-install.mjs` 等四个新脚本。逐条差异与处置见 [`_coverage/01-repin-v1.2.0-survey.md`](../_coverage/01-repin-v1.2.0-survey.md)。**0015 轮**（v1.2.0→v1.4.0）的差异见 [`_coverage/02-repin-v1.4.0-survey.md`](../_coverage/02-repin-v1.4.0-survey.md)：pinned-deps 覆盖内部包、skills 3→4、chord 依赖 telemetry、entry-graph 预算 20/73、release 先 pin 模型目录。
 
 > **两个基线 commit 不要混用**：`v1.0.3` tag 是 `d78dc83d6`；`_digested` 同步记录 0009 所用的区间起点 `98d2e1947` 在 v1.0.3 **之后 23 个 commit**，两者的 `packages/` 与 `.github/workflows/` 清单都不一样。写「v1.0.3 时如何」只能用 `git ls-tree v1.0.3`。
 
@@ -29,7 +29,7 @@
 
 | 页 | 内容 |
 |---|---|
-| [00-index.md](00-index.md) | 按问题选页的导航表；从 v1.2.0 归纳的三条组织立场 |
+| [00-index.md](00-index.md) | 按问题选页的导航表；从 v1.4.0 归纳的三条组织立场 |
 | [01-contribution-gates.md](01-contribution-gates.md) | issue/PR 准入工作流、`lgtmi`/`lgtm` 语义、issue 模板前置、triage 标签生命周期、触发边界 |
 | [02-issue-diagnosis-and-session-import.md](02-issue-diagnosis-and-session-import.md) | `/is` 诊断合同、issue-analysis CI 授权链、session gist 导出与 `/ir` 本地接续 |
 | [03-check-pipeline.md](03-check-pipeline.md) | `npm run check` 的逐项组成、pre-commit 条件触发、lockfile 人工豁免面 |

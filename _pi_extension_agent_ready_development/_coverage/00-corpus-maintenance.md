@@ -3,15 +3,16 @@
 ## 钉定基线
 
 - 仓库：`earendil-works/pi`
-- 基线：release tag `v1.2.0`，commit `06a466935`（`Release v1.2.0`）。
-- 上一基线：`v1.0.3`，commit `d78dc83d6`。本轮（0006）从 `v1.0.3` re-pin 到 `v1.2.0`。
+- 基线：release tag `v1.4.0`，commit `4a080252f`（`Release v1.4.0`）。
+- 上一基线：`v1.2.0`，commit `06a466935`。0015 轮从 `v1.2.0` re-pin 到 `v1.4.0`（跨 v1.3.0）。
+- 更早基线：`v1.0.3`，commit `d78dc83d6`（0006 轮从 `v1.0.3` re-pin 到 `v1.2.0`）。
 - 这是本轮核验版本，不是永久前提。Pi 处于活跃开发期，接口与主仓制度都会演进；更新版本时应逐条复核并改写过时结论，不能只替换链接。
 
 > **不要混用两个 "v1.0.3"**：`v1.0.3` tag 是 `d78dc83d6`；`_digested/_change_log/0009` 使用的区间起点 `98d2e1947` 在该 tag **之后 23 个 commit**（记为 v1.0.3+23）。两者的 `.github/workflows/` 清单不同——`durable-env.yml`→`env.yml` 的改名就发生在这 23 个 commit 内。核对"v1.0.3 时如何"必须用 `git ls-tree v1.0.3`。
 >
 > **注意区分两处清单差异**：`packages/` 不同是**另一回事**。`98d2e1947` 仍有 `client`/`protocol`/`server`（**14** 个包），三包删除（`7472cda0d`）**不是** `98d2e1947` 的祖先，发生在 `98d2e1947`→`v1.2.0` 区间内，**不在**上述 23 个 commit 里。即：改名属 v1.0.3+23 窗口，三包删除属 0009 区间（14 → 11）。
 
-## 本轮已核验的证据范围
+## 本轮已核验的证据范围（v1.2.0 时点；0015 轮新增项见文末）
 
 以下来源在本轮挖取时逐项对 tag 核验过存在性与内容：
 
@@ -59,7 +60,7 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 
 ## 结构约束
 
-- 正文结构规则由 [`verify.mjs`](../verify.mjs) 强制：严格 UTF-8、恰好一个结尾换行、语料内相对链接与锚点有效、外链只指向 `v1.2.0` 的 Pi 仓库路径（`PINNED_EXTERNAL`，`verify.mjs:26`）、每个目录有 README、SVG 图示的固有尺寸与无障碍元数据、图示与正文引用双向完整。
+- 正文结构规则由 [`verify.mjs`](../verify.mjs) 强制：严格 UTF-8、恰好一个结尾换行、语料内相对链接与锚点有效、外链只指向 `v1.4.0` 的 Pi 仓库路径（`BASELINE_TAG`，`verify.mjs:26`）、每个目录有 README、SVG 图示的固有尺寸与无障碍元数据、图示与正文引用双向完整。
 - `verify.mjs` **不核对远端内容**：它无法发现"链接指向的文件在上游被改名/删除"或"引文与 tag 不符"。本轮 6 处结构性越界锚点与 21 处内容性漂移都属于这一类，必须靠对 tag 的静态核对发现。
 - 每卷的图示由该卷自己的 `figures/README.md` 清单管理（文件与对应正文页），不跨卷共享图。
 - 陈述四分类（运行时事实／主仓要求／扩展仓建议／仓库自定）由正文维护，机器不可校验。
@@ -273,3 +274,25 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 - **真缺陷越界：0**（`virtual-modules.ts:59` 已修）。
 - 剩余 3 条越界**全部为已标注的存档引述**，属**正确实践**，不再计入债务。
 - 先前报的"1 条"既不准确（漏计 3 条），也**把 2 条合法历史算成了债**——两个方向的错都有。
+
+---
+
+## 0015 轮：re-pin v1.4.0
+
+**基线变更**：`v1.2.0`（`06a466935`）→ **`v1.4.0`**（`4a080252f`），跨 v1.3.0（`71023aec1`）。上游 144 commit、477 文件、+33,481/−10,733。勘察见 [`02-repin-v1.4.0-survey.md`](02-repin-v1.4.0-survey.md)，Discovery 见 `_digested/_change_log/0010-v1.2.0-to-v1.4.0.md`（语料外路径）。
+
+**机械部分**：`verify.mjs` 的 `BASELINE_TAG` 从硬编码正则改为常量（`v1.4.0`），369 条外链 tag 全部替换；对 79 个被引上游路径在 `git show v1.4.0:` 下逐条校验**存在性**与 `#L` 行号界，结果 0 缺失、0 越界。区间内被改且被引用的文件共 23 个，逐条复核引文。
+
+**内容层修正**（详见勘察页）：
+
+- pinned-deps 规则扩到内部 registry 依赖（`AGENTS.md:45` + `check-pinned-deps.mjs` 删除豁免）；
+- `.pi/skills` 3→4，新增 `github-work`（把 issue/PR/收尾路由到 `is.md`/`pr.md`/`wr.md`）；
+- chord 不再是零 Pi 依赖（`pi-telemetry`），telemetry 成 ai/chord/durable 的横切层；
+- entry-graph 预算：`ai ./models` 15→20（新增 `allow`）、`durable` 根 62→73；
+- release 第 3 步从"`--if-stale` 刷新 pin"改为"pin 最新目录 + hydrate + `build:offline`"，失败阻塞发布；release.mjs 行号整体下移（最大 +43）；
+- 模型目录发布新增 `check-model-catalog-compat`（对最新 release 的 pi-ai 跑 tsc）与 `MINIMUM_PI_VERSION`（1.2.1）；
+- `check` 首项是 `node scripts/biome-check.mjs --write`（不是 biome 直调）。
+
+**验证**：`node verify.mjs` 40 文件全部规则通过；`node --test verify.test.mjs` 通过。
+
+**残留**：语料未覆盖 `AGENTS.md:28` 的 `providers/data` gitignore 规则本身（只在 01 页补了一句）；`_digested` 与本语料无关的存量锚点债务不在本轮范围。

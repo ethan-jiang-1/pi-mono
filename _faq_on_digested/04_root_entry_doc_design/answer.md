@@ -18,7 +18,7 @@ Pi 没有像 DSH 那样在静态层把"地图"画出来（薄内核页表 + tier
 | （无 root `docs/`） | — | Pi 的 docs 在 `packages/coding-agent/docs/`（30+ 篇） | 没有 root `architecture.md` |
 | （无 root `CLAUDE.md`） | — | 只有 `.claude/settings.local.json`（本地设置） | 不像 DSH 把 CLAUDE.md symlink 到 AGENTS.md |
 | `SECURITY.md` | 人 | 安全披露流程 | — |
-| package README | 用/改某包的人或 agent | **API 参考**（如 `packages/agent/README.md` 564 行：Quick Start / Event Flow / Options / Methods） | 不是"合同"，是教程式参考 |
+| package README | 用/改某包的人或 agent | **API 参考**（如 `packages/agent/README.md` 569 行：Quick Start / Event Flow / Options / Methods） | 不是"合同"，是教程式参考 |
 
 **关键观察**：`README.md:51` 写的是 AGENTS.md *"for both humans and agents"*——Pi 把人和模型混为一谈，没有 DSH 的两入口分流。
 

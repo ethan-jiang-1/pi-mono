@@ -109,7 +109,7 @@ session.subscribe((event: AgentSessionEvent) => {
 
 ### session 管理操作
 
-> 方法名已对照 v0.86.1 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:3125`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork 在 `session.sessionManager` 上（RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:616-631）。
+> 方法名已对照 v0.86.1 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:3125`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork/switch 在 **`AgentSessionRuntime`** 上（`core/agent-session-runtime.ts`，`fork()` :262、`switchSession()` :196；RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:616-631）。
 
 ```ts
 // Compaction

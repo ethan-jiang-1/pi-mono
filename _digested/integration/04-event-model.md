@@ -155,7 +155,7 @@ RPC 子进程如果崩溃或断连，宿主不能假设自己拿到了所有事�
 3. 调 `get_messages`（RPC）或 SDK `session.messages`（getter，`agent-session.ts:1045`）重建消息历史——没有 `getMessages()` 方法。
 4. 如果有未完成的 prompt，用 `get_state` 检查状态再决定是重试还是继续。
 
-pi-mono 的 session 持久化在本地 JSONL 文件（`SessionManager`），重启后可以恢复。(注：agent 包的 session v4 在 JSONL 后端之外另有 `JsonlSessionRepo`，见 agent/03-Memory/3.5，但 coding-agent 层暂未接入。)这跟 OpenCode 的 SSE 重连 + REST 恢复策略思路一致，但实现上更轻量——直接读文件，不需要调多个 REST endpoint。
+pi-mono 的 session 持久化在本地 JSONL 文件（`SessionManager`），重启后可以恢复。（注：agent 包的 session v4 与 `JsonlSessionRepo` 已在 v1.0.0 随 session 层整树删除，见 `agent/CHANGELOG.md` [1.0.0]）这跟 OpenCode 的 SSE 重连 + REST 恢复策略思路一致，但实现上更轻量——直接读文件，不需要调多个 REST endpoint。
 
 ## 事件批处理
 
@@ -181,4 +181,4 @@ v0.84.0 agent 包的 session 存储换代 lane-based v4（详见 `agent/03-Memor
 - 未来 `AgentHarness` / `AgentLane` 骨架填满后，事件模型可能增加 `lane` 相关事件（如 `operation_started`/`operation_finished`、`lane_switch`）及 `SessionSnapshot`（protocol/client/server 路径的权威快照订阅模型）。（v1.0.0 注：该骨架已随 experimental harness 从 pi-agent-core 删除，由 `pi-durable` 承接；coding-agent 的 `SessionManager` 仍是本层事件的权威来源。）
 - `message_update` 增量化（v0.84.0，本节已有详述）是向快照模型靠拢的中间步。
 
-当前结论自洽：事件模型本篇描述的是 coding-agent 层事件的真实行为，不受 agent 包 session v4 未接入的影响。跟踪方向是 protocol/client/server 的 `SessionSnapshot` 模型（见 integration/06 的 experimental 路径介绍）。
+当前结论自洽：事件模型本篇描述的是 coding-agent 层事件的真实行为，不受 agent 包 session v4 未接入的影响。原先跟踪的 protocol/client/server `SessionSnapshot` 已随三包在 v1.2.0 删除，不再是可跟踪路径。

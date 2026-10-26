@@ -5,15 +5,22 @@
 > **⚠️ v1.2.0：durable 不再只是"任务运行时",已扩成"工具执行内核"（sync-0009）**。本区间把 durable 的能力面显著加宽，本页原有结论仍然成立但**不完整**。新增面（均为 v1.2.0 in-tag）：
 >
 > - **内建 Code Mode**（`README.md` §Code Mode，**:259**）：durable 侧**独立**实现了一套 codemode（`packages/durable/src/codemode/`，5 个文件），以 `pi.codemode.journal` + 时钟值做**确定性重放**——与 coding-agent 侧的 codemode 是**两份平行实现，不是迁移**。详见 [`04-codemode.md`](./04-codemode.md)。
-> - **`abandonOnRestart`**（`README.md:257`）：只被创建者内存中 await、且重启后创建者不再恢复的任务可标此位；Harness 重新调度时若发现它仍 live，会以 `abortReason: "restart"` 连同它拥有的一切一起 abort，然后才继续。非 replay-safe 的嵌套工具调用自动获得该标记。
-> - **`abortOwned` / `ownedTasks`**（`TaskRuntime`，`types.ts:211-220`；README 未记载）：任务级**直接**所有权索引的读写面，见下方 [abortOwned / ownedTasks](#abortowned--ownedtasks所有权索引的读写面)。
+> - **`abandonOnRestart`**（**v1.4.0 `README.md:353`**）：只被创建者内存中 await、且重启后创建者不再恢复的任务可标此位；Harness 重新调度时若发现它仍 live，会以 `abortReason: "restart"` 连同它拥有的一切一起 abort，然后才继续。非 replay-safe 的嵌套工具调用自动获得该标记。
+> - **`abortOwned` / `ownedTasks`**（`TaskRuntime`，**v1.4.0 `types.ts:291`/`:296`**；README 未记载）：任务级**直接**所有权索引的读写面，见下方 [abortOwned / ownedTasks](#abortowned--ownedtasks所有权索引的读写面)。
 > - **嵌套工具调用与 structured output**、`callers`、`ToolExecutionApi`/`HookApi` 暴露 `models`。
 > - **tool-search**（BM25）与 **images** 能力面：`src/tool-search/`、`src/search.ts`、`src/images/`。
-> - **调度器有界性**（两笔彼此独立的修复，经 `git show` 核实）：① `cb4375493` 消灭了**每轮 reconcile 的全量扫描**——原先每个 pass 从每个 live task 上溯到 root 找 cancelling owner，且 owned live work / idle scopes / chain loads / reservation / finalization / failFast 各自再扫一遍全部 live task，n 个 held task 的链约 **n³** 步（500 个要 12 秒，20,000 个跑不完）；改为在内存里维护 `#below`/`#intent`/`#unloaded`/`#finalizeChecks`/`#runnable`/`#waiters` 六个索引（open 时重建），任何 walk 都不再递归，500 个 held task 由 12.3 s 降到 **50 ms**。**所有权语义未变**。② `ea448f454` 让这些所有权索引**随 live work 收缩**（`indexSizes`，`:1238-1241`）——owner 边与已结束任务的 ownership 字段只在仍有用时保留。**注意「长 sleep 分片」不属于这两笔**：它是 `MAX_TIMER_DELAY = 2_147_483_647`（`scheduler.ts:54`，"Longest delay `setTimeout` supports; longer sleeps wait in several steps"），由 `da866ada1` 引入。③ 等待环拒绝：`#commitState`（`scheduler.ts:1453`）在任务转入 `waiting` 时先调 `#validateWait`（`:1480-1507`），对具名环**抛错直接拒绝**而不是挂死——错误文本 `Task ${current.id} cannot wait on ${cycle[0]}: ... is a wait cycle`（`:1500-1506`），环检测 `#waitCycle`（`:1516`）。**不是 `runtime.commit()`，也没有 `runtime.commit()` 这个 API。**（`eb2fce43d`）
-> - **`documentRetentionMs`**（`README.md:323`）：无人观察的已加载文档在最后一次使用后保留这么久；被观察的文档始终保留。
+> - **调度器有界性**（两笔彼此独立的修复，经 `git show` 核实）：① `cb4375493` 消灭了**每轮 reconcile 的全量扫描**——原先每个 pass 从每个 live task 上溯到 root 找 cancelling owner，且 owned live work / idle scopes / chain loads / reservation / finalization / failFast 各自再扫一遍全部 live task，n 个 held task 的链约 **n³** 步（500 个要 12 秒，20,000 个跑不完）；改为在内存里维护 `#below`/`#intent`/`#unloaded`/`#finalizeChecks`/`#runnable`/`#waiters` 六个索引（open 时重建），任何 walk 都不再递归，500 个 held task 由 12.3 s 降到 **50 ms**。**所有权语义未变**。② `ea448f454` 让这些所有权索引**随 live work 收缩**（`indexSizes`，`:1238-1241`）——owner 边与已结束任务的 ownership 字段只在仍有用时保留。**注意「长 sleep 分片」不属于这两笔**：它是 `MAX_TIMER_DELAY = 2_147_483_647`（`scheduler.ts:54`，"Longest delay `setTimeout` supports; longer sleeps wait in several steps"），由 `da866ada1` 引入。③ 等待环拒绝：`#commitState`（**v1.4.0 `scheduler.ts:1942`**）在任务转入 `waiting` 时先调 `#validateWait`（**`:1973`**），对具名环**抛错直接拒绝**而不是挂死——错误文本 `Task ${current.id} cannot wait on ${cycle[0]}: ... is a wait cycle`（**`:1997`**），环检测 `#waitCycle`（**`:2009`**）。**（v1.2.0 时本节曾写"没有 `runtime.commit()`"，v1.4.0 已不成立）**：`TaskRuntime.commit(change, context)` 是现行 API（`types.ts:272`），`sleeping` 等下一状态都经它提交；等待环仍由 `runtime.commit()` 里的校验具名拒绝。（`eb2fce43d`）
+> - **`documentRetentionMs`**（**v1.4.0 `README.md:419`**）：无人观察的已加载文档在最后一次使用后保留这么久；被观察的文档始终保留。
 > - **`ExecutionEnv.listFiles`**（可选方法）与 `packages/durable/src/testing/env-conformance.ts` 一致性套件。
 > - **Compaction 失败语义变更**：阻塞/阈值 compaction 失败现在**直接让该次生成以 `model_error` 失败**（`89e5c2c07`），并通过 `pi.live.compactionFailure` 保留最后一次失败；摘要生成**去掉 thinking**（`15e7bdc14`）。详见 [`../agent/03-Memory/3.1_Compaction.md`](../agent/03-Memory/3.1_Compaction.md)。
-> - README 由 613 行增至 **751** 行（经核实）。**订正**：本条原称"测试示例由 24 个增至 32 个（新增 `25-compaction.ts` 至 `31-reload-and-restart.ts`）"——**不成立**。`packages/durable/test/examples/` 在本区间**数量未变，两端都是 32 个**（`git ls-tree` 于 `98d2e1947` 与 `v1.2.0` 均为 32；早在 tag `v1.0.0` 就已是 32），本区间只**修改**了 7 个（`06`/`07`/`10`/`11`/`22`/`27`/`31`），**没有新增**；`25-compaction.ts` 亦非本轮新增。
+> **v1.4.0 追加（sync-0010）**：本节以上是 v1.2.0 的能力面；v1.4.0 改的是**运行时语义**，原文若干处已失效：
+>
+> - **新增 `sleeping` 状态**（`types.ts:219`、`scheduler.ts:67`、`task-graph.ts:29`），活跃状态集变五个；`TaskRuntime.sleep()` **删除**，改为 `sleepUntil(until, checkpoint, ctx)`（`types.ts:324-330`）或 `commit({status:"sleeping",until,checkpoint})`。详见 [sleep / wake](#sleep--wake把等待变成状态v140)。
+> - **crash-loop guard**：连续 `restartLimit`（默认 5）次崩溃/驱逐未提交新状态的任务会被 park，`blocked.reason="restart_limit"`，`Harness.retryTask(id)` 放行。
+> - **长 sleep 的 timer 常量搬家**：`MAX_TIMER_DELAY` 从 `scheduler.ts` 移到 `src/timers.ts:4`；`HarnessOptions.setTimer`/`now` 让它可以跑在宿主时钟上，`wake()`/`onWake` 让 Cloudflare DO 靠 alarm 唤醒而不持 timer。
+> - **SQLite schema v2**：`sleeping` 需要重建 tasks 表；迁过的库不能被 1.3.0 或更早打开。见 [durable-and-storage](../architecture-next/durable-and-storage.md)。
+> - 其余行号：`scheduler.ts` 1,953→**2,507** 行，`README.md` 751→**876** 行。
+
 
 ## 为什么是这个形状:设计考量
 
@@ -25,7 +32,7 @@
 
 ![durable 任务状态机与 abort 语义](./figures/task-states.svg)
 
-- 活跃状态集 `pending | running | waiting | completing`,终态离开图(`task-graph.ts:19-28`；v1.2.0 实测 `TaskGraphState` :19、`TaskGraphNode` :30、`TaskGraph` :44、`TaskGraphWatch` :49——旧引的 `:55` 已无效);
+- 活跃状态集 `pending | running | waiting | sleeping | completing`,终态离开图(v1.4.0 实测 `TaskGraphState` `task-graph.ts:29`、`blocked` 原因 `:38-46`；`sleeping` 是 v1.4.0 新增);
 - **waiting 是一等状态**:任务提交一个 `{ status: "waiting", checkpoint, on: [childTaskId…], policy }` 后不再运行任何代码,子任务就绪后由 Scheduler 恢复(`README.md` Child Tasks 节);
 - **重启后的诚实投影**:"tasks that were `running` show as `pending` until they run again"——图上显示的是已提交状态,不是推测的运行态(README Task Graph 节)。
 
@@ -51,18 +58,18 @@ subagent 工具在 `api.commit()` 里以 `ownership: { kind: "task", taskId }` �
 
 ### abortOwned / ownedTasks:所有权索引的读写面
 
-上面"abort 调用即 abort 孩子"讲的是**规则**；v1.2.0 把这条规则做成了任务自己可以调用的**一对 API**（`TaskRuntime`，`packages/durable/src/types.ts:211-220`）：
+上面"abort 调用即 abort 孩子"讲的是**规则**；v1.2.0 把这条规则做成了任务自己可以调用的**一对 API**（`TaskRuntime`，**v1.4.0 `packages/durable/src/types.ts:291`/`:296`**）：
 
-- `abortOwned(id, context)`：中止**本任务拥有**的任务，等它到终态后 resolve；中止别人拥有的任务会抛错，已终态的任务立即 resolve（`scheduler.ts:1692-1698` 的守卫原文：``Task ${id} is not owned by task ${invocation.taskId}``）。
+- `abortOwned(id, context)`：中止**本任务拥有**的任务，等它到终态后 resolve；中止别人拥有的任务会抛错，已终态的任务立即 resolve（**v1.4.0 `scheduler.ts:2213-2215`** 的守卫原文：``Task ${id} is not owned by task ${invocation.taskId}``）。
 - `ownedTasks(context)`：本任务**直接**拥有的 live 任务，按 ID 排序，**包括重启前旧 invocation 创建的**；不含它拥有的 conversation 里的任务。返回的是已提交记录的**副本**。
 
 两个关键字是**直接**与**不传递**：所有权是父子边，不是可达集。"Tasks in conversations it owns are not included."（`types.ts:216-218` 原文）。实现上 `ownedTasks` 只是对 `#below` 索引的一次下探并过滤 `record?.owner === invocation.taskId`（`scheduler.ts:1674-1691`），返回前 `sort((a, b) => a.id - b.id)` 再 `copyJson`——排序与副本都是为"按 ID 序、可供调用方安全读"服务的。
 
-唯一的真实产品调用点在工具调用结算路径（`packages/durable/src/harness/tool.ts:592-600`）：一次结算先用 `ownedTasks` 捞出本任务拥有的**所有** live 嵌套调用（含上次尝试遗留、这次再没调用过的），再用 `Promise.all` 对它们**先全部打标、不等任何一个结束**，然后才提交自己的结算。注释解释了为什么必须先打标："one may run until a sibling is cancelled."。这就是"调用者结算前先中止它留下的嵌套调用"的落地方式——与上面 §abort 语义的自底向上清理是同一条规则的**调用方向**。
+唯一的真实产品调用点在工具调用结算路径（**v1.4.0 `packages/durable/src/harness/tool.ts:648-653`**）：一次结算先用 `ownedTasks` 捞出本任务拥有的**所有** live 嵌套调用（含上次尝试遗留、这次再没调用过的），再用 `Promise.all` 对它们**先全部打标、不等任何一个结束**，然后才提交自己的结算。注释解释了为什么必须先打标："one may run until a sibling is cancelled."。这就是"调用者结算前先中止它留下的嵌套调用"的落地方式——与上面 §abort 语义的自底向上清理是同一条规则的**调用方向**。
 
 ### 等待环:具名拒绝而非挂死
 
-wait-for 图的边有两种（`docs/spec.md:2224-2228`）：每个任务连向**它等待的任务**，以及连向**它拥有的 live ordinary work**（后者把它当作 `completing` 扣住）。不变式是**这张图无环**（`scheduler.ts:1472-1479`）：
+wait-for 图的边有两种（**v1.4.0 `docs/spec.md:2369-2373`**）：每个任务连向**它等待的任务**，以及连向**它拥有的 live ordinary work**（后者把它当作 `completing` 扣住）。不变式是**这张图无环**（**v1.4.0 `scheduler.ts:1973` 起**）：
 
 > Invariant: the wait-for graph is acyclic. Only a wait adds an edge between existing tasks, as a new task has only incoming edges, so checking each wait maintains it.
 
@@ -70,27 +77,48 @@ wait-for 图的边有两种（`docs/spec.md:2224-2228`）：每个任务连向**
 
 > `Task <a> cannot wait on <b>: a -> b -> a is a wait cycle`
 
-**最短的环**是自己等自己、或等一个扣住自己的 owner。**一个反直觉的例外**：background 任务**可以**等待它所属 conversation 的 owner——因为它并不扣住该 owner，所以不构成环（`docs/spec.md:2227-2228` 原文："a background task may wait on the owner of its conversation, which it does not hold"；`CHANGELOG.md:32`；测试 `test/harness-structured.test.ts:555-567`）。机制是同一个"遇 background 即停"的规则：`#ownedLive` 把 background 排除在 ordinary owned work 之外（`scheduler.ts:1002-1019`），而 `#waitCycle` 只在 `#walkDown` 里走 owner 边，于是在 background 处找不到回边。
+**最短的环**是自己等自己、或等一个扣住自己的 owner。**一个反直觉的例外**：background 任务**可以**等待它所属 conversation 的 owner——因为它并不扣住该 owner，所以不构成环（**v1.4.0 `docs/spec.md:2372-2373`** 原文："a background task may wait on the owner of its conversation, which it does not hold"；`CHANGELOG.md:32`；测试 `test/harness-structured.test.ts:555-567`）。机制是同一个"遇 background 即停"的规则：`#ownedLive` 把 background 排除在 ordinary owned work 之外（`scheduler.ts:1002-1019`），而 `#waitCycle` 只在 `#walkDown` 里走 owner 边，于是在 background 处找不到回边。
 
 修复前的行为是**每个在环上的任务永久等待**，只有"自己等自己"和"owner 链"这两种环会被抓到（`CHANGELOG.md:32`）。
 
 ### 调度器有界性:索引随 live work 收缩
 
-v1.2.0 把调度器的内存占用从"见过的全部"改成"当前 live 的"（`scheduler.ts:184-192`）：
+v1.2.0 把调度器的内存占用从"见过的全部"改成"当前 live 的"（**v1.4.0 `scheduler.ts:240-246`**）：
 
 > The ownership indexes are bounded by live work: an owner edge and an ended task's ownership fields are kept only while something is listed below them in `#below`, so only the chains above live tasks are known, whole. Work that appears later below a dropped node finds it unknown and loads its chain from storage again.
 
 三处具体化：
 
-- **存活判据**：`LIVE_STATUSES = ["pending", "running", "waiting", "completing"]`（`scheduler.ts:52-55`）——终态任务不再计入索引。
-- **级联只从取消意图出发**：`#intent` 集合（`scheduler.ts:245-246`，"Live tasks with cancellation intent, the sources of abort cascades"）收的是 abort 标记，或**非 `completed` 的 held outcome**（`cancellationIntent()` `:1845-1848`）；级联主体 `:598-608` 从每个有意图的 owner 向下走。**没有意图时零遍历**（`scheduler.ts:1059-1062`："Nothing cancels, the common case: no walk."）。
-- **长 sleep 分片**：`MAX_TIMER_DELAY = 2_147_483_647`（`scheduler.ts:54`）是 `setTimeout` 的 32 位上限（约 24.8 天），更长的 sleep 切成多段（使用点 `:554` 与 `:1821`），避免溢出成"立即触发"。
+- **存活判据**：`LIVE_STATUSES = ["pending", "running", "waiting", "sleeping", "completing"]`（`scheduler.ts:67`）——终态任务不再计入索引。
+- **级联只从取消意图出发**：`#intent` 集合（`scheduler.ts:245-246`，"Live tasks with cancellation intent, the sources of abort cascades"）收的是 abort 标记，或**非 `completed` 的 held outcome**（`cancellationIntent()` `:1845-1848`）；级联主体 `:598-608` 从每个有意图的 owner 向下走。**没有意图时零遍历**（**`:1278`**："Nothing cancels, the common case: no walk."）。
+- **长 sleep 分片**：`MAX_TIMER_DELAY = 2_147_483_647`（v1.4.0 起在 `src/timers.ts:4`，原先在 `scheduler.ts`）是 `setTimeout` 的 32 位上限（约 24.8 天），更长的 sleep 切成多段（`timers.ts:22`），避免溢出成"立即触发"。
 
-代价写进了 `CHANGELOG.md:39-40`：先前"每个 live 父任务下 10,000 个已结束的 subagent 调用"会留下 10,000 个已结束任务与 10,001 条 conversation 边，现在都不留（`npm run bench:scheduler-memory`）；500 个 owned 任务的链从 12 秒降到 50 毫秒。可观测断言是测试用的 `get indexSizes`（`scheduler.ts:1238-1241`）。
+代价写进了 **`CHANGELOG.md:96`**：先前"每个 live 父任务下 10,000 个已结束的 subagent 调用"会留下 10,000 个已结束任务与 10,001 条 conversation 边，现在都不留（`npm run bench:scheduler-memory`）；500 个 owned 任务的链从 12 秒降到 50 毫秒。可观测断言是测试用的 `get indexSizes`（**v1.4.0 `scheduler.ts:1622`**）。
+
+### sleep / wake:把等待变成状态(v1.4.0)
+
+**问题**：旧的 `TaskRuntime.sleep()` 在 phase 内等待，而 phase 持有 invocation。进程重启后 phase 从头重跑，等待也重来——"睡一小时再继续"实际会反复重付这段时间。
+
+**解法**：任务结束 phase 但不持 invocation，状态记为 `sleeping`，checkpoint 带上恢复所需的一切：
+
+- 两种写法：`runtime.sleepUntil(until, checkpoint, ctx)`（`types.ts:324-330`）或在 `runtime.commit()` 里返回 `{ status: "sleeping", until, checkpoint }`（`:217-220,622-631`）。`until` 必须是有限非负数；被 abort 的调用不能 sleep。
+- 唤醒：默认由 Harness 自己 arm timer；`HarnessOptions.setTimer` + `now` 可换成宿主时钟；`HarnessOptions.onWake` + `Harness.wake()`（`harness/types.ts:648-656,790-796`）让 Cloudflare DO 这类宿主**不持 timer**、靠 alarm 唤醒。
+- 相位内的节拍用 `setTimer(cb, delayMs)`（`types.ts:312-317`）——它不持久，invocation 结束就失效。
+- 同一机制也用于重试退避、deferred poll 与 compaction 重试：等待不再占着 phase，进程可以在中途停或休眠。
+
+**代价**：旧版本读 JSONL 里的 sleeping 任务不会恢复（会话看起来一直 busy）；SQLite 必须迁到 v2，迁完不能回退到 ≤1.3.0。
+
+### crash-loop guard(v1.4.0)
+
+一个任务如果反复在"还没提交新状态"时被崩溃/驱逐打断，重开就会无限重跑。v1.4.0 给它计数并 park：
+
+- `TaskRecord.restarts`（`types.ts:681-686`）：open 时把被截断的 running 任务记回 pending 并 +1（`scheduler.ts:381-419`）；正常 close 写回的 pending **不计数**；任务提交任何新状态就把计数清零。
+- 达到 `settings.restartLimit`（默认 **5**，`harness/types.ts:572-577`、`agent.ts:57`）：任务被 park，`inspect()` 与 task graph 的 `blocked.reason` 是 `"restart_limit"`（`harness/types.ts:695-699`），`wake()` 不把它算作 active，`onReport` 报一次 `task_parked`。
+- `Harness.retryTask(id)`（`harness/types.ts:823`）清计数并重新允许调度。abort handler 被这样截断到限额则任务直接 `faulted`。
 
 ### 能力面延伸:工具跑远端,事实留本地(v1.2.0 起在 release 内)
 
-v1.0.3 之后 durable 的执行环境抽象(`ExecutionEnv`,`src/env/`)长出了第二个官方实现:新包 `@earendil-works/pi-env` 把"agent 的工具在另一台机器上执行"做成包级能力——pi-env README 的定位原文:"an agent's tools run on another machine, usually over SSH, while the Durable worker, its storage and credentials stay local"(`packages/env/README.md:3-4`)。即**工具的文件操作与命令执行整体上远端,而 Durable worker、存储与凭据留本地**——持久事实层与执行层可以拆到两台机器上。依赖方向是 env → durable(pi-env 实现 durable 的接口,反向不成立),该包自 **v1.2.0 起随 release 发布**(`packages/env/package.json` 版本号 1.2.0;`98d2e1947` 时还是 1.0.3 且 Unreleased),monorepo 内仍无其它包依赖它。这是 durable 线的能力延伸证据,但不改变下面的 experimental 定位结论。
+v1.0.3 之后 durable 的执行环境抽象(`ExecutionEnv`,`src/env/`)长出了第二个官方实现:新包 `@earendil-works/pi-env` 把"agent 的工具在另一台机器上执行"做成包级能力——pi-env README 的定位原文:"an agent's tools run on another machine, usually over SSH, while the Durable worker, its storage and credentials stay local"(`packages/env/README.md:3-4`)。即**工具的文件操作与命令执行整体上远端,而 Durable worker、存储与凭据留本地**——持久事实层与执行层可以拆到两台机器上。依赖方向是 env → durable(pi-env 实现 durable 的接口,反向不成立),该包自 **v1.2.0 起随 release 发布**（v1.4.0 时与其它包同为 1.4.0，依赖改为精确 pin；`98d2e1947` 时还是 1.0.3 且 Unreleased),monorepo 内仍无其它包依赖它。这是 durable 线的能力延伸证据,但不改变下面的 experimental 定位结论。
 
 ## 边界与上限
 
@@ -111,17 +139,17 @@ v1.0.3 之后 durable 的执行环境抽象(`ExecutionEnv`,`src/env/`)长出了�
 |------|--------|
 | `packages/durable/README.md:3-5` | experimental 定位与持久承诺 |
 | `packages/durable/README.md`(Abort and Subagents / Child Tasks / Task Graph 三节) | owned conversation、join policy、自底向上 abort、投影语义的官方表述 |
-| **`packages/durable/src/harness/task-graph.ts:19-28,60`** | 状态集与"durable commit publications"边界（v1.2.0 实测 :60；v1.0.3 时为 :58-62） |
-| **`packages/durable/src/harness/task-graph.ts:136`起** | 全量重建与增量推进（v1.2.0 `#build` :136；文件 222→236 行） |
-| **`packages/durable/src/harness/scheduler.ts:54-55`** | 活跃状态常量与长 sleep 分片（v1.2.0 `MAX_TIMER_DELAY` :54、`LIVE_STATUSES` :55；文件 **1337→1953** 行） |
+| **`packages/durable/src/harness/task-graph.ts:29,78`** | 状态集与"durable commit publications"边界（v1.2.0 实测 :60；v1.0.3 时为 :58-62） |
+| **`packages/durable/src/harness/task-graph.ts:136`起** | 全量重建与增量推进（**v1.4.0 `#build` :180；文件 222→299 行**） |
+| **`packages/durable/src/harness/scheduler.ts:67`** | 活跃状态常量（含 `sleeping`）；长 sleep 分片常量在 `src/timers.ts:4`。文件 **1953→2507** 行 |
 | **`packages/durable/src/harness/scheduler.ts:184-192`** | 所有权索引有界性：`#below` 只围绕 live work 展开，`#intent` 是级联的唯一来源（v1.2.0 新增注释块） |
 | **`packages/durable/src/harness/scheduler.ts:598-608`** | abort 级联主体：从每个有取消意图的 owner 向下走，background 不传递 |
 | **`packages/durable/src/harness/scheduler.ts:1472-1516`** | 等待环：`#validateWait`（不变式注释）+ `#waitCycle`；拒绝消息在 :1500-1506 |
-| **`packages/durable/src/types.ts:211-220`** | `TaskRuntime.abortOwned` / `ownedTasks`：**直接**所有权索引的读写面（不含所拥有 conversation 里的任务） |
-| **`packages/durable/src/harness/tool.ts:592-600`** | 唯一产品调用点：结算前先对本任务拥有的全部 nested 调用打标 |
+| **`packages/durable/src/types.ts:287-296`** | `TaskRuntime.abortOwned` / `ownedTasks`：**直接**所有权索引的读写面（不含所拥有 conversation 里的任务） |
+| **`packages/durable/src/harness/tool.ts:648-653`** | 唯一产品调用点：结算前先对本任务拥有的全部 nested 调用打标 |
 | `packages/durable/docs/spec.md:2219-2232` | 等待语义与 wait-for 图（§5.5）；注意源码注释 `scheduler.ts:1510` 误写作 §5.1 |
 | `packages/durable/test/examples/22/23/24-*.ts` | 前台/后台 subagent 与 child tasks 官方示例 |
 | **`packages/durable/README.md:257`** | `abandonOnRestart`：重启后放弃仍 live 的任务 |
-| **`packages/durable/README.md:259`** | §Code Mode：durable 侧内建 codemode（v1.2.0 新增） |
+| **`packages/durable/README.md:259`** | §Code Mode：durable 侧内建 codemode（v1.2.0 新增；v1.4.0 在 `README.md:355`） |
 | **`packages/durable/README.md:323`** | `documentRetentionMs` 文档保留期 |
 | **`packages/durable/src/codemode/`** | 5 文件；`createCodemodeExtension`/`createCodemodeTool`；`pi.codemode.journal` 确定性重放 |

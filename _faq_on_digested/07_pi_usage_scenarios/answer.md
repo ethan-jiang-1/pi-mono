@@ -51,3 +51,11 @@
 ## 引用
 
 各章文末已给全量来源(网络快照 2026-09-02)。总入口:CC [best practices(重写版)](https://code.claude.com/docs/en/best-practices)、[agents.md](https://agents.md)、[pi.dev/packages](https://pi.dev/packages)、[Mario Year in Review 2025](https://mariozechner.at/posts/2025-12-22-year-in-review-2025/)、[Armin: Pi, the minimal agent](https://lucumr.pocoo.org/2026/1/31/pi/)、[esc.sh 实测](https://blog.esc.sh/claude-code-to-pi/)、[skills.sh CLI(官方支持 Pi)](https://github.com/vercel-labs/skills)。
+
+
+## sync-0010 增量（v1.4.0）
+
+- **`/share` 目的地可选**：`sessionShareDestination` = `auto` / `gist` / `radius`（`core/settings-schema.ts:224-230`、`modes/interactive/session-share.ts:69-77`）。`radius` 不回退 gist，未登录直接提示 `/login radius`；`auto` 有 Radius 认证走 Radius、否则私有 gist。
+- **codemode 并发排队**：全进程最多 2 个 worker，超出按到达顺序最多等 60 s，`PI_CODEMODE_MAX_WORKERS` 可调；等待计入 `timeout_ms`（`extensions/codemode/execute.ts:58-116`）。
+- **恢复会话保留工具集**：`--tools +name`/`-name` 叠加在会话记录的工具上（#10785），普通名/`--no-tools` 仍整体覆盖。
+- **durable 的等待可跨重启**：`sleeping` 状态 + `sleepUntil`，适合"等一小时再继续"这类长任务；SQLite 需迁 v2（不可回退）。

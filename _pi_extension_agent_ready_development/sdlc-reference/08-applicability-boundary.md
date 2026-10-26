@@ -27,10 +27,10 @@
 |---|---|---|
 | 扩展生命周期 | factory 只做注册；长命资源从 `session_start` 或按需启动；清理放幂等 `session_shutdown` | Extensions 文档 |
 | 事件边界 | run 从 `before_agent_start` 到 `agent_end`；`agent_before_settle` 是最后可行动边界；`agent_settled` 只通知 | Extensions 文档 |
-| package 依赖划分 | host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）放 `peerDependencies` 用 `"*"`，不得放 `dependencies` | [Packages 文档](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/packages.md#L80-L92) |
+| package 依赖划分 | host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）放 `peerDependencies` 用 `"*"`，不得放 `dependencies` | [Packages 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md#L80-L92) |
 | 工具不可注销 | 只能以 `exposure: "hidden"` 重注册收回；`terminate: true` 需要同批已完成工具一致同意 | Extensions 文档 |
 | 模式差异 | JSON/print 无 UI；RPC 不转发自定义终端组件；用 `ctx.mode`/`ctx.hasUI` 守卫 | Extensions 文档 |
-| 会话文件格式 | 带树结构的 JSONL；导出/导入是搬运历史，不是重放（见[02 页](02-issue-diagnosis-and-session-import.md)的 `/ir` 边界） | [Session 格式文档](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/session-format.md) |
+| 会话文件格式 | 带树结构的 JSONL；导出/导入是搬运历史，不是重放（见[02 页](02-issue-diagnosis-and-session-import.md)的 `/ir` 边界） | [Session 格式文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) |
 
 区别判据很简单：**换成任何 Pi 用户都成立的是运行时合同；只有在这个仓库工作才成立的是主仓要求。**正文中的「主仓要求」标注就是给这条判据用的。
 
@@ -77,7 +77,7 @@
 - **「主仓这么写，所以这是 Pi 的推荐做法」**：不成立。本卷通篇标注了「主仓要求」与「扩展仓建议」的差别；主仓多数机制没有对外效力。
 - **「运行时合同可以按仓库改」**：也不成立。生命周期、依赖划分、模式差异是不可协商的运行时事实；违反它们的扩展会在并发、无头模式或干净安装时失败，与仓库制度无关。
 - **「借鉴等于复制」**：不等于。借原则的收益来自把判据适配到自己的失败面；照抄门槛值通常会把别人的带宽假设搬成自己的长期红灯。
-- **「本卷的三条立场是 Pi 的方法论」**：不是。那是对 `v1.2.0` 可观察机制的综合归纳，属**扩展仓建议**；Pi 没有声明采用任何统一开发方法名。
+- **「本卷的三条立场是 Pi 的方法论」**：不是。那是对 `v1.4.0` 可观察机制的综合归纳，属**扩展仓建议**；Pi 没有声明采用任何统一开发方法名。
 
 ## 下一步
 

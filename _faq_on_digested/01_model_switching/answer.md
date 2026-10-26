@@ -169,3 +169,12 @@ const { session } = await createAgentSession({
 - 源码：`packages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts`
 - `_digested/`：[agent/01-Anatomy/1.1_Agent_Info.md(../../_digested/agent/01-Anatomy/1.1_Agent_Info.md) — AgentLoopConfig
 - `_digested/`：[integration/03-runtime-api.md(../../_digested/integration/03-runtime-api.md) — SDK/RPC 模型管理 API
+
+
+## sync-0010 增量（v1.4.0）
+
+- **默认模型更换**（`core/model-resolver.ts:28,32,58-61`）：GitHub Copilot `gpt-5.4` → **`gpt-6.1-sol`**（5.4 已退役）；NVIDIA → **`nvidia/nemotron-3.5-super-vl-120b-a12b`**；Xiaomi 与三个 Token Plan → **`mimo-v2.6-pro`**（`mimo-v2.5-pro` 已离开目录）。
+- **`--model` 的 provider 选择规则变了**：不再按 catalog 顺序取第一个；先收集候选，具名 provider 可用则胜出，否则"唯一有凭据的候选"胜出，否则若具名匹配存在（哪怕不可用）就用它（`--api-key` 可给它补凭据），都没有才报歧义要求 `--provider`（`model-resolver.ts:227-259`）。`--api-key` 不参与选择。
+- **`kimi-coding` 改走 OpenAI Chat Completions**（`https://api.kimi.com/coding/v1`）：对 `models.json` 的 base URL 覆盖现在**必须带 `/v1`**，否则请求打错路径。
+- **切模型时丢弃旧模型的 thinking block**（v1.3.0）：不再把它当纯文本发给新模型；否则新模型会看到旧模型的推理并可能写进正文。GPT-6（API key）中途改 thinking level 则保留 prompt cache。
+- 新增 `MiniMax-M3.1-Flash`（minimax / minimax-cn，thinking low…max；**不能关闭**思考）。

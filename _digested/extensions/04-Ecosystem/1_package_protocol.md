@@ -1,6 +1,8 @@
 # 1. 包协议：生态的"公路系统"（官方基建详解）
 
-> 本篇是 04-Ecosystem 总览中"官方基建"的展开——`pi install` 到 `pi.dev` 目录之间的**完整协议细节**。全部硬事实，锚点在 `packages/coding-agent/docs/packages.md`（下称 packages.md），行号对应 v0.86.1 工作树。
+> **⚠️ 行号漂移（v1.4.0 复核）**：本页的 `packages.md:NNN` 原按 v0.85.1 的 **228 行**版本写成；该文档在 v1.0.0 被重写为 **129 行**（v1.4.0 仍 129 行），行号整体失效。下面已把引用重锚到 v1.4.0 的 `packages/coding-agent/docs/packages.md` 实际行号；机制结论未变。
+
+> 本篇是 04-Ecosystem 总览中"官方基建"的展开——`pi install` 到 `pi.dev` 目录之间的**完整协议细节**。全部硬事实，锚点在 `packages/coding-agent/docs/packages.md`（下称 packages.md），行号已按 **v1.4.0** 重锚（原为 v0.86.1/v0.85.1 的 228 行版，见页首横幅）。
 
 ## 一句话
 
@@ -10,44 +12,44 @@
 
 | Source | 例 | 存储位置 | 更新语义 |
 |--------|-----|----------|----------|
-| **npm** | `npm:@foo/bar@1.0.0` | `~/.pi/agent/npm/`（项目级 `.pi/npm/`） | **版本化 spec 被 pin**，`pi update --all` 不动它（packages.md:63）；裸 `npm:pkg` 才随 update 走 |
-| **git** | `git:github.com/user/repo@v1` | `~/.pi/agent/git/<host>/<path>` | refs 是 pinned tag/commit，update 只 **reconcile** 到配置的 ref 不前移（:90）；要升级必须显式 `pi install git:...@new-ref`；reconcile 改变 checkout 时 reset+clean+重跑 `npm install`（:93） |
-| **本地路径** | `./relative/pkg` | 不复制，直接引用 | 相对路径**相对 settings 文件解析**——项目 settings 里的相对包随仓库走（:107-110） |
+| **npm** | `npm:@foo/bar@1.0.0` | `~/.pi/agent/npm/`（项目级 `.pi/npm/`） | **版本化 spec 被 pin**，`pi update --all` 不动它（v1.4.0 `packages.md:38`；v0.85.1 时为 :63）；裸 `npm:pkg` 才随 update 走 |
+| **git** | `git:github.com/user/repo@v1` | `~/.pi/agent/git/<host>/<path>` | refs 是 pinned tag/commit，update 只 **reconcile** 到配置的 ref 不前移（v1.4.0 `packages.md:38`；v0.85.1 时为 :90）；要升级必须显式 `pi install git:...@new-ref`；reconcile 改变 checkout 时 reset+clean+重跑 `npm install`（:93） |
+| **本地路径** | `./relative/pkg` | 不复制，直接引用 | 相对路径**相对 settings 文件解析**——项目 settings 里的相对包随仓库走（v1.4.0 `packages.md:19`/`:40`；v0.85.1 时为 :107-110） |
 
 细节点：
 
-- npm 查询/安装可整体包进 wrapper（`npmCommand: ["mise", "exec", "node@20", "--", "npm"]`）——版本管理器场景一等公民（packages.md:66-72）。
-- git source 的 SSH 走 `~/.ssh/config`；CI 用 `GIT_TERMINAL_PROMPT=0` fail-fast（packages.md:89）。
-- 本地路径指向**单个文件**时按单 extension 加载，目录才按包规则（packages.md:107-110）。
+- npm 查询/安装可整体包进 wrapper（`npmCommand: ["mise", "exec", "node@20", "--", "npm"]`）——版本管理器场景一等公民（v1.4.0 `packages.md:17` 的 `pi update`；v0.85.1 时为 :66-72）。
+- git source 的 SSH 走 `~/.ssh/config`；CI 用 `GIT_TERMINAL_PROMPT=0` fail-fast（v1.4.0 `packages.md:31-40` 的 source 表；v0.85.1 时为 :89）。
+- 本地路径指向**单个文件**时按单 extension 加载，目录才按包规则（v1.4.0 `packages.md:40`；v0.85.1 时为 :107-110）。
 
 ## manifest 与发现
 
-`pi` manifest 四个数组（`extensions`/`skills`/`prompts`/`themes`），支持 glob 与 `!` 排除，正 glob 按字典序发现（packages.md:118-133）。没有 manifest 就按约定目录 auto-discover：`extensions/` 收 `.ts`/`.js`、`skills/` 递归找 `SKILL.md`、`prompts/` 收 `.md`、`themes/` 收 `.json`（:160-165）。声明式资源轴的细节见 [2.5](../02-Expansion/2.5_declarative_resources.md)。
+`pi` manifest 四个数组（`extensions`/`skills`/`prompts`/`themes`），支持 glob 与 `!` 排除，正 glob 按字典序发现（v1.4.0 `packages.md:57-72`；v0.85.1 时为 :118-133）。没有 manifest 就按约定目录 auto-discover：`extensions/` 收 `.ts`/`.js`、`skills/` 递归找 `SKILL.md`、`prompts/` 收 `.md`、`themes/` 收 `.json`（:160-165）。声明式资源轴的细节见 [2.5](../02-Expansion/2.5_declarative_resources.md)。
 
-画廊元数据是 manifest 的一部分：`pi-package` keyword 上 [pi.dev/packages](https://pi.dev/packages)，`video`（MP4，桌面悬停自动播放）/`image` 字段加预览，video 优先（packages.md:135-154）。
+画廊元数据是 manifest 的一部分：`pi-package` keyword 上 [pi.dev/packages](https://pi.dev/packages)，`video`（MP4，桌面悬停自动播放）/`image` 字段加预览，video 优先（v1.4.0 `packages.md:74`；v0.85.1 时为 :135-154）。
 
 ## 依赖规则：隔离是显式设计
 
-- 第三方运行时依赖 → `dependencies`；pi 从 npm/git 装包时**自动跑 `npm install`**（packages.md:169）。
-- **pi 核心包**（`@earendil-works/pi-ai`/`pi-agent-core`/`pi-coding-agent`/`pi-tui`/`typebox`）→ 必须放 `peerDependencies` 且 range 为 `"*"`，**不许打包**——由宿主统一供版本（packages.md:171）。
-- **依赖其他 pi 包** → `dependencies` + `bundledDependencies`，并通过 `node_modules/...` 路径引用其资源（packages.md:173-186）。
-- 底层保证："Pi loads packages with separate module roots, so separate installs do not collide or share modules"（packages.md:173）——每个包独立模块根，同名依赖不同版本共存。
+- 第三方运行时依赖 → `dependencies`；pi 从 npm/git 装包时**自动跑 `npm install`**（v1.4.0 `packages.md:78`；v0.85.1 时为 :169）。
+- **pi 核心包**（`@earendil-works/pi-ai`/`pi-agent-core`/`pi-coding-agent`/`pi-tui`/`typebox`）→ 必须放 `peerDependencies` 且 range 为 `"*"`，**不许打包**——由宿主统一供版本（v1.4.0 `packages.md:88`；v0.85.1 时为 :171）。
+- **依赖其他 pi 包** → `dependencies` + `bundledDependencies`，并通过 `node_modules/...` 路径引用其资源（v1.4.0 `packages.md:90`；v0.85.1 时为 :173-186）。
+- 底层保证："Pi loads packages with separate module roots, so separate installs do not collide or share modules"（v1.4.0 `packages.md:92`；v0.85.1 时为 :173）——每个包独立模块根，同名依赖不同版本共存。
 
 这条规则解释了生态里一个常见形态：大包（如 pi-mcp-adapter）把子能力打包进自己的 tarball 而不要求用户装一堆前置包。
 
 ## 过滤、启停与作用域
 
-- settings 里可以用对象形式**只加载包的一部分**：`{ source: "npm:my-package", extensions: ["extensions/*.ts", "!extensions/legacy.ts"] }`（packages.md:190-200，Package Filtering）。
+- settings 里可以用对象形式**只加载包的一部分**：`{ source: "npm:my-package", extensions: ["extensions/*.ts", "!extensions/legacy.ts"] }`（v1.4.0 `packages.md:94-119`，Package Filtering；v0.85.1 时为 :190-200）。
 - 资源可 enable/disable（TOC :15）。
-- 作用域：`pi install` 默认写**用户** settings（`~/.pi/agent/settings.json`），`-l` 写项目 `.pi/settings.json`——项目 settings 可提交给团队，项目被 trust 后 pi 启动时自动补装缺失包（packages.md:43）。
+- 作用域：`pi install` 默认写**用户** settings（`~/.pi/agent/settings.json`），`-l` 写项目 `.pi/settings.json`——项目 settings 可提交给团队，项目被 trust 后 pi 启动时自动补装缺失包（v1.4.0 `packages.md:19`/`:21`；v0.85.1 时为 :43）。
 
 ## 安全立场（协议不背书内容）
 
-packages.md:20 的警告是协议层最硬的一句：
+`packages.md` 的警告是协议层最硬的一句（v1.4.0 `:3`/`:21`；v0.85.1 时为 :20）：
 
 > Pi packages run with **full system access**. Extensions execute arbitrary code, and skills can instruct the model to perform any action including running executables. **Review source code before installing third-party packages.**
 
-协议层给的缓解全是**用户侧**的：`pi -e` 临时试用（packages.md:45-47）、project trust 闸门、版本 pin。没有签名、没有沙箱承诺、没有审核。机制层的真实护栏在扩展系统内部（`user_bash` fail-closed 等，见 [03-Patterns/3.3](../../extensions/03-Patterns/3.3_safety_guards.md)）。
+协议层给的缓解全是**用户侧**的：`pi -e` 临时试用（v1.4.0 `packages.md:23-27`；v0.85.1 时为 :45-47）、project trust 闸门、版本 pin。没有签名、没有沙箱承诺、没有审核。机制层的真实护栏在扩展系统内部（`user_bash` fail-closed 等，见 [03-Patterns/3.3](../../extensions/03-Patterns/3.3_safety_guards.md)）。
 
 ## 为什么这套协议重要（解释）
 

@@ -7,7 +7,7 @@
  * - Exactly one trailing newline.
  * - Markdown links: in-corpus relative targets must exist; fragments must match
  *   a heading slug in the target file; external links may only point to the
- *   pinned Pi baseline tag v1.2.0.
+ *   pinned Pi baseline tag (BASELINE_TAG).
  * - Markdown image references must point to an existing .svg in a figures dir.
  * - SVG figures: intrinsic size (width/height/viewBox), accessibility metadata
  *   (role="img", <title>, <desc>), root <svg> element.
@@ -23,7 +23,10 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const CORPUS_ROOT = resolve(dirname(fileURLToPath(import.meta.url)));
-const PINNED_EXTERNAL = /^https:\/\/github\.com\/earendil-works\/pi\/(?:blob|tree)\/v1\.2\.0(?:\/|$)/;
+const BASELINE_TAG = "v1.4.0";
+const PINNED_EXTERNAL = new RegExp(
+	`^https://github\\.com/earendil-works/pi/(?:blob|tree)/${BASELINE_TAG.replace(/\./g, "\\.")}(?:/|$)`,
+);
 const STRICT_DECODER = new TextDecoder("utf-8", { fatal: true, ignoreBOM: false });
 
 function listFiles(dir) {
@@ -158,7 +161,7 @@ function checkFile(path, errors) {
 				const slugs = headingSlugs(text);
 				if (!slugs.has(target.slice(1))) errors.push(`${rel}: in-page anchor ${target} has no matching heading`);
 			} else if (!PINNED_EXTERNAL.test(target)) {
-				errors.push(`${rel}: external link outside pinned v1.2.0 baseline: ${target}`);
+				errors.push(`${rel}: external link outside pinned ${BASELINE_TAG} baseline: ${target}`);
 			}
 			continue;
 		}

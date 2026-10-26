@@ -15,10 +15,10 @@
 | 件 | Pi 的对应物 | 状态 |
 |---|---|---|
 | 轨迹载体 | session JSONL：model-visible 状态在 system message 里，assistant 结算完整落盘 | 已消化（[01](01-model-visible-invariant.md)、[02](02-session-jsonl-anatomy.md)） |
-| 宿主注入缝 | `createHarness({ sessionManager: SessionManager.open(path) })`，注释明言支持 resume | 已有（[harness.ts:122-123](../../packages/coding-agent/test/suite/harness.ts#L122-L123)） |
+| 宿主注入缝 | `createHarness({ sessionManager: SessionManager.open(path) })`，注释明言支持 resume | 已有（[harness.ts:123-125](../../packages/coding-agent/test/suite/harness.ts#L123-L125)） |
 | 脚本推导 | assistant 结算（content blocks + stopReason + toolCall id）→ `FauxResponseStep[]` | **需要自己写**（DSH llm-replay 的 Pi 版核心） |
 
-断言点对应：DSH 的 `request/header` pin ↔ Pi 的 `before_provider_request`（payload 可整体断言/替换，[extensions/types.ts:879-883](../../packages/coding-agent/src/core/extensions/types.ts#L879-L883)）与 `before_provider_headers`。
+断言点对应：DSH 的 `request/header` pin ↔ Pi 的 `before_provider_request`（payload 可整体断言/替换，[extensions/types.ts:900-904](../../packages/coding-agent/src/core/extensions/types.ts#L900-L904)）与 `before_provider_headers`。
 
 ## 原型：录制 → 推导 → 无 key 续跑 → 重放一致（实测通过）
 
@@ -142,7 +142,7 @@ TRAJECTORY_ROLES: ["session","system","user","assistant","toolResult","assistant
 
 ## 原型过程里确认的两个事实（比通路本身更有价值）
 
-1. **resume 的装配责任在 SDK/应用层，不在 AgentSession。** `AgentSession` 构造函数只从 transcript 恢复工具（[agent-session.ts:509-513](../../packages/coding-agent/src/core/agent-session.ts#L509-L513) `_restoreToolsFromTranscript`），消息态必须由调用方从 `buildSessionContext()` 灌入（生产路径 [sdk.ts:200](../../packages/coding-agent/src/core/sdk.ts#L200) → `initialState.messages`，:399；运行时对齐见 `_refreshFinalizedContext`，:926-932）。原型第一版漏了这行，`session.messages` 为空——这本身就是对"轨迹是事实源、运行态是派生物"纪律的一次现场验证：**派生状态永远从持久事实重新折叠**（[orchestration/06](../orchestration/06-session-plane.md) 的说法）。
+1. **resume 的装配责任在 SDK/应用层，不在 AgentSession。** `AgentSession` 构造函数只从 transcript 恢复工具（[agent-session.ts:525](../../packages/coding-agent/src/core/agent-session.ts#L525) 调用 / :1830 定义 `_restoreToolsFromTranscript`），消息态必须由调用方从 `buildSessionContext()` 灌入（生产路径 [sdk.ts:200](../../packages/coding-agent/src/core/sdk.ts#L200) → `initialState.messages`，:399；运行时对齐见 `_refreshFinalizedContext`，:926-932）。原型第一版漏了这行，`session.messages` 为空——这本身就是对"轨迹是事实源、运行态是派生物"纪律的一次现场验证：**派生状态永远从持久事实重新折叠**（[orchestration/06](../orchestration/06-session-plane.md) 的说法）。
 2. **跨上下文 resume 会追加 patch 型 system message。** 续跑宿主的 cwd/资源与录制时不同 → 新 prompt sections ≠ 重放出的旧 sections → `declareToolChanges`/prompt patch 机制往轨迹里**追加一条** system message，文件变成 base + patch 两条。不变量的正确表述由此精确化：**"重放轨迹得到当前状态"，而不是"轨迹里只有一条 system message"。** 这正是 [01](01-model-visible-invariant.md) 边界节那条实测的出处。
 
 ## 适配真实录制（未实测，列为风险清单）

@@ -112,7 +112,7 @@ node dist/cli.js --mode rpc
 - [`04-event-model.md`](04-event-model.md)：做自己的 UI 时读，AgentSessionEvent 分类、渲染策略、重连恢复。
 - [`05-recipes.md`](05-recipes.md)：按产品形态选方案，Web/Tauri、本地后台、CI、IDE 插件。
 - [`06-coverage-and-parity.md`](06-coverage-and-parity.md)：更细的能力边界表，保留给需要核对 parity 的读者。
-- [`07-chord-and-facets.md`](07-chord-and-facets.md)：第四条 authoring 面。`packages/chord`（第 11 个包、零 Pi 依赖）与 facet/service 体系是什么、为什么它已在**非实验源码**里（Harness 的 `Context` 就是 chord 的）、与 `core/extensions` 扩展系统的关系、术语碰撞、以及**现状 vs 规格**陷阱（`facets.md` 自称取代 `plugins.md`，但核心改动一条未实现）。dev-only 限定同 06。
+- [`07-chord-and-facets.md`](07-chord-and-facets.md)：第四条 authoring 面。`packages/chord`（第 11 个包；v1.4.0 起依赖 `pi-telemetry`，不再是零 Pi 依赖）的 contracts/objects/refs 是什么、为什么它已在**非实验源码**里（Harness 的 `Context` 就是 chord 的、durable 的 sqlite 驱动来自 `chord/sqlite`）、与 `core/extensions` 扩展系统的关系、术语碰撞。**本页在 v1.4.0 已降级为历史取证**，现状看 `architecture-next/chord.md`。
 
 ## 当前最重要的边界
 

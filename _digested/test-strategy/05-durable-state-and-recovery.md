@@ -2,7 +2,7 @@
 
 > **源码锚点**：
 > - 核心持久化与状态机测试套件：`packages/durable/test/`（50+ 测试文件）
-> - 跨后端通用一致性测试集：`packages/durable/src/testing/storage-conformance.ts`（1,663 行参数化套件；v1.0.3 时为 1,584）
+> - 跨后端通用一致性测试集：`packages/durable/src/testing/storage-conformance.ts`（1,682 行参数化套件；v1.0.3 时为 1,583）
 > - 跨环境一致性测试集：`packages/durable/src/testing/env-conformance.ts`（633 行参数化套件；v1.0.3 时为 473（511 是同步起点 `98d2e1947` 的值，非 tag v1.0.3））
 > - 灾难恢复测试：`harness-generation-recovery.test.ts`、`harness-tools-recovery.test.ts`、`harness-tasks-recovery.test.ts`
 > - 巨型压缩与分叉测试：`harness-compaction.test.ts`（近 10 万字节）、`session-forks.test.ts`
@@ -22,45 +22,48 @@
 
 ---
 
-## 二、恢复测试三部曲（The Recovery Test Triad）
+## 二、恢复测试：重开而不是「续传」
 
-在 `packages/durable/test/` 中，有三个以 `-recovery.test.ts` 结尾的标志性测试资产，专门用来模拟各种“不可抗力崩溃”：
+`packages/durable/test/` 里有三个 `-recovery.test.ts`，模拟进程在关键处被截断：
 
 ```
-[正常执行链路]
-      │
-      ▼
-   写入事件流 / 触发工具执行 / 记录生成中状态
-      │
-      ▼ 模拟突发异常 (SIGKILL / 抛出致命异常 / 模拟断电)
-[物理阻断: 中断会话]
-      │
-      ▼ 重新创建存储句柄与 Harness 实例
-[重启恢复: harness.recover()]
-      │
-      ├─► 1. 验证存储层未决事务回滚 (Rollback uncommitted transactions)
-      ├─► 2. 验证任务图拓扑未断裂 (DAG state intact)
-      ├─► 3. 验证未决消息转换为可恢复错误 (Pending -> Errored with resume handle)
-      └─► 4. 再次触发 prompt(): 断点续传成功
+[正常执行]
+   │ 写入 commit（entry / task / document）/ 调工具 / 生成中
+   ▼ 模拟 SIGKILL / 抛错 / 关掉 storage
+[丢弃进程内状态]
+   │ 重新 Harness.open(同一 storage)
+   ▼ open 时 reconcile：running -> pending，重建 abort/finalize 持有
+[整段任务重跑：从 checkpoint 决定从哪里继续]
 ```
+
+**关键口径（v1.4.0 复核）**：**没有 `harness.recover()` 这个公开 API**。恢复 = 重新 `Harness.open(storage, …)`（`harness/harness.ts:540-575`，内部是 `TaskScheduler.open()` 的 reconcile，`scheduler.ts:374`）+ 需要时 `resume()`。恢复语义也不是「把半截生成转成错误事件 + resume handle」，而是**整段任务重跑**：checkpoint 让 phase 函数自己决定从哪里继续（见 [4.1](../agent/04-Harness/4.1_AgentHarness.md)）。这一点自 1.0.0 起成立，v1.4.0 的 `sleeping` 只是让「等待」也能跨重启。
 
 ### 1. 生成中断恢复（`harness-generation-recovery.test.ts`）
-- **模拟场景**：大模型刚输出了一半的 Token，网络套接字突发断开或进程崩溃；
-- **断言目标**：恢复后的 Session 不应处于“永远等待响应”的死锁状态，系统必须将半截生成记录转化为带错误标记的终止事件，并自动生成可重试的 Token 锚点。
+- **模拟**：流式生成到一半进程消失（或 storage 在生成中关闭）。
+- **断言**：重开后会话不会永久卡在「等待响应」；未提交的部分不进入事实层；任务按 checkpoint 重跑，已提交的 entry 不被重复追加。
 
 ### 2. 工具执行崩溃恢复（`harness-tools-recovery.test.ts`）
-- **模拟场景**：Agent 发起了一个耗时工具调用（如长命令执行），工具子进程在返回前夕异常退出；
-- **断言目标**：验证 `tool_call_id` 与未完成的执行凭证是否被安全清理，绝不在会话日志中遗留悬空引用（Dangling References）。
+- **模拟**：工具调用返回前子进程/宿主退出。
+- **断言**：tool call 与结果不会留下悬空引用；非 replay-safe 的调用按 `abandonOnRestart` 处理（连同它拥有的工作一起 abort，reason `restart`）；嵌套调用走 `NestedCallDoc` 的重放策略。
 
 ### 3. 任务拓扑图故障恢复（`harness-tasks-recovery.test.ts`）
-- **模拟场景**：复杂的有向无环图（DAG）子任务在执行到第 3 个节点时崩溃；
-- **断言目标**：依赖节点是否处于合规挂起状态，已完成节点的输出物是否依然持久化在 SQLite 中。
+- **模拟**：DAG 执行到中途崩溃。
+- **断言**：依赖节点处于合规的挂起/等待状态；task graph 从 commit publication 重建，而不是从内存猜；已完成节点的输出仍在存储里（与具体后端无关——conformance 对四个后端跑同一套断言）。
 
----
+### 4. v1.4.0 新增的恢复面
+
+| 测试 | 覆盖 |
+|---|---|
+| `harness-sleep.test.ts` | `sleeping` 跨重启存活、到点从 checkpoint 继续、不持 invocation |
+| `harness-blocked.test.ts` | crash-loop guard：`restarts` 计数、park、`restart_limit`、`retryTask` |
+| `harness-telemetry.test.ts` | `DURABLE_TELEMETRY_SCHEMA`：submit/phase span、内容不含 payload、错误截断 |
+| `harness-reports.test.ts` | `onReport(error, info)` 的 `ReportInfo` 分类 |
+| `indexeddb-storage.test.ts` | 第四后端接同一套 storage conformance |
+| `test-workers/wake.test.ts` | Cloudflare DO：alarm 唤醒 + 驱逐后 `wake()` 报告 |
 
 ## 三、解密 harness-compaction.test.ts：近 100KB 的状态压缩断言
 
-在长周期的编程任务中，会话历史动辄达到数万 Token，必须通过上下文压缩（Compaction）将旧轮次折叠为 `ContextEditEntry` 摘要。
+在长周期的编程任务中，会话历史动辄达到数万 Token，必须通过上下文压缩（Compaction）把旧轮次折叠。压缩以 `pi.compaction` entry 落盘；`ContextEdit[]` 只是 `EntryRecord.edits` 的字段类型，不存在 `ContextEditEntry` 这种条目。
 
 `harness-compaction.test.ts` 单个文件代码量接近 10 万字节，是全仓库最庞大的单测试文件之一。它测试的核心不变量包括：
 
@@ -69,17 +72,18 @@
 2. **多分支分叉压缩（Forked Branch Compaction）**：
    当用户在会话树的节点 A 分叉出分支 1 和分支 2 时，分支 1 的压缩**绝对不能污染或影响分支 2 的回放视图**；
 3. **跨存储引擎等价性（Cross-Backend Parity 与 storage-conformance.ts）**：
-   `packages/durable` 同时支持三种存储后端：
-   - `sqlite-storage`（生产默认，支持 ACID 事务与磁盘恢复）
-   - `jsonl-storage`（轻量级纯文本追加文件，易审计）
-   - `memory-storage`（纯内存，测试专用）
-   系统构建了长达 1,663 行的参数化套件 `packages/durable/src/testing/storage-conformance.ts`，`sqlite-storage.test.ts`、`jsonl-storage.test.ts` 与 `memory-storage.test.ts` 均接入此套件运行完全相同的状态机断言，确保开发、测试与生产的行为毫厘不差。
+   `packages/durable` 有四个存储后端：
+   - `sqlite`（ACID 事务与磁盘恢复；v1.4.0 驱动在 `@earendil-works/chord/sqlite`）
+   - `jsonl`（纯文本追加 + sidecar，易审计）
+   - `memory`（纯内存，测试与参考语义）
+   - `indexeddb`（v1.4.0 新增，浏览器）
+   参数化套件 `packages/durable/src/testing/storage-conformance.ts`（1,682 行）对每个后端跑完全相同的状态机断言——durable 不预设哪个后端是「生产默认」，选型由宿主决定。
 
 ### 第二条 conformance 线：执行环境（env-conformance.ts，v1.0.3 起）
 
-v1.0.3 把同一套"参数化一致性套件"模式从存储层复制到了**执行环境层**：`packages/durable/src/testing/env-conformance.ts`（633 行；v1.0.3 时为 473（511 是同步起点 `98d2e1947` 的值，非 tag v1.0.3））经 `registerEnvConformance`（`src/testing/runner.ts:28`）把任意 `ExecutionEnv` 实现接入同一套断言，覆盖面正是本轮接口扩张的能力：argv exec（数组命令直接 spawn、不经 shell）、输出窗口（`window`/`skipped` 的省略量语义）、以及体量最大的 watch 双模式案例（native/polling，缺失文件创建/替换/删除、父目录改名重建、exclude、close 幂等；watch 案例超时放宽到 30 秒以覆盖轮询延迟，`env-conformance.ts:124`，`watchCase` 统一给 30_000ms）。
+v1.0.3 把同一套"参数化一致性套件"模式从存储层复制到了**执行环境层**：`packages/durable/src/testing/env-conformance.ts`（633 行；v1.0.3 时为 473，v1.1.0 为 511）经 `registerEnvConformance`（`src/testing/runner.ts:28`）把任意 `ExecutionEnv` 实现接入同一套断言，覆盖面正是本轮接口扩张的能力：argv exec（数组命令直接 spawn、不经 shell）、输出窗口（`window`/`skipped` 的省略量语义）、以及体量最大的 watch 双模式案例（native/polling，缺失文件创建/替换/删除、父目录改名重建、exclude、close 幂等；watch 案例超时放宽到 30 秒以覆盖轮询延迟，`env-conformance.ts:124`，`watchCase` 统一给 30_000ms）。
 
-这条线的第一个外部消费者是新包 `pi-env`（SSH 远程执行环境，**v1.2.0 起在 release 内**）：其 `RemoteExecutionEnv` 与本机 `NodeExecutionEnv` 跑**同一套** env-conformance 断言（`packages/env/test/conformance.test.ts:16` 直接调用 `registerEnvConformance`），配合 differential 测试（随机操作序列逐结果对比两个环境）锁定"远程结果 == 本机直跑"的语义等价合同。CI 上由 `.github/workflows/env.yml` 跨 5 OS 矩阵驱动——一致性套件从"跨存储后端"扩展到了"跨机器、跨操作系统"。
+这条线的第一个外部消费者是新包 `pi-env`（SSH 远程执行环境，**v1.2.0 起在 release 内**）：其 `RemoteExecutionEnv` 与本机 `NodeExecutionEnv` 跑**同一套** env-conformance 断言（`packages/env/test/conformance.test.ts:17` 直接调用 `registerEnvConformance`），配合 differential 测试（随机操作序列逐结果对比两个环境）锁定"远程结果 == 本机直跑"的语义等价合同。CI 上由 `.github/workflows/env.yml` 跨 5 OS 矩阵驱动——一致性套件从"跨存储后端"扩展到了"跨机器、跨操作系统"。
 
 ---
 

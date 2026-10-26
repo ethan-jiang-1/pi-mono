@@ -44,12 +44,12 @@ convertToLlm() → Provider 请求（before_provider_request 是最后一站）
 
 ### 3. 一致性：agent loop 把差量算到"重放必相等"为止
 
-[agent-loop.ts:323-331](../../packages/agent/src/agent-loop.ts#L323-L331) 的 `declareToolChanges()` 把 pending system message 的工具字段替换为「已提交 transcript 重放出的工具状态」与「可执行集 `context.tools`」的差量。注释原话即合同：**"so replay always yields exactly `context.tools`"**。扩展想在请求里改工具，改的是声明面；运行时可执行的集合永远以重放结果为准。
+[agent-loop.ts:332-342](../../packages/agent/src/agent-loop.ts#L332-L342) 的 `declareToolChanges()` 把 pending system message 的工具字段替换为「已提交 transcript 重放出的工具状态」与「可执行集 `context.tools`」的差量。注释原话即合同：**"so replay always yields exactly `context.tools`"**。扩展想在请求里改工具，改的是声明面；运行时可执行的集合永远以重放结果为准。
 
 ### 4. 压缩与恢复不破坏它
 
 - 压缩：compaction entry 携带压缩边界处的**完整** prompt/tool checkpoint，成为压缩后上下文的 leading system message；被保留区间里的旧 system message 以它为准丢弃（[session-format.md](../../packages/coding-agent/docs/session-format.md) compaction 节；[compaction.ts:100](../../packages/coding-agent/src/core/compaction/compaction.ts#L100)："System messages are prompt state, not conversation; the compaction entry carries their replay."）。
-- 恢复：SDK resume 时 `buildSessionContext()` 折叠出的消息直接灌进 Agent 的 `initialState.messages`（[sdk.ts:200](../../packages/coding-agent/src/core/sdk.ts#L200)、:399）；`AgentSession._refreshFinalizedContext()`（[agent-session.ts:926-932](../../packages/coding-agent/src/core/agent-session.ts#L926-L932)）在边界提交、压缩等时机把 `agent.state.messages` 与投影重新对齐。
+- 恢复：SDK resume 时 `buildSessionContext()` 折叠出的消息直接灌进 Agent 的 `initialState.messages`（[sdk.ts:403-409](../../packages/coding-agent/src/core/sdk.ts#L403-L409)，`initialState.messages` 在 :409）；`AgentSession._refreshFinalizedContext()`（[agent-session.ts:938-944](../../packages/coding-agent/src/core/agent-session.ts#L938-L944)）在边界提交、压缩等时机把 `agent.state.messages` 与投影重新对齐。
 
 ## 这条不变量被当作测试合同，而不是希望
 
@@ -74,7 +74,7 @@ convertToLlm() → Provider 请求（before_provider_request 是最后一站）
 | 无独立 prompt 状态条目；重放即当前状态 | `packages/coding-agent/docs/session-format.md`（SessionMessageEntry 节、:87 兼容路径） |
 | 差量求值入口 | `packages/ai/src/utils/transcript.ts:57-66, :73-96, :104-112` |
 | 重放必等合同 | `packages/agent/src/agent-loop.ts:323-331` |
-| 落盘时机：`message_end` → `appendMessage`（system/user/assistant/toolResult 四类） | `packages/coding-agent/src/core/agent-session.ts:1131-1150` |
+| 落盘时机：`message_end` → `appendMessage`（system/user/assistant/toolResult 四类） | `packages/coding-agent/src/core/agent-session.ts:1165` |
 | resume 装配 | `packages/coding-agent/src/core/sdk.ts:200-222, :394-399` |
 | 运行时对齐 | `packages/coding-agent/src/core/agent-session.ts:926-932` |
 | 压缩携带 checkpoint | `packages/coding-agent/src/core/compaction/compaction.ts:100`；session-format.md compaction 节 |

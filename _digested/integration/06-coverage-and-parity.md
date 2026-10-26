@@ -26,8 +26,8 @@
 | compaction | SDK：`session.compact()` / RPC：`{"type":"compact"}` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 自动 compaction 开关 | RPC：`{"type":"set_auto_compaction"}` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | branch summary abort | SDK：`session.abortBranchSummary()` | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
-| session fork / clone | SDK：`session.sessionManager.fork()`（AgentSession 无 fork 方法）/ RPC：`{"type":"fork"}`、`{"type":"clone"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts)、[`rpc-mode.ts`](../../packages/coding-agent/src/modes/rpc/rpc-mode.ts) |
-| session 切换 | SDK：`session.sessionManager.switchSession()` / RPC：`{"type":"switch_session"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts) |
+| session fork / clone | SDK：`AgentSessionRuntime.fork()`（`agent-session-runtime.ts:262`；`SessionManager` 没有 `fork()`）/ RPC：`{"type":"fork"}`、`{"type":"clone"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts)、[`rpc-mode.ts`](../../packages/coding-agent/src/modes/rpc/rpc-mode.ts) |
+| session 切换 | SDK：`AgentSessionRuntime.switchSession()`（`:196`）/ RPC：`{"type":"switch_session"}` | [`session-manager.ts`](../../packages/coding-agent/src/core/session-manager.ts) |
 | 状态快照（重连恢复） | RPC：`{"type":"get_state"}` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
 | 模型切换 | SDK：`session.setModel(model, { persist })` / RPC：`{"type":"set_model"}`、`{"type":"cycle_model"}`（v0.84.3：默认只在 session 内生效；`persist: true` 才写全局默认，RPC 路径不传 `persist`，故不再改全局默认；v0.84.4：persist 时若带非空 scope，model 同时追加进 scope 与 enabledModels） | [`agent-session.ts`](../../packages/coding-agent/src/core/agent-session.ts) |
 | 可用模型查询 | RPC：`{"type":"get_available_models"}` | [`rpc-types.ts`](../../packages/coding-agent/src/modes/rpc/rpc-types.ts) |
@@ -58,7 +58,7 @@
 | 扩展终止整批工具调用 | 扩展 `tool_call` hook 返回 `terminate`（v0.84.1） | [`extensions/types.ts`](../../packages/coding-agent/src/core/extensions/types.ts) |
 | auth 预检 | CLI：`pi auth check`（provider/model 级，可输出解析后的 credential）（v0.84.1） | `packages/coding-agent/src/main.ts` |
 | 默认工具集配置 | `defaultTools` setting（全局或按项目，v0.84.2；v0.84.3 起可选值含 `powershell`） | [`docs/settings.md`](../../packages/coding-agent/docs/settings.md) |
-| PowerShell 执行 | SDK：`createPowerShellTool()`（内置工具，v0.84.3；基于 bash 工具定义，自带 UTF-8 输出 shim）。注意（v1.2.0 起在 release 内，sync 0008/0009）：durable 侧另有**同名**工厂 `createPowerShellTool()`（`packages/durable/src/tools/bash.ts:148`）——跨平台、argv exec 形式直接启动 pwsh 不经 shell 解析，与本行 coding-agent 的 Windows-only 实现是两回事 | [`tools/powershell.ts`](../../packages/coding-agent/src/core/tools/powershell.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
+| PowerShell 执行 | SDK：`createPowerShellTool()`（内置工具，v0.84.3；基于 bash 工具定义，自带 UTF-8 输出 shim）。注意（v1.2.0 起在 release 内，sync 0008/0009）：durable 侧另有**同名**工厂 `createPowerShellTool()`（`packages/durable/src/tools/bash.ts:168`）——跨平台、argv exec 形式直接启动 pwsh 不经 shell 解析，与本行 coding-agent 的 Windows-only 实现是两回事 | [`tools/powershell.ts`](../../packages/coding-agent/src/core/tools/powershell.ts)、[`sdk.ts`](../../packages/coding-agent/src/core/sdk.ts) |
 | 每模型思考深度 | `modelThinkingLevels` setting（v0.84.3，per-model 覆盖全局默认） | [`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
 | 终端能力覆盖 | `terminal.hyperlinks/images/trueColor` setting + env `PI_HYPERLINKS`/`PI_TRUE_COLOR`/`PI_IMAGE_PROTOCOL`（v0.84.4；优先级 settings > env > 自动检测） | [`terminal-image.ts`](../../packages/tui/src/terminal-image.ts)、[`settings-manager.ts`](../../packages/coding-agent/src/core/settings-manager.ts) |
 | 模型目录 | v0.84.4：DeepSeek 新增 `deepseek-v4-flash-vision-exp`（vision，1M ctx）；Cloudflare gateway 补 `workers-ai/*` passthrough；OpenRouter 图像模型刷新 | [`scripts/generate-models.ts`](../../packages/ai/scripts/generate-models.ts) |
@@ -136,7 +136,7 @@ v0.84 曾出现过一套 client/server 栈（协议版本 **1**、`PiClient`、`
 | extension UI（TUI 内的自定义界面） | 可选实现 `ExtensionUIContext`，第一版不必要 |
 | 交互式 bash（TUI 中的实时 stdin） | SDK/RPC 的 `bash` 命令只支持一次性执行 |
 | `/thinking` 斜杠命令（v0.84.3，TUI-only） | 等价于 SDK `setThinkingLevel` / RPC `set_thinking_level`，但无独立 RPC 命令 |
-| radius session 分享（v0.84.3，experimental、TUI-only） | 宿主自己实现分享链接/上传（`interactive/session-share.ts`，登录 radius 后可用） |
+| session 分享（v0.84.3 起） | `/share` 上传；v1.3.0 起由 `sessionShareDestination` 选 `auto`/`gist`/`radius`（默认 `auto`：有 Radius 认证走 Radius，否则私有 gist；`settings-schema.ts:224-229`） |
 | Markdown 渲染 | 宿主自渲染（事件中是原始文本） |
 | 跳到底部指示器（`TuiAltScreen.scrollToEndIndicator`，v0.85.0 新增） | 宿主自己渲染：follow-end 主 scroll view 滚离末端时，在最后一行居中显示一个可点击的"跳到底部"标签（选项 `tui-alt-screen.ts:180`，渲染 `:1618-1634`）。无 SDK/RPC 等价物 |
 | 鼠标区域组件（`MouseRegion`） | pi-tui 已从 `packages/tui/src/index.ts:21` 导出（`components/mouse-region.ts`），可作为宿主自绘 UI 的复用原语；无 SDK/RPC 等价物 |
@@ -153,7 +153,7 @@ TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages
 | 远程 workspace | 不是内置能力。文件操作在本地文件系统 |
 | 多用户服务 | 没有认证、隔离、审计。需要宿主自己实现多用户管理层 |
 | 权限自动批准 | hook 层面可以总是返回 approve，但产品上要非常保守 |
-| 长会话恢复 | session 持久化到 JSONL 文件（coding-agent 的 `SessionManager`），重启后可恢复。RPC 进程崩溃后需重新 spawn。agent 包另有 session v4（`JsonlSessionRepo`，lane-based），但 coding-agent 尚未接入 |
+| 长会话恢复 | session 持久化到 JSONL 文件（coding-agent 的 `SessionManager`），重启后可恢复。RPC 进程崩溃后需重新 spawn。agent 包的 session v4（`JsonlSessionRepo`）已在 v1.0.0 随 session 层整树删除；coding-agent 用 `SessionManager`（JSONL v3），durable 用 `Session` |
 | ~~web-ui 的纯前端方案~~ | **web-ui 包已被上游移除**（v0.83.0 前即删除）。浏览器方案需宿主自建，或（仅限读源码跟踪）参考 dev-only 的 protocol/client 栈 |
 | 扩展系统 | 通过 SDK 加载，jiti 运行时编译 TypeScript。外部集成通常不需要直接操作 |
 | 文件变更追踪 | `edit` 和 `write` 工具使用队列+去重机制，但不提供显式 diff API（需从 tool result 提取） |
@@ -181,7 +181,7 @@ TUI 的源码在 [`packages/coding-agent/src/modes/interactive/`](../../packages
 | Slack bot | 预置集成 | 无预置集成 |
 | MCP server 能力 | 有 CLI 管理工具 | **v1.0.0 起有一级支持**（旧结论"无"失效）：独立客户端包 `packages/mcp`（`@earendil-works/pi-mcp`，零 pi 依赖 + OAuth）+ 内置 `mcp` 扩展；配置在 `~/.pi/agent/mcp.json` 与受信项目 `.pi/mcp.json`（sync 0008 重锚：项目 override 逻辑现 `extensions/mcp/config.ts:74-154`，旧 `:117-118` 已失效；v1.0.1 起项目条目没有 `command`/`url`/`type` 即为 override，只改 `enabled`/`exposure`/`toolExposure`，其余继承全局定义，#10277）；CLI `pi mcp add/remove/list/login/logout`（`extensions/mcp/cli.ts:34-39`）、`--no-mcp`（**1.0.4 起已发布**，非 Unreleased）整体禁用内置 MCP 扩展；TUI `/mcp`（`extensions/mcp/index.ts:271`）。仍无 ACP |
 | ACP 编辑器协议 | 支持 | 无 |
-| SDK 跨语言方案 | `@opencode-ai/sdk` (JS/TS) | RPC JSONL（任意语言可实现）；另有 CBOR 二进制 protocol，但**已降级为 dev-only/source-only、非 supported**（见上文） |
+| SDK 跨语言方案 | `@opencode-ai/sdk` (JS/TS) | RPC JSONL（任意语言可实现）；CBOR 二进制 protocol 已随 `packages/protocol` 在 v1.2.0 整体删除，不存在 dev-only 的现存实现（见上文删除事实） |
 | CI JSON stream | `opencode run --format json` | RPC stdout JSONL |
 | in-process 嵌入 | SDK v2（实际 spawn 子进程） | SDK 真 in-process（同一事件循环） |
 

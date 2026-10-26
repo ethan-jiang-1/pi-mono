@@ -1,6 +1,8 @@
 # trajectory/ — 会话轨迹：model-visible 状态的事实源、可回放性与录制夹具
 
-> **当前基线：`v1.2.0`（tag `06a466935`）**，上一基线 `v1.0.3`（tag `d78dc83d6`）。`core/session-manager.ts` 在 v1.0.3→v1.2.0 区间**逐字节未变**，轨迹格式与 `SessionMessage` 形状不变。本区间对该层的唯一增量是 `AgentToolCallOutcome` 与 `tool_execution_end` 事件新增可选 **`durationMs?`**（单调时钟测得的 `execute()` 耗时，工具未运行时缺省；`packages/agent/src/types.ts:454`、`:538`）。下文行号为专题写作时的树实测。
+> **当前基线：`v1.4.0`（tag `4a080252f`）**。本区间 `core/session-manager.ts` 与轨迹格式**未变**；新增的是 `--tools +name/-name` 在恢复会话时的叠加语义，以及 durable 侧 `sleeping` 让一次 run 可以跨进程边界暂停。
+>
+> **更早基线**：`v1.2.0`（tag `06a466935`），上一基线 `v1.0.3`（tag `d78dc83d6`）。`core/session-manager.ts` 在 v1.0.3→v1.2.0 区间**逐字节未变**，轨迹格式与 `SessionMessage` 形状不变。本区间对该层的唯一增量是 `AgentToolCallOutcome` 与 `tool_execution_end` 事件新增可选 **`durationMs?`**（单调时钟测得的 `execute()` 耗时，工具未运行时缺省；`packages/agent/src/types.ts:454`、`:538`）。下文行号为专题写作时的树实测。
 >
 > **基线**：pi-mono 工作树 `6401d578bfd855765d4afd2908fd883a144da5ad`（2026-10-08，`v1.0.3-107-g6401d578b`）。行号均为该树实测；与全库 v1.0.3 基线（`98d2e1947`）区分。本专题由 [`_faq_on_digested/13_recorded_session_snapshots/`](../../_faq_on_digested/13_recorded_session_snapshots/question.md) 的二次研究升级而来——FAQ 保留研究过程归档，本目录是机制消化正文。
 

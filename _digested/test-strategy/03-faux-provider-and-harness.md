@@ -2,7 +2,7 @@
 
 > **源码锚点**：
 > - 官方 Faux Provider 内核：`packages/ai/src/providers/faux.ts`（727 行；v1.0.3 时为 711）
-> - Agent 会话集成测试套件驱动：`packages/coding-agent/test/suite/harness.ts`（275 行）
+> - Agent 会话集成测试套件驱动：`packages/coding-agent/test/suite/harness.ts`（278 行，v1.4.0）
 > - 核心驱动范例：`packages/coding-agent/test/test-harness.test.ts`
 
 ---
@@ -19,7 +19,7 @@ Pi-mono 给出了一套工业级解法：**全真宿主骨架 + 确定性虚拟�
 
 ---
 
-## 二、解密 packages/ai/src/providers/faux.ts：711 行的虚拟模型引擎
+## 二、解密 packages/ai/src/providers/faux.ts：727 行的虚拟模型引擎
 
 `packages/ai/src/providers/faux.ts` 不是玩具级的静态桩，而是一个在数据结构和协议上完全遵循 `Provider` 接口的完整微内核。
 

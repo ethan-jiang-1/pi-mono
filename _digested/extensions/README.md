@@ -1,6 +1,8 @@
 # extensions/ — pi 的扩充思路：极简核 + 靠扩展长能力
 
-> **当前基线：`v1.2.0`（tag `06a466935`）**，上一基线 `v1.0.3`（tag `d78dc83d6`）。v1.0.3→v1.2.0 对本目录的影响集中在行号漂移与 extension 事件面（`before_agent_start` union、`reachesTools`、`ToolNamespace.aliases`），已逐篇更正。历史基线演进入下。
+> **当前基线：`v1.4.0`（tag `4a080252f`）**。扩展 API 面在本区间**没有结构变化**：`core/extensions/types.ts` 逐字节未变，新增的只有 `@earendil-works/pi-ai/models` 虚拟模块/别名（#11156）。`docs/extensions.md` 的生命周期章节是**文档补写**，不是新事件。
+>
+> **更早基线**：`v1.2.0`（tag `06a466935`），上一基线 `v1.0.3`（tag `d78dc83d6`）。v1.0.3→v1.2.0 对本目录的影响集中在行号漂移与 extension 事件面（`before_agent_start` union、`reachesTools`、`ToolNamespace.aliases`），已逐篇更正。历史基线演进入下。
 >
 > **基线**：pi-mono `v0.84.4`（upstream tag `4e58f324f`，merge `6f8312a52`）；工作树已同步至 **v1.0.0**（tag `a13d35a74`，merge `9e387e653`，2026-10-02；v0.86.1 期间的 transcript SystemMessage 持久化、forced prompt 投影、`user_bash` fail-closed、`pi.on()` unsubscribe、cache warming 等已在各篇以"警示"标注；v1.0.0 增量见 [`_change_log/0007`](../_change_log/0007-v0.86.1-to-v1.0.0.md)——官方新增内置扩展 mcp/codemode/tool-search，`builtin:<name>` 机器名，pi-agent-core 收缩为最小核）。本目录是 2026-08 新增的第三个维度，与 [`agent/`](../agent/)（机制解剖）、[`harness/`](../harness/)（平台评价）、[`integration/`](../integration/)（外部嵌入）并列。
 > v0.84.3 变更：内置工具 7→8（新增 Windows-only 的 powershell，`ToolName` 联合在 `tools/index.ts:95`），本目录"7 个"表述已同步为 8。

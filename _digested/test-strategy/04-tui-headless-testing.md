@@ -1,7 +1,7 @@
 # 04 — TUI 无头测试与 Node:test 实践：VirtualTerminal 与字符网格断言
 
 > **源码锚点**：
-> - 测试入口与运行器：`packages/tui/package.json`（`"test": "node --test test/*.test.ts"`）
+> - 测试入口与运行器：`packages/tui/package.json`（`"test": "node --test --test-reporter=dot --test-reporter-destination=stdout test/*.test.ts"`（v1.4.0 起））
 > - 虚拟终端核心实现：`packages/tui/test/virtual-terminal.ts`（219 行）
 > - 复杂交互用例：`packages/tui/test/editor.test.ts`、`packages/tui/test/tui-alt-screen.test.ts`
 
@@ -95,10 +95,15 @@ terminal.sendInput("\x1b[A");       // 模拟按下上方向键 (Up Arrow)
 1. **CJK 与表情符号边界回归（`regression-overlay-cjk-boundary.test.ts`）**：
    专门测试当对话历史包含中文字符、中英混排时，右上角浮动弹出的 Overlay 遮罩层是否会出现行宽计算偏差导致的边框破裂；
 2. **Alt-Screen 全屏缓冲切换（`tui-alt-screen.test.ts`）**：
-   Pi v1.0.0 默认开启 fullscreen 模式。测试断言进入交互时是否正确发送 `\x1b[?1049h` 切换到备用屏幕缓冲区，并在进程退出或抛异常时 100% 保证发送 `\x1b[?1049l` 恢复主屏幕，绝不把用户的终端弄花；
+   Pi v1.0.0 默认开启 fullscreen 模式。测试断言进入交互时是否正确发送 `\x1b[?1049h` 切换到备用屏幕缓冲区，并在进程退出或抛异常时恢复主屏幕。**v1.4.0 修正了口径**：此前不调 `stop()` 的退出路径（如直接 `process.exit()`）并不恢复；v1.4.0 加了 `process.on("exit")` 兜底（`src/tui.ts:949-952,575-590`），硬杀与原生崩溃仍不覆盖。
 3. **大数据量流式吞吐压力测试（`alt-screen-large-transcript-bench.ts`）**：
    断言当模型流式吐出上万行代码时，虚拟视口滚动计算（Viewport Scroll Churn）的 CPU 与内存占用是否保持恒定；
-4. **按键路由测试矩阵（`tui-alt-screen.test.ts:901` 起，v1.0.3 键位修复 #10314 的配套回归）**：
+4. **退出兜底（`exit-restore.test.ts` + `test/fixtures/exit-without-stop.ts`，v1.4.0 新增）**：
+   子进程不调 `stop()` 直接退出，断言 stdout 里仍有 bracketed paste 关闭、Kitty keyboard pop、SGR reset 等恢复序列；
+5. **Markdown 边界（`markdown.test.ts`，v1.4.0 扩）**：未闭合 `$$` 不再吞 GFM 表格；CJK 标点旁的粗/斜体用 `marked-cjk-friendly` 渲染；
+6. **补全查询（`autocomplete.test.ts`，v1.4.0 扩）**：含 `[`/`(` 等正则元字符的查询不再返回空——修的是 fd 正则转义，模糊匹配本身未变；
+7. **终端图像（`terminal-image.test.ts`，v1.4.0 扩）**：Rex（`TERM_PROGRAM=rex`）走 Kitty images + truecolor + OSC 8；
+8. **按键路由测试矩阵（`tui-alt-screen.test.ts:901` 起，v1.0.3 键位修复 #10314 的配套回归）**：
    同一个逻辑按键在不同终端里是不同的字节序列。该用例向虚拟终端注入一整组 Home/End 逃逸序列（`\x1bOH`、`\x1b[F`、`\x1b[57423u` 等），断言**全部**路由给聚焦组件（编辑器）——"unmodified Home/End belong to the editor in every UI mode"；再注入 `\x1b[1;5H`/`\x1b[1;5F`（Ctrl+Home/End），断言其路由给 transcript 滚动（跳顶/跳底）。这是"最终状态断言"方法论在**输入侧**的镜像：不关心终端发了什么字节序列，只断言路由结果——多终端兼容问题被压缩成一张可穷举的序列表。
 
 ---

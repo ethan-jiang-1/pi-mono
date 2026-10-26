@@ -1,6 +1,8 @@
 # 07 Chord 与 Facet/Service：第四条 authoring 面
 
 > **基线**：v0.85.1（tag `d981de122`，merge `e3aa42f46`）。本文全部结论来自当前工作树的静态读源码取证，**没有运行 chord 测试**（原因与后果见末节）。
+> **⚠️ v1.4.0：本页整体降级为历史取证（v0.85.1）**。chord 的现行描述以 [architecture-next/chord.md](../architecture-next/chord.md) 为准。v1.2.0→v1.3.0 又改了一轮公开面（`Ref`/`placement`/async get/协议 4），v1.4.0 加 `Context.telemetry` 与 `chord/sqlite`。因此下文除 §5 术语碰撞外，**凡涉及 chord API、依赖方、子路径、测试数量的断言都不要直接引用**。逐条失效清单见 [_change_log/0010](../_change_log/0010-v1.2.0-to-v1.4.0.md)。
+
 > **⚠️ v1.0.0 增补（2026-10-02，`_change_log/0007`）**：chord 的依赖关系与 API 已变——① **pi-agent-core 与 chord 脱钩**（agent 包 src 零 chord import，`dependencies` 移除；v1.0.0 起 chord 的运行时依赖方是 client / coding-agent / **durable**（新）/ protocol / server 五个包，`Context`/`JsonValue` 类型的主要消费者是 pi-durable）；② **Replicated state 破坏性改形**：`MutableReplicatedState` 的 `state` 代理 + `publish()` 被 `change(context, mutate)` / `replace(context, value)` 取代（`src/types.ts:59-71`、实现 `src/services/state.ts:184/202/231`），`replicatedState()` 新增 `ReplicatedStateSource` 重载返回 `AttachedReplicatedState`（`src/api.ts:91-106`）；③ **delta 六动词 → 七动词**：新增 `m`（数组 reorder），delta 引擎收敛为唯一不可变 tracker（astra/cow 原型删除，`tracker.ts` 2,205 行，`delta/index.ts` 1,879→694 行）；④ esbuild pin 0.28.1→0.28.2；⑤ §7/§9/§10 引用的 `packages/agent/docs/**`（plugins.md、rpc.md、mobile-handoff 全树）已于 v1.0.0 整树删除——相关"规格 vs 现状"分析转为 git 历史考古。chord 仍无 CHANGELOG；本文正文保留 v0.85.1 取证原貌，以下按节标注 v1.0.0 变化点。
 >
 > **⚠️ v1.2.0 大幅作废（最重要的一条）**：本文取证于 v0.85.1、经 v1.0.0 增补，而 **v1.2.0 把本文的 Pi 侧研究对象整体删除了**，chord 自身也被重写。读本文前请先接受以下事实：
@@ -63,13 +65,15 @@ packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 
 
 ## 2. chord 是什么
 
-**【硬事实】** 定位（`packages/chord/README.md:3-7` 原文）：
+**【硬事实，v0.85.1 原文；v1.4.0 已不成立】** 定位（`packages/chord/README.md:3-7` 原文）：
 
 > Chord is an application-composition runtime for systems assembled from plugins/extensions. … It is developed as a standalone package in the Pi monorepo, but **it is not a Pi package: it does not depend on any other Pi workspace package** and can be used by unrelated applications.
 
-**【硬事实】** 它的**唯一运行时依赖是 `esbuild`**（`packages/chord/package.json:66`，v0.85.1 时 pin 在 `0.28.1`，v1.0.0 为 `0.28.2`），且只给 bundler 用。其余都是标准 JavaScript/Node API。`devDependencies` 只有 `shx` 与 `vitest`。`engines.node >= 22.19.0`。
+**v1.4.0 更正**：chord 依赖 `@earendil-works/pi-telemetry`（`packages/chord/package.json:87-90`），`Context.telemetry` 是必需成员；`docs/spec.md:6` 仍写「无其它 Pi 包」，与 package.json 自相矛盾。
 
-**【硬事实】** 它的五个功能性子路径（`packages/chord/package.json:8-35`，另有 `./package.json` 自身）：
+**【硬事实，v0.85.1】** 它的**唯一运行时依赖是 `esbuild`**（当时只给 bundler 用）。**v1.4.0 更正**：依赖是 `typebox` + `@earendil-works/pi-telemetry`，`esbuild` 与 `./bundler` 子路径都已删除；devDependencies 含 `@types/ws`/`shx`/`vitest`/`ws`。
+
+**【硬事实，v0.85.1】** 它的五个功能性子路径（当时）。**v1.4.0 是 9 条**：`.`、`./context`、`./delta`、`./output`、`./node`、`./sqlite`、`./sqlite/node`、`./sqlite/cloudflare`、`./telemetry-sqlite`（`packages/chord/package.json:8-54`）。下表为历史：
 
 | 子路径 | 内容 |
 |---|---|
@@ -312,7 +316,7 @@ Pi 侧（**全部已删除，不建链接**）：
 
 **本篇明确没做的事**：
 
-- **没有跑 chord 的测试。** 当前工作树未安装 `@earendil-works/chord`（`node_modules/@earendil-works/` 的符号链接建立于 chord 存在之前），跑 harness 或 chord 测试会直接 `Cannot find package '@earendil-works/chord/context'`。**"chord 测试是否全绿"是未验证的。**
+- **没有跑 chord 的测试。** 当前工作树**已**把 `node_modules/@earendil-works/chord` 链接到 `packages/chord`，此前的 `Cannot find package` 不再成立；但本轮仍未跑 chord 测试**"chord 测试是否全绿"是未验证的。**
 - **测试数量与线索给的数字不一致。** 线索说 "56 个 `it/test`"。实测：`packages/chord/test/` 下顶层 `it(`/`test(` 声明共 **160 个**（`delta.test.ts` 100、`services.test.ts` 18、`facets.test.ts` 14、`facet-loader.test.ts` 9、`service-wire.test.ts` 7、`bundle.test.ts` 5、`context.test.ts` 5、`boundary.test.ts` 1、`json.test.ts` 1；`helpers.ts` 0），另有 `services.test.ts:500` 一个 `test.each` 表（2 行，运行时展开）。`describe(` 24 个。**"存在多少条测试"是硬事实，"通过与否"未知。**
 
 **没核实的 / 存疑的**：
@@ -323,5 +327,5 @@ Pi 侧（**全部已删除，不建链接**）：
 - **"mobile" 指什么：不确定。** 修正一条更早的口径：**"mobile 全仓零命中"是不准确的**。实际命中分布是 —— `packages/*/src` 里只有 `coding-agent/src/core/export-html/template.{css,js}` 的响应式布局代码（与 facet 无关，5 处）；其余全在文档：`mobile-handoff/**`、`agent/docs/post-wp05-roadmap.md`、`agent/docs/work-packages/05-direct-durable-drive.md:524`（"## 13. Mobile assistant-output handoff"）、`agent/docs/harness.md`（4 处，均指向同一个 handoff）、`coding-agent/docs/sdk.md:8`（"Build a custom UI (web, desktop, mobile)"）。**没有任何 mobile 产品、包或服务**；这个词在 harness 语境里是 "mobile assistant-output handoff" 这个工作项名。只能写"它自称 design handoff，面向跨进程/远端 presentation 场景"。**不要断言存在移动端产品。**
 - **`experimental/mini/` 与 chord 的 `defineService` 是两套不同的东西**（`mini/shared/protocol.ts` 有它自己的 `defineService`），`mini/README.md` 自称 "six frame kinds" 而代码里的 `Frame` union 有七项 —— **以代码为准**。mini 与 `experimental/services/` 那套 chord 栈是**并列**关系，不是其上层。详见 [`06-coverage-and-parity.md`](06-coverage-and-parity.md)。**⚠️ v1.0.0：`experimental/mini|micro/` 已整体删除（无迁移）**，chord 栈的实验演示由 `experimental/durable/`（pi-durable Harness + SQLite 的 TUI agent）接替。
 - **chord 是否会被 Pi 之外的第三方采用：无法验证。** `README.md:6-7` 说"can be used by unrelated applications"，`boundary.test.ts` 保证了这个**技术前提**，但仓库里没有任何第三方消费者。
-- **chord 无 CHANGELOG、无版本协商。** `PLANNING.md:476` 要求"version negotiation can be a peer handshake or an adapter-guaranteed constructor parameter"，但 chord 侧**没有** `PROTOCOL_VERSION` 之类的版本常量（协议版本 8 在 `packages/protocol/src/protocol.ts:5`，属于 Pi，不属于 chord）。这与 §3 的"对称 RPC 仍未实现"一致。
+- ~~**chord 无 CHANGELOG、无版本协商。**~~ **两条都被 v1.3.0 推翻**：`packages/chord/CHANGELOG.md` 有 1.2.0/1.3.0/1.4.0 三段；`PROTOCOL_VERSION = 4`（`packages/chord/src/wire.ts:24`，根导出 `index.ts:82`），`hello` 带协议字段、旧 peer 直接 mismatch 拒绝（`connection.ts:832-835,654-663`）。协议版本 8 属于已删除的 `packages/protocol`，与 chord 无关。
 - **`plugins.md` / `rpc.md` 里哪些是现状、哪些是规格，本篇只抽查了少数几项**（§7 末）。要做全量对照需要逐符号核对 `experimental/services/`，本轮未做。

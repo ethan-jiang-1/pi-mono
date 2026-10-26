@@ -11,7 +11,7 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 源码：`provider-composer.ts` 的 `applyModelsJson()` / `modelFromJson()`，`Model` 对象 = `{ provider, id, baseUrl, api, ... }`。
 
 - 冲突只发生在 **provider 相同 + id 相同** 时：`applyModelsJson` 的 merge 语义是 **upsert by id**——你 `models` 里 id 撞上官方，就**替换**官方那条（换成你的 baseUrl）；没撞的就**叠加**。
-- **provider 不同** → 完全独立的两组模型，TUI 里按 provider 分组、`provider/model` 全限定引用无歧义。
+- **provider 不同** → 完全独立的两组模型，TUI 里按 provider 分组。**`provider/model` 只是提示，不是强制**：v1.4.0 的 `resolveModelReference` 会把整串也当作别家 provider 的模型 id 再匹配一次（`model-resolver.ts:224,257-258`），所以无凭据的 `micuapi/x` 可能解析到有凭据的官方 `deepseek/x`；要锁定 provider 用 `--provider`（`:149-150`）。
 - 所以"第三方的模型也叫 `deepseek-*`"本身**不是问题**，前提是给它**换一个 provider 名**。
 - 但要注意：即使 provider 不同，**裸 id 仍然会撞**——官方 `deepseek/deepseek-v4-flash-0731` 和第三方 `micuapi/deepseek-v4-flash-0731` 存在同名模型，CLI `--model deepseek-v4-flash-0731` 会报 `ambiguous across providers`，必须 `micuapi/deepseek-v4-flash-0731` 或 `--provider`。（见 §4）
 
@@ -107,7 +107,7 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 ## 4. 使用方式
 
 - **TUI**：`/model`（或 `/model` 后搜索）里 `micuapi` 单独分组，和官方 `deepseek` 并排；`/login micuapi` 录密钥。
-- **CLI**：`pi --provider micuapi --model deepseek-v4-flash-0731 ...`，或 `pi --model micuapi/deepseek-v4-flash-0731 ...`（`model-resolver.ts` 支持 `provider/model` 全限定，避免歧义报错）。注意这里 id 是 `deepseek-v4-flash-0731`，和官方 `deepseek/deepseek-v4-flash-0731` **id 完全相同**——两个 provider 下各有一个同名模型，裸 id `--model deepseek-v4-flash-0731` 会报 `ambiguous across providers`，必须用全限定或 `--provider`。
+- **CLI**：`pi --provider micuapi --model deepseek-v4-flash-0731 ...`，或 `pi --model micuapi/deepseek-v4-flash-0731 ...`（`model-resolver.ts` 接受 `provider/model`，但它是**提示**不是约束；无凭据时可能落到另一家同名 id，需要锁定请加 `--provider`）。注意这里 id 是 `deepseek-v4-flash-0731`，和官方 `deepseek/deepseek-v4-flash-0731` **id 完全相同**——两个 provider 下各有一个同名模型，裸 id `--model deepseek-v4-flash-0731` 会报 `ambiguous across providers`，必须用全限定或 `--provider`。
 - **SDK**：`createAgentSession({ model: models.getModel("micuapi", "deepseek-v4-flash-0731") })`。
 - **扩展**：等价写法 `pi.registerProvider("micuapi", { ...同上 })`（`custom-provider.md`），适合动态拉模型列表（fetch `/v1/models` 后注册）。
 
@@ -156,7 +156,7 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 
 - **自定义 provider 的新官方范例**：Azure Foundry 上只讲 Chat Completions 的部署（代表：deepseek/deepseek-v4-pro）现在可用 `provider: "azure"` + `api: "openai-completions"` 挂进 models.json——azure provider 从单一 Responses API 扩为双 API dispatch（`packages/ai/src/providers/azure.ts:44-53`，`azureStreams` 在 dispatch 前解析 endpoint 并把请求里的 `model` 换成部署名、`model.id` 保持 catalog id）。`AZURE_OPENAI_DEPLOYMENT_NAME_MAP` / `azureDeploymentName`（`packages/ai/src/api/azure-openai-config.ts:27-33`）对两种 API 都生效（此前部署名映射只作用于 Responses 路径，Chat Completions 发的是 catalog model id，任何部署名≠模型名的部署 404）。本篇 §2 的"新 provider 名 + 手动补 compat"流程因此多了一个官方范本。
 - **provider id 集合已变**：`azure-openai-responses` 已改名 `azure`（`a37306d43`，v1.0.3 唯一 Breaking）——models.json/auth.json/settings.json 里键为 `azure-openai-responses` 的条目必须改 `azure`（SDK 侧 `getModel("azure", ...)`）。本篇正文以自定义 provider（micuapi）为例不直接命中，但通用流程叙述里凡涉及官方 provider id 集合的地方均以此为准。
-- **锚点漂移声明（本轮追加）**：`generate-models.ts` 本轮 +100 行左右（`DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP` 已不在 L286，现 :289；Together 改名集 `:201`）、`provider-composer.ts` +21（`applyModelsJson` :281 → :300、`modelFromJson` :192 → :210）、`openai-completions.ts` +14（deepseek 魔法探测 :1598 → :1611）。§7 开头"锚点仍以 v0.85.1 为准"的声明继续适用，本段追加 v1.0.3（`76dfb88f6` 等）这轮漂移。
+- **锚点漂移声明**（v1.2.0 轮追加，**v1.4.0 再次漂移**）：`generate-models.ts` 在 v1.2.0→v1.4.0 又改 343 行（`DEEPSEEK_V4_FLASH_THINKING_LEVEL_MAP` 现 **:275**；Together 改名集按名检索）、`provider-composer.ts`（`modelFromJson` 现 **:212**、`applyModelsJson` 现 **:302**）、`openai-completions.ts` 的 deepseek 探测现 **:1621** 一带。§7 开头"锚点仍以 v0.85.1 为准"的声明对正文历史部分继续适用，但**引用这几处代码时请按 v1.4.0 行号**，本段追加 v1.0.3（`76dfb88f6` 等）这轮漂移。
 
 ## 8. v1.2.0 增量（2026-10-13 sync-0009 同步后）
 
@@ -180,3 +180,11 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
   > **版本判定注意**：`remote-catalog-provider.ts` **不是** v1.2.0 新增（v1.1.0 已有，158 → 240 行，+109/−27）；新增的是其中的 `withPersonalizedCatalog` 函数，以及新文件 `packages/ai/src/providers/openrouter-api.ts`（77 行，含 `OpenRouterModel` :28、`openRouterCost` :50）。
 
 - **对本篇主题的含义**：`personalizeOpenRouterCatalog` **不是一个 `fetchModels` 字段**——`createProvider()`（`openrouter.ts:62-87`）没有 `fetchModels`，它是被 coding-agent 注入的**自由函数**。回答"第三方 provider 的 baseUrl 怎么影响模型列表"时，这是 v1.2.0 新增的第三条路径（前两条是 §1–§7 讲的 pi.dev 目录与 models.json 自定义条目）。
+
+
+## sync-0010 增量（v1.4.0）
+
+- **attribution 头迁到 pi-ai**：OpenRouter / NVIDIA NIM / OpenCode 的归属头由 `identity` 统一注入（`packages/ai/src/utils/identity.ts`），coding-agent 的 `provider-attribution.ts` 已删除。扩展的 `before_provider_headers` 处理器**不再看到**这些头；返回 `null` 仍能删除某个头。
+- **自定义 provider 命中 `opencode.ai` 时**：`x-opencode-session` 现在也会发送（`packages/ai/src/models.ts:883`），不再只限内置 OpenCode provider；attribution 开启时还会发 `x-opencode-client`。
+- **UA 统一**：`pi/<version> (<platform>; <runtime>; <arch>)`（`formatUserAgent()`）；Cloudflare 不再发 `pi-coding-agent`。
+- 指向旧 base URL 的 `kimi-coding` 覆盖需补 `/v1`（见 01 篇）。

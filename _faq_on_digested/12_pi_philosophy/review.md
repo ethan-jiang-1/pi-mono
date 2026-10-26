@@ -53,7 +53,7 @@
 
 > **证据基础已变更**：本节此前引用 `packages/chord/PLANNING.md`（工作包拆分、迁移顺序、完成定义、精确交错点控制）。该文件在本区间被 chord2 重写（`0104fef1e`，facet/service runtime → typed host runtime）**删除**，上述内容没有等价替代文档——workpackage 与 definition-of-done 的叙述在 v1.2.0 的 chord 文档中不存在。现引用 `docs/{guide,spec,tutorial}.md`（本区间新增），结论相应收窄为"规格内的合同与已知限制 + 测试覆盖清单"。
 
-本卷不能声称全仓库统一实行某种正式方法。chord 的规格是**单个包**的设计文档，其"硬约束"节（`:5-9`）声明运行时只依赖自身 `delta` 模块与 `typebox`、不依赖其它 Pi 包——这是该包的自述，不是全仓制度的证明。
+本卷不能声称全仓库统一实行某种正式方法。chord 的规格是**单个包**的设计文档，其"硬约束"节（`:5-9`）声明运行时只依赖自身 `delta` 模块与 `typebox`、不依赖其它 Pi 包——**这条自述在 v1.4.0 已不成立**（chord 依赖 `@earendil-works/pi-telemetry`，`package.json:89`）；它只能作为历史自述，不是全仓制度的证明。
 
 ### 3.4 公开入口承担依赖成本合同
 
@@ -103,7 +103,7 @@ monorepo 中的依赖提升、workspace link 或构建残留，可能让缺依�
 
 ### 3.8 发布恢复承认部分成功，以及代码之外的数据变化
 
-[tag 管线](../../.github/workflows/build-binaries.yml)分开构建与资产校验、draft release、npm publish、registry 可用性确认、发布公告和公开 release。[publish helper](../../scripts/publish.mjs#L68-L108)跳过已存在版本，便于部分 npm 包发布成功后重试；[公告代码](../../scripts/publish-release-announcement.mjs)验证精确版本和 tarball，并使用不可变 release record 与条件 latest pointer 更新。
+[tag 管线](../../.github/workflows/build-binaries.yml)分开构建与资产校验、draft release、npm publish、registry 可用性确认、发布公告和公开 release。[publish helper](../../scripts/publish.mjs#L13-L28)跳过已存在版本，便于部分 npm 包发布成功后重试；[公告代码](../../scripts/publish-release-announcement.mjs)验证精确版本和 tarball，并使用不可变 release record 与条件 latest pointer 更新。
 
 具体例子：部分 npm 包已发布、随后公告失败时，删除 draft 不能撤销 npm 副作用。恢复要重新执行可重复步骤，并维护正确指针；Nix 构建失败则保留旧 stable。不能把它归纳为一键 rollback。完整证据与例外见 [SDLC 账本第 5.3 节](sdlc_evidence.md#L118-L124)。
 

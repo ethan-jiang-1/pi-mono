@@ -56,7 +56,7 @@ v1.2.0 的 workflow 清单比 v1.0.3 tag 多一个文件（13 vs 12）。
 
 ## 失效类型 B：锚点超出文件长度（3 处，`scripts/publish.mjs`）
 
-`scripts/publish.mjs` 从 3529 字节缩到 2781 字节（108 行 → 64 行），三处锚点 `L50-L68` / `L69-L72` / `L85-L108` 全部越界。
+`scripts/publish.mjs` 从 3529 字节缩到 2781 字节（110 行 → 64 行），三处锚点 `L50-L68` / `L69-L72` / `L85-L108` 全部越界。
 受影响：`sdlc-reference/07-release-and-recovery.md`。
 
 ## 失效类型 C：锚点在范围内但内容已变（21 处，风险最高）

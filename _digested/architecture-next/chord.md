@@ -1,68 +1,109 @@
-# chord：应用组合运行时（standalone，非 Pi 包）
+# chord：应用组合运行时（v1.4.0）
 
-> **本页基线：v1.2.0（`06a466935`）。** chord 在本区间经历 **chord2 重写**（`0104fef1e` — *replace the facet and service runtime with the chord2 host runtime*，85 文件，+14,743/−8,921）。旧 facet/service 运行时（`src/facets/`、`src/services/`、`src/api.ts`）与 `PLANNING.md` 全部删除，换成 `src/host.ts` 的 typed host runtime。
->
-> **读法**：本页「核心机制」中 **§ JSON delta 仍然成立**（该模块文件级存续）；**§Plugins/facets、§Services、§Replicated state 的多数 API 名与锚点已失效**，§Bundler、§Remote service wire 的 `./bundler` 子路径与 `PLANNING.md` 引用也已失效。凡失效处已就地标注。
+> **本页基线：v1.4.0（`4a080252f`）。** 本页在 v1.4.0 重写：旧版本（v1.2.0 的 chord2 重写）是一份"哪些 API 失效了"的清单，v1.2.0→v1.3.0 之间 chord 又把公开面整体画了一遍（`Ref`/placement/async get/协议 4），旧清单本身也过期。变更史见 [_change_log/0010](../_change_log/0010-v1.2.0-to-v1.4.0.md)。
+
+> **依赖关系（硬事实，注意与 chord 自己的 spec 冲突）**：v1.4.0 的 chord 依赖 **`typebox` + `@earendil-works/pi-telemetry`**（`packages/chord/package.json:87-90`），因为 `Context.telemetry` 需要 `TelemetrySpan`。`docs/spec.md:6` 仍写 "no other Pi packages"——那是过时陈述。消费者只有 `packages/durable` 与 `packages/env`（各自 pin `"@earendil-works/chord": "1.4.0"`）；`packages/coding-agent` 不依赖 chord。
 
 ## 它解决什么问题
 
-一个应用 feature（一组服务 + 一块 UI + 一份共享状态）需要同时跑在多个环境里。每个环境一份手写胶水会漂移；chord 把"怎么组合"做成通用机器。
+一个应用 feature（一组对象 + 一块 UI + 一份共享状态）要同时跑在多个环境里（主进程、子进程、浏览器、远程 host）。每个环境写一份胶水会漂移。chord 把"对象怎么被找到、怎么被调用、状态怎么同步、代码怎么热替换"做成通用机器。
 
-**与 Pi 的关系（硬事实）**：standalone，在 Pi monorepo 中开发但**不是 Pi 包**——运行时只依赖自身 `delta` 模块、Node/浏览器内建与 `typebox`（`docs/spec.md:5-9` 硬约束节），不依赖任何其它 Pi workspace 包。依赖方向单向：v1.2.0 的消费者只有 `packages/durable` 与 `packages/env`；**`packages/coding-agent` 不再依赖 chord**（v1.0.3 时依赖，随 experimental server 栈删除，见 `7472cda0d`）。
+它不负责 UI、不负责持久化、不负责业务——只负责组合。
 
 ## 核心机制
 
-### Contracts 与 typed host（v1.2.0 新形状）
+### 契约：四种契约形态 + placement
 
-chord2 的概念表（`docs/spec.md` §1）：**type**（名字 + 契约，分 `remote`/`local`）→ **factory**（`(input, principal, self) => behavior`，同步）→ **record**（按 `(type, canonicalInput, principalKey)` 稳定标识，持 cells/resources/holds/listeners/tasks，**跨 reload 存活**）→ **behavior**（factory 返回值，per-epoch 不可变）→ **handle**（`get` 的返回值，late-bound）→ **hold**（handle 的占用，有 hold 则 record 存活）→ **principal**（应用定义，由 link 盖章）。
+`local` / `remote` / `method` / `opaque`（`src/contract.ts`）。契约是运行期值（TypeBox schema），既用于类型推导，也用于 fingerprint。
 
-- 服务/契约注册：`host.serve(type, factory, options)`，由 plugin facet 调用（`docs/spec.md` §1）。
-- **§Plugins/facets（失效）**：旧的 `createFacetHost`（原引 `src/api.ts:22-30`）、`defineFacet`、`createStaticFacetLoader`、`combineFacetLoaders` 与 `src/api.ts` 本身**均已删除**。plugin loader 现在用动态 `import()` + cache-busting query（`docs/spec.md:7` 自述为 owner-approved 例外，并留 `TODO(loader)`：需换成隔离/可驱逐的 loader，旧模块副本会泄漏）。
-- **零停机 reload（语义保留，锚点失效）**：hot reload 仍是硬要求（`docs/spec.md:8`）；host restart 只用于 chord/runtime 自身代码变更或 host 级崩溃恢复。实现移到 `src/reload.ts`——原引 `src/facets/host.ts:423` 的 `FacetHost.reload()` **已不存在**。
-- **§Services（失效）**：`defineService`（原引 `api.ts:73-85`）、`$chord.` 保留前缀（原引 `src/services/wire.ts:40`）、process-local / remotely-exposable 的 service token 模型，均属 facet 运行时，已删除；`src/services/` 目录不存在。
+**v1.3.0 起 remote 契约必须声明对象在哪台 host 上**（placement）：
 
-### Replicated state（概念保留，API 名失效）
+```ts
+remote("session", { input, host: hostNamed("server"), ... })
+remote("session", { input, host: hostFamily("session:", "session"), ... })
+```
 
-旧契约「对 tracked `state` proxy 修改后 `publish(context)`」自 v1.0.0 起已替换为**事务性**接口；chord2 保留了事务性与挂载式两种形态，但**承载它们的模块路径已变**：
+`hostNamed` 给固定 host 名，`hostFamily` 用 "前缀 + input 的某个必填字符串字段" 拼 host 名（`contract.ts:50-82,103-108`）。`GetOptions.at` 已删除——调用方不再指定 host，`get` 归一化 input 后按 placement 解析。
 
-- `change(context, mutate)`：同步 copy-on-write draft 修改，回调返回后 draft 失效；写入 draft 的值按值拷贝，赋 `undefined` 删属性。
-- `replace(context, value)`：整体接管一份 alias-free strict-JSON 快照（调用方此后不得改动该根）。
-- 消费侧：consumer 收到完整不可变值；每次 flush 一个 decoded op batch；**每个 client/state 流持独立 path-codec 字典**；断连/替换后 replica unready 直至 rehydrate。
-- **锚点失效**：原引 `src/types.ts:59-71`（`MutableReplicatedState`）与 `src/services/state.ts:184/202/231`（实现）**均已删除**。`src/state.ts` 是 chord2 的新位置；精确 API 以 `docs/spec.md` §2「Contracts」与 `src/contract.ts`/`src/record.ts` 为准。
+placement 进入 description 与 fingerprint；`accepts` 适配器不能跨 placement 桥接。serve 一个不属于本机的类型会被拒（`host.ts:455-458`），hold 一个错位地址也会被拒（`connection.ts:899-902`）。
 
-### JSON delta（本区间未重写，仍成立）
+### object / reference / lifetime
 
-delta 引擎三合一系列（`10d1ad621` → `9a139c62b` → `d5cba1d97`）后只剩一个实现：v0.86.x 的可变 tracker 与 astra/cow 原型（约 3.5k 行）全部删除，唯一实现是不可变 tracker。`src/delta/` 的七个文件（`tracker.ts`、`index.ts`、`diff.ts`、`draft.ts`、`apply-immutable-trusted.ts`、`revision-validator.ts`、`README.md`）在 v1.2.0 **全部存续**，本页原有行号锚点大概率仍然有效：
+- **object**：按 `(type, canonicalInput, principalKey, contractFingerprint)` 稳定标识，持 state cells / resources / listeners / tasks，**跨 reload 存活**。旧文档叫 record，源码文件叫 `object.ts`（`record.ts` 已删）。
+- **reference（`Ref`）**：`get`/`hold` 的返回值，late-bound；`RefStatus` 是它的状态。
+- **lifetime**：`"referenced"`（默认，第一个 `get` 创建，最后一个 reference 释放后 dispose）或 `"host"`（facet 加载时创建，host 关闭或 reload 移除 facet 时销毁；只允许无必填 input 的 local 类型，且不能与 `linger` 同用）（`Lifetime` 定义 `object.ts:76`，两个分支 `:51`/`:59`）。
+- **linger**：provider 对象在最后一个 reference 释放后再保留一段时间；consumer 侧的远程 binding 也有 `HostOptions.linger`（按 type，cap 默认 4）（`host.ts:138-144`）。
 
-- `apply` 可变应用；`applyImmutable` 与 `applyImmutableBatches` 应用不可信批次并校验；`apply-immutable-trusted.ts` 提供信任路径。
-- `diffRevisions(before, after)`（`src/delta/diff.ts`）与 `Draft` 类型（`src/delta/draft.ts`）——后者是 `change()` 事务 draft 的类型基础。
-- 批次保证**收敛**但不保证最小/规范；首个 flush 恒为完整 base batch。独立指南 `packages/chord/src/delta/README.md`。
+### principal 由应用注入
 
-### §Remote service wire（失效）
+chord **不发明 principal**：
 
-原页描述的"transport 无关的服务 wire 语法、`JsonRepresentation<T>`、`InvalidJsonPart` 对 readonly JSON 结构直接判可赋值"属 facet 运行时。chord2 的对应面是 `src/wire.ts` + `src/link.ts` + `src/json.ts` + `src/remote.ts`（link/RPC over JSON links，`docs/spec.md` §9「Hosts and links」）。原引 `src/types.ts:134-150` 锚点已失效。原页"对称 RPC 仍是计划中的可选实现，`PLANNING.md` 有设计"——**`PLANNING.md` 已删除**，该设计文档不存在。
+- `createHost<P>({ self })`（`host.ts:251`）：`self` 是必填项（`HostOptions.self`，`:121`），表示 host 自己代码的 principal。
+- `connect(link, { principal })`：父 host 的请求以谁的身份发出（`host.ts:154-157`）。
+- `Route.principal`、`accept({ principal })` 同样必填。
 
-### §Bundler / Node 加载（部分失效）
+host 自己的 principal 按 `principalKey` 识别（不是对象身份）。`createHost<P>`/`defineFacet<P>`/`Serve<P>` 等泛型让工厂、方法、监听器、任务都能直接收窄到应用的 principal 类型。
 
-- **`@earendil-works/chord/bundler` 子路径已删除**。v1.2.0 的 exports 只有 `.`、`./context`、`./delta`、`./node`、`./package.json`；`esbuild` 依赖已从 `package.json` 移除（只剩 `typebox`）。原页描述的 content-addressed `.cjs` + `chord-facets.json` manifest 打包链随 facet 运行时一并消失。
-- **`@earendil-works/chord/node` 仍存在**（`src/node.ts`），但原引的 `createFacetBundleLoader`、`readFacetBundleArtifact()`、`createFacetBundleArtifactLoader()` 是 facet 时代的 API，需按 `docs/spec.md` §10「Host manager (library)」重新核对——那里描述的是 `createHostManager({ driver, keepAlive })`：fork driver（entry/init/lock/env）、串行化 start/stop/replace、exit-before-replace、grace 后 process-tree kill、control channel（ready/fatal/shutdown）、liveness callback。
+### 状态：cell、init 与按 variant 的 state
+
+- `self.state(name, schema, initial, { version?, migrate? })` 返回一个 cell；cell 的版本与迁移是**每个 cell 自己的**，`ServeOptions.state` 的全局版本已删除。
+- `self.state(name, schema, { init }, options?)`：第一次值由 `init(ctx)` 提供。init 在 resources open、references live 之后、对象 live 之前跑，保证没有方法/监听器/任务看到中间值；reload 保留 cell 不重跑 init，新增 cell 在 prepare 阶段跑（`object.ts:151-153,164-171`）。
+- state 成员类型是 `T`（v1.2.0 是 `T | undefined`）。未 hydrate 读会抛 `not_ready`，不在当前 variant 抛 `not_in_variant`。
+- 远程 reference 按 `variant` 判别联合；跨 variant 的成员必须先收窄。
+- 其余声明式设施：`self.resource(name, { version, deps?, exclusive?, open, close? })`、`self.on(name, source, [select,] handler)`、`self.derive(sources, fn)`、`self.task(fn)`。
+
+### get 是 async 的
+
+`ctx.get` 与 `host.get` 返回 `Promise<Ref>`：等 reference live **且该 variant 的每个 state 成员都有首个快照**才 resolve；超时抛 `unavailable/ready_timeout`（`HostOptions.readyTimeout` 默认 60 s，`host.ts:203-212,907`）。失败只释放那一个 reference。
+
+- 同步形态是 `host.hold`（可能处于 `loading`），给 UI 运行时用。
+- `self.get` 保持同步：对象只有在 references ready 且 hydrate 完成后才 live。
+- `GetOptions.state: false` 得到"只要方法不要状态"的 reference。
+
+### reload：两个 code version 并存
+
+hot reload 仍是硬要求。host 同时保留两个 code version，reload 分 prepare/commit：
+
+- 提交后旧版本的对象由 `retire` 流程退役：等旧 roots 结束，最多 `retireDeadline`（默认 5 s）；超时先 abort 旧 roots（reason `superseded`，给 1 s 宽限）再关只属于旧代码的资源（`reload.ts:256-278`）。
+- 对象的 tasks 在新一轮启动前先停旧的：`HostOptions.taskStopDeadline`（默认 5 s），超时上报后照样启动（`host.ts:128-132`、`object.ts:1404-1434`）。
+- `FacetApi.signal` 在该 run 被替换/移除、reload abort 或 host close 时 abort（`host.ts:75-80`）。prepare 期间旧、新 run 同时 live。
+- 跨 reload 保留的 resource 在 commit 时采用最新声明（`object.ts:276-284`），旧代码闭包随之可回收。
+
+## 通信：protocol 4
+
+`PROTOCOL_VERSION = 4`（`src/wire.ts:24`）。v1.2.0 **没有**这个常量；它先以 2 引入，随后 2→3、3→4 两次 bump，全部发生在 v1.2.0→v1.3.0 之间；`wire.ts` 在 v1.3.0..v1.4.0 零改动。
+
+- `hello` 带 protocol；**没有协议字段的旧 peer 视为 1，直接 mismatch**：`(frame.protocol ?? 1) !== 4` → `onProtocolMismatch({local:4,peer})` 并以 `protocol-version 4` 关闭（`connection.ts:832-835,654-663`）。没有协商。
+- protocol 4 的帧形状：`hold` 隐含该 variant 的 state（`state:false` 退出，`sub` 再开，`unsub` 停）；provider 以 unit 应答（`shape.state` 列出 consumer 缺的成员，随后逐个 snapshot）；`state` 帧是 `{hold, m, as:"snap"|"reset"|"ops"|"error", value?}`；`resync` 要求重发；`again` 标记断链后的重 hold；`origin` 标识 client 连接（`wire.ts:74-140`）。
+- **端到端流控**：peer 用 `ack` 帧确认已处理的帧（`hello.acks`），未确认帧超过 `LinkOptions.window`（默认 256 KiB）时 state 帧在发送端等待并按订阅合并；每个订阅的等待有界（`pendingCap`，默认 4 个窗口），超了变 reset（中继向下游发 `resync`）。call/result/控制帧**不受流控**，所以高负载下 result 可能先于它之前的 state 变化到达（`connection.ts:12-32,322-348,460-619`）。
+- `AcceptOptions.maxCalls` 限制对端同时在途的调用数，超了直接回 `unavailable/too_many_calls`，link 不断。
+- **打包**：JSON 超过 `PACK_THRESHOLD`（64K 字符，`link.ts:113`）的 call 参数/结果/state 快照走 deflate；IPC 用 base64 字段，WebSocket 用二进制 envelope；中继原样转发，使用方解压。`webSocketLink(socket, { compress, acceptPacked })` 控制开关（签名 `link.ts:414`，选项类型 `:354-359`）。
+- 同一对象的多个远程 reference **共享一个 binding**（一次 hold、每个 state 成员一条 stream、call 复用同一 hold），各自只保留 status/observer/release（`remote.ts:70-80`）。
+
+## 附属面
+
+| 子路径 | 内容 |
+|---|---|
+| `@earendil-works/chord/output` | `OutputBuffer`（head/tail 窗口）、`Progress`（按大小节流的提交）、`ProgressClock`、`boundOutput`/`sanitizeOutput`/`characterEnd`/`utf8ByteLength`（v1.3.0 从 durable 迁入，`output.ts`） |
+| `@earendil-works/chord/sqlite` | `SqliteDatabase`/`SqliteExecutor`/`SqliteValue`、迁移 runner（带"库版本比代码新就拒绝"的守卫）、schema prefix 校验 |
+| `@earendil-works/chord/sqlite/node` | `NodeSqliteDatabase`、`openNodeSqliteDatabase`（串行队列、statement cache、WAL、busy timeout） |
+| `@earendil-works/chord/sqlite/cloudflare` | `DurableObjectSqliteDatabase` |
+| `@earendil-works/chord/telemetry-sqlite` | `createSqliteTelemetry`：`SqliteTelemetry` 同时实现 `TelemetryContext` 与 `TelemetryStore` |
+| `@earendil-works/chord/node` | `nodeLoader` + host manager（fork driver、processLock、control channel） |
+
+`./delta`（JSON delta 引擎）自 v0.86.x 起是唯一实现（不可变 tracker），本页不重复；见 `src/delta/README.md`。
 
 ## 为什么值得记
 
-chord 是 Pi monorepo 里**唯一非 Pi 的通用运行时包**：它是"把多环境 feature 组合成声明式"的独立方案，不是 Pi 的子模块。v1.2.0 后 Pi 内部对它的依赖收窄到 durable 与 env 两个包。
-
-**v1.2.0 的变化值得单独记**：chord 此前**全程没有 CHANGELOG**，replicated state / delta 的破坏性改形零记录——v1.2.0 **首次加入 `CHANGELOG.md`**，chord2 重写有了正式记录。同时新增 `docs/{guide,spec,tutorial}.md`，规格开头即声明「文档与代码不一致时，以不一致为 bug」，第 12 节列出运行时尚未做到的事与留待决定的取舍。
-
-如果你在读 Pi 源码时遇到 chord，注意两点：(1) 不要按"Pi 的子模块"理解，它对 Pi 零依赖；(2) v1.0.3 时代的 facet/service 代码与文档**不兼容** chord2，迁移不是改 import 路径。
+- 它是 monorepo 里**唯一通用运行时**：不服务于 Pi 的业务，durable 与 env 只是它的消费者。
+- v1.4.0 的 chord 已经不是一个零依赖的独立库：它把 telemetry 作为运行时的必需上下文，同时把 sqlite 驱动下沉给它——这两件事让 chord 变成"基础设施的公共底座"。
+- 读 Pi 源码时遇到 chord，注意三点：(1) 术语是 object/reference/placement，不是旧的 record/handle/service；(2) 协议 4 与旧 peer 不互通；(3) 自定义 `Context` 必须提供 `telemetry`。
 
 ## 锚点
 
-- `packages/chord/package.json`（v1.2.0 的 exports 与唯一依赖 `typebox`）
-- `packages/chord/CHANGELOG.md`（**v1.2.0 新增**）
-- `packages/chord/docs/spec.md`（§1 概念表、§2 Contracts、§5 Lifetime、§7 Reload、§9 Hosts and links、§10 Host manager、§11 Test coverage、§12 Known limitations；`:5-9` 硬约束）
-- `packages/chord/docs/guide.md`、`docs/tutorial.md`
-- `packages/chord/src/host.ts`（chord2 typed host runtime 主体，1010 行）
-- `packages/chord/src/delta/`（**唯一在本区间未经重写的模块**，见上）
-- `packages/chord/README.md`（147 行；v1.0.3 时为 264 行）
-- 删除提交：`0104fef1e`（chord2 重写）、`7472cda0d`（experimental server 栈，coding-agent 随之不再依赖 chord）
-- 状态：experimental。**本页 §JSON delta 仍为 v1.2.0 事实；其余各节标注失效处请以 `docs/spec.md` 与 `src/` 为准。**
+- `packages/chord/package.json`：**10** 条 exports（`.`、`./context`、`./output`、`./delta`、`./node`、`./sqlite`、`./sqlite/node`、`./sqlite/cloudflare`、`./telemetry-sqlite`、`./package.json`）、依赖 `typebox` + `@earendil-works/pi-telemetry`
+- `packages/chord/CHANGELOG.md`：1.2.0 / 1.3.0 / 1.4.0 三段（1.3.0 是 Breaking 集中版）
+- `packages/chord/docs/spec.md`（协议与语义的规范文本，§1 概念、§2 contracts、§5 lifetime、§7 reload、§9 hosts and links、§10 host manager、§11 测试覆盖、§12 已知限制）；`docs/spec.md:6` 的"无其它 Pi 包"已过时
+- `packages/chord/src/host.ts`（1,303 行）、`contract.ts`、`object.ts`、`connection.ts`、`wire.ts`、`link.ts`、`reload.ts`、`remote.ts`
+- `packages/chord/README.md`（202 行）
+- 状态：experimental（`docs/spec.md` 自述"文档与代码不一致是 bug"）。

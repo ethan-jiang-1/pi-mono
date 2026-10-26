@@ -49,7 +49,9 @@ pi.on("before_agent_start", async (event, ctx) => {
 
 核心不变——`--tools` 仍是启动时一次性设置。但"白名单"的含义复杂了一倍：
 
-> **v1.2.0 续增（`ddaa0a034`，in-tag）**：`--tools` 本身也开始接受 **`+name`/`-name` 增量项**——此前只有 settings 的 `defaultTools` 支持，文档明确写着 "`--tools` does not accept `+name` or `-name`"。**只含增量项的列表不是白名单**：它在默认/继承集上增删（`sdk.ts:63-92` 文档块、`:280-283` 解析）；含普通工具名才是整体替换。增量项只匹配**确切工具名**，与普通名混用会抛错（`getToolListError`，`settings-manager.ts:95`）。
+> **v1.2.0 续增（`ddaa0a034`，in-tag）**：`--tools` 本身也开始接受 **`+name`/`-name` 增量项**——此前只有 settings 的 `defaultTools` 支持，文档明确写着 "`--tools` does not accept `+name` or `-name`"。**只含增量项的列表不是白名单**：它在默认/继承集上增删（`sdk.ts:63-92` 文档块、`:285-287` 解析（v1.4.0））；含普通工具名才是整体替换。增量项只匹配**确切工具名**，与普通名混用会抛错（`getToolListError`，`settings-manager.ts:95`）。
+>
+> **v1.3.0 追加（#10785）**：恢复会话时，`+name`/`-name` 现在**叠加在会话记录的工具集上**——先重放分支上所有 system message 的 `toolsAdded`/`toolsRemoved` 得到 loadout，再 `applyToolModifiers`（`core/agent-session.ts:525,1830-1860`）；分支从未提及的扩展工具按"新注册"启用，除非注册时 `defaultActive: false`。普通名列表/`--no-tools`/`--no-builtin-tools` 仍整体覆盖。
 
 **Pattern 语法**：`--tools`/`--exclude-tools` 的条目是精确名字或 `*` pattern（`createToolNameMatcher`，`core/mcp-servers.ts:21`——`*` 匹配任意字符含空串，全锚定；不含 `*` 的条目走 Set 精确匹配）。与 `toolExposure` 配置的 pattern 语法一致（同一匹配器）。
 

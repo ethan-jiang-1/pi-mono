@@ -1,6 +1,6 @@
 # 范围纪律与成本合同：minimal core、cost contracts 与审阅缓冲
 
-pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」：范围纪律（什么不该进核心）、成本合同（进了核心的东西多大）、审阅缓冲（维护者的时间是稀缺资源）。三层的名字都来自仓库自己的原话：`CONTRIBUTING.md` 的 **pi's core is minimal**、`check-entry-graphs.mjs` 注释的 **Entry points are cost contracts**、FAQ 的 **Auto-closing creates a buffer**。本页检视 `v1.2.0` 的这三层。**范围纪律与贡献门槛是主仓要求**；成本合同是主仓的工程实践；借鉴部分为扩展仓建议。
+pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」：范围纪律（什么不该进核心）、成本合同（进了核心的东西多大）、审阅缓冲（维护者的时间是稀缺资源）。三层的名字都来自仓库自己的原话：`CONTRIBUTING.md` 的 **pi's core is minimal**、`check-entry-graphs.mjs` 注释的 **Entry points are cost contracts**、FAQ 的 **Auto-closing creates a buffer**。本页检视 `v1.4.0` 的这三层（预算数字已按 v1.4.0 更新）。**范围纪律与贡献门槛是主仓要求**；成本合同是主仓的工程实践；借鉴部分为扩展仓建议。
 
 ![范围纪律与成本合同：约束从提醒变成会失败的检查](./figures/cost-contracts.svg)
 
@@ -10,13 +10,13 @@ pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」
 
 > First things first: **pi's core is minimal**.
 >
-> — [CONTRIBUTING.md L7](https://github.com/earendil-works/pi/blob/v1.2.0/CONTRIBUTING.md#L7)
+> — [CONTRIBUTING.md L7](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md#L7)
 
 > If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
 >
-> — [CONTRIBUTING.md L9](https://github.com/earendil-works/pi/blob/v1.2.0/CONTRIBUTING.md#L9)
+> — [CONTRIBUTING.md L9](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md#L9)
 
-它紧接着说明理由：核心的存在意义就是最小且可被 extension 影响与操纵，但连扩展的 hook point 也应经充分讨论，避免不可维护的膨胀与复杂交互（[CONTRIBUTING.md L11](https://github.com/earendil-works/pi/blob/v1.2.0/CONTRIBUTING.md#L11)）。这不是审美偏好，而是把「每进核心的一份代码都是全体用户的永久维护负债」制度化。资源类型地图（见 [04](./04-extension-points-map.md)）是这条纪律的另一面：正因为核心拒绝吸收新能力，才需要一张完整、稳定的扩展点地图。
+它紧接着说明理由：核心的存在意义就是最小且可被 extension 影响与操纵，但连扩展的 hook point 也应经充分讨论，避免不可维护的膨胀与复杂交互（[CONTRIBUTING.md L11](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md#L11)）。这不是审美偏好，而是把「每进核心的一份代码都是全体用户的永久维护负债」制度化。资源类型地图（见 [04](./04-extension-points-map.md)）是这条纪律的另一面：正因为核心拒绝吸收新能力，才需要一张完整、稳定的扩展点地图。
 
 ## 成本合同：exports 的图预算
 
@@ -24,23 +24,23 @@ pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」
 
 > Entry points are cost contracts.
 >
-> — [check-entry-graphs.mjs L3](https://github.com/earendil-works/pi/blob/v1.2.0/scripts/check-entry-graphs.mjs#L3)
+> — [check-entry-graphs.mjs L3](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs#L3)
 
-文件头注释给出了动机：一个多余的 `export *` 能让一个 1 文件的纯函数入口拖动整个 barrel——经 barrel 导入要付出约 37 MB 的模块求值图，而且直到有人测量之前什么都不失败。脚本遍历每个声明入口的值导入图（`import type` 被擦除、不计入），对列出的入口强制 `maxFiles` 与 `forbid` 预算：`v1.2.0` 中 `packages/ai` 的 `./models` 入口限 15 文件且禁触 `providers/`、`models.generated.ts` 等（完整清单见下表）；`./utils/*` 限 3 文件；`packages/durable` 的根入口限 62 文件且禁触 `packages/ai/src/index.ts`（[check-entry-graphs.mjs L38-L48](https://github.com/earendil-works/pi/blob/v1.2.0/scripts/check-entry-graphs.mjs#L38-L48)）。
+文件头注释给出了动机：一个多余的 `export *` 能让一个 1 文件的纯函数入口拖动整个 barrel——经 barrel 导入要付出约 37 MB 的模块求值图，而且直到有人测量之前什么都不失败。脚本遍历每个声明入口的值导入图（`import type` 被擦除、不计入），对列出的入口强制 `maxFiles`、`forbid` 与可选 `allow` 预算：`v1.4.0` 中 `packages/ai` 的 `./models` 入口限 **20** 文件、禁触 `providers/`、`models.generated.ts` 等，并 `allow` `packages/telemetry/src/index.ts`（完整清单见下表）；`./utils/*` 限 3 文件；`packages/durable` 的根入口限 **73** 文件且禁触 `packages/ai/src/index.ts`（[check-entry-graphs.mjs L38-L70](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs#L38-L70)）。
 
-`v1.2.0` 的预算全景：
+`v1.4.0` 的预算全景：
 
 | 入口 | maxFiles | forbid（禁止触达） |
 |---|---|---|
-| `packages/ai` → `./models` | 15 | `providers/`、`models.generated.ts`、`index.ts` 等 |
+| `packages/ai` → `./models` | **20** | `providers/`、`models.generated.ts`、`index.ts` 等；`allow` telemetry |
 | `packages/ai` → `./utils/*` | 3 | `providers/`、`api/`、`index.ts` |
-| `packages/durable` → `.`（根入口） | 62 | `packages/ai/src/index.ts`、typebox helpers |
+| `packages/durable` → `.`（根入口） | **73** | `packages/ai/src/index.ts`、typebox helpers |
 
 预算的边界同样是显式的（主仓实践）：
 
 > Budgets are deliberate. Entries with no budget remain unbounded; each listed entry states the graph it is allowed to reach.
 >
-> — [check-entry-graphs.mjs L33-L34](https://github.com/earendil-works/pi/blob/v1.2.0/scripts/check-entry-graphs.mjs#L33-L34)
+> — [check-entry-graphs.mjs L33-L34](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs#L33-L34)
 
 也就是说**预算只覆盖列出的入口**：未被列出的入口不受检查，这不证明它们轻，只证明尚未被纳入契约。该脚本由 `npm run check` 驱动，回归在提交时失败而非在生产中被测量出来（脚本注释原话是 "fails at commit time instead"）。
 
@@ -50,7 +50,7 @@ pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」
 
 > Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.
 >
-> — [CONTRIBUTING.md L81](https://github.com/earendil-works/pi/blob/v1.2.0/CONTRIBUTING.md#L81)
+> — [CONTRIBUTING.md L81](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md#L81)
 
 这是把「审阅成本」当作真实资源并显式定价的例子——代价是对新贡献者不友好，这一取舍由仓库自担。
 
@@ -58,9 +58,9 @@ pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」
 
 对扩展作者，成本还出现在另外三处（运行时事实）：
 
-- **组装成本**：第三方 package 可以执行扩展代码、其 skills 可以指示模型运行程序，因此安装前须审阅源码——「Review third-party package source before installing it. Review project package declarations before granting project trust.」（[packages.md L21](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/packages.md#L21)）。信任不是假设，是用户动作。
+- **组装成本**：第三方 package 可以执行扩展代码、其 skills 可以指示模型运行程序，因此安装前须审阅源码——「Review third-party package source before installing it. Review project package declarations before granting project trust.」（[packages.md L21](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md#L21)）。信任不是假设，是用户动作。
 - **升级成本**：lockstep 版本纪律（全包同版本、一起升级，见 [03](./03-repo-skills.md)）把「多包版本矩阵」这个升级成本源直接消除。
-- **上下文成本**：skills 只把名字、描述与路径放进系统提示、完整指令按需加载（见 [03](./03-repo-skills.md)）；会话 compaction 与 `context_edit` 控制历史进入模型上下文的体积（见 [05](./05-session-inspectability.md)）。宿主提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）声明为 `peerDependencies` 且禁止打包，否则在编译 ESM 下会绕过 Pi 的模块映射、制造重复类与注册表（[packages.md L88-L92](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/packages.md#L88-L92)）。
+- **上下文成本**：skills 只把名字、描述与路径放进系统提示、完整指令按需加载（见 [03](./03-repo-skills.md)）；会话 compaction 与 `context_edit` 控制历史进入模型上下文的体积（见 [05](./05-session-inspectability.md)）。宿主提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）声明为 `peerDependencies` 且禁止打包，否则在编译 ESM 下会绕过 Pi 的模块映射、制造重复类与注册表（[packages.md L88-L92](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md#L88-L92)）。
 
 ## 观点：约束从提醒变成检查
 

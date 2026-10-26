@@ -1,6 +1,8 @@
 # orchestration/ — pi 的工作编排原语阶梯(驾驶座视角)
 
-> **当前基线：`v1.2.0`（tag `06a466935`）**，上一基线 `v1.0.3`（tag `d78dc83d6`）。**历史起点**：`v1.0.0`（tag `a13d35a74`，当时复核锚点 `f0e079560`）；后续同步按 [全库记录](../README.md)追踪。本轮只校正本导览的责任层与完成边界，并复核相关合同到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`，不声明目录全部行号或源码仍与旧 tag 一致。
+> **当前基线：`v1.4.0`（tag `4a080252f`）**，上一基线 `v1.2.0`（tag `06a466935`）。本区间对编排层的影响：durable 加 `sleeping` 状态与 crash-loop guard、codemode 加 worker 准入与生命周期语义、`--tools +name/-name` 在恢复会话时叠加。
+>
+> **更早基线**：`v1.2.0`（tag `06a466935`），上一基线 `v1.0.3`（tag `d78dc83d6`）。**历史起点**：`v1.0.0`（tag `a13d35a74`，当时复核锚点 `f0e079560`）；后续同步按 [全库记录](../README.md)追踪。本轮只校正本导览的责任层与完成边界，并复核相关合同到 `cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`，不声明目录全部行号或源码仍与旧 tag 一致。
 >
 > 方法论备注：原语阶梯、统一维度矩阵和诚实登记空白的组织视角历史上受 DSH `orchestration-ladder` 启发；保留出处不等于以 DSH 作为 Pi 原生理念证据。行为事实仍取自 Pi，不能预设它应长成与外部项目同构的阶梯。
 
@@ -8,7 +10,7 @@
 
 Pi 的 coding-agent 默认工作流围绕单 agent loop 和扩展面展开：双队列、循环钩子与工具结算在运行核；计划/委派在示例扩展或生态；MCP 与 codemode 提供工具接入和代码编排（codemode 在 v1.2.0 有 coding-agent 与 durable **两份平行实现**）；独立 durable 提供实验性持久任务，v1.2.0 起同时是**工具执行内核**（内建 Code Mode、嵌套工具调用、tool-search）。不能把“coding-agent 没有统一长目标工作流”扩大成整个 monorepo 没有调度能力。
 
-**完成边界**：应用会话可能在 `agent_end` 后自动重试、压缩或续跑；宿主需要等待 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#respect-the-runtime-lifecycle)。业务正确性仍需另行验收，见 [重试设置](../../packages/coding-agent/docs/settings.md#network-and-retries)。
+**完成边界**：应用会话可能在 `agent_end` 后自动重试、压缩或续跑；宿主需要等待 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)。业务正确性仍需另行验收，见 [重试设置](../../packages/coding-agent/docs/settings.md#network-and-retries)。
 
 ## 为什么存在本目录
 

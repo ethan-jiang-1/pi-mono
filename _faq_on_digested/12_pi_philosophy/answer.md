@@ -57,7 +57,7 @@
 
 例如，计划或任务扩展可以把状态写到会话条目；不同用户也可以直接维护计划文件。两者都是选择，不是只有文件才符合 Pi 哲学。
 
-扩展并非无约束：[事件合同](../../packages/coding-agent/docs/extensions.md#events-and-concurrency)规定加载顺序、返回值效果与并发行为；[生命周期合同](../../packages/coding-agent/docs/extensions.md#respect-the-runtime-lifecycle)要求正确启动、关闭资源。这些合同帮助理解当前行为，**不构成跨版本兼容承诺**。
+扩展并非无约束：[事件合同](../../packages/coding-agent/docs/extensions.md#events-and-concurrency)规定加载顺序、返回值效果与并发行为；[生命周期合同](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)要求正确启动、关闭资源。这些合同帮助理解当前行为，**不构成跨版本兼容承诺**。
 
 ### 3. 上下文可控：可编辑的输入，不是“不管理状态”
 
@@ -97,7 +97,7 @@ Pi 也会自动管理状态：会话持久化、上下文压缩、请求恢复�
 
 工具失败通常以 `isError` 返回模型，模型可以选择改参数或换方案；但 coding-agent 对瞬时请求失败有**默认开启的自动重试**，也有自动压缩与溢出恢复。见 [settings](../../packages/coding-agent/docs/settings.md#network-and-retries)。
 
-因此，“harness 报告，模型/人裁决”只适合描述部分业务选择，不能作为全局定律。集成宿主判断完成时，应等待 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#respect-the-runtime-lifecycle)，不能仅看到 `agent_end` 就认为自动工作结束。
+因此，“harness 报告，模型/人裁决”只适合描述部分业务选择，不能作为全局定律。集成宿主判断完成时，应等待 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)，不能仅看到 `agent_end` 就认为自动工作结束。
 
 ## 五、代价是什么？
 
@@ -123,3 +123,11 @@ Pi 也会自动管理状态：会话持久化、上下文压缩、请求恢复�
 1. **最小核心是范围纪律，不是功能数量崇拜。**
 2. **上下文可调、过程可检查、宿主可替换，但程序仍承担自动状态管理与恢复。**
 3. **使用者能塑造工作流，也要理解改动、审计扩展并承担维护与安全责任。**
+
+
+## sync-0010 增量（v1.4.0）
+
+- **依赖规则扩展到内部包**：`AGENTS.md:45` 从 "Direct external deps" 改为 "Direct **registry** deps, **including internal workspace deps**"；`scripts/check-pinned-deps.mjs` 删除了内部包豁免，所有 registry 依赖必须是精确版本（实测仓库内已无 `^`）。
+- **发布前多了一道数据兼容门禁**：模型目录会直接服务已发布的 pi，发布前用 `check-model-catalog-compat.mjs` 对最新 release 的 pi-ai 做类型校验；不兼容时先升 `MINIMUM_PI_VERSION`（当前 1.2.1）。
+- **release 必须先 pin 最新模型目录再构建**（`scripts/release.mjs:91-129`），否则发布脚本失败——把"数据也是发布物"写进了流程。
+- **entry-graph 成本合同上调**：`packages/ai` 的 `./models` 15→20，`packages/durable` 根 66→73，并新增 `allow` 例外（`scripts/check-entry-graphs.mjs`）。

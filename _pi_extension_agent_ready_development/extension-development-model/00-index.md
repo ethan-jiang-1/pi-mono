@@ -4,7 +4,7 @@
 
 新建独立 Pi 扩展仓后，最容易出现的不是不会写 `pi.registerCommand()`，而是不知道怎样把用户意图、扩展实现、package 声明、测试结果和交付判断连成一条可复查的链。本卷给出一张 Pi-native 的总地图：变更落在哪种资源类型，哪种验证能证明什么，以及为什么「扩展能加载」「工具能执行」「干净环境能安装」是三个必须分别观察的结果。
 
-这是依据 Pi `v1.2.0` 源码、文档与示例归纳出的开发模型，不是 Pi 官方宣布的方法名，也不是扩展仓必须复制的主仓库制度。正文区分运行时事实、主仓要求、扩展仓建议与仓库自定；扩展仓自行决定治理规则与验证适配。
+这是依据 Pi `v1.4.0` 源码、文档与示例归纳出的开发模型，不是 Pi 官方宣布的方法名，也不是扩展仓必须复制的主仓库制度。正文区分运行时事实、主仓要求、扩展仓建议与仓库自定；扩展仓自行决定治理规则与验证适配。
 
 ## 一页总览：四个层次不要混成一件事
 
@@ -47,7 +47,7 @@
 
 > Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.
 >
-> — Pi [Extensions 文档](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/extensions.md#L3)
+> — Pi [Extensions 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md#L3)
 
 意图可以放在 issue、任务说明或 commit 说明里；它回答「为什么改、怎样算完成」，不拥有当前 API 或长期设计理由。扩展仓不必复制 pi-mono 的 issue 制度，只需让自己的任务入口能表达可观察结果。
 
@@ -64,7 +64,7 @@ Pi 用不同的资源类型承载不同种类的变化，`ResourceLoader` 统一
 | 固定的可复用提示命令 | prompt template | 同一 prompt 反复使用，无需执行行为 |
 | 多个资源作为整体分发 | package | 经 npm/git 共享，或多个资源属于一体 |
 
-资源判别来自 Pi 的 [Extensions](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/extensions.md#L3)、[Skills](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/skills.md#L3-L5) 与 [Prompt Templates](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/prompt-templates.md#L3) 文档开头的判别句（Skills 的判别句在第二段）；错配资源类型（例如把一堆指令写成扩展）不违反任何检查，但会付出维护与上下文成本。
+资源判别来自 Pi 的 [Extensions](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md#L3)、[Skills](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md#L3-L5) 与 [Prompt Templates](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/prompt-templates.md#L3) 文档开头的判别句（Skills 的判别句在第二段）；错配资源类型（例如把一堆指令写成扩展）不违反任何检查，但会付出维护与上下文成本。
 
 ### 3. 遵守运行时生命周期合同
 
@@ -72,7 +72,7 @@ Pi 用不同的资源类型承载不同种类的变化，`ResourceLoader` 统一
 
 - factory 里不要启动进程、socket、watcher 或计时器——有些调用只加载扩展不开会话；长命资源从 `session_start` 或需要的命令/工具里启动。
 - 一次 run 从 `before_agent_start` 经模型、消息、工具事件到 `agent_end`；自动重试、恢复、压缩或排队工作可以在其后继续。
-- 压缩可由扩展参与：`session_before_compact` 事件在压缩前触发，扩展提供的自定义摘要记为 `fromHook: true`，其 LLM `usage` 计入会话统计（运行时事实，见 [Compaction 文档](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/compaction.md#L150-L165)、[钩子事件](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/compaction.md#L296)）。
+- 压缩可由扩展参与：`session_before_compact` 事件在压缩前触发，扩展提供的自定义摘要记为 `fromHook: true`，其 LLM `usage` 计入会话统计（运行时事实，见 [Compaction 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/compaction.md#L150-L165)、[钩子事件](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/compaction.md#L296)）。
 - `agent_before_settle` 是最后一个可行动边界；`agent_settled` 是最终且仅通知的。
 - 清理放进幂等的 `session_shutdown`，因为取消、reload、会话替换和进程退出会汇聚到同一路径。
 
@@ -97,7 +97,7 @@ Pi 主仓库的测试套件是这套分层的参考实现：它用发布的 `@ea
 
 ### 6. 验证用户实际安装的形态
 
-源码目录能加载，不代表 package 声明完整。只要扩展经 package 分发，就应在干净 agent dir 中安装并复验至少一个可观察行为；并遵守 Pi 的依赖合同：host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）声明在 `peerDependencies` 用 `"*"`，绝不放进 `dependencies`——物理拷贝会绕过 Pi 的扩展模块映射，制造重复类和注册表（运行时事实，见 [Packages 文档](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/packages.md#L80-L92)）。
+源码目录能加载，不代表 package 声明完整。只要扩展经 package 分发，就应在干净 agent dir 中安装并复验至少一个可观察行为；并遵守 Pi 的依赖合同：host 提供的包（`@earendil-works/pi-ai`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-coding-agent`、`@earendil-works/pi-tui`、`typebox`）声明在 `peerDependencies` 用 `"*"`，绝不放进 `dependencies`——物理拷贝会绕过 Pi 的扩展模块映射，制造重复类和注册表（运行时事实，见 [Packages 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md#L80-L92)）。
 
 ### 7. 用交付判断收尾
 
@@ -119,7 +119,7 @@ Pi 主仓库的测试套件是这套分层的参考实现：它用发布的 `@ea
 
 ### 不要假设 UI 存在
 
-JSON、print 模式没有 UI；RPC 模式不能转发自定义终端组件。用 `ctx.mode === "tui"` 与 `ctx.hasUI` 守卫，并让工具与事件行为独立于渲染。RPC 模式下 `ctx.ui` 的对话框与通知方法经 extension UI 子协议请求/应答转发（此时 `ctx.mode === "rpc"` 且 `ctx.hasUI` 为 true），`custom()` 等终端专属方法不可用（运行时事实，见 [RPC Extension UI 文档](https://github.com/earendil-works/pi/blob/v1.2.0/packages/coding-agent/docs/rpc-extension-ui.md#L12-L25)）。
+JSON、print 模式没有 UI；RPC 模式不能转发自定义终端组件。用 `ctx.mode === "tui"` 与 `ctx.hasUI` 守卫，并让工具与事件行为独立于渲染。RPC 模式下 `ctx.ui` 的对话框与通知方法经 extension UI 子协议请求/应答转发（此时 `ctx.mode === "rpc"` 且 `ctx.hasUI` 为 true），`custom()` 等终端专属方法不可用（运行时事实，见 [RPC Extension UI 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/rpc-extension-ui.md#L12-L25)）。
 
 ### 不要误解注销与终止
 

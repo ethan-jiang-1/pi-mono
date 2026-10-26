@@ -122,7 +122,7 @@ CLI 的 `--extension` 参数走 `resolveExtensionSources(sources, {temporary: tr
 
 ## v1.0.3 后注记（2026-10-06 sync-0008 同步）
 
-**二分法新增第三形态样本：官方库包。** v1.0.3 之后 main 上新增的 `@earendil-works/pi-env`（`packages/env`，Unreleased，`package.json` 版本号 1.0.3 但尚未随任何 release 发布）是 `@earendil-works` 官方 monorepo npm 包，但**不是 Pi Package**：`package.json` 无 `pi` 字段、没有 `extensions/`/`skills/` 等约定目录（对照上文判据——两者都没有就不进 package 解析层）、不进 `settings.packages`、不被 `pi install`。它是 Durable 宿主 `import` 的**库依赖**（实现 durable 的 `ExecutionEnv` 接口）。与 v1.0.0 注记里 `packages/mcp`/`packages/codemode` 的"库 + 内置扩展消费"同族但更纯——连消费它的内置扩展都没有。"Extension 是运行时单位、Package 是分发单位"的二分法由此多出一个干净的对照样：**官方库包**（library dependency，走 npm import，对 pi 的资源解析/package-manager 完全不可见）vs **pi package**（分发容器，走 `pi install`/lockfile/`origin: "package"` 生命周期）。判据不受影响——pi-env 恰好反证了"仅有普通 `package.json` 不足以成为 package"这条规则。
+**二分法新增第三形态样本：官方库包。** v1.0.3 之后 main 上新增的 `@earendil-works/pi-env`（`packages/env`，Unreleased，`package.json` 版本号 1.0.3 但尚未随任何 release 发布）是 `@earendil-works` 官方 monorepo npm 包（依赖方向是 **env → durable**，durable 不依赖 env），但**不是 Pi Package**：`package.json` 无 `pi` 字段、没有 `extensions/`/`skills/` 等约定目录（对照上文判据——两者都没有就不进 package 解析层）、不进 `settings.packages`、不被 `pi install`。它是 Durable 宿主 `import` 的**库依赖**（实现 durable 的 `ExecutionEnv` 接口）。与 v1.0.0 注记里 `packages/mcp`/`packages/codemode` 的"库 + 内置扩展消费"同族但更纯——连消费它的内置扩展都没有。"Extension 是运行时单位、Package 是分发单位"的二分法由此多出一个干净的对照样：**官方库包**（library dependency，走 npm import，对 pi 的资源解析/package-manager 完全不可见）vs **pi package**（分发容器，走 `pi install`/lockfile/`origin: "package"` 生命周期）。判据不受影响——pi-env 恰好反证了"仅有普通 `package.json` 不足以成为 package"这条规则。
 
 **v1.2.0 更新（sync-0009）**：上一段的两处时间性描述已过时——
 

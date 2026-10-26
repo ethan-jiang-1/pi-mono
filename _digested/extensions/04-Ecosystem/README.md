@@ -23,13 +23,13 @@ upstream 的治理边界画得很清楚：**管协议，不管内容**。包格�
 
 | 机制 | 内容 | 锚点 |
 |------|------|------|
-| 包格式 | extension/skill/prompt template/theme 四类资源，`package.json` 的 `pi` manifest 或约定目录 | docs/packages.md:118-160 |
-| 分发渠道 | `pi install npm:@foo/bar@1.0.0` / `git:github.com/user/repo@v1` / 裸 URL / 本地路径；版本化 spec 被 pin | docs/packages.md:13-18 |
-| 安装位置 | 用户级 `~/.pi/agent/npm/`，项目级 `.pi/npm/`（项目包随 project trust 自动装） | docs/packages.md:43 |
-| 试用 | `pi -e npm:@foo/bar` 临时安装，仅当次运行有效 | docs/packages.md:45-47 |
-| **官方目录** | npm keyword **`pi-package`** → 自动出现在 [pi.dev/packages](https://pi.dev/packages) 画廊（Most downloads / Recently published 排序），可附 video/image 预览 | docs/packages.md:118/135-154 |
+| 包格式 | extension/skill/prompt template/theme 四类资源，`package.json` 的 `pi` manifest 或约定目录 | docs/packages.md:57-72（v1.4.0；v0.85.1 时为 118-133） |
+| 分发渠道 | `pi install npm:@foo/bar@1.0.0` / `git:github.com/user/repo@v1` / 裸 URL / 本地路径；版本化 spec 被 pin | docs/packages.md:9-15、:38（版本 pin） |
+| 安装位置 | 用户级 `~/.pi/agent/settings.json` 声明、`.pi/settings.json` 为项目级（项目包随 project trust 自动装） | docs/packages.md:19、:21 |
+| 试用 | `pi -e npm:@foo/bar` 临时安装，仅当次运行有效 | docs/packages.md:23-27 |
+| **官方目录** | npm keyword **`pi-package`** → 自动出现在 [pi.dev/packages](https://pi.dev/packages) 画廊（Most downloads / Recently published 排序），可附 video/image 预览 | docs/packages.md:74 |
 | 治理通道 | 每个包页有 `report` 链接 → upstream 仓库的 `package-report.yml` issue 模板 + `package-report` label——**举报驱动下架，不是审批准入** | pi.dev/packages 每个包卡片 |
-| 安全立场 | 明文警告"包以**完全系统权限**运行；安装前自审源码"——责任转移给用户 | docs/packages.md:20 |
+| 安全立场 | 明文警告"包可执行扩展代码、skill 可指示模型运行程序；安装前自审源码"——责任转移给用户（措辞在 v1.0.0 重写，不再写 "full system access"） | docs/packages.md:21 |
 | 标准兼容 | skills 遵循 [Agent Skills 标准](https://agentskills.io)（跨 harness 的开放标准），不发明私有格式 | README.md:358 |
 | 社区广场 | 官方 Discord（README:7 badge） | README.md:7 |
 

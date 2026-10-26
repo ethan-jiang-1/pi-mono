@@ -22,9 +22,9 @@
 | 终端不是唯一宿主 | [SDK](../../packages/coding-agent/docs/sdk.md)、[README](../../README.md#pi) | [集成](../integration/README.md) | 驱动入口事实；library-first 是结构概括，不是兼容保证 |
 | 上下文可分层、按需、导航 | [system-prompt](../../packages/coding-agent/src/core/system-prompt.ts)、[skills](../../packages/coding-agent/docs/skills.md)、[sessions](../../packages/coding-agent/docs/sessions.md) | [自描述](../harness/04-Self-Description/README.md)、[文件/会话 UI](9_session_and_file_ui.md) | 机制事实；不能推出无自动状态管理或指令必然生效 |
 | 会话树可检查与重建 | [session-format](../../packages/coding-agent/docs/session-format.md)、[SessionManager](../../packages/coding-agent/docs/sdk.md#sessionmanager-api) | [会话树分析](../agent/03-Memory/3.4_Session_Tree.md) | 应用会话合同；不是原始网络抓包或确定性执行重放 |
-| 工具失败与请求恢复分层 | [重试设置](../../packages/coding-agent/docs/settings.md#network-and-retries)、[settled 边界](../../packages/coding-agent/docs/extensions.md#respect-the-runtime-lifecycle) | [反馈分析](../harness/05-Design-Causality/5.4_feedback_loops.md) | 默认自动重试/压缩存在；“模型裁决”不能全局化 |
+| 工具失败与请求恢复分层 | [重试设置](../../packages/coding-agent/docs/settings.md#network-and-retries)、[settled 边界](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle) | [反馈分析](../harness/05-Design-Causality/5.4_feedback_loops.md) | 默认自动重试/压缩存在；“模型裁决”不能全局化 |
 | OS 隔离属于运行环境，代码仍须理解 | [权限声明](../../README.md#permissions--containerization)、[隔离方案](../../packages/coding-agent/docs/containerization.md)、[The One Rule](../../CONTRIBUTING.md#the-one-rule) | [安全边界](12_security_boundaries.md) | 安全与治理事实；无 sandbox 不等于无安全机制 |
-| 选择权伴随组装、升级和审计成本 | [扩展生命周期](../../packages/coding-agent/docs/extensions.md#respect-the-runtime-lifecycle)、[packages](../../packages/coding-agent/docs/packages.md) | [知识载体](../harness/05-Design-Causality/5.1_knowledge_externalization.md)、[正确路径](../harness/05-Design-Causality/5.3_paved_road_friction.md) | 综合解释；没有成本测量或永久稳定性承诺 |
+| 选择权伴随组装、升级和审计成本 | [扩展生命周期](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)、[packages](../../packages/coding-agent/docs/packages.md) | [知识载体](../harness/05-Design-Causality/5.1_knowledge_externalization.md)、[正确路径](../harness/05-Design-Causality/5.3_paved_road_friction.md) | 综合解释；没有成本测量或永久稳定性承诺 |
 
 ## 更新时先检查什么？
 

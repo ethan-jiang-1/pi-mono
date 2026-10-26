@@ -3,6 +3,8 @@
 codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模型写 JS，在 QuickJS-WASM 中调用宿主注入能力；它编排的是工具调用，不是专用子代理原语。
 
 > **⚠️ v1.2.0：codemode 有**两份平行实现**，不是一次迁移。** 本页主体描述的是 **coding-agent 侧**（`packages/codemode` 独立包 + `packages/coding-agent/src/extensions/codemode/` 内置扩展）。v1.2.0 在 **durable 侧**又**独立新增**了一套 `packages/durable/src/codemode/`——它**不是**上述实现的下移或替代，两者并存、互不继承。差异见下节。
+>
+> **v1.3.0/v1.4.0 增量**：worker 生命周期语义变了（`acquireWorker`/`onWorkerStarted`；`close()` 与实际退出解耦），coding-agent 侧加了"等空闲 worker"的准入（上限 2 / 60 s / `PI_CODEMODE_MAX_WORKERS`）。详见 [worker 生命周期与准入](#worker-生命周期与准入v13v14)。
 
 > **应用合同局部复核**：`cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`。下文部分细节属于独立 `CodemodeSandbox` 包，不能直接当 coding-agent 默认值：应用 `codemode` 工具默认 inactive，需显式启用；成功的 `store` 写会话 custom entry，失败写入不保留；应用还注入 `models`、工具搜索等能力，脚本未指定超时则无默认期限。见 [应用 codemode 文档](../../packages/coding-agent/docs/codemode.md)、[启用设置](../../packages/coding-agent/docs/settings.md#tools)。
 
@@ -33,7 +35,7 @@ codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模�
 
 | | coding-agent 侧 | durable 侧（v1.2.0 新增） |
 |---|---|---|
-| 包 | `packages/codemode`（独立）+ `packages/coding-agent/src/extensions/codemode/` | `packages/durable/src/codemode/`（5 个文件：`codemode.ts` 1,037 行、`describe.ts`、`index.ts`、`models.ts`、`output.ts`） |
+| 包 | `packages/codemode`（独立）+ `packages/coding-agent/src/extensions/codemode/` | `packages/durable/src/codemode/`（5 个文件：`codemode.ts` 1,044 行、`describe.ts`、`index.ts`、`models.ts`、`output.ts`） |
 | 入口 | 扩展 `index.ts` → `tool.ts`，依赖 `@earendil-works/pi-codemode` | `createCodemodeExtension` / `createCodemodeTool`（`index.ts` 导出） |
 | 状态 | 成功 `store` 写会话 `codemode-store` custom entry | 每次投递结果写 **`pi.codemode.journal`**（kind 常量 `codemode.ts:149`），按投递顺序 |
 | 核心差异 | 沙箱只管执行，持久化由宿主扩展实现 | **journal + 时钟值重放**：给定同样的脚本、`startedAt`、`seed`、工具与 store，在同一 fingerprint 的 VM 上重放出同样的调用、参数与输出（确定性重放，`codemode.ts:10-29` 有完整说明） |
@@ -50,13 +52,25 @@ codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模�
 - `text(value)` / `image(...)` / `console.*`:向 `result.output` 追加内容(v1.2.0：`README.md:51`);
 - `store(key, value)` / `load(key)`:跨次执行的 JSON 状态,单值上限 256 Ki、总量 1 Mi(v1.2.0：`README.md:74`);
 - `exit()`:立即成功结束,保留 output 与 store 写入(v1.2.0：`README.md:53`);
-- **可注入 globals**：独立包支持宿主 globals，应用用它提供 `models`、工具搜索/声明等，见 [包合同](../../packages/codemode/README.md#usage)与[应用 Globals](../../packages/coding-agent/docs/codemode.md#globals)。没有原生 timers、`fetch`、`process`、`require`、modules、`WebAssembly`；可通过宿主提供的工具触及外部世界。
+- **可注入 globals**：独立包支持宿主 globals，应用用它提供 `models`、工具搜索/声明等，见 [包合同](../../packages/codemode/README.md#usage-on-node-and-bun)与[应用 Globals](../../packages/coding-agent/docs/codemode.md#globals)。没有原生 timers、`fetch`、`process`、`require`、modules、`WebAssembly`；可通过宿主提供的工具触及外部世界。
 
 ### 资源与终止
 
 - `timeoutMs` 默认有期限,`Infinity` 显式免除;**"等一个永远无法 settle 的 promise"会立即失败而不是挂死**——VM 无 timer 无 I/O,宿主能识别这种死态(v1.2.0：`README.md:58`);
 - `memoryLimitBytes` 封顶 VM 堆,超限在脚本内部抛 `InternalError: out of memory`(v1.2.0：`README.md:60`);
 - 输出封顶(v1.0.1,#10283):`text()`/`image()`/`console.*` 桥接到宿主的输出也有限额——超过 `MAX_OUTPUT_CHARS`(16 Mi 字符,含 base64 图像数据)或 `MAX_OUTPUT_ITEMS`(10 万条)即以 `RangeError` 失败脚本(**v1.2.0：`packages/codemode/src/runtime/prelude-source.ts:42-43`**)。此前 VM 堆有 `memoryLimitBytes` 但宿主侧留存无限额:一个死循环 `console.log` 能把**宿主进程**内存耗到崩溃;item 上限正是堵"循环打印空串"的绕过。
+
+### worker 生命周期与准入（v1.3.0/v1.4.0）
+
+**这是本区间 codemode 唯一的 Breaking**（1.3.0）：worker 支撑的结果与 `close()` 现在表示"**已请求关停**"，不再等 worker 真正退出（`execution.ts:17-20`、`VmChannel.stop`、`runtime/host.ts:20-75`）。如果宿主需要"worker 真的没了"才释放容量，必须自己跟踪：
+
+- `acquireWorker?(): () => void`：wasm 加载后、`new Worker` 前同步调用；构造失败立刻 release，成功则在 `exit` 时 release（`runtime/host.ts:30-38`）。
+- `onWorkerStarted?(exited: Promise<void>)`：每次 `execute()`/`start()` 的 worker 调一次，`exited` 在真退出时 resolve（`:68`）。
+- `stop()` 的路径：置中断位 → `void worker.terminate()`（不等）→ `worker.unref()`（`:59-66`）。Bun 上不可中断的内建会拖住进程退出。
+
+**coding-agent 侧另有一套准入**（v1.4.0，不在包里）：全进程最多 **2** 个 codemode worker，超出的脚本按到达顺序排队、最多等 **60 s**；`PI_CODEMODE_MAX_WORKERS` 可调（每次调用重读）；取消的 worker 占槽到真正退出；**排队时间计入脚本的 `timeout_ms`**（`packages/coding-agent/src/extensions/codemode/execute.ts:58-116,557-568,596-600`）。durable 侧没有这套——它只接收宿主传进来的 sandbox，多个会话共享上限要宿主自己接。
+
+> 易混点：`MAX_CONCURRENT_MODEL_CALLS = 4` 是 `models.*` 嵌套调用的并发上限，与 worker 上限无关。
 
 ### 状态语义
 
@@ -103,7 +117,7 @@ codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模�
 | **`packages/codemode/README.md:74`** | store/load:宿主持久、失败无写入、容量上限（v1.0.1 时为 `:55-65`） |
 | **v1.2.0：`packages/codemode/src/runtime/prelude-source.ts:42-43`** | 输出封顶常量 MAX_OUTPUT_CHARS / MAX_OUTPUT_ITEMS |
 | **v1.2.0：`packages/codemode/src/runtime/prelude-source.ts:58`起**（v1.0.1 时为 `:56-135`；文件 512→522 行） | lockdown:built-ins 冻结与 OVERRIDABLE accessor 化 |
-| **`packages/codemode/src/runtime/execution.ts:102-131,324`** | 宿主侧 BridgeError 严格校验与 sandbox 错误收场（**v1.2.0 从 `host.ts` 迁出**；`host.ts` 416→79 行） |
+| **`packages/codemode/src/runtime/execution.ts:102-131,324`** | 宿主侧 BridgeError 严格校验与 sandbox 错误收场（**v1.2.0 从 `host.ts` 迁出**；`host.ts` 416→88 行（v1.4.0）） |
 | **`packages/coding-agent/src/extensions/codemode/execute.ts:359`** | image() 输出落盘与 `[Image saved to ...]` 前置标签（`:370`） |
 | `packages/coding-agent/src/core/tools/read.ts:33,216` | tools.read() 读图返回 image block |
 | **`packages/coding-agent/src/extensions/codemode/tool.ts:145`** | 工具声明附 guidelines(toCodemodeDeclaration)（渲染在 `:149`） |

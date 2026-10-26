@@ -122,10 +122,12 @@ describe("MyExtension Contract Tests", () => {
 
 ```typescript
 import { describe, expect, it } from "vitest";
+// 注意：test-harness 不随包导出（package.json exports 只有 `.` 与 `./rpc-entry`）。
+// 仓内测试直接相对导入；外部仓需自带这一层薄封装。
 import { 
   createHarnessWithExtensions, 
   type Harness 
-} from "@earendil-works/pi-coding-agent/test-harness";
+} from "../../packages/coding-agent/test/test-harness.ts";
 import { 
   fauxAssistantMessage, 
   fauxToolCall 

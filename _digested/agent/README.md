@@ -1,5 +1,7 @@
 # pi-mono Agent 架构手册
 
+> **v1.4.0 基线（sync 0010）**：源码锚点对应 tag `4a080252f`。本区间对 Agent 内核影响最小（`packages/agent` 只加 `AgentOptions.identity`），影响集中在 harness/session 层：durable 加 `sleeping` 状态（`TaskRuntime.sleep()` 删除）、SQLite schema v2、crash-loop guard、IndexedDB 后端；详见 [0010](../_change_log/0010-v1.2.0-to-v1.4.0.md)。
+
 > **⚠️ v0.84.3 基线（2026-08-25）**：本仓库代码已同步到 v0.84.3（tag `4e58f324f`，merge `6f8312a52`），源码锚点对应工作树。v0.84.0 重点变化：① **session v4**——agent 包 session 模型整体重写（lane-based，旧 JSONL/in-memory repo API 删除），新专题 [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md)；② **`AgentHarness` 去泛型化重设计为 `AgentLane` 骨架**（多数操作 `HarnessNotImplemented`），4.1 已按 v0.84.2 完全重写；③ `FileSystem.renameFile()` 变必需；④ `message_update` wire 事件改纯 delta；⑤ auth 一批 breaking（见 5.2 警示）。v0.84.3 为渐进迭代（PowerShell 工具、compaction 加固、jiti 四模式等），各篇顶部已补 v0.84.3 警示。
 >
 > **⚠️ v0.86.1 基线（sync 0006）**：本仓库代码已同步到 v0.86.1，各篇行号锚点已按需重锚。本轮重点：agent 包 328 commits 的 durable harness runtime / session v4 重构（3.4/3.5 已重写，含 branch/lanes 分离、JSONL format 4、legacy v3 升级、named-branch streaming fork）；ai 包 `Context` → branded `TranscriptContext` 重构（5.1 高影响警示）；Meta Muse OAuth（5.2）；`state.systemPrompt` readonly（#9548，1.1/1.2）。详见 [`../_change_log/0006-v0.84.4-to-v0.86.1.md`](../_change_log/0006-v0.84.4-to-v0.86.1.md)。

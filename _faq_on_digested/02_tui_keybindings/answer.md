@@ -2,7 +2,7 @@
 
 ## 一句话
 
-pi-mono 的 TUI 是自研 terminal 渲染器（`packages/tui`，依赖仅 `get-east-asian-width` + `marked`，无 react/ink）渲染的一个终端应用，它是 SDK 的 **consumer**——所有 TUI 操作最终都调 `AgentSession` 的方法。快捷键定义在 `packages/coding-agent/src/core/keybindings.ts`，可以通过 `~/.pi/agent/keybindings.json` 自定义。
+pi-mono 的 TUI 是自研 terminal 渲染器（`packages/tui`，依赖仅 `get-east-asian-width` + `marked` + `marked-cjk-friendly`（v1.4.0 新增），无 react/ink）渲染的一个终端应用，它是 SDK 的 **consumer**——所有 TUI 操作最终都调 `AgentSession` 的方法。快捷键定义在 `packages/coding-agent/src/core/keybindings.ts`，可以通过 `~/.pi/agent/keybindings.json` 自定义。
 
 ---
 
@@ -172,7 +172,7 @@ TUI 只是一个参考实现。**所有快捷键能做到的事，SDK/RPC 都有
 
 ## 架构要点
 
-- **TUI 用自研渲染器**（`packages/tui` 的 tokenizer/布局，依赖仅 `get-east-asian-width` + `marked`，无 react/ink），源码在 `packages/coding-agent/src/modes/interactive/`
+- **TUI 用自研渲染器**（`packages/tui` 的 tokenizer/布局，依赖仅 `get-east-asian-width` + `marked` + `marked-cjk-friendly`，无 react/ink），源码在 `packages/coding-agent/src/modes/interactive/`
 - **TUI 是 SDK consumer**——它创建 `AgentSession`、订阅事件、通过快捷键调 session 方法
 - **TUI 组件**：assistant message 渲染、diff 预览、session 选择器、模型选择器、thinking 选择器、OAuth 登录对话框等
 - **启动方式**：直接 `node dist/cli.js`（不给 `--mode` 时就是默认的 interactive/TUI 模式）；`--mode` 只接受 `"text" | "json" | "rpc"`（`packages/coding-agent/src/cli/args.ts:11,96-99`），**没有** `--mode interactive` 这种写法
@@ -242,3 +242,11 @@ v1.2.0 新增 OSC 7501 程序状态上报：支持的终端与 agent dashboard �
 - 源码：`packages/coding-agent/src/modes/interactive/components/` — TUI 组件目录
 - `_digested/`：[agent/04-Harness/README.md(../../_digested/agent/04-Harness/README.md) — AgentHarness 和工具
 - `_digested/`：[integration/02-advanced.md(../../_digested/integration/02-advanced.md) — TUI vs SDK 架构关系
+
+
+## sync-0010 增量（v1.4.0）
+
+- **Rex 终端**（`TERM_PROGRAM=rex`）：`{images:"kitty", trueColor:true, hyperlinks:true}`（`packages/tui/src/terminal-image.ts:94-99`）。此前超链接退化为 `text (url)`。Rex 只部分实现 Kitty 图形协议（无 Unicode placeholders），但够 pi 用。
+- **退出时恢复终端模式**（#11170）：不调 `stop()` 的退出路径（如 `process.exit()`）此前会把 mouse tracking / focus reporting / Kitty keyboard / alternate screen 留在终端里；v1.4.0 用 `process.on("exit")` 同步写恢复序列（`src/tui.ts:953,575-590`、`terminal.ts:527-540`）。**硬杀/原生崩溃仍不覆盖**。
+- **Markdown**：未闭合 `$$` 不再吞掉后续 GFM 表格（`markdown.ts:107,122-136`）；CJK 标点旁的粗/斜体改用 `marked-cjk-friendly` 覆盖 tokenizer（`:194-197`）。
+- **`@` 补全**：修的是 fd 正则被 `[`/`(` 破坏后返回空（`autocomplete.ts:24` 加 `escapeRegex`）；模糊匹配本身未变。

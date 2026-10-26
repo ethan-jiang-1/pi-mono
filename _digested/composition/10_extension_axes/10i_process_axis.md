@@ -39,7 +39,7 @@
 
 和第二条扩展轴一样，**轴 8 目前是实验路径，不是可用的部署选项**：
 
-- **运行时在**：`packages/chord`（第 11 个包，零 Pi 依赖，由 `packages/chord/test/boundary.test.ts` 自动守住边界）；
+- **运行时在**：`packages/chord`（第 11 个包；v1.4.0 起依赖 `pi-telemetry`，boundary 测试为此显式放行该依赖）；
 - **活证据在**（**v1.2.0 已删除**）：`packages/coding-agent/examples/plugins/pi-example-plugin/`（`src/contract.ts` / `src/session.ts` / `src/tui.ts`）；
 
 > **⚠️ v1.2.0（sync 0009）**：`packages/coding-agent/examples/plugins/pi-example-plugin/` 已在 v1.2.0 删除（`7472cda0d`），`packages/chord/src/api.ts` 与旧 facet/service 运行时随 chord2 重写（`0104fef1e`）删除。下文对这两者的引用只作历史线索；chord 现状见 [`architecture-next/chord.md`](../../architecture-next/chord.md)。

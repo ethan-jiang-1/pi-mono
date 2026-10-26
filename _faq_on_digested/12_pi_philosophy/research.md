@@ -70,7 +70,7 @@
 - [agent-loop](../../packages/agent/src/agent-loop.ts)和[工具合同](../../packages/agent/src/types.ts)：工具执行错误转换为模型可见错误结果。
 - [settings:125–133](../../packages/coding-agent/docs/settings.md#network-and-retries)：agent-level retry 默认开启、最多 3 次，provider 重试另有配置。
 - [AgentSession:1839–1876](../../packages/coding-agent/src/core/agent-session.ts#L1839-L1876)处理重试与压缩后的续跑；[_prepareRetry:3747–3786](../../packages/coding-agent/src/core/agent-session.ts#L3747-L3786)执行预算、指数退避及事件通知。
-- [extensions:62–67](../../packages/coding-agent/docs/extensions.md#respect-the-runtime-lifecycle)：`agent_end` 后仍可能有自动工作；`agent_settled` 才是最终通知边界。
+- [extensions:62–67](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)：`agent_end` 后仍可能有自动工作；`agent_settled` 才是最终通知边界。
 
 **性质**：当前行为事实。工具业务重试常由模型选择，但“Pi 从不自动恢复/裁决”是错误的全局归纳。
 
@@ -86,9 +86,9 @@
 
 ## 9. 组装与维护成本：能证明到哪里？
 
-**一手支撑**：[扩展生命周期](../../packages/coding-agent/docs/extensions.md#respect-the-runtime-lifecycle)、[package](../../packages/coding-agent/docs/packages.md)、[贡献纪律](../../CONTRIBUTING.md#philosophy)说明用户与维护者仍需管理资源、选择能力并理解交互。
+**一手支撑**：[扩展生命周期](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)、[package](../../packages/coding-agent/docs/packages.md)、[贡献纪律](../../CONTRIBUTING.md#philosophy)说明用户与维护者仍需管理资源、选择能力并理解交互。
 
-[package.json:20–27](../../package.json#L20-L27)与[tsconfig:56–57](../../tsconfig.json#L56-L57)显示 examples 多数参加类型检查，但 gondolin 明确排除。类型兼容也不保证运行语义正确。[runtime-deps 负例测试:27–34](../../scripts/check-runtime-deps.test.mjs#L27-L34)直接反驳“Pi 门禁从不测负例”。
+[package.json:20–27](../../package.json#L20-L27)与[tsconfig:56–57](../../tsconfig.json#L52-L53)显示 examples 多数参加类型检查，但 gondolin 明确排除。类型兼容也不保证运行语义正确。[runtime-deps 负例测试:27–34](../../scripts/check-runtime-deps.test.mjs#L27-L34)直接反驳“Pi 门禁从不测负例”。
 
 **性质**：“用组装与理解成本换职责受控、上下文可调和宿主选择权”是解释。没有成本测量，不能声称“低一个数量级”；没有逐项覆盖审计，不能声称所有散文都无验证、所有 examples 都保真。
 

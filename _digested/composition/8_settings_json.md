@@ -59,7 +59,7 @@ v1.2.0 起 pi **发布**了四份配置 JSON Schema，放在 `https://pi.dev/sch
 | `defaultProvider` | string | 默认 LLM 提供商 | 无（首次启动选） | 可用 `Ctrl+P` 运行时切换 |
 | `defaultModel` | string | 默认模型 ID | 无 | 可以是自定义模型名 |
 | `thinking` | string | 思考模式 | `"normal"` | `"off"`/`"normal"`/`"high"`/`"xhigh"`/`"max"` |
-| `defaultTools` | string[] | 启动时启用的内置工具 | `["read","bash","edit","write"]`（v1.2.0 为 `DEFAULT_TOOL_NAMES`，`settings-manager.ts:83`；v1.0.3 时在 `:215`） | settings.json 的实际键名是 **`defaultTools`**（旧文写的 `tools` 不是有效键；CLI flag 才是 `--tools`）。v1.0.0 起支持 **`+name`/`-name` 增量项**：只含增量项的列表在继承/默认集上增删，含普通工具名的列表整体替换。**注意**：这些具名函数在 v1.0.3 基线**就已存在**（当时为 `isToolModifier` `:217`、`mergeDefaultTools` `:225`、`resolveDefaultTools` `:236`），v1.2.0 的新变化只是把 `isToolModifier`/`applyToolModifiers` **导出**、并抽出 `applyToolModifiers`——**不是**新增五个符号。**v1.2.0 真正新增的是 CLI 侧行为**：`--tools` 也开始接受 `+name`/`-name`（`ddaa0a034`，`docs/settings.md:56`），此前基线文档明确写着 "`--tools` does not accept `+name` or `-name`"（v1.0.3 时字段 `:168`、合并 `:225-234`、解析 `:236-250`；v1.2.0 的**行号**为 `DEFAULT_TOOL_NAMES` `:83`、`isToolModifier` `:86`、`applyToolModifiers` `:108`、`mergeDefaultTools` `:124`、`resolveDefaultTools` `:135`）；`/reload` 会启用新加入的工具（0.99.2），`--tools`/`--no-tools` 仍可覆盖。v1.0.3+ 口径同步：CLI `--tools`/`--exclude-tools` 现支持 `*` pattern，且 `--tools` 不再移除 MCP 工具（除非条目以 `mcp__` 开头） |
+| `defaultTools` | string[] | 启动时启用的内置工具 | `["read","bash","edit","write"]`（v1.2.0 为 `DEFAULT_TOOL_NAMES`，`settings-manager.ts:85`（v1.4.0）；v1.0.3 时在 `:215`） | settings.json 的实际键名是 **`defaultTools`**（旧文写的 `tools` 不是有效键；CLI flag 才是 `--tools`）。v1.0.0 起支持 **`+name`/`-name` 增量项**：只含增量项的列表在继承/默认集上增删，含普通工具名的列表整体替换。**注意**：这些具名函数在 v1.0.3 基线**就已存在**（当时为 `isToolModifier` `:217`、`mergeDefaultTools` `:225`、`resolveDefaultTools` `:236`），v1.2.0 的新变化只是把 `isToolModifier`/`applyToolModifiers` **导出**、并抽出 `applyToolModifiers`——**不是**新增五个符号。**v1.2.0 真正新增的是 CLI 侧行为**：`--tools` 也开始接受 `+name`/`-name`（`ddaa0a034`，`docs/settings.md:56`），此前基线文档明确写着 "`--tools` does not accept `+name` or `-name`"（v1.0.3 时字段 `:168`、合并 `:225-234`、解析 `:236-250`；v1.2.0 的**行号**为 `DEFAULT_TOOL_NAMES` `:85`、`isToolModifier` `:88`、`applyToolModifiers` `:110`、`mergeDefaultTools` `:126`、`resolveDefaultTools` `:137`（v1.4.0））；`/reload` 会启用新加入的工具（0.99.2），`--tools`/`--no-tools` 仍可覆盖。v1.0.3+ 口径同步：CLI `--tools`/`--exclude-tools` 现支持 `*` pattern，且 `--tools` 不再移除 MCP 工具（除非条目以 `mcp__` 开头） |
 
 ### 技能与扩展配置
 
@@ -142,10 +142,17 @@ Provider 认证不在 `settings.json` 里——它在以下位置：
 | 键 | 类型 | 作用 | 默认值 | 备注 |
 |---|------|------|--------|------|
 | `cacheWarming` | string | prompt cache 预热模式 | `"streaming"` | `"off"`/`"streaming"`/`"idle"`（`settings-manager.ts:82`、`:182`，v1.0.0 行号）。**global-only**——每次刷新是一次真实付费请求，不提供项目级覆盖 |
-| `compaction.reserveTokens` | number | 压缩预留 token | `16384` | |
+| `compaction.reserveTokens` | number | **只决定自动压缩何时开始**（v1.4.0 起不再限制摘要输出；摘要改用模型输出上限） | `16384` | `docs/compaction.md:35`；`generateSummary` 的参数已改名 `_reserveTokens` 并注明 Unused（`core/compaction/compaction.ts:648`） |
 | `compaction.keepRecentTokens` | number | 压缩保留最近消息 token | `20000` | |
 | `compaction.modelOverrides` | Record | 按 `"provider/modelId"` 键覆盖上面两项 | `{}` | `settings-manager.ts:32` 声明、`:940` 读取（按当前 modelKey 查 override，未命中回落全局默认，v1.0.0 行号）；不同模型上下文窗口差异大时按模型调预算 |
 | `compat.allowedFallbackModels` | — | Bedrock/Anthropic 兼容层：声明允许的 fallback 模型 | 无 | **`packages/ai/src/providers/compat-schema.ts:485`**（v1.2.0 迁出；v1.0.3 时为 `ai/src/types.ts:839`）（#9294）；为空/缺省时调用方必须省略 `fallbacks` 字段（Anthropic 对无许可 fallback 目标的模型拒绝该字段） |
+
+
+### 会话与分享（v1.3.0 新增）
+
+| 键 | 类型 | 含义 | 默认 | 说明 |
+|---|---|---|---|---|
+| `sessionShareDestination` | `"auto" \| "gist" \| "radius"` | `/share` 上传到哪 | `"auto"` | `auto`：有 Radius 认证走 Radius，否则私有 gist；`radius`：不回退，未登录要求先 `/login radius`；`gist`：跳过 Radius。schema `core/settings-schema.ts:224-230`、分派 `modes/interactive/session-share.ts:69-77`。**setter 只写 global 层** |
 
 cache warming 的成本模型（何时值得刷）见 [13_token_budget_audit.md](./13_token_budget_audit.md)。
 
@@ -200,11 +207,11 @@ pi **读**项目层的 `.pi/settings.json`，且项目值覆盖 agent-dir 值（
 
 ## 锚点
 
-- 本机审计的 settings：`~/.pi/agent/settings.json`（只有 `defaultProvider` / `defaultModel` / `thinking` / 主题）
+- 本机审计的 settings：`~/.pi/agent/settings.json`（只有 `defaultProvider` / `defaultModel` / `defaultThinkingLevel` / 主题（`thinking` 不是有效键））
 - `packages/coding-agent/docs/usage.md`（settings 的 CLI 参数对照表）
 - `packages/coding-agent/docs/skills.md`（"Using Skills from Other Harnesses" 的官方做法——`skills` 数组）
-- `packages/coding-agent/src/core/settings-manager.ts`：`CACHE_WARMING_MODES`（**v1.2.0：L52**；v1.0.0 时为 L82）、`cacheWarming` 读取（**L915**）、`CompactionSettings.modelOverrides`（schema **L22**）、override 读取（**L831**）。文件 1533→**1428** 行
-- v1.0.0 键锚点（均已对照当前工作树核实）：`QuietStartup` 类型（**v1.2.0：于 `settings-schema.ts:465` 定义**，`:20`/`:42` 处 import）、`quietStartup` getter（**`settings-manager.ts:981-983`**）、`getQuietStartup()`（**`:981`**）、`tuiMode` getter（**`:1241-1242`**）、`getTuiMode()`（**`:1241`**）、`fullscreenWheelScrollLines`（**`:1284`**）、`getFullscreenWheelScrollLines()`（`:1389-1396`）、`defaultTools` 字段（`:168`）与 `+name/-name` 合并/解析（`:225-250`）、`DEFAULT_TOOL_NAMES`（`:215`）；`--tui-mode` 帮助文本（`cli/args.ts:326`）
+- `packages/coding-agent/src/core/settings-manager.ts`：`CACHE_WARMING_MODES`（**v1.4.0：L54**；v1.0.0 时为 L82）、`cacheWarming` 读取（**L929**）、`CompactionSettings.modelOverrides`（schema **L22**）、override 读取按名检索。文件 1533→1428→**1443** 行（v1.4.0）
+- v1.0.0 键锚点（均已对照当前工作树核实）：`QuietStartup` 类型（**v1.2.0：于 `settings-schema.ts:465` 定义**，`:20`/`:42` 处 import）、`quietStartup` getter（**`settings-manager.ts:996-998`**）、`getQuietStartup()`（**`:996`**）、`tuiMode` getter（**`:1256-1257`**）、`getTuiMode()`（**`:1256`**）、`fullscreenWheelScrollLines`（**`:1299`**）（v1.4.0）、`getFullscreenWheelScrollLines()`（`:1389-1396`）、`defaultTools` 字段（`:168`）与 `+name/-name` 合并/解析（`:225-250`）、`DEFAULT_TOOL_NAMES`（`:215`）；`--tui-mode` 帮助文本（`cli/args.ts:326`）
 - **`packages/ai/src/providers/compat-schema.ts`：`allowedFallbackModels`（L485）**——v1.2.0 已不在 `ai/src/types.ts`（该文件 1172→893 行，类型外迁）
 - `packages/coding-agent/src/core/cache-warmer.ts`：成本模型常量与刷新时机（L20、L26、L29）
 - 官方 docs：`packages/coding-agent/docs/settings.md`（`#cache-warming` 小节）

@@ -165,7 +165,7 @@ extensions/<name>/
 | B 进程内真会话 | 公开 SDK：`createAgentSession` + `DefaultResourceLoader`（`extensionFactories`，见 `examples/sdk/06-extensions.ts`）+ 脚本化 provider（一个测试夹具扩展调 `pi.registerProvider()`，见 `examples/sdk/02-custom-model.ts` 与 `docs/custom-provider.md`） | 集成证据的唯一来源：真 agent loop、真工具分发、真转录 | ~10ms/会话 |
 | C 子进程 smoke | spawn `pi --extension driver`（或安装形态），断言 stdout JSON | 发布形态、可选性、跨扩展命名冲突 | ~秒级 |
 
-**分发事实**（决策依据）：pi 的测试 harness 在 `packages/coding-agent/test/` 内，**未随包导出**（package.json `exports` 只有 `.`/`rpc-entry`/`client`/`experimental/plugin`）。外部 repo 拿不到现成 harness，必须自带薄层——车道 B 用公开 SDK 拼（两个官方例子就是拼块），仓内 `test/suite/harness.ts` 是抄写模板而非可 import 的依赖。车道 A 的 mock-API 风格在 pi 仓内大量存在（`plan-mode-extension.test.ts` 等），**收口条款：它只许测纯逻辑 handler，集成证据必须出自车道 B**——这是把 DSH"hand-built 充当组装证据不算数"投影到 pi 的现存双风格上。
+**分发事实**（决策依据）：pi 的测试 harness 在 `packages/coding-agent/test/` 内，**未随包导出**（v1.4.0 的 package.json `exports` 只有 `.` 与 `./rpc-entry`；`client`/`experimental/plugin` 是 v1.0.0 的旧条目，已随 experimental 栈删除）。外部 repo 拿不到现成 harness，必须自带薄层——车道 B 用公开 SDK 拼（两个官方例子就是拼块），仓内 `test/suite/harness.ts` 是抄写模板而非可 import 的依赖。车道 A 的 mock-API 风格在 pi 仓内大量存在（`plan-mode-extension.test.ts` 等），**收口条款：它只许测纯逻辑 handler，集成证据必须出自车道 B**——这是把 DSH"hand-built 充当组装证据不算数"投影到 pi 的现存双风格上。
 
 ### 6.3 CI 车道与检查单要点
 

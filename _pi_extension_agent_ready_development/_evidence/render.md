@@ -2605,3 +2605,89 @@ release：lockstep、仓外本地 smoke、tag 后不重跑脚本；smoke 未过�
   ```
 
 核验：`v1.4.0`
+
+## repo-harness/06-scope-discipline-and-cost-contracts.md
+
+### E111
+
+核心最小；不属于核心的功能做成扩展，膨胀核心的 PR 会被拒；hook 点也要先讨论
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `First things first: **pi's core is minimal**.`，提示行 7
+
+  ```text
+  First things first: **pi's core is minimal**.
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.`，提示行 9
+
+  ```text
+  If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Pi's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions.  Even hook points for extensions however should be well considered and discussed to avoid adding unmaintainable bloat and complex interactions.`，提示行 11
+
+  ```text
+  Pi's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions.  Even hook points for extensions however should be well considered and discussed to avoid adding unmaintainable bloat and complex interactions.
+  ```
+
+核验：`v1.4.0`
+
+### E112
+
+入口即成本合同：按 entries 声明 maxFiles/forbid/allow 预算，超预算在提交时失败；未列出的入口不受检查
+
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `* Entry points are cost contracts.`，提示行 3
+
+  ```text
+  * Entry points are cost contracts.
+  ```
+
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `* Budgets are deliberate. Entries with no budget remain unbounded; each listed entry states the`，提示行 33
+
+  ```text
+  * Budgets are deliberate. Entries with no budget remain unbounded; each listed entry states the
+  ```
+
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `"./models": {`，提示行 38
+
+  ```text
+  "./models": {
+  ```
+
+核验：`v1.4.0`
+
+### E113
+
+自动关闭制造审阅缓冲，让维护者按自己的节奏重开达标 issue
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `pi receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality bar in this guide or do not follow CONTRIBUTING.md. Some are slung at the repository mindlessly via an agent instead of being reviewed and shaped by the person submitting them. Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.`，提示行 81
+
+  ```text
+  pi receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality bar in this guide or do not follow CONTRIBUTING.md. Some are slung at the repository mindlessly via an agent instead of being reviewed and shaped by the person submitting them. Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.
+  ```
+
+核验：`v1.4.0`
+
+### E114
+
+第三方 package 以完全权限运行，安装前须审源码；宿主提供包须 peerDependencies 且不打包
+
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Project packages are installed and loaded only after project trust is resolved. Packages can execute extension code and can include skills that instruct the model to run programs. Review third-party package source before installing it. Review project package declarations before granting project trust.`，提示行 21
+
+  ```text
+  Project packages are installed and loaded only after project trust is resolved. Packages can execute extension code and can include skills that instruct the model to run programs. Review third-party package source before installing it. Review project package declarations before granting project trust.
+  ```
+
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
+
+  ```text
+  Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.
+  ```
+
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Do not list host-provided packages in `dependencies`. A physical copy can bypass Pi's extension module mapping in compiled ESM and create duplicate classes, registries, and initialization work. Pi reports an extension warning when it detects this manifest configuration. Other Pi packages used as dependencies must be included in the published tarball and referenced through their `node_modules` resource paths.`，提示行 90
+
+  ```text
+  Do not list host-provided packages in `dependencies`. A physical copy can bypass Pi's extension module mapping in compiled ESM and create duplicate classes, registries, and initialization work. Pi reports an extension warning when it detects this manifest configuration. Other Pi packages used as dependencies must be included in the published tarball and referenced through their `node_modules` resource paths.
+  ```
+
+核验：`v1.4.0`

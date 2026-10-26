@@ -1714,3 +1714,263 @@ scripts/issues：本机批量 triage，每个 issue 一个 durable 会话，15 �
   ```
 
 核验：`v1.4.0`
+
+## sdlc-reference/06-review-and-human-role.md
+
+### E072
+
+The One Rule：必须理解自己的代码；允许 AI 写作，禁止不理解而提交
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.`，提示行 15
+
+  ```text
+  **You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.`，提示行 17
+
+  ```text
+  Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.
+  ```
+
+核验：`v1.4.0`
+
+### E073
+
+agent 从仓库根运行以拾取 AGENTS.md；最终维护者决定不交给 AI
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.`，提示行 19
+
+  ```text
+  If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `### Why not let AI triage everything?`，提示行 91
+
+  ```text
+  ### Why not let AI triage everything?
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.`，提示行 93
+
+  ```text
+  AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.
+  ```
+
+核验：`v1.4.0`
+
+### E074
+
+审阅缓冲：默认自动关闭、允许无回复、周末不保证审、封禁写入制度
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `This guide exists to save both sides time.`，提示行 3
+
+  ```text
+  This guide exists to save both sides time.
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `### Why are new issues and PRs auto-closed?`，提示行 79
+
+  ```text
+  ### Why are new issues and PRs auto-closed?
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `### Why do some issues get no reply?`，提示行 87
+
+  ```text
+  ### Why do some issues get no reply?
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx`，提示行 25
+
+  ```text
+  Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `## Blocking`，提示行 50
+
+  ```text
+  ## Blocking
+  ```
+
+核验：`v1.4.0`
+
+### E075
+
+AGENTS 语调：无 emoji、无套话、技术散文直接
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- No emojis in commits, issues, PR comments, or code`，提示行 6
+
+  ```text
+  - No emojis in commits, issues, PR comments, or code
+  ```
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- Technical prose only, be direct`，提示行 8
+
+  ```text
+  - Technical prose only, be direct
+  ```
+
+核验：`v1.4.0`
+
+### E076
+
+deslop：删除无当前需求的推测性抽象与防御；不为减行数换抽象、不削弱测试
+
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.`，提示行 19
+
+  ```text
+  - Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.
+  ```
+
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Remove speculative defensive programming inside trusted code. Validate at real trust boundaries; rely on types and established invariants internally.`，提示行 20
+
+  ```text
+  - Remove speculative defensive programming inside trusted code. Validate at real trust boundaries; rely on types and established invariants internally.
+  ```
+
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Do not keep fallback behavior for states that should be impossible. Prefer fixing the invariant or type model.`，提示行 21
+
+  ```text
+  - Do not keep fallback behavior for states that should be impossible. Prefer fixing the invariant or type model.
+  ```
+
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Do not replace clear code with a new abstraction solely to reduce line count.`，提示行 54
+
+  ```text
+  - Do not replace clear code with a new abstraction solely to reduce line count.
+  ```
+
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Do not weaken tests to permit simplification. Update tests only when an approved behavior change or a cleaner equivalent structure requires it.`，提示行 55
+
+  ```text
+  - Do not weaken tests to permit simplification. Update tests only when an approved behavior change or a cleaner equivalent structure requires it.
+  ```
+
+核验：`v1.4.0`
+
+### E077
+
+代码质量：读完整文件、非必要不用 any；单行唯一 call site 的 helper 内联（deslop 的相近判据）
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes.`，提示行 17
+
+  ```text
+  - Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes.
+  ```
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- No `any` unless absolutely necessary.`，提示行 18
+
+  ```text
+  - No `any` unless absolutely necessary.
+  ```
+
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Inline trivial helpers, wrappers, adapters, and pass-through layers when they obscure rather than clarify behavior.`，提示行 17
+
+  ```text
+  - Inline trivial helpers, wrappers, adapters, and pass-through layers when they obscure rather than clarify behavior.
+  ```
+
+核验：`v1.4.0`
+
+### E078
+
+删除看似有意的功能前先问；不保留向后兼容除非用户要求
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- Always ask before removing functionality or code that appears intentional.`，提示行 25
+
+  ```text
+  - Always ask before removing functionality or code that appears intentional.
+  ```
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- Do not preserve backward compatibility unless the user asks for it.`，提示行 26
+
+  ```text
+  - Do not preserve backward compatibility unless the user asks for it.
+  ```
+
+核验：`v1.4.0`
+
+### E079
+
+deslop 对重大删除设审批门：列清删什么/为什么/影响/替代并等显式批准，独立决定不打包
+
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `## Approval gate for significant removals`，提示行 27
+
+  ```text
+  ## Approval gate for significant removals
+  ```
+
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `Routine, behavior-preserving cleanup does not require approval, such as inlining a single-use trivial helper, removing an unreachable branch proven impossible by the type model, or deleting newly added duplication. If uncertain whether a removal is significant, ask.`，提示行 48
+
+  ```text
+  Routine, behavior-preserving cleanup does not require approval, such as inlining a single-use trivial helper, removing an unreachable branch proven impossible by the type model, or deleting newly added duplication. If uncertain whether a removal is significant, ask.
+  ```
+
+核验：`v1.4.0`
+
+### E080
+
+规则与用户指令冲突时，先请求显式确认再执行
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `## User Override`，提示行 123
+
+  ```text
+  ## User Override
+  ```
+
+核验：`v1.4.0`
+
+### E081
+
+大改走 RFC；Philosophy 规定核心最小、非核心做成扩展、hook 点也要先讨论
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `## Where can I learn about plans?`，提示行 99
+
+  ```text
+  ## Where can I learn about plans?
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `## Philosophy`，提示行 5
+
+  ```text
+  ## Philosophy
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `First things first: **pi's core is minimal**.`，提示行 7
+
+  ```text
+  First things first: **pi's core is minimal**.
+  ```
+
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.`，提示行 9
+
+  ```text
+  If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
+  ```
+
+核验：`v1.4.0`
+
+### E082
+
+/wr 收尾步骤与固定免责行；只提交本会话文件
+
+- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/wr.md) — text: `- If the conversation already mentions a GitHub issue or PR, use that existing context.`，提示行 12
+
+  ```text
+  - If the conversation already mentions a GitHub issue or PR, use that existing context.
+  ```
+
+- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/wr.md) — text: `- Never stage unrelated files.`，提示行 35
+
+  ```text
+  - Never stage unrelated files.
+  ```
+
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- End every AI-posted comment with the AI-generated disclaimer line specified by the originating prompt (e.g. `This comment is AI-generated by `/wr``).`，提示行 92
+
+  ```text
+  - End every AI-posted comment with the AI-generated disclaimer line specified by the originating prompt (e.g. `This comment is AI-generated by `/wr``).
+  ```
+
+核验：`v1.4.0`

@@ -2677,6 +2677,414 @@
 			],
 			"page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
 			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E072",
+			"claim": "The One Rule：必须理解自己的代码；允许 AI 写作，禁止不理解而提交",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed."
+					},
+					"quote": "**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.",
+					"hintLine": 15,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "Using AI to write code is fine. Submitting AI-generated slop without understanding it is not."
+					},
+					"quote": "Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.",
+					"hintLine": 17,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E073",
+			"claim": "agent 从仓库根运行以拾取 AGENTS.md；最终维护者决定不交给 AI",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file."
+					},
+					"quote": "If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.",
+					"hintLine": 19,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "### Why not let AI triage everything?"
+					},
+					"quote": "### Why not let AI triage everything?",
+					"hintLine": 91,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate."
+					},
+					"quote": "AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.",
+					"hintLine": 93,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E074",
+			"claim": "审阅缓冲：默认自动关闭、允许无回复、周末不保证审、封禁写入制度",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "This guide exists to save both sides time."
+					},
+					"quote": "This guide exists to save both sides time.",
+					"hintLine": 3,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "### Why are new issues and PRs auto-closed?"
+					},
+					"quote": "### Why are new issues and PRs auto-closed?",
+					"hintLine": 79,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "### Why do some issues get no reply?"
+					},
+					"quote": "### Why do some issues get no reply?",
+					"hintLine": 87,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx"
+					},
+					"quote": "Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx",
+					"hintLine": 25,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "## Blocking"
+					},
+					"quote": "## Blocking",
+					"hintLine": 50,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E075",
+			"claim": "AGENTS 语调：无 emoji、无套话、技术散文直接",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "- No emojis in commits, issues, PR comments, or code"
+					},
+					"quote": "- No emojis in commits, issues, PR comments, or code",
+					"hintLine": 6,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Technical prose only, be direct"
+					},
+					"quote": "- Technical prose only, be direct",
+					"hintLine": 8,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E076",
+			"claim": "deslop：删除无当前需求的推测性抽象与防御；不为减行数换抽象、不削弱测试",
+			"sources": [
+				{
+					"path": ".pi/prompts/deslop.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement."
+					},
+					"quote": "- Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.",
+					"hintLine": 19,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/deslop.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Remove speculative defensive programming inside trusted code. Validate at real trust boundaries; rely on types and established invariants internally."
+					},
+					"quote": "- Remove speculative defensive programming inside trusted code. Validate at real trust boundaries; rely on types and established invariants internally.",
+					"hintLine": 20,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/deslop.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Do not keep fallback behavior for states that should be impossible. Prefer fixing the invariant or type model."
+					},
+					"quote": "- Do not keep fallback behavior for states that should be impossible. Prefer fixing the invariant or type model.",
+					"hintLine": 21,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/deslop.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Do not replace clear code with a new abstraction solely to reduce line count."
+					},
+					"quote": "- Do not replace clear code with a new abstraction solely to reduce line count.",
+					"hintLine": 54,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/deslop.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Do not weaken tests to permit simplification. Update tests only when an approved behavior change or a cleaner equivalent structure requires it."
+					},
+					"quote": "- Do not weaken tests to permit simplification. Update tests only when an approved behavior change or a cleaner equivalent structure requires it.",
+					"hintLine": 55,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E077",
+			"claim": "代码质量：读完整文件、非必要不用 any；单行唯一 call site 的 helper 内联（deslop 的相近判据）",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes."
+					},
+					"quote": "- Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes.",
+					"hintLine": 17,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "- No `any` unless absolutely necessary."
+					},
+					"quote": "- No `any` unless absolutely necessary.",
+					"hintLine": 18,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/deslop.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Inline trivial helpers, wrappers, adapters, and pass-through layers when they obscure rather than clarify behavior."
+					},
+					"quote": "- Inline trivial helpers, wrappers, adapters, and pass-through layers when they obscure rather than clarify behavior.",
+					"hintLine": 17,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E078",
+			"claim": "删除看似有意的功能前先问；不保留向后兼容除非用户要求",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Always ask before removing functionality or code that appears intentional."
+					},
+					"quote": "- Always ask before removing functionality or code that appears intentional.",
+					"hintLine": 25,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Do not preserve backward compatibility unless the user asks for it."
+					},
+					"quote": "- Do not preserve backward compatibility unless the user asks for it.",
+					"hintLine": 26,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E079",
+			"claim": "deslop 对重大删除设审批门：列清删什么/为什么/影响/替代并等显式批准，独立决定不打包",
+			"sources": [
+				{
+					"path": ".pi/prompts/deslop.md",
+					"locator": {
+						"kind": "text",
+						"value": "## Approval gate for significant removals"
+					},
+					"quote": "## Approval gate for significant removals",
+					"hintLine": 27,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/deslop.md",
+					"locator": {
+						"kind": "text",
+						"value": "Routine, behavior-preserving cleanup does not require approval, such as inlining a single-use trivial helper, removing an unreachable branch proven impossible by the type model, or deleting newly added duplication. If uncertain whether a removal is significant, ask."
+					},
+					"quote": "Routine, behavior-preserving cleanup does not require approval, such as inlining a single-use trivial helper, removing an unreachable branch proven impossible by the type model, or deleting newly added duplication. If uncertain whether a removal is significant, ask.",
+					"hintLine": 48,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E080",
+			"claim": "规则与用户指令冲突时，先请求显式确认再执行",
+			"sources": [
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "## User Override"
+					},
+					"quote": "## User Override",
+					"hintLine": 123,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E081",
+			"claim": "大改走 RFC；Philosophy 规定核心最小、非核心做成扩展、hook 点也要先讨论",
+			"sources": [
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "## Where can I learn about plans?"
+					},
+					"quote": "## Where can I learn about plans?",
+					"hintLine": 99,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "## Philosophy"
+					},
+					"quote": "## Philosophy",
+					"hintLine": 5,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "First things first: **pi's core is minimal**."
+					},
+					"quote": "First things first: **pi's core is minimal**.",
+					"hintLine": 7,
+					"volatility": "medium"
+				},
+				{
+					"path": "CONTRIBUTING.md",
+					"locator": {
+						"kind": "text",
+						"value": "If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected."
+					},
+					"quote": "If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.",
+					"hintLine": 9,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
+		},
+		{
+			"id": "E082",
+			"claim": "/wr 收尾步骤与固定免责行；只提交本会话文件",
+			"sources": [
+				{
+					"path": ".pi/prompts/wr.md",
+					"locator": {
+						"kind": "text",
+						"value": "- If the conversation already mentions a GitHub issue or PR, use that existing context."
+					},
+					"quote": "- If the conversation already mentions a GitHub issue or PR, use that existing context.",
+					"hintLine": 12,
+					"volatility": "medium"
+				},
+				{
+					"path": ".pi/prompts/wr.md",
+					"locator": {
+						"kind": "text",
+						"value": "- Never stage unrelated files."
+					},
+					"quote": "- Never stage unrelated files.",
+					"hintLine": 35,
+					"volatility": "medium"
+				},
+				{
+					"path": "AGENTS.md",
+					"locator": {
+						"kind": "text",
+						"value": "- End every AI-posted comment with the AI-generated disclaimer line specified by the originating prompt (e.g. `This comment is AI-generated by `/wr``)."
+					},
+					"quote": "- End every AI-posted comment with the AI-generated disclaimer line specified by the originating prompt (e.g. `This comment is AI-generated by `/wr``).",
+					"hintLine": 92,
+					"volatility": "medium"
+				}
+			],
+			"page": "sdlc-reference/06-review-and-human-role.md",
+			"checkedAt": "v1.4.0"
 		}
 	]
 }

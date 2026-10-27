@@ -40,20 +40,20 @@ convertToLlm() → Provider 请求（before_provider_request 是最后一站）
 
 ### 2. 求值：唯一的求值入口在 packages/ai
 
-[transcript.ts](../../packages/ai/src/utils/transcript.ts) 是唯一的重放器：`getCurrentTools()`（:57-66）按顺序应用每条 system message 的工具差量；`getCurrentSystemMessage()`（:73-96）把所有 system message 折叠成"当前 prompt + 当前工具"的单条消息。provider 侧拿到的 system 状态只能从这里出来——不存在第二个真相源。
+[transcript.ts](../../packages/ai/src/utils/transcript.ts) 是唯一的重放器：`getCurrentTools()`按顺序应用每条 system message 的工具差量；`getCurrentSystemMessage()`把所有 system message 折叠成"当前 prompt + 当前工具"的单条消息。provider 侧拿到的 system 状态只能从这里出来——不存在第二个真相源。
 
 ### 3. 一致性：agent loop 把差量算到"重放必相等"为止
 
-[E013](../_evidence/render.md#e013) 的 `declareToolChanges()` 把 pending system message 的工具字段替换为「已提交 transcript 重放出的工具状态」与「可执行集 `context.tools`」的差量。注释原话即合同：**"so replay always yields exactly `context.tools`"**。扩展想在请求里改工具，改的是声明面；运行时可执行的集合永远以重放结果为准。
+[agent-loop.ts（E013）](../_evidence/render.md#e013) 的 `declareToolChanges()` 把 pending system message 的工具字段替换为「已提交 transcript 重放出的工具状态」与「可执行集 `context.tools`」的差量。注释原话即合同：**"so replay always yields exactly `context.tools`"**。扩展想在请求里改工具，改的是声明面；运行时可执行的集合永远以重放结果为准。
 
 ### 4. 压缩与恢复不破坏它
 
-- 压缩：compaction entry 携带压缩边界处的**完整** prompt/tool checkpoint，成为压缩后上下文的 leading system message；被保留区间里的旧 system message 以它为准丢弃（[session-format.md](../../packages/coding-agent/docs/session-format.md) compaction 节；[E014](../_evidence/render.md#e014)："System messages are prompt state, not conversation; the compaction entry carries their replay."）。
-- 恢复：SDK resume 时 `buildSessionContext()` 折叠出的消息直接灌进 Agent 的 `initialState.messages`（[E015](../_evidence/render.md#e015)，`initialState.messages` 在 :409）；`AgentSession._refreshFinalizedContext()`（[E016](../_evidence/render.md#e016)）在边界提交、压缩等时机把 `agent.state.messages` 与投影重新对齐。
+- 压缩：compaction entry 携带压缩边界处的**完整** prompt/tool checkpoint，成为压缩后上下文的 leading system message；被保留区间里的旧 system message 以它为准丢弃（[session-format.md](../../packages/coding-agent/docs/session-format.md) compaction 节；[compaction.ts（E014）](../_evidence/render.md#e014)："System messages are prompt state, not conversation; the compaction entry carries their replay."）。
+- 恢复：SDK resume 时 `buildSessionContext()` 折叠出的消息直接灌进 Agent 的 `initialState.messages`（[sdk.ts（E015）](../_evidence/render.md#e015)）；`AgentSession._refreshFinalizedContext()`（[agent-session.ts（E016）](../_evidence/render.md#e016)）在边界提交、压缩等时机把 `agent.state.messages` 与投影重新对齐。
 
 ## 这条不变量被当作测试合同，而不是希望
 
-[E017](../_evidence/render.md#e017)："keeps tool declarations stable across a session JSON round-trip"——把 transcript `JSON.parse(JSON.stringify(...))` 往返后断言重放出的声明不变，:295 注释原话 "Simulate a resume: the persisted JSON must replay to the same declarations."
+[system-prompt-updates.test.ts（E017）](../_evidence/render.md#e017)："keeps tool declarations stable across a session JSON round-trip"——把 transcript `JSON.parse(JSON.stringify(...))` 往返后断言重放出的声明不变；注释原话 "Simulate a resume: the persisted JSON must replay to the same declarations."
 
 这是 Pi 版的"快照测试"：**不冻结某一次装配的字节，而是冻结"往返后重放相等"这个性质。** DSH 的快照 diff 抓的是"装配结果变了没"；Pi 的 round-trip 抓的是"日志还能不能忠实重建装配"。
 
@@ -71,12 +71,12 @@ convertToLlm() → Provider 请求（before_provider_request 是最后一站）
 
 | 主张 | 位置 |
 |---|---|
-| 无独立 prompt 状态条目；重放即当前状态 | `packages/coding-agent/docs/session-format.md`（SessionMessageEntry 节、:87 兼容路径） |
-| 差量求值入口 | `packages/ai/src/utils/transcript.ts:57-66, :73-96, :104-112` |
-| 重放必等合同 | `packages/agent/src/agent-loop.ts:323-331` |
-| 落盘时机：`message_end` → `appendMessage`（system/user/assistant/toolResult 四类） | `packages/coding-agent/src/core/agent-session.ts:1165` |
-| resume 装配 | `packages/coding-agent/src/core/sdk.ts:200-222, :394-399` |
-| 运行时对齐 | `packages/coding-agent/src/core/agent-session.ts:926-932` |
-| 压缩携带 checkpoint | `packages/coding-agent/src/core/compaction/compaction.ts:100`；session-format.md compaction 节 |
+| 无独立 prompt 状态条目；重放即当前状态 | `packages/coding-agent/docs/session-format.md`（SessionMessageEntry 节） |
+| 差量求值入口 | `packages/ai/src/utils/transcript.ts`（getCurrentTools / getCurrentSystemMessage） |
+| 重放必等合同 | `packages/agent/src/agent-loop.ts`（declareToolChanges） |
+| 落盘时机：`message_end` → `appendMessage`（system/user/assistant/toolResult 四类） | `packages/coding-agent/src/core/agent-session.ts`（appendMessage） |
+| resume 装配 | `packages/coding-agent/src/core/sdk.ts`（initialState.messages / buildSessionContext） |
+| 运行时对齐 | `packages/coding-agent/src/core/agent-session.ts`（_refreshFinalizedContext） |
+| 压缩携带 checkpoint | `packages/coding-agent/src/core/compaction/compaction.ts`（compaction entry 的 checkpoint）；session-format.md compaction 节 |
 | round-trip 合同测试 | `packages/coding-agent/test/system-prompt-updates.test.ts:276-302` |
 | 请求局部变换与流事件边界 | `packages/coding-agent/docs/extensions.md`（Events and concurrency） |

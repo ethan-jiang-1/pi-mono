@@ -10,10 +10,10 @@
 
 ### 1. 不变量是结构性实现的（transcript 即请求源）
 
-- [docs/session-format.md](../../packages/coding-agent/docs/session-format.md)（SessionMessageEntry 节，:80）：原话 "System messages carry the prompt and tool loadout: the first request of a session persists one with every prompt section and tool declaration, and later changes persist as system messages that patch `sections` by name (`null` removes one) and list `toolsAdded`/`toolsRemoved`. Replaying them in order yields the current prompt and tools; **there is no separate prompt state entry**."；:87 说明旧会话的兼容路径（首个请求补声明、重放方式相同）。
+- [docs/session-format.md](../../packages/coding-agent/docs/session-format.md)（SessionMessageEntry 节）：原话 "System messages carry the prompt and tool loadout: the first request of a session persists one with every prompt section and tool declaration, and later changes persist as system messages that patch `sections` by name (`null` removes one) and list `toolsAdded`/`toolsRemoved`. Replaying them in order yields the current prompt and tools; **there is no separate prompt state entry**."；:87 说明旧会话的兼容路径（首个请求补声明、重放方式相同）。
 - [packages/agent/src/agent-loop.ts:323-331](../../packages/agent/src/agent-loop.ts)：`declareToolChanges` 的合同注释——"the transcript's system messages declare what the model may call … so replay always yields exactly `context.tools`"。实现把 pending system message 的工具字段替换为「已提交 transcript 与可执行集的差量」。
 - [packages/ai/src/utils/transcript.ts:57-66](../../packages/ai/src/utils/transcript.ts)：`getCurrentTools`——"Resolve the tools available after applying every transcript delta in order"；:73-96 `getCurrentSystemMessage`——"Replay every system message into one leading system message holding the current prompt and tools"；:98-102 `getCurrentSystemPrompt`；:104-112 无 mid-conversation system message 的 API 的折叠路径。
-- [E014](../_evidence/render.md#e014)：round-trip 合同测试，:295 注释 "Simulate a resume: the persisted JSON must replay to the same declarations."。
+- [E014](../_evidence/render.md#e014)：round-trip 合同测试，注释 "Simulate a resume: the persisted JSON must replay to the same declarations."。
 - compaction 不破坏不变量：[docs/session-format.md](../../packages/coding-agent/docs/session-format.md) compaction 节（`systemMessage` 字段 = 压缩边界处的完整 prompt/tool checkpoint）；[E015](../_evidence/render.md#e015) 注释 "System messages are prompt state, not conversation; the compaction entry carries their replay."。
 - 边界（账本级而非逐字节级）：[packages/coding-agent/docs/extensions.md](../../packages/coding-agent/docs/extensions.md)（Events and concurrency 节）——`context` / `context_with_system` 可做请求局部变换，强制 prompt 可与结构化记录不同；provider 流事件不持久化。与 12 号 FAQ research.md 第 6 节一致。
 
@@ -46,7 +46,7 @@
 ### 5. 轨迹资产的官方通道
 
 - 类型面：[E020](../_evidence/render.md#e020)（`SessionHeader`、`message` / `model_change` / `compaction` / `branch_summary` / `label` / `context_edit` 等 entry）。
-- 迁移：:286-329 `migrateV1ToV2` / `migrateV2ToV3`（载入时就地变异）；[docs/session-format.md](../../packages/coding-agent/docs/session-format.md)（version 节，:24-30）"Existing sessions are automatically migrated to the current version (v3) when loaded."。
+- 迁移：`migrateV1ToV2` / `migrateV2ToV3`（载入时就地变异）；[docs/session-format.md](../../packages/coding-agent/docs/session-format.md)（version 节）"Existing sessions are automatically migrated to the current version (v3) when loaded."。
 - 可移植：`/export` jsonl（[E021](../_evidence/render.md#e021)）；`/import`（[E022](../_evidence/render.md#e022)）；分享（[E023](../_evidence/render.md#e023)）；bug-report 自动携带（[E024](../_evidence/render.md#e024) `files.push({ name: "session.jsonl", ... })`）。
 
 ### 6. 「不是测试语料」的反证（grep 口径）

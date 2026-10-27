@@ -299,7 +299,7 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 
 ## 0016 轮：claim-first 重构与证据台账
 
-正文不再携带版本号与行号；引用统一为 `[E###]`，指向 `_evidence/render.md` 的对应标题。坐标、引文与核验时间在 `_evidence/claims.json`。
+机制页正文不再携带行号锚点；README/00-index 允许基线版本声明。引用统一为 `[E###]`，指向 `_evidence/render.md` 的对应标题。坐标、引文与核验时间在 `_evidence/claims.json`。
 
 **同步流程（本目录）**
 

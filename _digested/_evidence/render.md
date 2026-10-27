@@ -13,7 +13,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E001
 
-证据：检查入口
+仓库把质量规则写成一条 npm run check 链：biome、依赖、类型、入口图、install-lock 与 browser smoke
 
 - [`package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/package.json) — text: `"build:native:win32": "npm --prefix packages/tui run build:native:win32", "check": "node scripts/biome-check.mjs --write`，提示行 20
 
@@ -25,7 +25,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E002
 
-证据：类型检查配置
+根 tsconfig 的 include 覆盖 packages/*/src、test 与 examples，类型检查面与仓库结构一致
 
 - [`tsconfig.json`](https://github.com/earendil-works/pi/blob/v1.4.0/tsconfig.json) — text: `"include": ［"scripts/model-catalog-protocol.ts", "scripts/model-catalog-protocol.test.ts", "packages/*/src/**/*", "packa`，提示行 52
 
@@ -37,7 +37,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E003
 
-证据：runtime-deps 负例测试
+runtime-deps 检查有回归测试，覆盖 workspace 解析与缺依赖导致的失败
 
 - [`scripts/check-runtime-deps.test.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-runtime-deps.test.mjs) — text: `// #9132: workspace resolution and installing every release package masked a missing runtime dependency. test("rejects u`，提示行 27
 
@@ -51,7 +51,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E004
 
-证据：CONTRIBUTING:11
+核心保持最小且可被扩展操纵；扩展 hook 点也要经讨论
 
 - [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Pi's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions. Even hoo`，提示行 11
 
@@ -63,7 +63,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E005
 
-证据：README:100
+根 README 把贡献规则与开发规则指向 CONTRIBUTING.md 与 AGENTS.md
 
 - [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `See ［CONTRIBUTING.md］(CONTRIBUTING.md) for contribution guidelines and ［AGENTS.md］(AGENTS.md) for project-specific rules`，提示行 100
 
@@ -77,7 +77,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E006
 
-证据：Agent.prompt 的错误消息
+session 出错后清空错误态与 steer/follow-up 两条队列，避免残留状态影响下一轮
 
 - [`packages/agent/src/agent.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/agent/src/agent.ts) — text: `this._state.errorMessage = undefined; this.clearFollowUpQueue(); this.clearSteeringQueue(); }`，提示行 374
 
@@ -89,7 +89,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E007
 
-证据：其它负例
+runtime-deps 的负例测试覆盖 dev-only 依赖、副作用 import、混合导出与字面量运行时加载
 
 - [`scripts/check-runtime-deps.test.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-runtime-deps.test.mjs) — text: `test("rejects dev-only dependencies, side-effect imports, mixed exports, and literal runtime loads", async (t) => { cons`，提示行 57
 
@@ -101,7 +101,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E008
 
-证据：test:scripts
+仓库提供 profile:tui 与 profile:rpc 脚本用于性能剖析
 
 - [`package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/package.json) — text: `"profile:tui": "node scripts/profile-coding-agent-node.mjs --mode tui", "profile:rpc": "node scripts/profile-coding-agen`，提示行 38
 
@@ -115,7 +115,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E009
 
-证据：agent-loop:705–775
+工具可在执行前通过 prepareArguments 调整调用参数
 
 - [`packages/agent/src/agent-loop.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/agent/src/agent-loop.ts) — text: `if (!tool.prepareArguments) { return toolCall; } const preparedArguments = tool.prepareArguments(toolCall.arguments); if`，提示行 705
 
@@ -127,7 +127,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E010
 
-证据：低层 loop:245–270
+循环把 prepareRequest 返回的 thinkingLevel 应用到下一次请求
 
 - [`packages/agent/src/agent-loop.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/agent/src/agent-loop.ts) — text: `? undefined : requestUpdate.thinkingLevel, }; } // Stream assistant response const message = await streamAssistantRespon`，提示行 245
 
@@ -139,7 +139,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E011
 
-证据：AgentSession:1839–1876
+分支记录曾增删的工具，被移除的工具保持 inactive
 
 - [`packages/coding-agent/src/core/agent-session.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/agent-session.ts) — text: `// Tools the branch ever added or removed. Removed tools stay inactive. const mentioned = new Set( systemMessages .flatM`，提示行 1839
 
@@ -151,7 +151,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E012
 
-证据：_prepareRetry:3747–3786
+扩展 UI、命令上下文或关闭动作任一存在即视为有绑定
 
 - [`packages/coding-agent/src/core/agent-session.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/agent-session.ts) — text: `const hasBindings = this._extensionUIContext || this._extensionCommandContextActions || this._extensionShutdownHandler |`，提示行 3747
 
@@ -165,7 +165,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E013
 
-证据：agent-loop.ts:332-342
+declareToolChanges 把工具声明与 context.tools 的差量写进 system message，保证重放得到相同工具集
 
 - [`packages/agent/src/agent-loop.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/agent/src/agent-loop.ts) — text: `/** * Declare tool loadout changes to the model. * * `context.tools` is what the runtime can execute; the transcript's s`，提示行 332
 
@@ -177,7 +177,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E014
 
-证据：compaction.ts:100
+compaction entry 携带被压缩 system message 的重放状态
 
 - [`packages/coding-agent/src/core/compaction/compaction.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/compaction/compaction.ts) — text: `// System messages are prompt state, not conversation; the compaction entry carries their replay.`，提示行 100
 
@@ -189,7 +189,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E015
 
-证据：sdk.ts:403-409
+resume 时 SDK 把 buildSessionContext 折叠出的消息灌入 Agent 的 initialState.messages
 
 - [`packages/coding-agent/src/core/sdk.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/sdk.ts) — text: `const agent = new Agent({ initialState: { systemPrompt: "", model, thinkingLevel, tools: ［］, messages: existingSession.m`，提示行 403
 
@@ -201,7 +201,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E016
 
-证据：agent-session.ts:938-944
+会话在边界提交与压缩时把 agent.state.messages 与投影重新对齐
 
 - [`packages/coding-agent/src/core/agent-session.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/agent-session.ts) — text: `private _refreshFinalizedContext(): void { const projection = this.sessionManager.buildSessionProjection(); for (const e`，提示行 938
 
@@ -213,7 +213,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E017
 
-证据：system-prompt-updates.test.ts:276-302
+round-trip 测试断言 session JSON 往返后工具声明不变
 
 - [`packages/coding-agent/test/system-prompt-updates.test.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/system-prompt-updates.test.ts) — text: `test("keeps tool declarations stable across a session JSON round-trip", async () => { const executableTool: AgentTool = `，提示行 276
 
@@ -227,7 +227,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E018
 
-证据：sdk.ts:209-222
+打开既有会话时用 buildSessionContext 恢复消息上下文
 
 - [`packages/coding-agent/src/core/sdk.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/sdk.ts) — text: `// Check if session has existing data to restore const existingSession = sessionManager.buildSessionContext(); const has`，提示行 209
 
@@ -239,7 +239,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E019
 
-证据：messages.ts:162-169
+custom 消息转换为上下文时被包成 text block
 
 - [`packages/coding-agent/src/core/messages.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/messages.ts) — text: `case "custom": { const content = typeof m.content === "string" ? ［{ type: "text" as const, text: m.content }］ : m.conten`，提示行 162
 
@@ -251,7 +251,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E020
 
-证据：session-manager.ts:543-573
+buildSessionProjection 从条目树与叶子构建会话投影
 
 - [`packages/coding-agent/src/core/session-manager.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-manager.ts) — text: `export function buildSessionProjection( entries: SessionEntry［］, leafId?: string | null, byId?: Map<string, SessionEntry`，提示行 543
 
@@ -263,7 +263,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E021
 
-证据：messages.ts:148-196
+convertToLlm 把 AgentMessage 映射为 provider 的 Message
 
 - [`packages/coding-agent/src/core/messages.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/messages.ts) — text: `export function convertToLlm(messages: AgentMessage［］): Message［］ { return messages .map((m): Message | undefined => { s`，提示行 148
 
@@ -275,7 +275,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E022
 
-证据：session-manager.ts:41
+session JSONL 当前版本是 3
 
 - [`packages/coding-agent/src/core/session-manager.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-manager.ts) — text: `export const CURRENT_SESSION_VERSION = 3;`，提示行 41
 
@@ -287,7 +287,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E023
 
-证据：session-manager.ts:286-344
+旧 v1 会话在载入时就地迁移出 id/parentId 树结构
 
 - [`packages/coding-agent/src/core/session-manager.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-manager.ts) — text: `/** Migrate v1 → v2: add id/parentId tree structure. Mutates in place. */ function migrateV1ToV2(entries: FileEntry［］): `，提示行 286
 
@@ -299,7 +299,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E024
 
-证据：cache-warmer.ts:49-55
+可用一 token 输出上限重放请求，检查 prompt cache 条目是否保持不变
 
 - [`packages/coding-agent/src/core/cache-warmer.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/cache-warmer.ts) — text: `* Whether replaying the request with a one-token output cap leaves its cache * entry untouched. Anthropic's budget-based`，提示行 49
 
@@ -311,7 +311,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E025
 
-证据：session-manager.ts:1766, :1793
+SessionManager.open(path) 打开既有会话文件
 
 - [`packages/coding-agent/src/core/session-manager.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-manager.ts) — text: `static open(path: string, sessionDir?: string, cwdOverride?: string): SessionManager {`，提示行 1766
 
@@ -323,7 +323,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E026
 
-证据：session-export.ts:38
+/export 未给路径时生成带时间戳的 JSONL 文件名
 
 - [`packages/coding-agent/src/core/session-export.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-export.ts) — text: `outputPath ?? `session-${new Date().toISOString().replace(/［:.］/g, "-")}.jsonl`,`，提示行 38
 
@@ -335,7 +335,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E027
 
-证据：interactive-mode.ts:6533
+命令参数解析按首个空白切分参数串
 
 - [`packages/coding-agent/src/modes/interactive/interactive-mode.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/modes/interactive/interactive-mode.ts) — text: `const firstWhitespaceIndex = argsString.search(/\s/);`，提示行 6533
 
@@ -347,7 +347,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E028
 
-证据：session-share.ts:59
+会话导出与导入使用 session.jsonl 文件名
 
 - [`packages/coding-agent/src/modes/interactive/session-share.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/modes/interactive/session-share.ts) — text: `const jsonlFile = path.join(tempDir, "session.jsonl");`，提示行 59
 
@@ -359,7 +359,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E029
 
-证据：bug-report.ts:262
+分享时把 session.jsonl 作为 application/x-ndjson 上传
 
 - [`packages/coding-agent/src/core/bug-report.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/bug-report.ts) — text: `files.push({ name: "session.jsonl", contentType: "application/x-ndjson", data: bundle.sessionJsonl });`，提示行 262
 
@@ -371,7 +371,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E030
 
-证据：evals/harness.ts:389-391
+无扩展注入时，provider 收到的 system prompt 就是重放出的 transcript prompt
 
 - [`packages/evals/src/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/src/harness.ts) — text: `// extension sent; otherwise the replayed transcript prompt is what the provider received. const systemPrompt = forcedSy`，提示行 389
 
@@ -385,7 +385,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E031
 
-证据：harness.ts:123-125
+test harness 的 sessionManager 选项用于续接会话或测试 resume
 
 - [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `/** Session to continue, for example to test a resume. Default: a new in-memory session. */ sessionManager?: SessionMana`，提示行 123
 
@@ -397,7 +397,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E032
 
-证据：extensions/types.ts:900-904
+before_provider_request 可替换 provider 请求 payload
 
 - [`packages/coding-agent/src/core/extensions/types.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/extensions/types.ts) — text: `/** Fired before a provider request is sent. Can replace the payload. */ export interface BeforeProviderRequestEvent { t`，提示行 900
 
@@ -409,7 +409,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E033
 
-证据：agent-session.ts:525
+AgentSession 构造时从 transcript 恢复默认工具集
 
 - [`packages/coding-agent/src/core/agent-session.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/agent-session.ts) — text: `if (this._usesDefaultTools) this._restoreToolsFromTranscript(this._defaultToolModifiers);`，提示行 525
 
@@ -421,7 +421,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E034
 
-证据：sdk.ts:200
+SDK 未传 settingsManager 时按 cwd 与 agentDir 创建
 
 - [`packages/coding-agent/src/core/sdk.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/sdk.ts) — text: `const settingsManager = options.settingsManager ?? SettingsManager.create(cwd, agentDir);`，提示行 200
 

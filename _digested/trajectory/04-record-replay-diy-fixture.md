@@ -15,10 +15,10 @@
 | 件 | Pi 的对应物 | 状态 |
 |---|---|---|
 | 轨迹载体 | session JSONL：model-visible 状态在 system message 里，assistant 结算完整落盘 | 已消化（[01](01-model-visible-invariant.md)、[02](02-session-jsonl-anatomy.md)） |
-| 宿主注入缝 | `createHarness({ sessionManager: SessionManager.open(path) })`，注释明言支持 resume | 已有（[E031](../_evidence/render.md#e031)） |
+| 宿主注入缝 | `createHarness({ sessionManager: SessionManager.open(path) })`，注释明言支持 resume | 已有（[harness.ts（E031）](../_evidence/render.md#e031)） |
 | 脚本推导 | assistant 结算（content blocks + stopReason + toolCall id）→ `FauxResponseStep[]` | **需要自己写**（DSH llm-replay 的 Pi 版核心） |
 
-断言点对应：DSH 的 `request/header` pin ↔ Pi 的 `before_provider_request`（payload 可整体断言/替换，[E032](../_evidence/render.md#e032)）与 `before_provider_headers`。
+断言点对应：DSH 的 `request/header` pin ↔ Pi 的 `before_provider_request`（payload 可整体断言/替换，[extensions/types.ts（E032）](../_evidence/render.md#e032)）与 `before_provider_headers`。
 
 ## 原型：录制 → 推导 → 无 key 续跑 → 重放一致（实测通过）
 
@@ -142,14 +142,14 @@ TRAJECTORY_ROLES: ["session","system","user","assistant","toolResult","assistant
 
 ## 原型过程里确认的两个事实（比通路本身更有价值）
 
-1. **resume 的装配责任在 SDK/应用层，不在 AgentSession。** `AgentSession` 构造函数只从 transcript 恢复工具（[E033](../_evidence/render.md#e033) 调用 / :1830 定义 `_restoreToolsFromTranscript`），消息态必须由调用方从 `buildSessionContext()` 灌入（生产路径 [E034](../_evidence/render.md#e034) → `initialState.messages`，:399；运行时对齐见 `_refreshFinalizedContext`，:926-932）。原型第一版漏了这行，`session.messages` 为空——这本身就是对"轨迹是事实源、运行态是派生物"纪律的一次现场验证：**派生状态永远从持久事实重新折叠**（[orchestration/06](../orchestration/06-session-plane.md) 的说法）。
+1. **resume 的装配责任在 SDK/应用层，不在 AgentSession。** `AgentSession` 构造函数只从 transcript 恢复工具（[agent-session.ts（E033）](../_evidence/render.md#e033)，调用与定义见该条目），消息态必须由调用方从 `buildSessionContext()` 灌入（生产路径 [sdk.ts（E034）](../_evidence/render.md#e034) → `initialState.messages`；运行时对齐见 `_refreshFinalizedContext`）。原型第一版漏了这行，`session.messages` 为空——这本身就是对"轨迹是事实源、运行态是派生物"纪律的一次现场验证：**派生状态永远从持久事实重新折叠**（[orchestration/06](../orchestration/06-session-plane.md) 的说法）。
 2. **跨上下文 resume 会追加 patch 型 system message。** 续跑宿主的 cwd/资源与录制时不同 → 新 prompt sections ≠ 重放出的旧 sections → `declareToolChanges`/prompt patch 机制往轨迹里**追加一条** system message，文件变成 base + patch 两条。不变量的正确表述由此精确化：**"重放轨迹得到当前状态"，而不是"轨迹里只有一条 system message"。** 这正是 [01](01-model-visible-invariant.md) 边界节那条实测的出处。
 
 ## 适配真实录制（未实测，列为风险清单）
 
 原型用 faux 录制（无 key 环境下的合法替身）。接**真实会话**文件时有三处摩擦，通路不变、适配要做：
 
-1. **模型重映射**：`model_change` / assistant 结算里的 `provider`/`model` 指向真实 provider，resume 的模型恢复（[E018](../_evidence/render.md#e018)）找不到 faux 注册项。两条路：入口把 entries 的模型字段改写为 faux（推导时顺手做），或在测试注册表里注册同名模型但 api 指向 faux。
+1. **模型重映射**：`model_change` / assistant 结算里的 `provider`/`model` 指向真实 provider，resume 的模型恢复（[sdk.ts（E018）](../_evidence/render.md#e018)）找不到 faux 注册项。两条路：入口把 entries 的模型字段改写为 faux（推导时顺手做），或在测试注册表里注册同名模型但 api 指向 faux。
 2. **噪声清洗**：Pi 没有 DSH 的 `{{session:1}}` tokenize / scrub 基建；`cwd`、时间戳、uuid 都是原样字节。夹具入库前要自己决定 projected（抹平包络）/ complete（原始）的形态，并接受 diff 噪声归自己管。
 3. **隐私**：真实会话可能含凭据与私有代码；bug-report 通道拿到的 `session.jsonl` 入库前要过 scrub——这一步 DSH 有制度，Pi 侧完全归 DIY 者。
 

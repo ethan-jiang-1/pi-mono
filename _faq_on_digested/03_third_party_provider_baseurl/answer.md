@@ -175,7 +175,7 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
   2. **图片与分类模型不过滤**（`openrouter.ts:47`：`if (!isModelType(model, "chat")) return [model];`）。
   3. **回退规则很窄**：仅 **401/403/404** 时整体退回原目录（`:34`）；其它非 OK 状态**抛错**（`:35`）。缺 limit 时保留目录原值，per-key 值经 `top_provider`（contextWindow/maxTokens）与 `openRouterCost`（cost）覆盖目录。
 
-- **接线在 coding-agent**：`packages/coding-agent/src/core/model-runtime.ts:230-238` 对 `provider.id === "openrouter"` 走 `withPersonalizedCatalog(provider, personalizeOpenRouterCatalog, ...)`，其它 provider 落到 `withRemoteCatalog`（:239）。两者都是 `remote-catalog-provider.ts` 里的函数（文件 240 行）：`withRemoteCatalog` :104 是 pi.dev 目录叠加，`withPersonalizedCatalog` :195 则**跳过刷新间隔/etag 缓存，并把个性化结果持久化为目录**（:232-237），因此离线、`pi -p`、RPC 路径也用得上。
+- **接线在 coding-agent**：`packages/coding-agent/src/core/model-runtime.ts`（withPersonalizedCatalog 分派） 对 `provider.id === "openrouter"` 走 `withPersonalizedCatalog(provider, personalizeOpenRouterCatalog, ...)`，其它 provider 落到 `withRemoteCatalog`。两者都是 `remote-catalog-provider.ts` 里的函数（文件 240 行）：`withRemoteCatalog` 是 pi.dev 目录叠加，`withPersonalizedCatalog` :195 则**跳过刷新间隔/etag 缓存，并把个性化结果持久化为目录**，因此离线、`pi -p`、RPC 路径也用得上。
 
   > **版本判定注意**：`remote-catalog-provider.ts` **不是** v1.2.0 新增（v1.1.0 已有，158 → 240 行，+109/−27）；新增的是其中的 `withPersonalizedCatalog` 函数，以及新文件 `packages/ai/src/providers/openrouter-api.ts`（77 行，含 `OpenRouterModel` :28、`openRouterCost` :50）。
 

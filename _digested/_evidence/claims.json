@@ -3,7 +3,7 @@
 		{
 			"id": "E001",
 			"page": "harness/05-Design-Causality/5.1_knowledge_externalization.md",
-			"claim": "证据：检查入口",
+			"claim": "仓库把质量规则写成一条 npm run check 链：biome、依赖、类型、入口图、install-lock 与 browser smoke",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -21,7 +21,7 @@
 		{
 			"id": "E002",
 			"page": "harness/05-Design-Causality/5.1_knowledge_externalization.md",
-			"claim": "证据：类型检查配置",
+			"claim": "根 tsconfig 的 include 覆盖 packages/*/src、test 与 examples，类型检查面与仓库结构一致",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -39,7 +39,7 @@
 		{
 			"id": "E003",
 			"page": "harness/05-Design-Causality/5.1_knowledge_externalization.md",
-			"claim": "证据：runtime-deps 负例测试",
+			"claim": "runtime-deps 检查有回归测试，覆盖 workspace 解析与缺依赖导致的失败",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -57,7 +57,7 @@
 		{
 			"id": "E004",
 			"page": "harness/05-Design-Causality/5.2_shape_causality.md",
-			"claim": "证据：CONTRIBUTING:11",
+			"claim": "核心保持最小且可被扩展操纵；扩展 hook 点也要经讨论",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -75,7 +75,7 @@
 		{
 			"id": "E005",
 			"page": "harness/05-Design-Causality/5.2_shape_causality.md",
-			"claim": "证据：README:100",
+			"claim": "根 README 把贡献规则与开发规则指向 CONTRIBUTING.md 与 AGENTS.md",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -93,7 +93,7 @@
 		{
 			"id": "E006",
 			"page": "harness/05-Design-Causality/5.3_paved_road_friction.md",
-			"claim": "证据：Agent.prompt 的错误消息",
+			"claim": "session 出错后清空错误态与 steer/follow-up 两条队列，避免残留状态影响下一轮",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -111,7 +111,7 @@
 		{
 			"id": "E007",
 			"page": "harness/05-Design-Causality/5.3_paved_road_friction.md",
-			"claim": "证据：其它负例",
+			"claim": "runtime-deps 的负例测试覆盖 dev-only 依赖、副作用 import、混合导出与字面量运行时加载",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -129,7 +129,7 @@
 		{
 			"id": "E008",
 			"page": "harness/05-Design-Causality/5.3_paved_road_friction.md",
-			"claim": "证据：test:scripts",
+			"claim": "仓库提供 profile:tui 与 profile:rpc 脚本用于性能剖析",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -147,7 +147,7 @@
 		{
 			"id": "E009",
 			"page": "harness/05-Design-Causality/5.4_feedback_loops.md",
-			"claim": "证据：agent-loop:705–775",
+			"claim": "工具可在执行前通过 prepareArguments 调整调用参数",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -165,7 +165,7 @@
 		{
 			"id": "E010",
 			"page": "harness/05-Design-Causality/5.4_feedback_loops.md",
-			"claim": "证据：低层 loop:245–270",
+			"claim": "循环把 prepareRequest 返回的 thinkingLevel 应用到下一次请求",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -183,7 +183,7 @@
 		{
 			"id": "E011",
 			"page": "harness/05-Design-Causality/5.4_feedback_loops.md",
-			"claim": "证据：AgentSession:1839–1876",
+			"claim": "分支记录曾增删的工具，被移除的工具保持 inactive",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -201,7 +201,7 @@
 		{
 			"id": "E012",
 			"page": "harness/05-Design-Causality/5.4_feedback_loops.md",
-			"claim": "证据：_prepareRetry:3747–3786",
+			"claim": "扩展 UI、命令上下文或关闭动作任一存在即视为有绑定",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -219,7 +219,7 @@
 		{
 			"id": "E013",
 			"page": "trajectory/01-model-visible-invariant.md",
-			"claim": "证据：agent-loop.ts:332-342",
+			"claim": "declareToolChanges 把工具声明与 context.tools 的差量写进 system message，保证重放得到相同工具集",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -237,7 +237,7 @@
 		{
 			"id": "E014",
 			"page": "trajectory/01-model-visible-invariant.md",
-			"claim": "证据：compaction.ts:100",
+			"claim": "compaction entry 携带被压缩 system message 的重放状态",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -255,7 +255,7 @@
 		{
 			"id": "E015",
 			"page": "trajectory/01-model-visible-invariant.md",
-			"claim": "证据：sdk.ts:403-409",
+			"claim": "resume 时 SDK 把 buildSessionContext 折叠出的消息灌入 Agent 的 initialState.messages",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -273,7 +273,7 @@
 		{
 			"id": "E016",
 			"page": "trajectory/01-model-visible-invariant.md",
-			"claim": "证据：agent-session.ts:938-944",
+			"claim": "会话在边界提交与压缩时把 agent.state.messages 与投影重新对齐",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -291,7 +291,7 @@
 		{
 			"id": "E017",
 			"page": "trajectory/01-model-visible-invariant.md",
-			"claim": "证据：system-prompt-updates.test.ts:276-302",
+			"claim": "round-trip 测试断言 session JSON 往返后工具声明不变",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -309,7 +309,7 @@
 		{
 			"id": "E018",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：sdk.ts:209-222",
+			"claim": "打开既有会话时用 buildSessionContext 恢复消息上下文",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -327,7 +327,7 @@
 		{
 			"id": "E019",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：messages.ts:162-169",
+			"claim": "custom 消息转换为上下文时被包成 text block",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -345,7 +345,7 @@
 		{
 			"id": "E020",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：session-manager.ts:543-573",
+			"claim": "buildSessionProjection 从条目树与叶子构建会话投影",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -363,7 +363,7 @@
 		{
 			"id": "E021",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：messages.ts:148-196",
+			"claim": "convertToLlm 把 AgentMessage 映射为 provider 的 Message",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -381,7 +381,7 @@
 		{
 			"id": "E022",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：session-manager.ts:41",
+			"claim": "session JSONL 当前版本是 3",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -399,7 +399,7 @@
 		{
 			"id": "E023",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：session-manager.ts:286-344",
+			"claim": "旧 v1 会话在载入时就地迁移出 id/parentId 树结构",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -417,7 +417,7 @@
 		{
 			"id": "E024",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：cache-warmer.ts:49-55",
+			"claim": "可用一 token 输出上限重放请求，检查 prompt cache 条目是否保持不变",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -435,7 +435,7 @@
 		{
 			"id": "E025",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：session-manager.ts:1766, :1793",
+			"claim": "SessionManager.open(path) 打开既有会话文件",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -453,7 +453,7 @@
 		{
 			"id": "E026",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：session-export.ts:38",
+			"claim": "/export 未给路径时生成带时间戳的 JSONL 文件名",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -471,7 +471,7 @@
 		{
 			"id": "E027",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：interactive-mode.ts:6533",
+			"claim": "命令参数解析按首个空白切分参数串",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -489,7 +489,7 @@
 		{
 			"id": "E028",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：session-share.ts:59",
+			"claim": "会话导出与导入使用 session.jsonl 文件名",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -507,7 +507,7 @@
 		{
 			"id": "E029",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：bug-report.ts:262",
+			"claim": "分享时把 session.jsonl 作为 application/x-ndjson 上传",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -525,7 +525,7 @@
 		{
 			"id": "E030",
 			"page": "trajectory/02-session-jsonl-anatomy.md",
-			"claim": "证据：evals/harness.ts:389-391",
+			"claim": "无扩展注入时，provider 收到的 system prompt 就是重放出的 transcript prompt",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -543,7 +543,7 @@
 		{
 			"id": "E031",
 			"page": "trajectory/04-record-replay-diy-fixture.md",
-			"claim": "证据：harness.ts:123-125",
+			"claim": "test harness 的 sessionManager 选项用于续接会话或测试 resume",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -561,7 +561,7 @@
 		{
 			"id": "E032",
 			"page": "trajectory/04-record-replay-diy-fixture.md",
-			"claim": "证据：extensions/types.ts:900-904",
+			"claim": "before_provider_request 可替换 provider 请求 payload",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -579,7 +579,7 @@
 		{
 			"id": "E033",
 			"page": "trajectory/04-record-replay-diy-fixture.md",
-			"claim": "证据：agent-session.ts:525",
+			"claim": "AgentSession 构造时从 transcript 恢复默认工具集",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -597,7 +597,7 @@
 		{
 			"id": "E034",
 			"page": "trajectory/04-record-replay-diy-fixture.md",
-			"claim": "证据：sdk.ts:200",
+			"claim": "SDK 未传 settingsManager 时按 cwd 与 agentDir 创建",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{

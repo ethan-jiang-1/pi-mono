@@ -49,6 +49,9 @@ for (const corpus of corpora) {
 			if (archived) continue;
 			if (/#L\d/.test(line)) failures.push(`${relative(repo, page)}:${lineNumber}: line anchor "${line.match(/#L\d+/)[0]}"`);
 			if (tag && line.includes(tag) && !/基线|baseline|\btag\b|release tag/u.test(line)) failures.push(`${relative(repo, page)}:${lineNumber}: baseline version "${tag}"`);
+			if (/[（，]\s*:\d{2,4}/u.test(line) || /在\s*:\d{2,4}/u.test(line)) {
+				failures.push(`${relative(repo, page)}:${lineNumber}: bare line reference`);
+			}
 		}
 	}
 }

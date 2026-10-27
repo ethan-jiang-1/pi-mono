@@ -100,7 +100,7 @@ pi install npm:pi-mcp-adapter
 ```
 
 ```
-~/.pi/agent/npm/node_modules/pi-mcp-adapter/   ← 安装根目录（:2031, :2072）
+~/.pi/agent/npm/node_modules/pi-mcp-adapter/   ← 安装根目录
 ├── package.json          ← 里面可能有 pi 字段
 ├── extensions/
 │   ├── index.ts          ← 扩展 1

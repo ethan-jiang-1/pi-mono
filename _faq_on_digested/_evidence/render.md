@@ -13,7 +13,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E001
 
-证据：system-prompt-updates.test.ts:295
+round-trip 测试断言持久化的 JSON 重放出相同的工具声明
 
 - [`packages/coding-agent/test/system-prompt-updates.test.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/system-prompt-updates.test.ts) — text: `// Simulate a resume: the persisted JSON must replay to the same declarations.`，提示行 295
 
@@ -25,7 +25,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E002
 
-证据：faux.ts:556-560
+faux 的 deferred 状态记录请求模型、待取次数与取消标记
 
 - [`packages/ai/src/providers/faux.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/providers/faux.ts) — text: `model: requestModel, pendingFetches: Math.max(0, Math.floor(options.deferred?.pendingFetches ?? 0)), cancelled: false, }`，提示行 556
 
@@ -37,7 +37,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E003
 
-证据：faux.ts:427-431
+faux 把工具调用参数按 token 尺寸分块流式推送
 
 - [`packages/ai/src/providers/faux.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/providers/faux.ts) — text: `for (const chunk of splitStringByTokenSize(JSON.stringify(block.arguments), minTokenSize, maxTokenSize)) { await schedul`，提示行 427
 
@@ -49,7 +49,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E004
 
-证据：faux.ts:358
+faux 的流最终以完整的 assistant message 结算
 
 - [`packages/ai/src/providers/faux.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/providers/faux.ts) — text: `message: AssistantMessage,`，提示行 358
 
@@ -61,7 +61,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E005
 
-证据：faux.ts:526-551
+faux 在开始流之前通过 onResponse 回调报告状态与响应头
 
 - [`packages/ai/src/providers/faux.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/providers/faux.ts) — text: `queueMicrotask(async () => { try { await streamOptions?.onResponse?.({ status: 200, headers: {} }, requestModel); if (!s`，提示行 526
 
@@ -73,7 +73,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E006
 
-证据：faux.ts:447
+faux 在 error/aborted 结算时推 error 事件并结束流，不再推 done
 
 - [`packages/ai/src/providers/faux.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/providers/faux.ts) — text: `return;`，提示行 447
 
@@ -85,7 +85,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E007
 
-证据：faux.ts:490-503
+faux 的模型定义带 maxTokens 上限（示例为 16384）
 
 - [`packages/ai/src/providers/faux.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/providers/faux.ts) — text: `maxTokens: 16384, }, ］; const models = modelDefinitions.map((definition) => ({ id: definition.id, name: definition.name `，提示行 490
 
@@ -97,7 +97,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E008
 
-证据：session-manager.ts:1766
+SessionManager.open(path, sessionDir?, cwdOverride?) 打开既有会话
 
 - [`packages/coding-agent/src/core/session-manager.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-manager.ts) — text: `static open(path: string, sessionDir?: string, cwdOverride?: string): SessionManager {`，提示行 1766
 
@@ -109,7 +109,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E009
 
-证据：session-export.ts:38
+导出会话未给路径时生成带时间戳的 JSONL 文件名
 
 - [`packages/coding-agent/src/core/session-export.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-export.ts) — text: `outputPath ?? `session-${new Date().toISOString().replace(/［:.］/g, "-")}.jsonl`,`，提示行 38
 
@@ -121,7 +121,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E010
 
-证据：bug-report.ts:262
+分享会话时把 session.jsonl 以 application/x-ndjson 上传
 
 - [`packages/coding-agent/src/core/bug-report.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/bug-report.ts) — text: `files.push({ name: "session.jsonl", contentType: "application/x-ndjson", data: bundle.sessionJsonl });`，提示行 262
 
@@ -133,7 +133,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E011
 
-证据：session-manager.ts:286-329
+migrateV1ToV2 就地补出 id/parentId 树结构
 
 - [`packages/coding-agent/src/core/session-manager.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-manager.ts) — text: `/** Migrate v1 → v2: add id/parentId tree structure. Mutates in place. */ function migrateV1ToV2(entries: FileEntry［］): `，提示行 286
 
@@ -145,7 +145,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E012
 
-证据：harness.ts:122-123
+测试 harness 的 sessionManager 选项用于续接会话或测试 resume
 
 - [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `modelsJson?: Record<string, unknown>; /** Session to continue, for example to test a resume. Default: a new in-memory se`，提示行 122
 
@@ -157,7 +157,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E013
 
-证据：`before_provider_request`
+before_provider_request 钩子可以修改消息后交给模型
 
 - [`packages/coding-agent/src/core/extensions/types.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/extensions/types.ts) — text: `* Fired before each LLM call. Can modify messages. * * `messages` holds the conversation without system messages. The pr`，提示行 879
 
@@ -171,7 +171,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E014
 
-证据：packages/coding-agent/test/system-prompt-updates.test.ts:276-302
+round-trip 测试断言工具声明在 JSON 往返后不变
 
 - [`packages/coding-agent/test/system-prompt-updates.test.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/system-prompt-updates.test.ts) — text: `test("keeps tool declarations stable across a session JSON round-trip", async () => { const executableTool: AgentTool = `，提示行 276
 
@@ -183,7 +183,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E015
 
-证据：packages/coding-agent/src/core/compaction/compaction.ts:100
+compaction entry 携带被压缩 system message 的重放状态
 
 - [`packages/coding-agent/src/core/compaction/compaction.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/compaction/compaction.ts) — text: `// System messages are prompt state, not conversation; the compaction entry carries their replay.`，提示行 100
 
@@ -195,7 +195,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E016
 
-证据：packages/coding-agent/test/suite/harness.ts:111-124
+测试 harness 的选项覆盖 provider、模型与 settings
 
 - [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `export interface HarnessOptions { provider?: string; models?: FauxModelDefinition［］; settings?: Partial<Settings>; tools`，提示行 111
 
@@ -207,7 +207,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E017
 
-证据：packages/coding-agent/src/core/session-manager.ts:1766
+SessionManager.open 用路径打开会话，可覆盖 sessionDir 与 cwd
 
 - [`packages/coding-agent/src/core/session-manager.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-manager.ts) — text: `static open(path: string, sessionDir?: string, cwdOverride?: string): SessionManager {`，提示行 1766
 
@@ -219,7 +219,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E018
 
-证据：packages/coding-agent/src/core/extensions/types.ts:879-883
+每次 LLM 调用前的钩子可以改写 transcript 消息
 
 - [`packages/coding-agent/src/core/extensions/types.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/extensions/types.ts) — text: `* Fired before each LLM call. Can modify messages. * * `messages` holds the conversation without system messages. The pr`，提示行 879
 
@@ -231,7 +231,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E019
 
-证据：packages/coding-agent/src/core/extensions/runner.ts:1365-1381
+emitBeforeProviderRequest 允许扩展替换或保留请求 payload
 
 - [`packages/coding-agent/src/core/extensions/runner.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/extensions/runner.ts) — text: `return currentMessages; } async emitBeforeProviderRequest(payload: unknown): Promise<unknown> { const ctx = this.createC`，提示行 1365
 
@@ -243,7 +243,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E020
 
-证据：packages/coding-agent/src/core/session-manager.ts:43-197
+SessionHeader 的 version 可缺省，缺省即 v1 旧会话
 
 - [`packages/coding-agent/src/core/session-manager.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-manager.ts) — text: `export interface SessionHeader { type: "session"; version?: number; // v1 sessions don't have this id: string; timestamp`，提示行 43
 
@@ -255,7 +255,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E021
 
-证据：packages/coding-agent/src/core/session-export.ts:38
+导出未指定路径时用时间戳生成 session JSONL 文件名
 
 - [`packages/coding-agent/src/core/session-export.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/session-export.ts) — text: `outputPath ?? `session-${new Date().toISOString().replace(/［:.］/g, "-")}.jsonl`,`，提示行 38
 
@@ -267,7 +267,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E022
 
-证据：packages/coding-agent/src/modes/interactive/interactive-mode.ts:6533
+斜杠命令参数解析按首个空白切分
 
 - [`packages/coding-agent/src/modes/interactive/interactive-mode.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/modes/interactive/interactive-mode.ts) — text: `const firstWhitespaceIndex = argsString.search(/\s/);`，提示行 6533
 
@@ -279,7 +279,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E023
 
-证据：packages/coding-agent/src/modes/interactive/session-share.ts:59
+bug-report 把临时目录里的 session.jsonl 打进诊断包
 
 - [`packages/coding-agent/src/modes/interactive/session-share.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/modes/interactive/session-share.ts) — text: `const jsonlFile = path.join(tempDir, "session.jsonl");`，提示行 59
 
@@ -291,7 +291,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E024
 
-证据：packages/coding-agent/src/core/bug-report.ts:262
+分享包把 session.jsonl 作为 application/x-ndjson 上传
 
 - [`packages/coding-agent/src/core/bug-report.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/src/core/bug-report.ts) — text: `files.push({ name: "session.jsonl", contentType: "application/x-ndjson", data: bundle.sessionJsonl });`，提示行 262
 
@@ -2169,7 +2169,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E180
 
-证据：贡献者批准及 auto-close
+新贡献者的 issue/PR 默认自动关闭，维护者按节奏复审重开
 
 - [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `## Contribution Gate All issues and PRs from new contributors are auto-closed by default. Issues submitted Friday throug`，提示行 21
 
@@ -2181,7 +2181,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E181
 
-证据：RFC
+较大的设计变更走 RFC，公开的只是一部分
 
 - [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `## Where can I learn about plans? Earendil uses RFCs to discuss larger changes. Not all of them are public, but quite a `，提示行 99
 
@@ -2193,7 +2193,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E182
 
-证据：check 脚本组合
+根的 check 命令串起 biome、依赖、类型、入口图、install-lock 与 browser smoke
 
 - [`package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/package.json) — text: `"build:native:win32": "npm --prefix packages/tui run build:native:win32", "check": "node scripts/biome-check.mjs --write`，提示行 20
 
@@ -2205,7 +2205,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E183
 
-证据：release 脚本
+release 脚本在收尾时把 [Unreleased] 段落改名并输出提示
 
 - [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `console.log(` Added ［Unreleased］ to ${changelog}`); } } // Main flow console.log("\n=== Release Script ===\n"); // 1. Ch`，提示行 251
 
@@ -2217,7 +2217,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E184
 
-证据：主 CI
+主 CI 的 build-check-test 在单个 Linux runner 上跑 checkout/build/check/test
 
 - [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `build-check-test: runs-on: ubuntu-latest steps: - name: Checkout uses: actions/checkout@3d3c42e5aac5ba805825da76410c1812`，提示行 14
 
@@ -2229,7 +2229,7 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 ### E185
 
-证据：后文
+issue 量超过维护者能实时负责的量，是自动关闭的政策理由
 
 - [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `pi receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality b`，提示行 81
 

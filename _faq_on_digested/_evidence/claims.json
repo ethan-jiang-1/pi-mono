@@ -3,7 +3,7 @@
 		{
 			"id": "E001",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：system-prompt-updates.test.ts:295",
+			"claim": "round-trip 测试断言持久化的 JSON 重放出相同的工具声明",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -21,7 +21,7 @@
 		{
 			"id": "E002",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：faux.ts:556-560",
+			"claim": "faux 的 deferred 状态记录请求模型、待取次数与取消标记",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -39,7 +39,7 @@
 		{
 			"id": "E003",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：faux.ts:427-431",
+			"claim": "faux 把工具调用参数按 token 尺寸分块流式推送",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -57,7 +57,7 @@
 		{
 			"id": "E004",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：faux.ts:358",
+			"claim": "faux 的流最终以完整的 assistant message 结算",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -75,7 +75,7 @@
 		{
 			"id": "E005",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：faux.ts:526-551",
+			"claim": "faux 在开始流之前通过 onResponse 回调报告状态与响应头",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -93,7 +93,7 @@
 		{
 			"id": "E006",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：faux.ts:447",
+			"claim": "faux 在 error/aborted 结算时推 error 事件并结束流，不再推 done",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -111,7 +111,7 @@
 		{
 			"id": "E007",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：faux.ts:490-503",
+			"claim": "faux 的模型定义带 maxTokens 上限（示例为 16384）",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -129,7 +129,7 @@
 		{
 			"id": "E008",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：session-manager.ts:1766",
+			"claim": "SessionManager.open(path, sessionDir?, cwdOverride?) 打开既有会话",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -147,7 +147,7 @@
 		{
 			"id": "E009",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：session-export.ts:38",
+			"claim": "导出会话未给路径时生成带时间戳的 JSONL 文件名",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -165,7 +165,7 @@
 		{
 			"id": "E010",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：bug-report.ts:262",
+			"claim": "分享会话时把 session.jsonl 以 application/x-ndjson 上传",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -183,7 +183,7 @@
 		{
 			"id": "E011",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：session-manager.ts:286-329",
+			"claim": "migrateV1ToV2 就地补出 id/parentId 树结构",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -201,7 +201,7 @@
 		{
 			"id": "E012",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：harness.ts:122-123",
+			"claim": "测试 harness 的 sessionManager 选项用于续接会话或测试 resume",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -219,7 +219,7 @@
 		{
 			"id": "E013",
 			"page": "13_recorded_session_snapshots/answer.md",
-			"claim": "证据：`before_provider_request`",
+			"claim": "before_provider_request 钩子可以修改消息后交给模型",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -237,7 +237,7 @@
 		{
 			"id": "E014",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/test/system-prompt-updates.test.ts:276-302",
+			"claim": "round-trip 测试断言工具声明在 JSON 往返后不变",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -255,7 +255,7 @@
 		{
 			"id": "E015",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/src/core/compaction/compaction.ts:100",
+			"claim": "compaction entry 携带被压缩 system message 的重放状态",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -273,7 +273,7 @@
 		{
 			"id": "E016",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/test/suite/harness.ts:111-124",
+			"claim": "测试 harness 的选项覆盖 provider、模型与 settings",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -291,7 +291,7 @@
 		{
 			"id": "E017",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/src/core/session-manager.ts:1766",
+			"claim": "SessionManager.open 用路径打开会话，可覆盖 sessionDir 与 cwd",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -309,7 +309,7 @@
 		{
 			"id": "E018",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/src/core/extensions/types.ts:879-883",
+			"claim": "每次 LLM 调用前的钩子可以改写 transcript 消息",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -327,7 +327,7 @@
 		{
 			"id": "E019",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/src/core/extensions/runner.ts:1365-1381",
+			"claim": "emitBeforeProviderRequest 允许扩展替换或保留请求 payload",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -345,7 +345,7 @@
 		{
 			"id": "E020",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/src/core/session-manager.ts:43-197",
+			"claim": "SessionHeader 的 version 可缺省，缺省即 v1 旧会话",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -363,7 +363,7 @@
 		{
 			"id": "E021",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/src/core/session-export.ts:38",
+			"claim": "导出未指定路径时用时间戳生成 session JSONL 文件名",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -381,7 +381,7 @@
 		{
 			"id": "E022",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/src/modes/interactive/interactive-mode.ts:6533",
+			"claim": "斜杠命令参数解析按首个空白切分",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -399,7 +399,7 @@
 		{
 			"id": "E023",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/src/modes/interactive/session-share.ts:59",
+			"claim": "bug-report 把临时目录里的 session.jsonl 打进诊断包",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -417,7 +417,7 @@
 		{
 			"id": "E024",
 			"page": "13_recorded_session_snapshots/research.md",
-			"claim": "证据：packages/coding-agent/src/core/bug-report.ts:262",
+			"claim": "分享包把 session.jsonl 作为 application/x-ndjson 上传",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -3225,7 +3225,7 @@
 		{
 			"id": "E180",
 			"page": "12_pi_philosophy/review.md",
-			"claim": "证据：贡献者批准及 auto-close",
+			"claim": "新贡献者的 issue/PR 默认自动关闭，维护者按节奏复审重开",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -3243,7 +3243,7 @@
 		{
 			"id": "E181",
 			"page": "12_pi_philosophy/review.md",
-			"claim": "证据：RFC",
+			"claim": "较大的设计变更走 RFC，公开的只是一部分",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -3261,7 +3261,7 @@
 		{
 			"id": "E182",
 			"page": "12_pi_philosophy/review.md",
-			"claim": "证据：check 脚本组合",
+			"claim": "根的 check 命令串起 biome、依赖、类型、入口图、install-lock 与 browser smoke",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -3279,7 +3279,7 @@
 		{
 			"id": "E183",
 			"page": "12_pi_philosophy/review.md",
-			"claim": "证据：release 脚本",
+			"claim": "release 脚本在收尾时把 [Unreleased] 段落改名并输出提示",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -3297,7 +3297,7 @@
 		{
 			"id": "E184",
 			"page": "12_pi_philosophy/review.md",
-			"claim": "证据：主 CI",
+			"claim": "主 CI 的 build-check-test 在单个 Linux runner 上跑 checkout/build/check/test",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{
@@ -3315,7 +3315,7 @@
 		{
 			"id": "E185",
 			"page": "12_pi_philosophy/review.md",
-			"claim": "证据：后文",
+			"claim": "issue 量超过维护者能实时负责的量，是自动关闭的政策理由",
 			"checkedAt": "v1.4.0",
 			"sources": [
 				{

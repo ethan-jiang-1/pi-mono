@@ -1,8 +1,8 @@
 # 1. 包协议：生态的"公路系统"（官方基建详解）
 
-> **⚠️ 行号漂移（v1.4.0 复核）**：本页的 `packages.md:NNN` 原按 v0.85.1 的 **228 行**版本写成；该文档在 v1.0.0 被重写为 **129 行**（v1.4.0 仍 129 行），行号整体失效。下面已把引用重锚到 v1.4.0 的 `packages/coding-agent/docs/packages.md` 实际行号；机制结论未变。
+> **⚠️ 行号漂移（v1.5.0 复核）**：本页的 `packages.md:NNN` 原按 v0.85.1 的 **228 行**版本写成；该文档在 v1.0.0 被重写为 **129 行**（v1.4.0 仍 129 行），**v1.5.0 增长到 153 行**（新增 changelog 机制、install-failure 容错、`-e` 包缓存三节）。下面引用的行号已逐条核对，在 v1.5.0 仍成立；机制结论未变。
 
-> 本篇是 04-Ecosystem 总览中"官方基建"的展开——`pi install` 到 `pi.dev` 目录之间的**完整协议细节**。全部硬事实，锚点在 `packages/coding-agent/docs/packages.md`（下称 packages.md），行号已按 **v1.4.0** 重锚（原为 v0.86.1/v0.85.1 的 228 行版，见页首横幅）。
+> 本篇是 04-Ecosystem 总览中"官方基建"的展开——`pi install` 到 `pi.dev` 目录之间的**完整协议细节**。全部硬事实，锚点在 `packages/coding-agent/docs/packages.md`（下称 packages.md），行号已按 **v1.5.0** 逐条核对（原为 v0.86.1/v0.85.1 的 228 行版，见页首横幅）。
 
 ## 一句话
 
@@ -31,7 +31,8 @@
 ## 依赖规则：隔离是显式设计
 
 - 第三方运行时依赖 → `dependencies`；pi 从 npm/git 装包时**自动跑 `npm install`**（v1.4.0 `packages.md:78`；v0.85.1 时为 :169）。
-- **pi 核心包**（`@earendil-works/pi-ai`/`pi-agent-core`/`pi-coding-agent`/`pi-tui`/`typebox`）→ 必须放 `peerDependencies` 且 range 为 `"*"`，**不许打包**——由宿主统一供版本（v1.4.0 `packages.md:88`；v0.85.1 时为 :171）。
+- **pi 核心包**（`@earendil-works/pi-ai`/`pi-agent-core`/`pi-coding-agent`/`pi-tui`/`typebox`）→ 必须放 `peerDependencies` 且 range 为 `"*"`，**不许打包**——由宿主统一供版本（`packages.md:100-111`）。
+  > **v1.5.0**：`typebox` **仍在** host-provided 清单里（`packages.md:110`），扩展写 TypeBox 依然合法。但校验已改走 `@earendil-works/pi-schema`：`Type.Refine()` 不跑、codec 不解码、`Format.Set()` 注册的自定义 format 不检查（标准 format 仍校验）。新代码建议用 pi-schema builders。详见 [1.3 的“TypeBox 退场后的三层事实”](../../agent/01-Anatomy/1.3_Tool_Registry.md#参数-schematypebox-退场后的三层事实v150)。
 - **依赖其他 pi 包** → `dependencies` + `bundledDependencies`，并通过 `node_modules/...` 路径引用其资源（v1.4.0 `packages.md:90`；v0.85.1 时为 :173-186）。
 - 底层保证："Pi loads packages with separate module roots, so separate installs do not collide or share modules"（v1.4.0 `packages.md:92`；v0.85.1 时为 :173）——每个包独立模块根，同名依赖不同版本共存。
 
@@ -58,3 +59,14 @@
 1. **npm 即分发**：零新基建——作者用现成的版本/CI/下载统计，目录（pi.dev）只是 npm 的聚合视图。
 2. **pin + reconcile 分离**：团队可复现（pin），升级可预期（显式 move ref），这是"项目 settings 提交进仓库"能成立的前提。
 3. **独立模块根**：包可以自由捆绑依赖甚至嵌套其他 pi 包，"装 A 顺手装了 A 依赖的 B"成为默认体验——生态包之间互操作的摩擦被协议抹平。
+
+## v1.5.0：扩展包可以自带 changelog
+
+新增能力，不影响既有包的兼容性。
+
+包作者在 `package.json` 里声明 `pi.changelogPath`，或干脆把 `CHANGELOG.md` 放在包根目录。Pi 在**下一次全新启动**时（不是 `--continue`、不是 `/reload`）比较「上次见到的版本」与当前版本，把更新的条目显示在 **"Extension Updates"** 下。
+
+- 默认展开；设 `collapseChangelog` 把它压成「一个包一行」。
+- 「上次见到的版本」由 Pi 自己记录，作者不需要维护状态。
+
+**为什么值得写进协议页**：这让包的升级叙事跟着包走，而不是跟着 pi 的 release notes 走——生态包升级时可以告诉用户「这次改了什么」，而不必让用户去翻包的 git log。

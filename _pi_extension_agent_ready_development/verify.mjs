@@ -23,7 +23,8 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const CORPUS_ROOT = resolve(dirname(fileURLToPath(import.meta.url)));
-const BASELINE_TAG = "v1.4.0";
+const BASELINE_TAG = "v1.5.0";
+export { BASELINE_TAG };
 const PINNED_EXTERNAL = new RegExp(
 	`^https://github\\.com/earendil-works/pi/(?:blob|tree)/${BASELINE_TAG.replace(/\./g, "\\.")}(?:/|$)`,
 );

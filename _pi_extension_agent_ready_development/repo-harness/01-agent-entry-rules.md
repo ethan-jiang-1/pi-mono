@@ -14,7 +14,7 @@ pi-mono 对没来过的 coding agent 的全部入口合同由两个文件承担�
 >
 > — AGENTS.md（[E003](../_evidence/render.md#e003)）
 
-> Never run `npm run build` or `npm test` unless requested by the user.
+> Run `npm run build` whenever something needs built output (`dist/`): tests or benchmarks that import built packages, Durable's workerd suite. Never use it to type check or lint: that is `npm run check`, the preferred check.
 >
 > — AGENTS.md（[E004](../_evidence/render.md#e004)）
 

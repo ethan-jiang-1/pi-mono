@@ -6,13 +6,16 @@ pi-mono 的质量检查不是单一「全仓检查」按钮，而是按事件与
 
 ## 主 CI：ci.yml
 
-触发：push 到 `main`、面向 `main` 的 PR。两个 job：
+触发：push 到 `main`、面向 `main` 的 PR。**本基线起三个 job**（v1.4.0 是两个，原来的 `build-check-test` 单 job 被拆开）：
 
 [E034](../_evidence/render.md#e034)
 
-- **build-check-test**（单 Linux runner）：Node 22、系统依赖（cairo/pango 图形库、fd、ripgrep）、`npm ci --ignore-scripts`、`npm run build`、`npm run check`（[03 页](03-check-pipeline.md)）、**`npm run build:daemon --workspace packages/env`**、`npm test`。
+- **build-check**（Linux runner）：Node 22、系统依赖、`npm ci --ignore-scripts`、`npm run build`、**打包 preview 包并上传 artifact**、`npm run check`（[03 页](03-check-pipeline.md)）。
+  > 本基线拆出两件事：① `npm test` 移进下面的矩阵 job；② 新增 `Pack preview packages` + `Upload preview packages` 两步，把构建产物作为 artifact 交给 `preview-packages.yml` 发布到 pkg.earendil.com。这个 workflow **只读 artifact 作为数据，从不 checkout 或运行 PR 代码**（其头部注释明说），并按 `main` / `pr-<number>` 移动 ref、PR 关闭时删除 ref；且只有 pkg.earendil.com 允许该仓库、该 workflow 与其中每个包时上传才被接受。
 
-  其中 daemon 构建步骤是 v1.2.0 新增：pi-env 的 Rust daemon 在 v1.2.0 起进入主 CI 路径，因此 `packages/env` 的测试不会跑到一个未构建的 daemon 上。**v1.0.3 的 ci.yml 没有这一步**（本页旧版曾据此描述）。
+- **test**（矩阵 job，`fail-fast: false`）：三档 `coding-agent` / `durable` / `other`，各自跑 `npm test`。**按包分片是为了让最慢与最快的测试互不阻塞**——`fail-fast: false` 保证一档失败不取消其余。durable 档跳过 fd/ripgrep 系统依赖安装（它不需要，见其 `if: matrix.name != 'durable'`）。
+
+  其中 daemon 构建步骤是 v1.2.0 新增（本基线仍在 `build-check` 里）：pi-env 的 Rust daemon 在 v1.2.0 起进入主 CI 路径，因此 `packages/env` 的测试不会跑到一个未构建的 daemon 上。**v1.0.3 的 ci.yml 没有这一步**（本页旧版曾据此描述）。
 
 - **mcp-conformance**（独立 Linux runner，）：工作流内注释说明其性质：
 

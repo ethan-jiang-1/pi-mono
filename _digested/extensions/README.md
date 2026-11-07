@@ -1,6 +1,8 @@
 # extensions/ — pi 的扩充思路：极简核 + 靠扩展长能力
 
-> **当前基线：`v1.4.0`（tag `4a080252f`）**。扩展 API 面在本区间**没有结构变化**：`core/extensions/types.ts` 逐字节未变，新增的只有 `@earendil-works/pi-ai/models` 虚拟模块/别名（#11156）。`docs/extensions.md` 的生命周期章节是**文档补写**，不是新事件。
+> **当前基线：`v1.5.0`（tag `f9a263655`）**。v1.4.0 时本页写的是"扩展 API 面无结构变化（`core/extensions/types.ts` 逐字节未变）"——**v1.5.0 已不成立**：该文件 +27/−3，新增 `KeybindingHints` 接口（`keyText`/`keyHint`），并让 `ToolRenderContext` / `MessageRenderOptions` / `EntryRenderOptions` 三者 **extends 它**；内联组件新增 `blocked`（OSC 7501 program status），`MessageRenderOptions` 新增 `messageId` / `timestamp`。
+>
+> 更重要的变化不在类型面而在**校验底座**：TypeBox 离开校验器的位置，参数校验一律走 `@earendil-works/pi-schema`——但**源码写法不变**（`import { Type } from "@earendil-works/pi-ai"` 仍可用）。三层事实见 [`agent/01-Anatomy/1.3_Tool_Registry.md`](../agent/01-Anatomy/1.3_Tool_Registry.md)。
 >
 > **更早基线**：`v1.2.0`（tag `06a466935`），上一基线 `v1.0.3`（tag `d78dc83d6`）。v1.0.3→v1.2.0 对本目录的影响集中在行号漂移与 extension 事件面（`before_agent_start` union、`reachesTools`、`ToolNamespace.aliases`），已逐篇更正。历史基线演进入下。
 >

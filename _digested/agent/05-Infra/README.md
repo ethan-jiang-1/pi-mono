@@ -1,6 +1,6 @@
 # 05-Infra：AI 基础设施层
 
-> **基线：v1.4.0（`4a080252f`）。** 本目录 5.1/5.2 的正文主体仍是 v0.84.2 时代的三层拆分（`api/`/`providers/`/`auth/`），v1.4.0 起另加两个横切面：**client identity**（UA/attribution 统一到 ai，见 5.1）与 **telemetry**（ai/chord/durable 共用的追踪契约，见 5.3）。
+> **基线：v1.5.0（`f9a263655`），上一基线 v1.4.0（`4a080252f`）。** 本目录 5.1/5.2 的正文主体仍是 v0.84.2 时代的三层拆分（`api/`/`providers/`/`auth/`），v1.4.0 起另加两个横切面：**client identity**（UA/attribution 统一到 ai，见 5.1）与 **telemetry**（ai/chord/durable 共用的追踪契约，见 5.3）。
 
 ## 一句话定位
 

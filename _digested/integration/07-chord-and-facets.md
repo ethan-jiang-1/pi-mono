@@ -1,7 +1,9 @@
 # 07 Chord 与 Facet/Service：第四条 authoring 面
 
 > **基线**：v0.85.1（tag `d981de122`，merge `e3aa42f46`）。本文全部结论来自当前工作树的静态读源码取证，**没有运行 chord 测试**（原因与后果见末节）。
-> **⚠️ v1.4.0：本页整体降级为历史取证（v0.85.1）**。chord 的现行描述以 [architecture-next/chord.md](../architecture-next/chord.md) 为准。v1.2.0→v1.3.0 又改了一轮公开面（`Ref`/`placement`/async get/协议 4），v1.4.0 加 `Context.telemetry` 与 `chord/sqlite`。因此下文除 §5 术语碰撞外，**凡涉及 chord API、依赖方、子路径、测试数量的断言都不要直接引用**。逐条失效清单见 [_change_log/0010](../_change_log/0010-v1.2.0-to-v1.4.0.md)。
+> **⚠️ v1.4.0：本页整体降级为历史取证（v0.85.1）**。chord 的现行描述以 [architecture-next/chord.md](../architecture-next/chord.md) 为准。
+>
+> **⚠️ v1.5.0：chord 现在是双运行时**——`@earendil-works/chord`（现役 v1）与 `@earendil-works/chord/next`（experimental v2，v1.5.0 首次有 export）。本页的 facet/service 讨论只适用于 v0.85.x；**v2 的插件模型见 [architecture-next/chord-v2.md](../architecture-next/chord-v2.md)**。v1.2.0→v1.3.0 又改了一轮公开面（`Ref`/`placement`/async get/协议 4），v1.4.0 加 `Context.telemetry` 与 `chord/sqlite`。因此下文除 §5 术语碰撞外，**凡涉及 chord API、依赖方、子路径、测试数量的断言都不要直接引用**。逐条失效清单见 [_change_log/0010](../_change_log/0010-v1.2.0-to-v1.4.0.md)。
 
 > **⚠️ v1.0.0 增补（2026-10-02，`_change_log/0007`）**：chord 的依赖关系与 API 已变——① **pi-agent-core 与 chord 脱钩**（agent 包 src 零 chord import，`dependencies` 移除；v1.0.0 起 chord 的运行时依赖方是 client / coding-agent / **durable**（新）/ protocol / server 五个包，`Context`/`JsonValue` 类型的主要消费者是 pi-durable）；② **Replicated state 破坏性改形**：`MutableReplicatedState` 的 `state` 代理 + `publish()` 被 `change(context, mutate)` / `replace(context, value)` 取代（`src/types.ts:59-71`、实现 `src/services/state.ts:184/202/231`），`replicatedState()` 新增 `ReplicatedStateSource` 重载返回 `AttachedReplicatedState`（`src/api.ts:91-106`）；③ **delta 六动词 → 七动词**：新增 `m`（数组 reorder），delta 引擎收敛为唯一不可变 tracker（astra/cow 原型删除，`tracker.ts` 2,205 行，`delta/index.ts` 1,879→694 行）；④ esbuild pin 0.28.1→0.28.2；⑤ §7/§9/§10 引用的 `packages/agent/docs/**`（plugins.md、rpc.md、mobile-handoff 全树）已于 v1.0.0 整树删除——相关"规格 vs 现状"分析转为 git 历史考古。chord 仍无 CHANGELOG；本文正文保留 v0.85.1 取证原貌，以下按节标注 v1.0.0 变化点。
 >
@@ -140,7 +142,7 @@ packages/server/src/errors.ts:1                   RemoteServiceErrorCode 来自 
 
 ## 4. chord 与 Pi 既有 extension 系统的关系：**并存，不是替代**
 
-**【硬事实】** `core/extensions` 那套**完好无损**：`ExtensionAPI`（`packages/coding-agent/src/core/extensions/types.ts:1252`）与 `ExtensionFactory`（同文件 `:1588`）都还在，`packages/coding-agent/examples/extensions/` 本轮零改动（该目录顶层 79 个条目、递归 118 个文件，其中 86 个是 `.ts`/`.js` 源文件——**引用数字时说明口径**）。
+**【硬事实】** `core/extensions` 那套**完好无损**：`ExtensionAPI`（`packages/coding-agent/src/core/extensions/types.ts:1252`）与 `ExtensionFactory`（同文件 `:1588`）都还在，`packages/coding-agent/examples/extensions/` 本轮**有改动但不触及 API**（v1.5.0：顶层 79 个条目、递归 **115** 个文件，其中 86 个是 `.ts`/`.js` 源；v1.4.0→v1.5.0 改了 18 个文件 +87/−510，集中在 `custom-provider-*`/`gondolin` 的依赖与 `README`，没有 `ExtensionAPI` 形状变化文件——**引用数字时说明口径**）。
 
 **【解释】** 所以 facet/plugin 是**平行的第二套组合机制**，不是 extension 系统 2.0。两者的差别不在功能，而在**代码住在哪个进程里**：
 

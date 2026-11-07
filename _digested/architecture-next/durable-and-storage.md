@@ -1,6 +1,11 @@
 # durable（Pico5）与存储后端：session 事实层的契约 + 接盘的运行时
 
-> **本页基线：v1.4.0（`4a080252f`）。** v1.2.0 时 durable 的定位是"进程内被 coding-agent 消费的运行时与契约上游"；v1.4.0 起多了两条硬约束：**等待变成持久任务状态**（`sleeping`，SQLite schema 升到 2 且不可回退），以及 **SQLite 驱动下沉到 `@earendil-works/chord/sqlite`**（durable 只剩存储语义与自有迁移）。契约本身（原子提交、record 类型、storage backends、ExecutionEnv）不变。
+> **本页基线：v1.5.0（`f9a263655`）。** v1.2.0 时 durable 的定位是"进程内被 coding-agent 消费的运行时与契约上游"；v1.4.0 起多了两条硬约束：**等待变成持久任务状态**（`sleeping`，SQLite schema 升到 2 且不可回退），以及 **SQLite 驱动下沉到 `@earendil-works/chord/sqlite`**（durable 只剩存储语义与自有迁移）。契约本身（原子提交、record 类型、storage backends、ExecutionEnv）不变；但 `Storage.commit()` 在 v1.5.0 被重写：一次存一组 batch 并返回 `CommitResult`，watch 也从事件流换成 `ConversationView` 窗口 + `observeCommits()`。
+>
+> **v1.5.0 新增三条存储层变化**（sync-0011，详见 [orchestration/07](../orchestration/07-durable-tasks.md#v150-的四组重写)）：
+> 1. **`Storage.commit(batches, receive, context)`** 取代 `commit(writes, adopt, context)`；每个 batch 各自一个 seq、各自原子，检查看得到前面的 batch；首个被拒的 batch 不入库而其前的入库；其他失败整体 reject。（`packages/durable/src/types.ts:1340-1346`）
+> 2. **`StoreStorage`**：Durable 的 `Storage` 落在 Chord v2 的 store 上，每次 Session commit 经 `ChordStore.commitSeries()`（`chord/src/next/store/store.ts:323`）走一次后端事务。
+> 3. **进度写入 deferred**：`settings.progress.persistWithinMs`（默认 1,000 ms）决定流式内容最迟何时落盘；SQLite 事务少约 5.7×，代价是崩溃最多丢约 1 秒流式内容。
 
 ## 它解决什么问题
 
@@ -8,13 +13,13 @@
 
 v1.0.0 起它不再只是契约层：pi-agent-core 的 harness/session/pico3 被删除后，durable 成为**唯一**的持久会话运行时。src 从 13 个文档壳文件长到 60 文件（+51.2k 行）；v0.86.x 的独立后端包 `session-backends` 也被它吸收。v1.0.0→v1.0.3 的增长点几乎全在**执行环境契约层**（`src/env/`），v1.0.3→v1.2.0 新增 `src/codemode/`、`src/tool-search/`、`src/images/`（82 文件）。
 
-**v1.2.0→v1.4.0 再增长到 85 文件**（108 文件被改，+7,966/−2,203）。这一轮不是加能力面，而是**改运行时语义**：sleep/wake、crash-loop guard、假时钟、IndexedDB 后端、telemetry；同时把 sqlite 驱动整体移交 chord。叙事仍是"会话事实层 + 执行环境契约层 + 确定性代码执行层"，但"等待"从实现细节变成了契约的一部分。
+**v1.2.0→v1.4.0 再增长到 85 文件**（**v1.5.0 为 97 个 `.ts`**）（108 文件被改，+7,966/−2,203）。这一轮不是加能力面，而是**改运行时语义**：sleep/wake、crash-loop guard、假时钟、IndexedDB 后端、telemetry；同时把 sqlite 驱动整体移交 chord。叙事仍是"会话事实层 + 执行环境契约层 + 确定性代码执行层"，但"等待"从实现细节变成了契约的一部分。
 
 ## 契约（硬事实）
 
-公开 API 面已不小（`packages/durable/src/index.ts`，216 行）：`Harness` + `createRegistry` + `defineTask`/`defineExtension`/`defineTool` + 内置 docs（`AgentDoc`/`InboxDoc`/`UsageDoc`/`LiveDoc`/`ProviderDoc`/`ConversationView`）+ 全套 record 类型 + `MemoryStorage`。`ProviderDoc`（kind `pi.provider`，`src/harness/provider.ts:12`）是 provider 侧会话身份：scope conversation、**fork: "initial"**（每个 fork/子会话拿到全新 UUIDv7 而不是继承父身份），请求前经 `ensureProviderSessionId` 惰性读取，无该文档的 legacy 会话在首次请求前做一次 migration commit 回填。subpath exports：`./env`、`./env/node`、`./tools`（内置 `CodingTools` 扩展：read/write/edit/bash；另有 `createPowerShellTool`（`src/tools/bash.ts:168`），跨平台 argv exec 形式，**不自动安装**）、`./storage/memory|jsonl|jsonl/node|sqlite|sqlite/node|indexeddb`、`./testing`（storage conformance + **env conformance**）（`packages/durable/package.json`）。依赖：chord、pi-ai、pi-codemode、pi-telemetry、diff、typebox，以及 images 子路径用的 `@silvia-odwyer/photon`。subpath 还包括 `./codemode`、`./tool-search`、`./images`、`./images/node`、`./images/cloudflare`、`./storage/sqlite/cloudflare`。
+公开 API 面已不小（`packages/durable/src/index.ts`，v1.5.0 为 234 行）：`Harness` + `createRegistry` + `defineTask`/`defineExtension`/`defineTool` + 内置 docs（`AgentDoc`/`InboxDoc`/`UsageDoc`/`LiveDoc`/`ProviderDoc`/`ConversationView`）+ 全套 record 类型 + `MemoryStorage`。`ProviderDoc`（kind `pi.provider`，`src/harness/provider.ts:12`）是 provider 侧会话身份：scope conversation、**fork: "initial"**（每个 fork/子会话拿到全新 UUIDv7 而不是继承父身份），请求前经 `ensureProviderSessionId` 惰性读取，无该文档的 legacy 会话在首次请求前做一次 migration commit 回填。subpath exports：`./env`、`./env/node`、`./tools`（内置 `CodingTools` 扩展：read/write/edit/bash；另有 `createPowerShellTool`（`src/tools/bash.ts:168`），跨平台 argv exec 形式，**不自动安装**）、`./storage/memory|jsonl|jsonl/node|sqlite|sqlite/node|indexeddb`、`./testing`（storage conformance + **env conformance**）（`packages/durable/package.json`）。依赖（v1.5.0，均精确 pin 1.5.0）：chord、pi-ai、pi-codemode、**pi-schema**、pi-telemetry、diff，以及 images 子路径用的 `@silvia-odwyer/photon`。**v1.5.0 起 `typebox` 已从依赖中移除**——校验改由 `pi-schema` 承担。subpath 还包括 `./codemode`、`./tool-search`、`./images`、`./images/node`、`./images/cloudflare`、`./storage/sqlite/cloudflare`。
 
-**真正的规范是 `packages/durable/docs/spec.md`（**5,618** 行，normative；前身 `docs/pico-v5.md` 在 1.0.0 发布整形 eaa8b0d06 中改名，npm 不再随包发布 docs/）**，开头引用块即核心规则：
+**真正的规范是 `packages/durable/docs/spec.md`（**v1.5.0 为 6,531 行**，normative；前身 `docs/pico-v5.md` 在 1.0.0 发布整形 eaa8b0d06 中改名，npm 不再随包发布 docs/）**，开头引用块即核心规则：
 
 > "A Session atomically commits immutable entries, full task records, and Chord-tracked documents. Only committed state is observable."
 
@@ -31,7 +36,7 @@ v1.0.0 起它不再只是契约层：pi-agent-core 的 harness/session/pico3 被
 
 章节地图：terms/invariants（§1）、core records（§2）、documents（§3）、transactions（§4）、tasks（§5）、submissions and inbox（§6）、**extensions/hooks/tools/system prompt**（§7，新增）、built-in tasks（§8）、document observation 与 Chord（§9）、storage contract（§10）、backends（§11：Memory/SQLite/JSONL **三个都已实现**，不再是前瞻）、API footguns（§12）、non-goals（§13）。
 
-### Record 类型（`src/types.ts`，1,274 行）
+### Record 类型（`src/types.ts`，v1.5.0 为 1,445 行）
 
 - `Id`/`Seq`：session 全局数字 ID / 单调 commit 序号；`ROOT_CONVERSATION_ID = 1`（`types.ts:40`）。
 - `ConversationRecord`：fork 源（`parent.conversationId` + `at`）与 owner 边（授权/子树 abort）。
@@ -48,14 +53,14 @@ v1.0.0 起它不再只是契约层：pi-agent-core 的 harness/session/pico3 被
 - **crash-loop guard**：`settings.restartLimit` 默认 5（`harness/types.ts:572-577`、`agent.ts:57`）；`TaskRecord.restarts`（`types.ts:681-686`）在 open 时计数（`scheduler.ts:381-419`），达限 park（`blocked.reason="restart_limit"`），`Harness.retryTask(id)` 放行（`harness/types.ts:823`）。
 - **时钟与唤醒**：`HarnessOptions.setTimer`/`now`（`harness/types.ts:640-647`）让 sleep、progress 节流、idle 回收都跑在宿主时钟上；`Harness.wake()`/`onWake`（`:648-656,790-796`）让 Cloudflare DO 这类宿主体眠、靠 alarm 唤醒。
 - **失败后的队列策略**：`settings.afterFailedRun`（`:566-571`）= `keep`（默认）/`continue`/`withdraw`。
-- **结构化并发**：`TaskScheduler` 串行化于 Session line，任务/会话构成 ownership 树，abort 级联 + `completing` hold（`src/harness/scheduler.ts`，2,507 行）。
+- **结构化并发**：`TaskScheduler` 串行化于 Session line，任务/会话构成 ownership 树，abort 级联 + `completing` hold（`src/harness/scheduler.ts`，v1.5.0 为 3,158 行）。
 - **compaction**：`CompactionTask`（`src/harness/compaction.ts:112`）+ `selectCut`（`:279`）；`settings.compaction.modelOverrides` 按 `"provider/modelId"` 给不同窗口的模型配阈值（`harness/types.ts:516-521`）；默认策略在 `src/harness/agent.ts:20-38`。
 - **extensions**：`defineExtension/defineTool/section/hook/wrapTool/wrapSection`（`src/harness/define.ts:6-43`）；安装制 registry：`install/uninstall` 按名替换/移除（`registry.ts:73-86`）；`Extension` 类型（`src/harness/types.ts:365`）。
 - **documents**：`defineDoc`/`defineDocFamily` 现在**必须**给 `checkpointWhen`（`types.ts:78`，提交时直接调用而非可选链：`session/transaction.ts:868`）；内置 doc 分别用 `()=>true`（agent/provider/usage/inbox/live）与 `()=>false`（tool/codemode）。
 - **telemetry**：`HarnessOptions.telemetry`（`harness/types.ts:611`）接 `TelemetryContext`；`DURABLE_TELEMETRY_SCHEMA`（`harness/telemetry.ts:50`）定义 `pi.durable.submit`/`pi.durable.phase` 与三个 metric，phase 的 span 会透传给 pi-ai 请求（`harness/generation.ts:224-231`）。见 [5.3 Telemetry](../agent/05-Infra/5.3_Telemetry_Layer.md)。
 - **inbox/usage/view**：`InboxDoc`（`pi.inbox`，`src/harness/inbox.ts:21`）、`UsageDoc`（`pi.usage`，`src/harness/usage.ts:14`）、`ConversationView`（`src/harness/view.ts:25`；挂载表含 `ProviderDoc`）。
-- **task graph view**：`Harness.taskGraph()`/`watchTaskGraph()`（`src/harness/harness.ts:369-373`），从 commit publication 推进 owner 边/status，并把 `blocked` 原因暴露出来（`task-graph.ts:38-46`）。
-- **conformance**：`src/testing/storage-conformance.ts`（1,682 行）+ benchmark，经 `registerStorageConformance`（`runner.ts:13`）接入任意 Vitest/Jest 兼容 runner；第二条线 `src/testing/env-conformance.ts`（633 行，`registerEnvConformance`，`runner.ts:28`）验证执行环境，被 `pi-env` 的 conformance/ssh-external 测试直接消费。
+- **task graph view**：`Harness.watchTaskGraph()`/`observeTaskGraph()`（**`taskGraph()` v1.5.0 删除**；`src/harness/harness.ts:378-385`），从 commit publication 推进 owner 边/status，并把 `blocked` 原因暴露出来（`task-graph.ts:38-46`）。
+- **conformance**：`src/testing/storage-conformance.ts`（v1.5.0 为 2,099 行）+ benchmark，经 `registerStorageConformance`（`runner.ts:13`）接入任意 Vitest/Jest 兼容 runner；第二条线 `src/testing/env-conformance.ts`（633 行，`registerEnvConformance`，`runner.ts:28`）验证执行环境，被 `pi-env` 的 conformance/ssh-external 测试直接消费。
 
 ### MemoryStorage 与 IndexedDB
 
@@ -71,7 +76,7 @@ v0.86.x 时 SQLite 后端是独立包 `@earendil-works/pi-session-backend-sqlite
 - **驱动在 chord**：`SqliteExecutor`/`SqliteDatabase` 契约（`chord/src/sqlite/database.ts`）、串行队列 + barrier、statement cache、`BEGIN IMMEDIATE` 事务、`wal_checkpoint(TRUNCATE)`、WAL/busy timeout 配置（`chord/src/sqlite/node.ts`）、`DurableObjectSqliteDatabase`（`cloudflare.ts`）、`validateSqliteSchemaPrefix`（`schema.ts`）。
 - **迁移 runner 也在 chord**，带版本下界守卫：库的版本 > 代码支持版本直接抛 `SQLite schema version N is newer than supported version …`（`chord/src/sqlite/migrations.ts:34-36`）。这就是"v2 之后不能回退到 1.3.0"的实现点。
 - **schema v2（v1.4.0）**：重建 tasks 表放开 status 的 CHECK 约束以容纳 `sleeping`（`storage/sqlite/migrations.ts:91-115`：建 `tasks_v2` → `INSERT…SELECT` → `DROP` → `RENAME` → 重建 5 个索引）。**打开即迁移**（`storage.ts:170-171`），没有 opt-in。
-- **namespacing（v1.3.0）**：`SqliteStorage.open(database, { prefix })` 给每张表/索引加前缀，供"与宿主表共库"的场景；Cloudflare DO 适配器对同一 storage 对象协调操作。JSONL 后端不变（`storage/jsonl/storage.ts` 846 行，目录 866 行；sidecar 回收见 spec §11.3）。
+- **namespacing（v1.3.0）**：`SqliteStorage.open(database, { prefix })` 给每张表/索引加前缀，供"与宿主表共库"的场景；Cloudflare DO 适配器对同一 storage 对象协调操作。JSONL 后端不变（`storage/jsonl/storage.ts` v1.5.0 为 907 行，目录 927 行；sidecar 回收见 spec §11.3）。
 
 ## ExecutionEnv：执行环境契约层（v1.0.3 大扩，硬事实）
 
@@ -90,7 +95,7 @@ v1.0.0 时 `src/env/` 只是"够 bash 工具用"的本地抽象；v1.0.3 一晚�
 ### conformance 双线与 packages/env 的关系
 
 - **env-conformance**（`src/testing/env-conformance.ts`，633 行）是 storage-conformance 之外的**第二条 conformance 线**：`registerEnvConformance`（`src/testing/runner.ts:28`）把任意 `ExecutionEnv` 实现接入同一套断言，含 watch 案例（缺失文件创建/替换/删除、祖先目录连带创建、父目录改名重建、exclude、close 幂等、watch 案例超时 30 s 以覆盖轮询延迟，`env-conformance.ts:124`、`:275-620`）。
-- **依赖方向是 env → durable，反向不成立**：`packages/env/package.json` 依赖精确版本 `@earendil-works/pi-durable 1.4.0`，其 `watch.ts`/`errors.ts`/`remote-env.ts` 从 `pi-durable/env` 导入（`FileError`/`FileWatcher`/`WatchChange` 等）；durable 不依赖 pi-env。durable 出契约，pi-env（TS 客户端 `RemoteExecutionEnv` + SSH 上的 Rust daemon）做实现。
+- **依赖方向是 env → durable，反向不成立**：`packages/env/package.json` 依赖精确版本 `@earendil-works/pi-durable 1.5.0`（v1.4.0 时为 1.4.0），其 `watch.ts`/`errors.ts`/`remote-env.ts` 从 `pi-durable/env` 导入（`FileError`/`FileWatcher`/`WatchChange` 等）；durable 不依赖 pi-env。durable 出契约，pi-env（TS 客户端 `RemoteExecutionEnv` + SSH 上的 Rust daemon）做实现。
 - **`RemoteExecutionEnv` 是 `ExecutionEnv` 的第二个官方实现**（`packages/env/src/remote-env.ts`，v1.2.0 起在 release 内）：工具的文件操作和命令执行整体搬到远端机器，而 Durable worker、存储与凭据留本地（`packages/env/README.md:3-4`）。合同是**语义等价**（`packages/env/docs/semantics.md`）：`RemoteExecutionEnv` 的结果必须等于 `NodeExecutionEnv` 直接跑在那台远端机器上的结果，只有错误消息文本允许不同——由 conformance（`packages/env/test/conformance.test.ts:4` import、`:17` 调用 durable 的 `registerEnvConformance`）与 differential（随机操作序列 + durable 工具，逐结果对比两个环境）双测试锁定，CI 跨 **5 OS 矩阵**（`env-daemons.yml` 的 8 目标交叉构建）跑，`env.yml` 的 `release-daemons` job 再在 **6 平台 runner** 上用发布构建实测（`env.yml:75-126`）。durable 侧每一步接口扩张（argv exec、window/skipped、scanLines 助手导出、watch）都在为这条消费线铺路。
 
 ### images 子系统（v1.2.0 新增）
@@ -135,7 +140,7 @@ durable 只**声明**可选的 `ExecutionEnv.listFiles`（并有 conformance 用
 
 ## codemode：确定性代码执行层（v1.2.0 新增，硬事实）
 
-`packages/durable/src/codemode/`（5 文件，主体 `codemode.ts` 1,044 行）是 v1.2.0 新能力面。**注意：这与 `packages/coding-agent/src/extensions/codemode/` 是两套独立实现**——后者调用 `@earendil-works/pi-codemode` 包，前者是 durable 自己的 journal 式实现。不要把其中一个描述为另一个的迁移。
+`packages/durable/src/codemode/`（5 文件，主体 `codemode.ts` v1.5.0 为 1,042 行）是 v1.2.0 新能力面。**注意：这与 `packages/coding-agent/src/extensions/codemode/` 是两套独立实现**——后者调用 `@earendil-works/pi-codemode` 包，前者是 durable 自己的 journal 式实现。不要把其中一个描述为另一个的迁移。
 
 导出面（`src/codemode/index.ts`）：`createCodemodeExtension` / `createCodemodeTool` / `CodemodeStoreDoc` / `CODEMODE_TOOL_NAME` / `CODEMODE_MODULE_VERSION` / `DEFAULT_CODEMODE_INLINE_BUDGET` 与配套类型。
 
@@ -153,11 +158,11 @@ durable 只**声明**可选的 `ExecutionEnv.listFiles`（并有 conformance 用
 
 ## 锚点
 
-- `packages/durable/docs/spec.md`（**5,618** 行，normative；§1 不变量、§7 执行环境契约、§11 backends——按节名检索，行号随版本漂移）
-- `packages/durable/README.md`（**876** 行，experimental usage guide；`README.md:3` "Experimental" 横幅）
+- `packages/durable/docs/spec.md`（**v1.5.0 为 6,531 行**，normative；§1 不变量、§7 执行环境契约、§11 backends——按节名检索，行号随版本漂移）
+- `packages/durable/README.md`（**v1.5.0 为 973 行**，experimental usage guide；`README.md:3` "Experimental" 横幅）
 - `packages/durable/src/env/index.ts:374`：`ExecutionEnv`；`:359-373`：`Shell`/`exec`（`:365`）；`:315`：`window`；`:322/:338/:347`：`ShellOutputWindow`/`ShellOutputSkip`/`ShellOutputInfo`；`:231/:256`：`openBinaryReader`/`openDirReader`；`:106`：`scanLines`；`:262`：`watch`
 - `packages/durable/src/env/node.ts:612`：`NodeExecutionEnv`；`:673-686`：argv exec 实现；`node-watch.ts:139`：`NodeFileWatcher`（设计说明 `:132-138`）；`:52/:54`：FSEvents settle 与目录预算
-- `packages/durable/src/testing/storage-conformance.ts`（1,682 行）、`env-conformance.ts`（633 行）；`runner.ts:13/:28`：双 conformance 注册器
+- `packages/durable/src/testing/storage-conformance.ts`（v1.5.0 为 2,099 行）、`env-conformance.ts`（633 行）；`runner.ts:13/:28`：双 conformance 注册器
 - `packages/durable/src/harness/provider.ts:12`：`ProviderDoc`；`:26`：`ensureProviderSessionId`；`view.ts:26`：`ConversationView`
 - `packages/durable/src/tools/bash.ts:145/:168`：`createBashTool`/`createPowerShellTool`（后者不进 `CodingTools`）
 - `packages/env/README.md:3-4`：远程执行定位；`packages/env/docs/semantics.md`：语义等价合同；`packages/env/package.json`：env → durable 依赖方向

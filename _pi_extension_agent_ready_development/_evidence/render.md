@@ -1,6 +1,6 @@
 # 证据附录（生成物）
 
-由 `_evidence/claims.json` 生成，基线 `v1.4.0`。**不要手改**；改台账后重新运行：
+由 `_evidence/claims.json` 生成，基线 `v1.5.0`。**不要手改**；改台账后重新运行：
 
 ```sh
 node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
@@ -15,325 +15,325 @@ node _digested/_evidence/tools/render-evidence.mjs --corpus <语料目录>
 
 agent 必须从仓库根运行，才会自动拾取 AGENTS.md 并遵守其规则
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `The One Rule`，提示行 19
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `The One Rule`，提示行 19
 
   ```text
   If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E002
 
 提问先答后改；散文直接、简洁、无套话
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Conversational Style`，提示行 8
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Conversational Style`，提示行 8
 
   ```text
   - Technical prose only, be direct
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Conversational Style`，提示行 12
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Conversational Style`，提示行 12
 
   ```text
   - When the user asks a question, answer it first before making edits or running implementation commands.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E003
 
 改代码后跑 npm run check，全量输出、不允许只截尾；check 不跑测试
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Commands`，提示行 32
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Commands`，提示行 32
 
   ```text
   - After code changes (not docs): `npm run check` (full output, no tail). Fix all errors, warnings, and infos before committing. Does not run tests.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E004
 
-未经用户请求不得运行 npm run build 或 npm test
+未经用户请求不得运行 npm test；需要构建产物（dist/）时可以运行 npm run build，但不得用它做类型检查——类型检查是 npm run check
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Commands`，提示行 33
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Commands`，提示行 33
 
   ```text
-  - Never run `npm run build` or `npm test` unless requested by the user.
+  - Run `npm run build` whenever something needs built output (`dist/`): tests or benchmarks that import built packages, Durable's workerd suite. Never use it to type check or lint: that is `npm run check`, the preferred check.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E005
 
 不得直接跑全量 vitest（含 e2e）；非 e2e 用 ./test.sh，或从包根跑单文件
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Commands`，提示行 34
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Commands`，提示行 34
 
   ```text
   - Never run the full vitest suite directly: it includes e2e tests that activate when endpoint/auth env vars are present. For all non-e2e tests, run `./test.sh` from the repo root. Otherwise run specific tests from the package root:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E006
 
 coding-agent test/suite 必须用 test/suite/harness.ts + faux provider，禁止真实 key
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Commands`，提示行 38
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Commands`，提示行 38
 
   ```text
   - For `packages/coding-agent/test/suite/`, use `test/suite/harness.ts` + the faux provider. No real provider APIs, keys, or paid tokens.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E007
 
 修 issue 的回归测试旁必须写 issue 号注释
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Commands`，提示行 39
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Commands`，提示行 39
 
   ```text
   - When regressions tests for fixing a github issue, add a comment with the github issue number next to the test.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E008
 
 临时脚本写入 /tmp 文件再跑，不内嵌多行脚本
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Commands`，提示行 40
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Commands`，提示行 40
 
   ```text
   - For ad-hoc scripts, `write` them to a temp file (e.g. `/tmp`), run, edit if needed, remove when done. Don't embed multi-line scripts in `bash` commands.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E009
 
 直接 registry 依赖（含内部 workspace 包）必须精确版本
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Dependency and Install Security`，提示行 45
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Dependency and Install Security`，提示行 45
 
   ```text
   - Treat npm dep and lockfile changes as reviewed code. Direct registry deps, including internal workspace deps, stay pinned to exact versions.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E010
 
 本地用 npm install --ignore-scripts 水合，CI 用 npm ci；不得擅自跑 lifecycle 脚本
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Dependency and Install Security`，提示行 47
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Dependency and Install Security`，提示行 47
 
   ```text
   - Hydrate/update locally with `npm install --ignore-scripts`; clean/CI-style with `npm ci --ignore-scripts`. Don't run lifecycle scripts unless the user asks.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E011
 
 带安装脚本的新依赖须评审并进显式 allowlist；lockfile 提交被 pre-commit 拦截
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Dependency and Install Security`，提示行 49
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Dependency and Install Security`，提示行 49
 
   ```text
   - If `packages/coding-agent/install-lock/` needs regen, run `node scripts/generate-coding-agent-install-lock.mjs` (verify with `--check` or `npm run check`). New deps with lifecycle scripts require review and an explicit allowlist entry in that script; never add one silently.
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Dependency and Install Security`，提示行 50
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Dependency and Install Security`，提示行 50
 
   ```text
   - Pre-commit blocks lockfile commits unless `PI_ALLOW_LOCKFILE_CHANGE=1`. Don't bypass unless the user wants the lockfile change committed.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E012
 
 除非用户要求，否则不提交
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Git`，提示行 41
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Git`，提示行 41
 
   ```text
   - Never commit unless the user asks.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E013
 
 只提交本次自己改的文件；显式暂存路径，禁止 git add -A/.
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Git`，提示行 58
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Git`，提示行 58
 
   ```text
   - Only commit files YOU changed in THIS session.
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Git`，提示行 59
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Git`，提示行 59
 
   ```text
   - Stage explicit paths (`git add <path1> <path2>`); never `git add -A` / `git add .`.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E014
 
 禁止 reset --hard、checkout .、clean -fd、stash 与 --no-verify；永不 force push
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Git`，提示行 66
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Git`，提示行 66
 
   ```text
   - `git reset --hard`, `git checkout .`, `git clean -fd`, `git stash`, `git add -A`, `git add .`, `git commit --no-verify`.
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Git`，提示行 72
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Git`，提示行 72
 
   ```text
   - Never force push.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E015
 
 commit message 格式固定为 {feat,fix,docs}[(scope)]: <message>
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Git`，提示行 62
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Git`，提示行 62
 
   ```text
   - Message format: `{feat,fix,docs}[(ai,tui,agent,coding-agent)]: <commit message> (optionally multiple lines)`. Message is informative and concise.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E016
 
 pi 的核保持最小；不属于核的功能应做成扩展，膨胀核的 PR 会被拒
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Philosophy`，提示行 7
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Philosophy`，提示行 7
 
   ```text
   First things first: **pi's core is minimal**.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Philosophy`，提示行 9
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Philosophy`，提示行 9
 
   ```text
   If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E017
 
 提交者必须理解自己的代码；不理解而提交 AI 产物会被关闭
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `The One Rule`，提示行 15
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `The One Rule`，提示行 15
 
   ```text
   **You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `The One Rule`，提示行 17
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `The One Rule`，提示行 17
 
   ```text
   Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E018
 
 新贡献者的 issue 与 PR 默认自动关闭
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Contribution Gate`，提示行 23
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Contribution Gate`，提示行 23
 
   ```text
   All issues and PRs from new contributors are auto-closed by default.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E019
 
 lgtmi/lgtm 解锁贡献资格，命令须在回复开头或结尾；只有 lgtm 允许开 PR
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Contribution Gate`，提示行 31
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Contribution Gate`，提示行 31
 
   ```text
   - `lgtmi`: your future issues will not be auto-closed
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Contribution Gate`，提示行 32
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Contribution Gate`，提示行 32
 
   ```text
   - `lgtm`: your future issues and PRs will not be auto-closed
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Contribution Gate`，提示行 34
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Contribution Gate`，提示行 34
 
   ```text
   The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E020
 
 开 PR 前必须已获 lgtm；npm run check 与 ./test.sh 都必须通过
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Before Submitting a PR`，提示行 58
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Before Submitting a PR`，提示行 58
 
   ```text
   Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Before Submitting a PR`，提示行 63
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Before Submitting a PR`，提示行 63
 
   ```text
   npm run check
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Before Submitting a PR`，提示行 67
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Before Submitting a PR`，提示行 67
 
   ```text
   Both must pass.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E021
 
 贡献者不得改 CHANGELOG.md，条目由维护者添加
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — heading: `Before Submitting a PR`，提示行 69
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — heading: `Before Submitting a PR`，提示行 69
 
   ```text
   Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E022
 
-生成模型数据目录被 gitignore：不得暂存，也不要从 git 历史里找
+模型目录定义在 packages/ai/catalog/，不得直接改 models.generated.ts；生成数据目录被 gitignore，不得暂存
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — heading: `Code Quality`，提示行 28
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — heading: `Code Quality`，提示行 28
 
   ```text
-  - Never modify `packages/ai/src/models.generated.ts` directly; update `packages/ai/scripts/generate-models.ts` instead, then regenerate. Including the resulting `models.generated.ts` diff is always OK, even if regeneration includes unrelated upstream model metadata changes. The generated model data in `packages/ai/src/providers/data/` is gitignored: never stage it, and don't look for it in git history.
+  - Never modify `packages/ai/src/models.generated.ts` directly; update the catalog definitions in `packages/ai/catalog/` instead (see its README), then regenerate. Including the resulting `models.generated.ts` diff is always OK, even if regeneration includes unrelated upstream model metadata changes. The generated model data in `packages/ai/src/providers/data/` is gitignored: never stage it, and don't look for it in git history.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## sdlc-reference/07-release-and-recovery.md
 
@@ -341,567 +341,573 @@ lgtmi/lgtm 解锁贡献资格，命令须在回复开头或结尾；只有 lgtm 
 
 lockstep 版本：所有包同一版本、一起发布；sync-versions 与 publish 各断言一次
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.`，提示行 10
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.`，提示行 10
 
   ```text
   **Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.
   ```
 
-- [`scripts/sync-versions.js`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/sync-versions.js) — text: `const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));`，提示行 29
+- [`scripts/sync-versions.js`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/sync-versions.js) — text: `const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));`，提示行 29
 
   ```text
   const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));
   ```
 
-- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish.mjs) — text: `const versions = ［...new Set(packages.map((pkg) => pkg.version))］;`，提示行 33
+- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish.mjs) — text: `const versions = ［...new Set(packages.map((pkg) => pkg.version))］;`，提示行 33
 
   ```text
   const versions = [...new Set(packages.map((pkg) => pkg.version))];
   ```
 
-- [`package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/package.json) — text: `"version:patch": "npm version patch --workspaces --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts",`，提示行 43
+- [`package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/package.json) — text: `"version:patch": "npm version patch --workspaces --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts",`，提示行 43
 
   ```text
   "version:patch": "npm version patch --workspaces --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts",
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E024
 
 两个发布入口：release:local 只做仓外 tarball smoke；真实发布推 main 与 tag
 
-- [`scripts/local-release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/local-release.mjs) — text: `import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";`，提示行 4
+- [`scripts/local-release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/local-release.mjs) — text: `import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";`，提示行 4
 
   ```text
   import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
   ```
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `3. **Run the release script**:`，提示行 37
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `3. **Run the release script**:`，提示行 37
 
   ```text
   3. **Run the release script**:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E025
 
 发布前：先审 changelog、仓外本地 smoke、再跑发布脚本
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `1. **Update CHANGELOGs**: ask the user whether they ran the `/cl` prompt on the latest commit on `main`. If not, they must run `/cl` first to audit and update each package's `［Unreleased］` section before releasing.`，提示行 12
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `1. **Update CHANGELOGs**: ask the user whether they ran the `/cl` prompt on the latest commit on `main`. If not, they must run `/cl` first to audit and update each package's `［Unreleased］` section before releasing.`，提示行 12
 
   ```text
   1. **Update CHANGELOGs**: ask the user whether they ran the `/cl` prompt on the latest commit on `main`. If not, they must run `/cl` first to audit and update each package's `[Unreleased]` section before releasing.
   ```
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):`，提示行 14
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):`，提示行 14
 
   ```text
   2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E026
 
 release.mjs 的十步：干净树 → npm 注册 → catalog pin+build → bump → changelog → 产物 → 检查 → commit/tag → 下周期段 → push
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `* 1. Check for uncommitted changes`，提示行 10
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `* 1. Check for uncommitted changes`，提示行 10
 
   ```text
   * 1. Check for uncommitted changes
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `// 1. Check for uncommitted changes`，提示行 258
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `// 1. Check for uncommitted changes`，提示行 258
 
   ```text
   // 1. Check for uncommitted changes
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function assertPackagesAreRegisteredWithNpm() {`，提示行 57
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `function assertPackagesAreRegisteredWithNpm() {`，提示行 57
 
   ```text
   function assertPackagesAreRegisteredWithNpm() {
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `// Pin and verify the Nix model catalog before modifying versions, so the pin`，提示行 271
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `// Pin and verify the Nix model catalog before modifying versions, so the pin`，提示行 271
 
   ```text
   // Pin and verify the Nix model catalog before modifying versions, so the pin
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function bumpOrSetVersion(target) {`，提示行 186
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `function bumpOrSetVersion(target) {`，提示行 186
 
   ```text
   function bumpOrSetVersion(target) {
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function updateChangelogsForRelease(version) {`，提示行 217
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `function updateChangelogsForRelease(version) {`，提示行 217
 
   ```text
   function updateChangelogsForRelease(version) {
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `// 5. Regenerate release artifacts`，提示行 286
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `// 5. Regenerate release artifacts`，提示行 286
 
   ```text
   // 5. Regenerate release artifacts
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `// 6. Run checks and tests`，提示行 293
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `// 6. Run checks and tests`，提示行 293
 
   ```text
   // 6. Run checks and tests
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function stageChangedFiles() {`，提示行 176
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `function stageChangedFiles() {`，提示行 176
 
   ```text
   function stageChangedFiles() {
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `function addUnreleasedSection() {`，提示行 238
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `function addUnreleasedSection() {`，提示行 238
 
   ```text
   function addUnreleasedSection() {
   ```
 
-- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/release.mjs) — text: `run("git push origin main");`，提示行 336
+- [`scripts/release.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/release.mjs) — text: `run("git push origin main");`，提示行 336
 
   ```text
   run("git push origin main");
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E027
 
 tag 推出后不得重跑 release 脚本
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## ［Unreleased］` changelog sections, commits `Add ［Unreleased］ section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.`，提示行 46
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## ［Unreleased］` changelog sections, commits `Add ［Unreleased］ section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.`，提示行 46
 
   ```text
   The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## [Unreleased]` changelog sections, commits `Add [Unreleased] section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E028
 
 公开放最后：二进制先入 draft，后续失败由 cleanup 删除草稿
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'`，提示行 14
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'`，提示行 14
 
   ```text
   description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'
   ```
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `# Keep the public GitHub Release publication last. Binary assets are staged in`，提示行 25
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `# Keep the public GitHub Release publication last. Binary assets are staged in`，提示行 25
 
   ```text
   # Keep the public GitHub Release publication last. Binary assets are staged in
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E029
 
 六个阶段 + 并行 3b env-daemons；publish-npm 的 needs 含两者
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `build:`，提示行 27
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `build:`，提示行 27
 
   ```text
   build:
   ```
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `smoke-test-binaries:`，提示行 131
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `smoke-test-binaries:`，提示行 131
 
   ```text
   smoke-test-binaries:
   ```
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `stage-github-release:`，提示行 210
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `stage-github-release:`，提示行 210
 
   ```text
   stage-github-release:
   ```
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `# The pi-env daemon for every remote system @earendil-works/pi-env supports; the npm package ships them all.`，提示行 304
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `# The pi-env daemon for every remote system @earendil-works/pi-env supports; the npm package ships them all.`，提示行 304
 
   ```text
   # The pi-env daemon for every remote system @earendil-works/pi-env supports; the npm package ships them all.
   ```
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `publish-npm:`，提示行 312
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `publish-npm:`，提示行 312
 
   ```text
   publish-npm:
   ```
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `announce-pi-dev-release:`，提示行 389
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `announce-pi-dev-release:`，提示行 389
 
   ```text
   announce-pi-dev-release:
   ```
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `publish-github-release:`，提示行 430
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `publish-github-release:`，提示行 430
 
   ```text
   publish-github-release:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E030
 
 公告：逐包校验 npm 版本与 tarball；release record 与 installer 用 if-none-match；latest 指针乐观锁且不降级
 
-- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `for (const pkg of packages) {`，提示行 272
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-release-announcement.mjs) — text: `for (const pkg of packages) {`，提示行 272
 
   ```text
   for (const pkg of packages) {
   ```
 
-- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `async function resolvePackageFromNpm(pkg) {`，提示行 70
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-release-announcement.mjs) — text: `async function resolvePackageFromNpm(pkg) {`，提示行 70
 
   ```text
   async function resolvePackageFromNpm(pkg) {
   ```
 
-- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `export async function advanceLatestRelease(version, readLatest, writeLatest) {`，提示行 254
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-release-announcement.mjs) — text: `export async function advanceLatestRelease(version, readLatest, writeLatest) {`，提示行 254
 
   ```text
   export async function advanceLatestRelease(version, readLatest, writeLatest) {
   ```
 
-- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `const current = await readLatest();`，提示行 256
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-release-announcement.mjs) — text: `const current = await readLatest();`，提示行 256
 
   ```text
   const current = await readLatest();
   ```
 
-- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `"public, max-age=31536000, immutable",`，提示行 297
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-release-announcement.mjs) — text: `"public, max-age=31536000, immutable",`，提示行 297
 
   ```text
   "public, max-age=31536000, immutable",
   ```
 
-- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-release-announcement.mjs) — text: `"no-store",`，提示行 346
+- [`scripts/publish-release-announcement.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-release-announcement.mjs) — text: `"no-store",`，提示行 346
 
   ```text
   "no-store",
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E031
 
 Nix 线：tag 构建要求版本等于 tag；stable 只 fast-forward 不回退
 
-- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `build:`，提示行 87
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/nix.yml) — text: `build:`，提示行 87
 
   ```text
   build:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E032
 
 三处幂等：npm 已发布则跳过；公告对象 if-none-match；草稿 Release 由 cleanup job 兜底
 
-- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish.mjs) — text: `function isPublished(name, version) {`，提示行 13
+- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish.mjs) — text: `function isPublished(name, version) {`，提示行 13
 
   ```text
   function isPublished(name, version) {
   ```
 
-- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish.mjs) — text: `if (pkg.published) {`，提示行 50
+- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish.mjs) — text: `if (pkg.published) {`，提示行 50
 
   ```text
   if (pkg.published) {
   ```
 
-- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish.mjs) — text: `const args = ［"publish", pkg.tarballPath, "--access", "public", "--provenance", "--ignore-scripts"］;`，提示行 54
+- [`scripts/publish.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish.mjs) — text: `const args = ［"publish", pkg.tarballPath, "--access", "public", "--provenance", "--ignore-scripts"］;`，提示行 54
 
   ```text
   const args = ["publish", pkg.tarballPath, "--access", "public", "--provenance", "--ignore-scripts"];
   ```
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `cleanup-draft-github-release:`，提示行 460
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `cleanup-draft-github-release:`，提示行 460
 
   ```text
   cleanup-draft-github-release:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E033
 
 恢复动作：修好重跑失败 job，不重跑 release；Nix 的 tag 不能修，source_ref 仅供恢复
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `6. **If CI publish or announcement fails**: inspect the failed job. The publish helper is idempotent and skips package versions already present on npm; the announcement job rechecks availability before updating the R2 marker. Rerun the failed job or workflow after fixing CI or transient npm issues. Do not rerun `npm run release:patch` or `npm run release:minor` for the same version.`，提示行 52
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `6. **If CI publish or announcement fails**: inspect the failed job. The publish helper is idempotent and skips package versions already present on npm; the announcement job rechecks availability before updating the R2 marker. Rerun the failed job or workflow after fixing CI or transient npm issues. Do not rerun `npm run release:patch` or `npm run release:minor` for the same version.`，提示行 52
 
   ```text
   6. **If CI publish or announcement fails**: inspect the failed job. The publish helper is idempotent and skips package versions already present on npm; the announcement job rechecks availability before updating the R2 marker. Rerun the failed job or workflow after fixing CI or transient npm issues. Do not rerun `npm run release:patch` or `npm run release:minor` for the same version.
   ```
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `5. **CI builds the Nix release**: the tag push also triggers `.github/workflows/nix.yml`, which builds the tagged flake on Linux and macOS and then fast-forwards the `stable` branch to the release commit. `nix run github:earendil-works/pi/stable` runs the latest release. If the Nix build fails, `stable` stays on the previous release; the tag cannot be fixed, so fix `main` and ship the fix in the next release.`，提示行 50
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `5. **CI builds the Nix release**: the tag push also triggers `.github/workflows/nix.yml`, which builds the tagged flake on Linux and macOS and then fast-forwards the `stable` branch to the release commit. `nix run github:earendil-works/pi/stable` runs the latest release. If the Nix build fails, `stable` stays on the previous release; the tag cannot be fixed, so fix `main` and ship the fix in the next release.`，提示行 50
 
   ```text
   5. **CI builds the Nix release**: the tag push also triggers `.github/workflows/nix.yml`, which builds the tagged flake on Linux and macOS and then fast-forwards the `stable` branch to the release commit. `nix run github:earendil-works/pi/stable` runs the latest release. If the Nix build fails, `stable` stays on the previous release; the tag cannot be fixed, so fix `main` and ship the fix in the next release.
   ```
 
-- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/build-binaries.yml) — text: `description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'`，提示行 14
+- [`.github/workflows/build-binaries.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/build-binaries.yml) — text: `description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'`，提示行 14
 
   ```text
   description: 'Source ref to build/publish (defaults to tag; use only for release recovery)'
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## sdlc-reference/04-ci-matrix.md
 
 ### E034
 
-主 CI 触发 push/PR main；build-check-test 依次 build、check、env daemon 构建、npm test
+主 CI 触发 push/PR main；build-check 依次 build、打包 preview 包、check；测试拆到并行 test job 矩阵；另有 mcp-conformance job
 
-- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `on:`，提示行 3
-
-  ```text
-  on:
-  ```
-
-- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `build-check-test:`，提示行 14
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/ci.yml) — text: `push:`
 
   ```text
-  build-check-test:
+  push:
   ```
 
-- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `- name: Build the pi-env daemon`，提示行 41
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/ci.yml) — text: `  build-check:`
+
+  ```text
+    build-check:
+  ```
+
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/ci.yml) — text: `  test:`
+
+  ```text
+    test:
+  ```
+
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/ci.yml) — text: `- name: Build the pi-env daemon`
 
   ```text
   - name: Build the pi-env daemon
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E035
 
 mcp-conformance 是独立 job，用官方 conformance 套件对 baseline.json 锁协议兼容
 
-- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `mcp-conformance:`，提示行 47
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/ci.yml) — text: `mcp-conformance:`，提示行 47
 
   ```text
   mcp-conformance:
   ```
 
-- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `# Runs pi's MCP client from source against the pinned official conformance suite and fails on`，提示行 62
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/ci.yml) — text: `# Runs pi's MCP client from source against the pinned official conformance suite and fails on`，提示行 62
 
   ```text
   # Runs pi's MCP client from source against the pinned official conformance suite and fails on
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E036
 
 根 npm test = 脚本单测 + 各 workspace test；evals 的普通单测在 CI 内，真实模型 eval 不在
 
-- [`package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/package.json) — text: `"test": "npm run test:scripts && npm run test --workspaces --if-present",`，提示行 40
+- [`package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/package.json) — text: `"test": "npm run test:scripts && npm run test --workspaces --if-present",`，提示行 40
 
   ```text
   "test": "npm run test:scripts && npm run test --workspaces --if-present",
   ```
 
-- [`packages/evals/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/package.json) — text: `"test": "vitest run --config vitest.test.config.ts"`，提示行 11
+- [`packages/evals/package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/package.json) — text: `"test": "vitest run --config vitest.test.config.ts"`，提示行 11
 
   ```text
   "test": "vitest run --config vitest.test.config.ts"
   ```
 
-- [`packages/evals/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/package.json) — text: `"eval": "npm run eval:host && npm run eval:docs --",`，提示行 8
+- [`packages/evals/package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/package.json) — text: `"eval": "npm run eval:host && npm run eval:docs --",`，提示行 8
 
   ```text
   "eval": "npm run eval:host && npm run eval:docs --",
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E037
 
 env.yml 路径门控的 PR 检查，四个 job：daemons / check / release-daemons（六平台）/ tests（五 OS）
 
-- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env.yml) — text: `on:`，提示行 6
+- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/env.yml) — text: `on:`，提示行 6
 
   ```text
   on:
   ```
 
-- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env.yml) — text: `check:`，提示行 25
+- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/env.yml) — text: `check:`，提示行 25
 
   ```text
   check:
   ```
 
-- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env.yml) — text: `if (missing.length || unexpected.length) { console.error({ missing, unexpected }); process.exit(1); }`，提示行 70
+- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/env.yml) — text: `if (missing.length || unexpected.length) { console.error({ missing, unexpected }); process.exit(1); }`，提示行 70
 
   ```text
   if (missing.length || unexpected.length) { console.error({ missing, unexpected }); process.exit(1); }
   ```
 
-- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env.yml) — text: `tests:`，提示行 128
+- [`.github/workflows/env.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/env.yml) — text: `tests:`，提示行 128
 
   ```text
   tests:
   ```
 
-- [`.github/workflows/env-daemons.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/env-daemons.yml) — text: `name: pi-env daemons`，提示行 1
+- [`.github/workflows/env-daemons.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/env-daemons.yml) — text: `name: pi-env daemons`，提示行 1
 
   ```text
   name: pi-env daemons
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E038
 
 nix.yml 五类触发；pin 刷新按 provider/type/api 判 stale；三系统 build；stable fast-forward；bot 回写 pin
 
-- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `on:`，提示行 16
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/nix.yml) — text: `on:`，提示行 16
 
   ```text
   on:
   ```
 
-- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `- name: Refresh the model catalog pin if stale`，提示行 68
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/nix.yml) — text: `- name: Refresh the model catalog pin if stale`，提示行 68
 
   ```text
   - name: Refresh the model catalog pin if stale
   ```
 
-- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `build:`，提示行 87
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/nix.yml) — text: `build:`，提示行 87
 
   ```text
   build:
   ```
 
-- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `update-stable:`，提示行 136
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/nix.yml) — text: `update-stable:`，提示行 136
 
   ```text
   update-stable:
   ```
 
-- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `commit-pin:`，提示行 154
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/nix.yml) — text: `commit-pin:`，提示行 154
 
   ```text
   commit-pin:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E039
 
 npm-audit 每日/手动运行，production-only，moderate 及以上未接受即失败
 
-- [`.github/workflows/npm-audit.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/npm-audit.yml) — text: `on:`，提示行 3
+- [`.github/workflows/npm-audit.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/npm-audit.yml) — text: `on:`，提示行 3
 
   ```text
   on:
   ```
 
-- [`.github/workflows/npm-audit.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/npm-audit.yml) — text: `- name: Install dependencies without lifecycle scripts`，提示行 24
+- [`.github/workflows/npm-audit.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/npm-audit.yml) — text: `- name: Install dependencies without lifecycle scripts`，提示行 24
 
   ```text
   - name: Install dependencies without lifecycle scripts
   ```
 
-- [`scripts/npm-audit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/npm-audit.mjs) — text: `// Runs `npm audit --omit=dev` and fails on advisories at or above the audit`，提示行 1
+- [`scripts/npm-audit.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/npm-audit.mjs) — text: `// Runs `npm audit --omit=dev` and fails on advisories at or above the audit`，提示行 1
 
   ```text
   // Runs `npm audit --omit=dev` and fails on advisories at or above the audit
   ```
 
-- [`scripts/npm-audit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/npm-audit.mjs) — text: `for (const id of Object.keys(acceptedAdvisories)) {`，提示行 69
+- [`scripts/npm-audit.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/npm-audit.mjs) — text: `for (const id of Object.keys(acceptedAdvisories)) {`，提示行 69
 
   ```text
   for (const id of Object.keys(acceptedAdvisories)) {
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E040
 
 模型目录数据链：generate 校验并做兼容检查；publish 有窗口限制；脚本拒绝不一致目录、用 SHA-256 作 revision、已当前则跳过
 
-- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `on:`，提示行 3
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/publish-model-catalog.yml) — text: `on:`，提示行 3
 
   ```text
   on:
   ```
 
-- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `generate:`，提示行 41
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/publish-model-catalog.yml) — text: `generate:`，提示行 41
 
   ```text
   generate:
   ```
 
-- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `# The compatibility check reads the latest release's source from its git tag.`，提示行 52
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/publish-model-catalog.yml) — text: `# The compatibility check reads the latest release's source from its git tag.`，提示行 52
 
   ```text
   # The compatibility check reads the latest release's source from its git tag.
   ```
 
-- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `publish:`，提示行 83
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/publish-model-catalog.yml) — text: `publish:`，提示行 83
 
   ```text
   publish:
   ```
 
-- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/publish-model-catalog.yml) — text: `- name: Check publication window`，提示行 119
+- [`.github/workflows/publish-model-catalog.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/publish-model-catalog.yml) — text: `- name: Check publication window`，提示行 119
 
   ```text
   - name: Check publication window
   ```
 
-- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-model-catalog.mjs) — text: `const JSON_CONTENT_TYPE = "application/json; charset=utf-8";`，提示行 28
+- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-model-catalog.mjs) — text: `const JSON_CONTENT_TYPE = "application/json; charset=utf-8";`，提示行 28
 
   ```text
   const JSON_CONTENT_TYPE = "application/json; charset=utf-8";
   ```
 
-- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-model-catalog.mjs) — text: `const providersDir = join(inputDir, "providers");`，提示行 88
+- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-model-catalog.mjs) — text: `const providersDir = join(inputDir, "providers");`，提示行 88
 
   ```text
   const providersDir = join(inputDir, "providers");
   ```
 
-- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-model-catalog.mjs) — text: `const digest = createHash("sha256").update(allModelsBytes).digest("hex");`，提示行 160
+- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-model-catalog.mjs) — text: `const digest = createHash("sha256").update(allModelsBytes).digest("hex");`，提示行 160
 
   ```text
   const digest = createHash("sha256").update(allModelsBytes).digest("hex");
   ```
 
-- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/publish-model-catalog.mjs) — text: `...bundle.providerIds.flatMap((providerId) => ［`，提示行 307
+- [`scripts/publish-model-catalog.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/publish-model-catalog.mjs) — text: `...bundle.providerIds.flatMap((providerId) => ［`，提示行 307
 
   ```text
   ...bundle.providerIds.flatMap((providerId) => [
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E041
 
 真实模型评估（eval/eval:host/eval:docs）需要 PI_PROVIDER/PI_MODEL，不在主 CI 命令内
 
-- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.`，提示行 24
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/README.md) — text: `The host smoke eval, on-demand documentation audit, and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.`，提示行 24
 
   ```text
-  Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.
+  The host smoke eval, on-demand documentation audit, and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## sdlc-reference/05-testing-layers.md
 
@@ -909,381 +915,375 @@ npm-audit 每日/手动运行，production-only，moderate 及以上未接受即
 
 test.sh 构造隔离 home/npm 配置，只删带 marker 的 pi-test.* 目录，用 env -i 白名单跑测试
 
-- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `# Isolate user resources, credentials, temporary files, and tool configuration.`，提示行 4
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.5.0/test.sh) — text: `# Isolate user resources, credentials, temporary files, and tool configuration.`，提示行 4
 
   ```text
   # Isolate user resources, credentials, temporary files, and tool configuration.
   ```
 
-- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `# Only remove the marked directory created above, never an unverified path.`，提示行 15
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.5.0/test.sh) — text: `# Only remove the marked directory created above, never an unverified path.`，提示行 15
 
   ```text
   # Only remove the marked directory created above, never an unverified path.
   ```
 
-- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `# Start from an empty environment and allow only required platform and test settings.`，提示行 39
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.5.0/test.sh) — text: `# Start from an empty environment and allow only required platform and test settings.`，提示行 39
 
   ```text
   # Start from an empty environment and allow only required platform and test settings.
   ```
 
-- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `# Preserve CI detection only for runner behavior and test reporting.`，提示行 77
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.5.0/test.sh) — text: `# Preserve CI detection only for runner behavior and test reporting.`，提示行 77
 
   ```text
   # Preserve CI detection only for runner behavior and test reporting.
   ```
 
-- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.4.0/test.sh) — text: `env -i "${test_env［@］}" npm test`，提示行 84
+- [`test.sh`](https://github.com/earendil-works/pi/blob/v1.5.0/test.sh) — text: `env -i "${test_env［@］}" npm test`，提示行 84
 
   ```text
   env -i "${test_env[@]}" npm test
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E043
 
 suite 规则：用 harness.ts 与 faux provider，不用真实 key/网络，保持 CI 安全
 
-- [`packages/coding-agent/test/suite/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/README.md) — text: `- Use `test/suite/harness.ts``，提示行 6
+- [`packages/coding-agent/test/suite/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/README.md) — text: `- Use `test/suite/harness.ts``，提示行 6
 
   ```text
   - Use `test/suite/harness.ts`
   ```
 
-- [`packages/coding-agent/test/suite/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/README.md) — text: `- Do not use real provider APIs, real API keys, network calls, or paid tokens`，提示行 8
+- [`packages/coding-agent/test/suite/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/README.md) — text: `- Do not use real provider APIs, real API keys, network calls, or paid tokens`，提示行 8
 
   ```text
   - Do not use real provider APIs, real API keys, network calls, or paid tokens
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E044
 
 harness 用假 provider + 假 key，但 Agent/AgentSession 是真实实现，资源加载默认替身，响应脚本化、事件收集
 
-- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `const fauxProvider: FauxProviderRegistration = registerFauxProvider({`，提示行 153
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/harness.ts) — text: `const fauxProvider: FauxProviderRegistration = registerFauxProvider({`，提示行 153
 
   ```text
   const fauxProvider: FauxProviderRegistration = registerFauxProvider({
   ```
 
-- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `await authStorage.modify(model.provider, async () => ({ type: "api_key", key: "faux-key" }));`，提示行 168
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/harness.ts) — text: `await authStorage.modify(model.provider, async () => ({ type: "api_key", key: "faux-key" }));`，提示行 168
 
   ```text
   await authStorage.modify(model.provider, async () => ({ type: "api_key", key: "faux-key" }));
   ```
 
-- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `const agent = new Agent({`，提示行 195
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/harness.ts) — text: `const agent = new Agent({`，提示行 195
 
   ```text
   const agent = new Agent({
   ```
 
-- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `? await createTestExtensionsResult(options.extensionFactories, tempDir)`，提示行 229
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/harness.ts) — text: `? await createTestExtensionsResult(options.extensionFactories, tempDir)`，提示行 229
 
   ```text
   ? await createTestExtensionsResult(options.extensionFactories, tempDir)
   ```
 
-- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `session.subscribe((event) => {`，提示行 250
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/harness.ts) — text: `session.subscribe((event) => {`，提示行 250
 
   ```text
   session.subscribe((event) => {
   ```
 
-- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `setResponses: fauxProvider.setResponses,`，提示行 262
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/harness.ts) — text: `setResponses: fauxProvider.setResponses,`，提示行 262
 
   ```text
   setResponses: fauxProvider.setResponses,
   ```
 
-- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `return events.filter((event): event is Extract<AgentSessionEvent, { type: T }> => event.type === type);`，提示行 267
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/harness.ts) — text: `return events.filter((event): event is Extract<AgentSessionEvent, { type: T }> => event.type === type);`，提示行 267
 
   ```text
   return events.filter((event): event is Extract<AgentSessionEvent, { type: T }> => event.type === type);
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E045
 
 faux provider 经 pi-ai 的 ./compat 子路径公开导出，宿主 harness 自身也这样导入
 
-- [`packages/ai/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/package.json) — text: `"./compat": {`，提示行 22
+- [`packages/ai/package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/ai/package.json) — text: `"./compat": {`，提示行 22
 
   ```text
   "./compat": {
   ```
 
-- [`packages/ai/src/compat.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/compat.ts) — text: `export function registerFauxProvider(options: RegisterFauxProviderOptions = {}): FauxProviderRegistration {`，提示行 162
+- [`packages/ai/src/compat.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/ai/src/compat.ts) — text: `export function registerFauxProvider(options: RegisterFauxProviderOptions = {}): FauxProviderRegistration {`，提示行 162
 
   ```text
   export function registerFauxProvider(options: RegisterFauxProviderOptions = {}): FauxProviderRegistration {
   ```
 
-- [`packages/ai/src/compat.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/ai/src/compat.ts) — text: `export function streamSimple<TApi extends Api>(`，提示行 278
+- [`packages/ai/src/compat.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/ai/src/compat.ts) — text: `export function streamSimple<TApi extends Api>(`，提示行 278
 
   ```text
   export function streamSimple<TApi extends Api>(
   ```
 
-- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/test/suite/harness.ts) — text: `import { registerFauxProvider, streamSimple } from "@earendil-works/pi-ai/compat";`，提示行 18
+- [`packages/coding-agent/test/suite/harness.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/test/suite/harness.ts) — text: `import { registerFauxProvider, streamSimple } from "@earendil-works/pi-ai/compat";`，提示行 18
 
   ```text
   import { registerFauxProvider, streamSimple } from "@earendil-works/pi-ai/compat";
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E046
 
 release smoke 标准：Node 与 Bun 各跑一次真实 prompt 并等模型回复，启动不算通过
 
-- [`.pi/skills/interactive-testing.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/interactive-testing.md) — text: `For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.`，提示行 19
+- [`.pi/skills/interactive-testing.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/interactive-testing.md) — text: `For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.`，提示行 19
 
   ```text
   For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E047
 
 evals 文档评估：Docker 配对 with/without docs，两臂各一分数才计入 lift，需要 PI_PROVIDER/PI_MODEL，单次不能证明稳定性
 
-- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `- `*.docs.eval.ts` is a documentation-lift eval. `eval:docs` runs each case in isolated `without_docs` and `with_docs` containers and reports lift.`，提示行 9
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/README.md) — text: `- `*.docs.eval.ts` is a documentation-lift eval. `eval:docs` runs each case in isolated `without_docs` and `with_docs` containers and reports lift.`，提示行 9
 
   ```text
   - `*.docs.eval.ts` is a documentation-lift eval. `eval:docs` runs each case in isolated `without_docs` and `with_docs` containers and reports lift.
   ```
 
-- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: ``without_docs` omits the coding-agent `README.md`, `CHANGELOG.md`, `docs/`, and `examples/`, then removes the Pi documentation-routing section from the default system prompt.`，提示行 84
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/README.md) — text: ``without_docs` omits the coding-agent `README.md`, `CHANGELOG.md`, `docs/`, and `examples/`, then removes the Pi documentation-routing section from the default system prompt.`，提示行 84
 
   ```text
   `without_docs` omits the coding-agent `README.md`, `CHANGELOG.md`, `docs/`, and `examples/`, then removes the Pi documentation-routing section from the default system prompt.
   ```
 
-- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `1. Mounts the repository ephemerally for a Docker build, packs the current workspace packages using the repository's consumer-install machinery, then creates separate `without_docs` and `with_docs` images from the staged runtime.`，提示行 73
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/README.md) — text: `1. Mounts the repository ephemerally for a Docker build, packs the current workspace packages using the repository's consumer-install machinery, then creates separate `without_docs` and `with_docs` images from the staged runtime.`，提示行 73
 
   ```text
   1. Mounts the repository ephemerally for a Docker build, packs the current workspace packages using the repository's consumer-install machinery, then creates separate `without_docs` and `with_docs` images from the staged runtime.
   ```
 
-- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `A pair contributes to pass-rate lift only when both arms produce exactly one score. Missing, duplicate, skipped, pending, unscored, or errored arms block the pair. If any pair in an eval set is blocked, headline pass rates are withheld. Missing telemetry remains unavailable rather than being treated as zero.`，提示行 103
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/README.md) — text: `A pair contributes to pass-rate lift only when both arms produce exactly one score. Missing, duplicate, skipped, pending, unscored, or errored arms block the pair. If any pair in an eval set is blocked, headline pass rates are withheld. Missing telemetry remains unavailable rather than being treated as zero.`，提示行 103
 
   ```text
   A pair contributes to pass-rate lift only when both arms produce exactly one score. Missing, duplicate, skipped, pending, unscored, or errored arms block the pair. If any pair in an eval set is blocked, headline pass rates are withheld. Missing telemetry remains unavailable rather than being treated as zero.
   ```
 
-- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `Documentation evals allow only `read`, `write`, `edit`, `grep`, `find`, and `ls` by default. They do not expose shell or web-search tools. Provider traffic still requires container network access, so Docker alone cannot prove that arbitrary code written by an agent never uses the network.`，提示行 90
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/README.md) — text: `Documentation evals allow only `read`, `write`, `edit`, `grep`, `find`, and `ls` by default. They do not expose shell or web-search tools. Provider traffic still requires container network access, so Docker alone cannot prove that arbitrary code written by an agent never uses the network.`，提示行 90
 
   ```text
   Documentation evals allow only `read`, `write`, `edit`, `grep`, `find`, and `ls` by default. They do not expose shell or web-search tools. Provider traffic still requires container network access, so Docker alone cannot prove that arbitrary code written by an agent never uses the network.
   ```
 
-- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.`，提示行 24
+- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/README.md) — text: `The host smoke eval, on-demand documentation audit, and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.`，提示行 105
 
   ```text
-  Host evals (smoke, documentation audit) and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.
+  The host smoke eval, on-demand documentation audit, and documentation-lift evals need `PI_PROVIDER` and `PI_MODEL`.
   ```
 
-- [`packages/evals/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/README.md) — text: `The report flags no lift, negative deltas, saturated controls or treatments, and observed flakiness. One repetition cannot establish stability.`，提示行 105
-
-  ```text
-  The report flags no lift, negative deltas, saturated controls or treatments, and observed flakiness. One repetition cannot establish stability.
-  ```
-
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## sdlc-reference/03-check-pipeline.md
 
 ### E048
 
-check 链：biome（--write，warning 即失败）→ pinned-deps → runtime-deps → ts-imports → entry-graphs → install-lock → tsc → browser-smoke
+check 链：biome（--write，warning 即失败）→ pinned-deps → runtime-deps → ts-imports → entry-graphs → install-lock → tsc → examples tsc → browser-smoke
 
-- [`package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/package.json) — text: `"check": "node scripts/biome-check.mjs --write && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-imports && npm run check:entry-graphs && npm run check:install-lock:coding-agent && tsc --noEmit && npm run check:browser-smoke",`，提示行 21
+- [`package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/package.json) — text: `"check": "node scripts/biome-check.mjs --write && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-impo`，提示行 21
 
   ```text
-  "check": "node scripts/biome-check.mjs --write && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-imports && npm run check:entry-graphs && npm run check:install-lock:coding-agent && tsc --noEmit && npm run check:browser-smoke",
+  "check": "node scripts/biome-check.mjs --write && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-imports && npm run check:entry-graphs && npm run check:install-lock:coding-agent && tsc --noEmit && tsc --noEmit -p packages/coding-agent/examples/tsconfig.json && npm run check:browser-smoke",
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E049
 
 pinned-deps：所有直接 registry 依赖（含内部包）必须 exact，非 registry specifier 跳过
 
-- [`scripts/check-pinned-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-pinned-deps.mjs) — text: `for (const ［name, specifier］ of Object.entries(dependencies)) {`，提示行 47
+- [`scripts/check-pinned-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-pinned-deps.mjs) — text: `for (const ［name, specifier］ of Object.entries(dependencies)) {`，提示行 47
 
   ```text
   for (const [name, specifier] of Object.entries(dependencies)) {
   ```
 
-- [`scripts/check-pinned-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-pinned-deps.mjs) — text: `function isNonRegistrySpecifier(specifier) {`，提示行 24
+- [`scripts/check-pinned-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-pinned-deps.mjs) — text: `function isNonRegistrySpecifier(specifier) {`，提示行 24
 
   ```text
   function isNonRegistrySpecifier(specifier) {
   ```
 
-- [`scripts/check-pinned-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-pinned-deps.mjs) — text: `function getVersionSpecifier(specifier) {`，提示行 28
+- [`scripts/check-pinned-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-pinned-deps.mjs) — text: `function getVersionSpecifier(specifier) {`，提示行 28
 
   ```text
   function getVersionSpecifier(specifier) {
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E050
 
 runtime-deps：检查公开 workspace 包 src 的静态 import/export/require，要求依赖已声明
 
-- [`scripts/check-runtime-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-runtime-deps.mjs) — text: `function checkSource(source, manifest) {`，提示行 26
+- [`scripts/check-runtime-deps.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-runtime-deps.mjs) — text: `function checkSource(source, manifest) {`，提示行 26
 
   ```text
   function checkSource(source, manifest) {
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E051
 
 ts-imports：禁止 .ts 源码里相对 .js 说明符
 
-- [`scripts/check-ts-relative-imports.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-ts-relative-imports.mjs) — text: `function isRelativeJavaScriptSpecifier(specifier) {`，提示行 37
+- [`scripts/check-ts-relative-imports.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-ts-relative-imports.mjs) — text: `function isRelativeJavaScriptSpecifier(specifier) {`，提示行 37
 
   ```text
   function isRelativeJavaScriptSpecifier(specifier) {
   ```
 
-- [`scripts/check-ts-relative-imports.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-ts-relative-imports.mjs) — text: `if (failures.length > 0) {`，提示行 101
+- [`scripts/check-ts-relative-imports.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-ts-relative-imports.mjs) — text: `if (failures.length > 0) {`，提示行 101
 
   ```text
   if (failures.length > 0) {
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E052
 
 entry-graphs：入口即成本合同；按入口给 maxFiles/forbid/allow 预算，只计 value import
 
-- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `* Entry points are cost contracts.`，提示行 3
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-entry-graphs.mjs) — text: `* Entry points are cost contracts.`，提示行 3
 
   ```text
   * Entry points are cost contracts.
   ```
 
-- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `* Only value imports count. `import type` / `export type` are erased before Node sees them.`，提示行 11
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-entry-graphs.mjs) — text: `* Only value imports count. `import type` / `export type` are erased before Node sees them.`，提示行 11
 
   ```text
   * Only value imports count. `import type` / `export type` are erased before Node sees them.
   ```
 
-- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `"./models": {`，提示行 38
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-entry-graphs.mjs) — text: `"./models": {`，提示行 38
 
   ```text
   "./models": {
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E053
 
 install-lock --check：重生成并逐字比对；带 install script 的包须在显式 allowlist
 
-- [`scripts/generate-coding-agent-install-lock.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/generate-coding-agent-install-lock.mjs) — text: `const allowedInstallScriptPackages = new Map(［`，提示行 17
+- [`scripts/generate-coding-agent-install-lock.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/generate-coding-agent-install-lock.mjs) — text: `const allowedInstallScriptPackages = new Map(［`，提示行 17
 
   ```text
   const allowedInstallScriptPackages = new Map([
   ```
 
-- [`scripts/generate-coding-agent-install-lock.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/generate-coding-agent-install-lock.mjs) — text: `if (!packageName || !entry.version) {`，提示行 320
+- [`scripts/generate-coding-agent-install-lock.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/generate-coding-agent-install-lock.mjs) — text: `if (!packageName || !entry.version) {`，提示行 320
 
   ```text
   if (!packageName || !entry.version) {
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E054
 
 browser-smoke：用 esbuild 打浏览器目标，断言包含中立入口且不含 node adapter/被禁依赖
 
-- [`scripts/check-browser-smoke.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-browser-smoke.mjs) — text: `for (const expectedInput of ［`，提示行 66
+- [`scripts/check-browser-smoke.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-browser-smoke.mjs) — text: `for (const expectedInput of ［`，提示行 66
 
   ```text
   for (const expectedInput of [
   ```
 
-- [`scripts/check-browser-smoke.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-browser-smoke.mjs) — text: `for (const forbiddenInput of ［`，提示行 100
+- [`scripts/check-browser-smoke.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-browser-smoke.mjs) — text: `for (const forbiddenInput of ［`，提示行 100
 
   ```text
   for (const forbiddenInput of [
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E055
 
 pre-commit：无条件 lockfile gate + npm run check；仅命中前端/依赖路径时加跑 browser smoke；随后重暂存
 
-- [`.husky/pre-commit`](https://github.com/earendil-works/pi/blob/v1.4.0/.husky/pre-commit) — text: `node scripts/check-lockfile-commit.mjs`，提示行 6
+- [`.husky/pre-commit`](https://github.com/earendil-works/pi/blob/v1.5.0/.husky/pre-commit) — text: `node scripts/check-lockfile-commit.mjs`，提示行 6
 
   ```text
   node scripts/check-lockfile-commit.mjs
   ```
 
-- [`.husky/pre-commit`](https://github.com/earendil-works/pi/blob/v1.4.0/.husky/pre-commit) — text: `RUN_BROWSER_SMOKE=0`，提示行 37
+- [`.husky/pre-commit`](https://github.com/earendil-works/pi/blob/v1.5.0/.husky/pre-commit) — text: `RUN_BROWSER_SMOKE=0`，提示行 37
 
   ```text
   RUN_BROWSER_SMOKE=0
   ```
 
-- [`.husky/pre-commit`](https://github.com/earendil-works/pi/blob/v1.4.0/.husky/pre-commit) — text: `# Restage files that were previously staged and may have been modified by formatting`，提示行 56
+- [`.husky/pre-commit`](https://github.com/earendil-works/pi/blob/v1.5.0/.husky/pre-commit) — text: `# Restage files that were previously staged and may have been modified by formatting`，提示行 56
 
   ```text
   # Restage files that were previously staged and may have been modified by formatting
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E056
 
 lockfile gate：PI_ALLOW_LOCKFILE_CHANGE 放行、仅 workspace 元数据放行，其余失败并打印人工审查清单
 
-- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `const stagedFiles = git(［"diff", "--cached", "--name-only"］)`，提示行 77
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-lockfile-commit.mjs) — text: `const stagedFiles = git(［"diff", "--cached", "--name-only"］)`，提示行 77
 
   ```text
   const stagedFiles = git(["diff", "--cached", "--name-only"])
   ```
 
-- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `const allowValue = process.env.PI_ALLOW_LOCKFILE_CHANGE;`，提示行 5
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-lockfile-commit.mjs) — text: `const allowValue = process.env.PI_ALLOW_LOCKFILE_CHANGE;`，提示行 5
 
   ```text
   const allowValue = process.env.PI_ALLOW_LOCKFILE_CHANGE;
   ```
 
-- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `if (allowed) {`，提示行 86
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-lockfile-commit.mjs) — text: `if (allowed) {`，提示行 86
 
   ```text
   if (allowed) {
   ```
 
-- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `const changes = getLockfilePackageChanges();`，提示行 91
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-lockfile-commit.mjs) — text: `const changes = getLockfilePackageChanges();`，提示行 91
 
   ```text
   const changes = getLockfilePackageChanges();
   ```
 
-- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-lockfile-commit.mjs) — text: `console.error("Review lockfile changes before committing:");`，提示行 99
+- [`scripts/check-lockfile-commit.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-lockfile-commit.mjs) — text: `console.error("Review lockfile changes before committing:");`，提示行 99
 
   ```text
   console.error("Review lockfile changes before committing:");
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## sdlc-reference/01-contribution-gates.md
 
@@ -1291,235 +1291,235 @@ lockfile gate：PI_ALLOW_LOCKFILE_CHANGE 放行、仅 workspace 元数据放行�
 
 新贡献者 issue/PR 默认自动关闭；维护者用 lgtmi/lgtm 恢复资格，命令须在回复首或尾
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `All issues and PRs from new contributors are auto-closed by default.`，提示行 23
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `All issues and PRs from new contributors are auto-closed by default.`，提示行 23
 
   ```text
   All issues and PRs from new contributors are auto-closed by default.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar below will not be reopened or receive a reply.`，提示行 27
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar below will not be reopened or receive a reply.`，提示行 27
 
   ```text
   Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar below will not be reopened or receive a reply.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `- `lgtmi`: your future issues will not be auto-closed`，提示行 31
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `- `lgtmi`: your future issues will not be auto-closed`，提示行 31
 
   ```text
   - `lgtmi`: your future issues will not be auto-closed
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.`，提示行 34
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.`，提示行 34
 
   ```text
   The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E058
 
 issue 质量门槛：用模板、短而具体、值得读
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If you open an issue, you must use one of the two GitHub issue templates.`，提示行 38
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `If you open an issue, you must use one of the two GitHub issue templates.`，提示行 38
 
   ```text
   If you open an issue, you must use one of the two GitHub issue templates.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If you open an issue, keep it short, concrete, and worth reading.`，提示行 40
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `If you open an issue, keep it short, concrete, and worth reading.`，提示行 40
 
   ```text
   If you open an issue, keep it short, concrete, and worth reading.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E059
 
 PR 前置：已获 lgtm；npm run check 与 ./test.sh 都通过；不改 CHANGELOG
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.`，提示行 58
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.`，提示行 58
 
   ```text
   Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `npm run check`，提示行 63
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `npm run check`，提示行 63
 
   ```text
   npm run check
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Both must pass.`，提示行 67
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `Both must pass.`，提示行 67
 
   ```text
   Both must pass.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.`，提示行 69
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.`，提示行 69
 
   ```text
   Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E060
 
 issue-gate 只在 opened 触发；受信 bot/协作者/批准文件放行，其余加 untriaged 并以 not_planned 关闭
 
-- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-gate.yml) — text: `types: ［opened］`，提示行 5
+- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-gate.yml) — text: `types: ［opened］`，提示行 5
 
   ```text
   types: [opened]
   ```
 
-- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-gate.yml) — text: `const TRUSTED_BOT_AUTHORS = new Set(［'dependabot［bot］', 'sentry［bot］', 'claude［bot］'］);`，提示行 20
+- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-gate.yml) — text: `const TRUSTED_BOT_AUTHORS = new Set(［'dependabot［bot］', 'sentry［bot］', 'claude［bot］'］);`，提示行 20
 
   ```text
   const TRUSTED_BOT_AUTHORS = new Set(['dependabot[bot]', 'sentry[bot]', 'claude[bot]']);
   ```
 
-- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-gate.yml) — text: `const permission = await getPermission(issueAuthor);`，提示行 84
+- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-gate.yml) — text: `const permission = await getPermission(issueAuthor);`，提示行 84
 
   ```text
   const permission = await getPermission(issueAuthor);
   ```
 
-- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-gate.yml) — text: `const approvedContent = await getTextFile(APPROVED_FILE);`，提示行 90
+- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-gate.yml) — text: `const approvedContent = await getTextFile(APPROVED_FILE);`，提示行 90
 
   ```text
   const approvedContent = await getTextFile(APPROVED_FILE);
   ```
 
-- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-gate.yml) — text: `const message = ［`，提示行 99
+- [`.github/workflows/issue-gate.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-gate.yml) — text: `const message = ［`，提示行 99
 
   ```text
   const message = [
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E061
 
 untriaged 标签由 issue-triage-labels 维护：重开/标记时清理，last-read 前进时关闭未处理项
 
-- [`.github/workflows/issue-triage-labels.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-triage-labels.yml) — text: `const UNTRIAGED_LABEL = 'untriaged';`，提示行 17
+- [`.github/workflows/issue-triage-labels.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-triage-labels.yml) — text: `const UNTRIAGED_LABEL = 'untriaged';`，提示行 17
 
   ```text
   const UNTRIAGED_LABEL = 'untriaged';
   ```
 
-- [`.github/workflows/issue-triage-labels.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-triage-labels.yml) — text: `state_reason: 'not_planned',`，提示行 165
+- [`.github/workflows/issue-triage-labels.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-triage-labels.yml) — text: `state_reason: 'not_planned',`，提示行 165
 
   ```text
   state_reason: 'not_planned',
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E062
 
 pr-gate 只在 pull_request_target opened 触发；批准文件需 capability 恰为 pr，否则关闭 PR
 
-- [`.github/workflows/pr-gate.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/pr-gate.yml) — text: `types: ［opened］`，提示行 5
+- [`.github/workflows/pr-gate.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/pr-gate.yml) — text: `types: ［opened］`，提示行 5
 
   ```text
   types: [opened]
   ```
 
-- [`.github/workflows/pr-gate.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/pr-gate.yml) — text: `const permission = await getPermission(prAuthor);`，提示行 101
+- [`.github/workflows/pr-gate.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/pr-gate.yml) — text: `const permission = await getPermission(prAuthor);`，提示行 101
 
   ```text
   const permission = await getPermission(prAuthor);
   ```
 
-- [`.github/workflows/pr-gate.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/pr-gate.yml) — text: `const approvedContent = await getTextFile(APPROVED_FILE);`，提示行 107
+- [`.github/workflows/pr-gate.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/pr-gate.yml) — text: `const approvedContent = await getTextFile(APPROVED_FILE);`，提示行 107
 
   ```text
   const approvedContent = await getTextFile(APPROVED_FILE);
   ```
 
-- [`.github/workflows/pr-gate.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/pr-gate.yml) — text: `console.log(`${prAuthor} is not approved, closing PR`);`，提示行 116
+- [`.github/workflows/pr-gate.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/pr-gate.yml) — text: `console.log(`${prAuthor} is not approved, closing PR`);`，提示行 116
 
   ```text
   console.log(`${prAuthor} is not approved, closing PR`);
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E063
 
 approve-contributor 在 issue_comment created 生效；评论者需写权限，lgtm→pr、lgtmi→issue，已有 pr 不降级，随后 bot 提交批准文件
 
-- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/approve-contributor.yml) — text: `const approvalAtStartPattern = /^［\s.］*(?:@［A-Za-z0-9］(?:［A-Za-z0-9-］{0,37}［A-Za-z0-9］)?(?:\s*,\s*|［.:］\s*|\s+))*(lgtmi|lgtm)(?=$|［\s］|［^\p{L}\p{N}_\s］)/iu;`，提示行 33
+- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/approve-contributor.yml) — text: `const approvalAtStartPattern = /^［\s.］*(?:@［A-Za-z0-9］(?:［A-Za-z0-9-］{0,37}［A-Za-z0-9］)?(?:\s*,\s*|［.:］\s*|\s+))*(lgtmi|lgtm)(?=$|［\s］|［^\p{L}\p{N}_\s］)/iu;`，提示行 33
 
   ```text
   const approvalAtStartPattern = /^[\s.]*(?:@[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?(?:\s*,\s*|[.:]\s*|\s+))*(lgtmi|lgtm)(?=$|[\s]|[^\p{L}\p{N}_\s])/iu;
   ```
 
-- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/approve-contributor.yml) — text: `const { data: permissionLevel } = await github.rest.repos.getCollaboratorPermissionLevel({`，提示行 46
+- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/approve-contributor.yml) — text: `const { data: permissionLevel } = await github.rest.repos.getCollaboratorPermissionLevel({`，提示行 46
 
   ```text
   const { data: permissionLevel } = await github.rest.repos.getCollaboratorPermissionLevel({
   ```
 
-- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/approve-contributor.yml) — text: `const content = fs.readFileSync(APPROVED_FILE, 'utf8');`，提示行 133
+- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/approve-contributor.yml) — text: `const content = fs.readFileSync(APPROVED_FILE, 'utf8');`，提示行 133
 
   ```text
   const content = fs.readFileSync(APPROVED_FILE, 'utf8');
   ```
 
-- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/approve-contributor.yml) — text: `for (const username of approvalTargets) {`，提示行 140
+- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/approve-contributor.yml) — text: `for (const username of approvalTargets) {`，提示行 140
 
   ```text
   for (const username of approvalTargets) {
   ```
 
-- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/approve-contributor.yml) — text: `- name: Commit and push`，提示行 176
+- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/approve-contributor.yml) — text: `- name: Commit and push`，提示行 176
 
   ```text
   - name: Commit and push
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E064
 
 四类 issue 模板：bug 要求 pi -ne 预验证与最小复现，contribution 是 PR 前置，package-report 走独立入口，config 关闭空白 issue
 
-- [`.github/ISSUE_TEMPLATE/bug.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/ISSUE_TEMPLATE/bug.yml) — text: `**Important:** before reporting an issue in core, please validate first with `pi -ne` that this is not caused by an extension you loaded.`，提示行 14
+- [`.github/ISSUE_TEMPLATE/bug.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/ISSUE_TEMPLATE/bug.yml) — text: `**Important:** before reporting an issue in core, please validate first with `pi -ne` that this is not caused by an extension you loaded.`，提示行 14
 
   ```text
   **Important:** before reporting an issue in core, please validate first with `pi -ne` that this is not caused by an extension you loaded.
   ```
 
-- [`.github/ISSUE_TEMPLATE/bug.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/ISSUE_TEMPLATE/bug.yml) — text: `description: Minimal steps to trigger the bug.`，提示行 28
+- [`.github/ISSUE_TEMPLATE/bug.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/ISSUE_TEMPLATE/bug.yml) — text: `description: Minimal steps to trigger the bug.`，提示行 28
 
   ```text
   description: Minimal steps to trigger the bug.
   ```
 
-- [`.github/ISSUE_TEMPLATE/contribution.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/ISSUE_TEMPLATE/contribution.yml) — text: `description: Propose a change or feature (required for new contributors before submitting a PR)`，提示行 2
+- [`.github/ISSUE_TEMPLATE/contribution.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/ISSUE_TEMPLATE/contribution.yml) — text: `description: Propose a change or feature (required for new contributors before submitting a PR)`，提示行 2
 
   ```text
   description: Propose a change or feature (required for new contributors before submitting a PR)
   ```
 
-- [`.github/ISSUE_TEMPLATE/package-report.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/ISSUE_TEMPLATE/package-report.yml) — text: `description: Report a problematic Pi package listed on pi.dev`，提示行 2
+- [`.github/ISSUE_TEMPLATE/package-report.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/ISSUE_TEMPLATE/package-report.yml) — text: `description: Report a problematic Pi package listed on pi.dev`，提示行 2
 
   ```text
   description: Report a problematic Pi package listed on pi.dev
   ```
 
-- [`.github/ISSUE_TEMPLATE/config.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/ISSUE_TEMPLATE/config.yml) — text: `blank_issues_enabled: false`，提示行 1
+- [`.github/ISSUE_TEMPLATE/config.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/ISSUE_TEMPLATE/config.yml) — text: `blank_issues_enabled: false`，提示行 1
 
   ```text
   blank_issues_enabled: false
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## sdlc-reference/02-issue-diagnosis-and-session-import.md
 
@@ -1527,193 +1527,193 @@ approve-contributor 在 issue_comment created 生效；评论者需写权限，l
 
 /is 合同：不信 issue 里的分析，独立读全代码、追执行路径、只提议不实现
 
-- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.`，提示行 14
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/is.md) — text: `3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.`，提示行 14
 
   ```text
   3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.
   ```
 
-- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `- Do not trust implementation proposals in the issue without verification`，提示行 23
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/is.md) — text: `- Do not trust implementation proposals in the issue without verification`，提示行 23
 
   ```text
   - Do not trust implementation proposals in the issue without verification
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E066
 
 /is 操作约束：CI 下不加 inprogress/不 assign；完整读 issue 与评论；关闭时自动摘标签
 
-- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.`，提示行 9
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/is.md) — text: `1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.`，提示行 9
 
   ```text
   1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.
   ```
 
-- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `2. Read the issue in full, including all comments and linked issues/PRs. Use fields supported by GitHub CLI, for example:`，提示行 10
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/is.md) — text: `2. Read the issue in full, including all comments and linked issues/PRs. Use fields supported by GitHub CLI, for example:`，提示行 10
 
   ```text
   2. Read the issue in full, including all comments and linked issues/PRs. Use fields supported by GitHub CLI, for example:
   ```
 
-- [`.github/workflows/remove-inprogress-on-close.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/remove-inprogress-on-close.yml) — text: `on:`，提示行 3
+- [`.github/workflows/remove-inprogress-on-close.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/remove-inprogress-on-close.yml) — text: `on:`，提示行 3
 
   ```text
   on:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E067
 
 issue-analysis 由 pi-analyze 标签或 staff 评论 @issuron analyze 触发
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `# Runs the repo's /is prompt against an issue when the `pi-analyze` label is added`，提示行 1
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `# Runs the repo's /is prompt against an issue when the `pi-analyze` label is added`，提示行 1
 
   ```text
   # Runs the repo's /is prompt against an issue when the `pi-analyze` label is added
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `on:`，提示行 50
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `on:`，提示行 50
 
   ```text
   on:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E068
 
 授权链：触发者须为 org staff 成员且有 admin/write；org token 缺失直接拒绝
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `const response = await fetch(`，提示行 181
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `const response = await fetch(`，提示行 181
 
   ```text
   const response = await fetch(
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `const { data } = await github.rest.repos.getCollaboratorPermissionLevel({`，提示行 224
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `const { data } = await github.rest.repos.getCollaboratorPermissionLevel({`，提示行 224
 
   ```text
   const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `if (!process.env.ORG_READ_TOKEN) {`，提示行 174
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `if (!process.env.ORG_READ_TOKEN) {`，提示行 174
 
   ```text
   if (!process.env.ORG_READ_TOKEN) {
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E069
 
 analyze：高熵目录、专用 auth.json、pi -p 跑 /is、导出 HTML+gist、回评论与接续指令、失败也导出、最后摘标签
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Create high-entropy working directory name`，提示行 267
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `- name: Create high-entropy working directory name`，提示行 267
 
   ```text
   - name: Create high-entropy working directory name
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Write auth.json`，提示行 332
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `- name: Write auth.json`，提示行 332
 
   ```text
   - name: Write auth.json
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `# `PI_AUTH_JSON` must come from a login dedicated to this workflow. OpenAI Codex`，提示行 34
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `# `PI_AUTH_JSON` must come from a login dedicated to this workflow. OpenAI Codex`，提示行 34
 
   ```text
   # `PI_AUTH_JSON` must come from a login dedicated to this workflow. OpenAI Codex
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Run pi /is`，提示行 355
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `- name: Run pi /is`，提示行 355
 
   ```text
   - name: Run pi /is
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `ISSUE_ANALYSIS_MODEL: openai-codex/gpt-5.5`，提示行 264
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `ISSUE_ANALYSIS_MODEL: openai-codex/gpt-5.5`，提示行 264
 
   ```text
   ISSUE_ANALYSIS_MODEL: openai-codex/gpt-5.5
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Export session files`，提示行 487
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `- name: Export session files`，提示行 487
 
   ```text
   - name: Export session files
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Comment with session import instructions`，提示行 571
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `- name: Comment with session import instructions`，提示行 571
 
   ```text
   - name: Comment with session import instructions
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Comment on analysis failure`，提示行 650
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `- name: Comment on analysis failure`，提示行 650
 
   ```text
   - name: Comment on analysis failure
   ```
 
-- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/issue-analysis.yml) — text: `- name: Persist refreshed auth.json`，提示行 418
+- [`.github/workflows/issue-analysis.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/issue-analysis.yml) — text: `- name: Persist refreshed auth.json`，提示行 418
 
   ```text
   - name: Persist refreshed auth.json
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E070
 
 /ir 接受 gist/分享 URL/issue/本地文件；导入时把 session 里的 CI cwd 变体重写为本地 cwd 并 switchSession
 
-- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `function parseRef(`，提示行 58
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/extensions/import-repro.ts) — text: `function parseRef(`，提示行 58
 
   ```text
   function parseRef(
   ```
 
-- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `async function findIssueGistId(owner: string, repo: string, issue: string): Promise<string> {`，提示行 236
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/extensions/import-repro.ts) — text: `async function findIssueGistId(owner: string, repo: string, issue: string): Promise<string> {`，提示行 236
 
   ```text
   async function findIssueGistId(owner: string, repo: string, issue: string): Promise<string> {
   ```
 
-- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `function getCwdRewriteVariants(sourceCwd: string): string［］ {`，提示行 154
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/extensions/import-repro.ts) — text: `function getCwdRewriteVariants(sourceCwd: string): string［］ {`，提示行 154
 
   ```text
   function getCwdRewriteVariants(sourceCwd: string): string[] {
   ```
 
-- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `const ciWorkdirName = getCiWorkdirName(sourceCwd);`，提示行 207
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/extensions/import-repro.ts) — text: `const ciWorkdirName = getCiWorkdirName(sourceCwd);`，提示行 207
 
   ```text
   const ciWorkdirName = getCiWorkdirName(sourceCwd);
   ```
 
-- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `function getPlatformContinuationNotice(sourceCwd: string): string | undefined {`，提示行 187
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/extensions/import-repro.ts) — text: `function getPlatformContinuationNotice(sourceCwd: string): string | undefined {`，提示行 187
 
   ```text
   function getPlatformContinuationNotice(sourceCwd: string): string | undefined {
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E071
 
 scripts/issues：本机批量 triage，每个 issue 一个 durable 会话，15 类分类，环境变量控制模型/并发/端口
 
-- [`scripts/issues/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/issues/README.md) — text: `| `TRIAGE_MODEL` | `openai-codex/gpt-5.6-sol` | `provider/model`. Supported providers: `openai-codex`, `anthropic`. |`，提示行 45
+- [`scripts/issues/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/issues/README.md) — text: `| `TRIAGE_MODEL` | `openai-codex/gpt-5.6-sol` | `provider/model`. Supported providers: `openai-codex`, `anthropic`. |`，提示行 45
 
   ```text
   | `TRIAGE_MODEL` | `openai-codex/gpt-5.6-sol` | `provider/model`. Supported providers: `openai-codex`, `anthropic`. |
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## sdlc-reference/06-review-and-human-role.md
 
@@ -1721,259 +1721,259 @@ scripts/issues：本机批量 triage，每个 issue 一个 durable 会话，15 �
 
 The One Rule：必须理解自己的代码；允许 AI 写作，禁止不理解而提交
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.`，提示行 15
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.`，提示行 15
 
   ```text
   **You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.`，提示行 17
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.`，提示行 17
 
   ```text
   Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E073
 
 agent 从仓库根运行以拾取 AGENTS.md；最终维护者决定不交给 AI
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.`，提示行 19
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.`，提示行 19
 
   ```text
   If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `### Why not let AI triage everything?`，提示行 91
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `### Why not let AI triage everything?`，提示行 91
 
   ```text
   ### Why not let AI triage everything?
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.`，提示行 93
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.`，提示行 93
 
   ```text
   AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E074
 
 审阅缓冲：默认自动关闭、允许无回复、周末不保证审、封禁写入制度
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `This guide exists to save both sides time.`，提示行 3
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `This guide exists to save both sides time.`，提示行 3
 
   ```text
   This guide exists to save both sides time.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `### Why are new issues and PRs auto-closed?`，提示行 79
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `### Why are new issues and PRs auto-closed?`，提示行 79
 
   ```text
   ### Why are new issues and PRs auto-closed?
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `### Why do some issues get no reply?`，提示行 87
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `### Why do some issues get no reply?`，提示行 87
 
   ```text
   ### Why do some issues get no reply?
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx`，提示行 25
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx`，提示行 25
 
   ```text
   Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `## Blocking`，提示行 50
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `## Blocking`，提示行 50
 
   ```text
   ## Blocking
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E075
 
 AGENTS 语调：无 emoji、无套话、技术散文直接
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- No emojis in commits, issues, PR comments, or code`，提示行 6
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `- No emojis in commits, issues, PR comments, or code`，提示行 6
 
   ```text
   - No emojis in commits, issues, PR comments, or code
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- Technical prose only, be direct`，提示行 8
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `- Technical prose only, be direct`，提示行 8
 
   ```text
   - Technical prose only, be direct
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E076
 
 deslop：删除无当前需求的推测性抽象与防御；不为减行数换抽象、不削弱测试
 
-- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.`，提示行 19
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/deslop.md) — text: `- Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.`，提示行 19
 
   ```text
   - Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.
   ```
 
-- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Remove speculative defensive programming inside trusted code. Validate at real trust boundaries; rely on types and established invariants internally.`，提示行 20
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/deslop.md) — text: `- Remove speculative defensive programming inside trusted code. Validate at real trust boundaries; rely on types and established invariants internally.`，提示行 20
 
   ```text
   - Remove speculative defensive programming inside trusted code. Validate at real trust boundaries; rely on types and established invariants internally.
   ```
 
-- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Do not keep fallback behavior for states that should be impossible. Prefer fixing the invariant or type model.`，提示行 21
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/deslop.md) — text: `- Do not keep fallback behavior for states that should be impossible. Prefer fixing the invariant or type model.`，提示行 21
 
   ```text
   - Do not keep fallback behavior for states that should be impossible. Prefer fixing the invariant or type model.
   ```
 
-- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Do not replace clear code with a new abstraction solely to reduce line count.`，提示行 54
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/deslop.md) — text: `- Do not replace clear code with a new abstraction solely to reduce line count.`，提示行 54
 
   ```text
   - Do not replace clear code with a new abstraction solely to reduce line count.
   ```
 
-- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Do not weaken tests to permit simplification. Update tests only when an approved behavior change or a cleaner equivalent structure requires it.`，提示行 55
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/deslop.md) — text: `- Do not weaken tests to permit simplification. Update tests only when an approved behavior change or a cleaner equivalent structure requires it.`，提示行 55
 
   ```text
   - Do not weaken tests to permit simplification. Update tests only when an approved behavior change or a cleaner equivalent structure requires it.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E077
 
 代码质量：读完整文件、非必要不用 any；单行唯一 call site 的 helper 内联（deslop 的相近判据）
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes.`，提示行 17
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `- Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes.`，提示行 17
 
   ```text
   - Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes.
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- No `any` unless absolutely necessary.`，提示行 18
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `- No `any` unless absolutely necessary.`，提示行 18
 
   ```text
   - No `any` unless absolutely necessary.
   ```
 
-- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Inline trivial helpers, wrappers, adapters, and pass-through layers when they obscure rather than clarify behavior.`，提示行 17
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/deslop.md) — text: `- Inline trivial helpers, wrappers, adapters, and pass-through layers when they obscure rather than clarify behavior.`，提示行 17
 
   ```text
   - Inline trivial helpers, wrappers, adapters, and pass-through layers when they obscure rather than clarify behavior.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E078
 
 删除看似有意的功能前先问；不保留向后兼容除非用户要求
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- Always ask before removing functionality or code that appears intentional.`，提示行 25
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `- Always ask before removing functionality or code that appears intentional.`，提示行 25
 
   ```text
   - Always ask before removing functionality or code that appears intentional.
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- Do not preserve backward compatibility unless the user asks for it.`，提示行 26
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `- Do not preserve backward compatibility unless the user asks for it.`，提示行 26
 
   ```text
   - Do not preserve backward compatibility unless the user asks for it.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E079
 
 deslop 对重大删除设审批门：列清删什么/为什么/影响/替代并等显式批准，独立决定不打包
 
-- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `## Approval gate for significant removals`，提示行 27
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/deslop.md) — text: `## Approval gate for significant removals`，提示行 27
 
   ```text
   ## Approval gate for significant removals
   ```
 
-- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `Routine, behavior-preserving cleanup does not require approval, such as inlining a single-use trivial helper, removing an unreachable branch proven impossible by the type model, or deleting newly added duplication. If uncertain whether a removal is significant, ask.`，提示行 48
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/deslop.md) — text: `Routine, behavior-preserving cleanup does not require approval, such as inlining a single-use trivial helper, removing an unreachable branch proven impossible by the type model, or deleting newly added duplication. If uncertain whether a removal is significant, ask.`，提示行 48
 
   ```text
   Routine, behavior-preserving cleanup does not require approval, such as inlining a single-use trivial helper, removing an unreachable branch proven impossible by the type model, or deleting newly added duplication. If uncertain whether a removal is significant, ask.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E080
 
 规则与用户指令冲突时，先请求显式确认再执行
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `## User Override`，提示行 123
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `## User Override`，提示行 123
 
   ```text
   ## User Override
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E081
 
 大改走 RFC；Philosophy 规定核心最小、非核心做成扩展、hook 点也要先讨论
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `## Where can I learn about plans?`，提示行 99
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `## Where can I learn about plans?`，提示行 99
 
   ```text
   ## Where can I learn about plans?
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `## Philosophy`，提示行 5
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `## Philosophy`，提示行 5
 
   ```text
   ## Philosophy
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `First things first: **pi's core is minimal**.`，提示行 7
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `First things first: **pi's core is minimal**.`，提示行 7
 
   ```text
   First things first: **pi's core is minimal**.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.`，提示行 9
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.`，提示行 9
 
   ```text
   If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E082
 
 /wr 收尾步骤与固定免责行；只提交本会话文件
 
-- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/wr.md) — text: `- If the conversation already mentions a GitHub issue or PR, use that existing context.`，提示行 12
+- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/wr.md) — text: `- If the conversation already mentions a GitHub issue or PR, use that existing context.`，提示行 12
 
   ```text
   - If the conversation already mentions a GitHub issue or PR, use that existing context.
   ```
 
-- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/wr.md) — text: `- Never stage unrelated files.`，提示行 35
+- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/wr.md) — text: `- Never stage unrelated files.`，提示行 35
 
   ```text
   - Never stage unrelated files.
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `- End every AI-posted comment with the AI-generated disclaimer line specified by the originating prompt (e.g. `This comment is AI-generated by `/wr``).`，提示行 92
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `- End every AI-posted comment with the AI-generated disclaimer line specified by the originating prompt (e.g. `This comment is AI-generated by `/wr``).`，提示行 92
 
   ```text
   - End every AI-posted comment with the AI-generated disclaimer line specified by the originating prompt (e.g. `This comment is AI-generated by `/wr``).
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## repo-harness/04-extension-points-map.md
 
@@ -1981,151 +1981,145 @@ deslop 对重大删除设审批门：列清删什么/为什么/影响/替代并�
 
 三种资源判别：扩展=可执行行为；skill=指令+资产；prompt template=固定命令
 
-- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.`，提示行 3
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) — text: `Extensions are TypeScript modules that extend Pi's behavior. They can subscribe to lifecycle events, register custom tools callable by the LLM, add commands, and more.`，提示行 3
 
   ```text
-  Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.
+  Extensions are TypeScript modules that extend Pi's behavior. They can subscribe to lifecycle events, register custom tools callable by the LLM, add commands, and more.
   ```
 
-- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md) — text: `Use a skill when a workflow needs more context than a prompt template but does not need a new executable integration point. Skills can bundle scripts, references, and assets alongside their instructions.`，提示行 5
+- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/skills.md) — text: `Use a skill when a workflow needs more context than a prompt template but does not need a new executable integration point. Skills can bundle scripts, references, and assets alongside their instructions.`，提示行 5
 
   ```text
   Use a skill when a workflow needs more context than a prompt template but does not need a new executable integration point. Skills can bundle scripts, references, and assets alongside their instructions.
   ```
 
-- [`packages/coding-agent/docs/prompt-templates.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/prompt-templates.md) — text: `Prompt templates turn Markdown files into reusable `/` commands. Use one when you want to reuse the same prompt without adding executable behavior or a larger set of supporting instructions.`，提示行 3
+- [`packages/coding-agent/docs/prompt-templates.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/prompt-templates.md) — text: `Prompt templates turn Markdown files into reusable `/` commands. Use one when you want to reuse the same prompt without adding executable behavior or a larger set of supporting instructions.`，提示行 3
 
   ```text
   Prompt templates turn Markdown files into reusable `/` commands. Use one when you want to reuse the same prompt without adding executable behavior or a larger set of supporting instructions.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E084
 
 集成点表列全可注册能力；另有 tool namespace、prepareLoadout、registerToolRenderer 与 named actions 可重绑
 
-- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `## Choose an integration point`，提示行 171
-
-  ```text
-  ## Choose an integration point
-  ```
-
-- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: ``namespace: { name, aliases, description, instructions }` groups related tools, as MCP servers do. Codemode tools list a namespace under one heading with its `description`. `instructions` holds longer usage guidance; it is not listed, and codemode scripts read it with `describeNamespace(name)`. `aliases` are other names scripts may look the namespace up by, for example the server name `docs` for `mcp__docs`; a name and the same name as a script identifier (`my-docs`, `my_docs`) match alike.`，提示行 275
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) — text: ``namespace: { name, aliases, description, instructions }` groups related tools, as MCP servers do. Codemode tools list a namespace under one heading with its `description`. `instructions` holds longer usage guidance; it is not listed, and codemode scripts read it with `describeNamespace(name)`. `aliases` are other names scripts may look the namespace up by, for example the server name `docs` for `mcp__docs`; a name and the same name as a script identifier (`my-docs`, `my_docs`) match alike.`，提示行 275
 
   ```text
   `namespace: { name, aliases, description, instructions }` groups related tools, as MCP servers do. Codemode tools list a namespace under one heading with its `description`. `instructions` holds longer usage guidance; it is not listed, and codemode scripts read it with `describeNamespace(name)`. `aliases` are other names scripts may look the namespace up by, for example the server name `docs` for `mcp__docs`; a name and the same name as a script identifier (`my-docs`, `my_docs`) match alike.
   ```
 
-- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `A tool that orchestrates other tools can adjust what the model sees while it is active with `prepareLoadout(loadout)`. It runs whenever the active tools change and receives the declared tools, the callable tools, and every registered tool with its exposure, namespace, and prompt guidelines. It returns replacement `descriptions` for declared tools (including its own) and `hiddenDeclarations`: active tools whose declarations requests leave out while they stay active and callable. The default system prompt leaves hidden tools out of its tool list and rules, and names no tool in the skills hint when the file reader is hidden, so the orchestrating tool should present their guidelines itself. `codemode` uses only this hook, `exposure`, `reachesTools`, and `ctx.executeTool()`, so another tool can implement the same behavior under a different name.`，提示行 293
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) — text: `A tool that orchestrates other tools can adjust what the model sees while it is active with `prepareLoadout(loadout)`. It runs whenever the active tools change and receives the declared tools, the callable tools, and every registered tool with its exposure, namespace, and prompt guidelines. It returns replacement `descriptions` for declared tools (including its own) and `hiddenDeclarations`: active tools whose declarations requests leave out while they stay active and callable. The default system prompt leaves hidden tools out of its tool list and rules, and names no tool in the skills hint when the file reader is hidden, so the orchestrating tool should present their guidelines itself. `codemode` uses only this hook, `exposure`, `reachesTools`, and `ctx.executeTool()`, so another tool can implement the same behavior under a different name.`，提示行 293
 
   ```text
   A tool that orchestrates other tools can adjust what the model sees while it is active with `prepareLoadout(loadout)`. It runs whenever the active tools change and receives the declared tools, the callable tools, and every registered tool with its exposure, namespace, and prompt guidelines. It returns replacement `descriptions` for declared tools (including its own) and `hiddenDeclarations`: active tools whose declarations requests leave out while they stay active and callable. The default system prompt leaves hidden tools out of its tool list and rules, and names no tool in the skills hint when the file reader is hidden, so the orchestrating tool should present their guidelines itself. `codemode` uses only this hook, `exposure`, `reachesTools`, and `ctx.executeTool()`, so another tool can implement the same behavior under a different name.
   ```
 
-- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `A tool's `renderCall` and `renderResult` draw its calls in the interactive transcript and in HTML exports. `pi.registerToolRenderer((toolName, next) => renderers)` chooses renderers for calls to any tool, including tools that are not registered yet, such as MCP tools in a resumed session before their server connected. `next()` returns what the remaining resolvers (in extension load order), then the registered tool, would use, so `next() ?? mine` only fills in.`，提示行 305
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) — text: `Tools can provide `renderCall` and `renderResult` for custom TUI display.`，提示行 305
 
   ```text
-  A tool's `renderCall` and `renderResult` draw its calls in the interactive transcript and in HTML exports. `pi.registerToolRenderer((toolName, next) => renderers)` chooses renderers for calls to any tool, including tools that are not registered yet, such as MCP tools in a resumed session before their server connected. `next()` returns what the remaining resolvers (in extension load order), then the registered tool, would use, so `next() ?? mine` only fills in.
+  Tools can provide `renderCall` and `renderResult` for custom TUI display.
   ```
 
-- [`packages/coding-agent/docs/keybindings.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/keybindings.md) — text: `Pi exposes named actions, such as `app.session.new`, that can be assigned keybindings. You can change default assignments or bind unassigned actions in Pi's ［user configuration］(configuration.md#agent-directory).`，提示行 3
+- [`packages/coding-agent/docs/keybindings.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/keybindings.md) — text: `Pi exposes named actions, such as `app.session.new`, that can be assigned keybindings. You can change default assignments or bind unassigned actions in Pi's ［user configuration］(configuration.md#agent-directory).`，提示行 3
 
   ```text
   Pi exposes named actions, such as `app.session.new`, that can be assigned keybindings. You can change default assignments or bind unassigned actions in Pi's [user configuration](configuration.md#agent-directory).
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E085
 
 四个专题面：MCP 连接、codemode 沙箱、自定义 provider、虚拟模型路由
 
-- [`packages/coding-agent/docs/mcp.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/mcp.md) — text: `Pi connects to ［Model Context Protocol］(https://modelcontextprotocol.io) servers over stdio or streamable HTTP and makes their tools and resources available to the model.`，提示行 3
+- [`packages/coding-agent/docs/mcp.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/mcp.md) — text: `Pi connects to ［Model Context Protocol］(https://modelcontextprotocol.io) servers over stdio or streamable HTTP and makes their tools and resources available to the model.`，提示行 3
 
   ```text
   Pi connects to [Model Context Protocol](https://modelcontextprotocol.io) servers over stdio or streamable HTTP and makes their tools and resources available to the model.
   ```
 
-- [`packages/coding-agent/docs/codemode.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/codemode.md) — text: `The `codemode` tool lets the model write a JavaScript script that calls pi's other tools and runs non-LLM models, such as classifiers and image models. Only the script's output reaches the model, so a script can run calls in parallel and filter large results before the model sees them. To turn it on, see ［Enable codemode］(cli.md#enable-codemode).`，提示行 3
+- [`packages/coding-agent/docs/codemode.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/codemode.md) — text: `The `codemode` tool lets the model write a JavaScript script that calls pi's other tools and runs non-LLM models, such as classifiers and image models. Only the script's output reaches the model, so a script can run calls in parallel and filter large results before the model sees them. To turn it on, see ［Enable codemode］(cli.md#enable-codemode).`，提示行 3
 
   ```text
   The `codemode` tool lets the model write a JavaScript script that calls pi's other tools and runs non-LLM models, such as classifiers and image models. Only the script's output reaches the model, so a script can run calls in parallel and filter large results before the model sees them. To turn it on, see [Enable codemode](cli.md#enable-codemode).
   ```
 
-- [`packages/coding-agent/docs/custom-provider.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/custom-provider.md) — text: `A provider extension connects Pi to a model service that needs custom authentication, model discovery, request handling, or streaming. If the service already speaks a supported API, configure it in `models.json` instead.`，提示行 3
+- [`packages/coding-agent/docs/custom-provider.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/custom-provider.md) — text: `A provider extension connects Pi to a model service that needs custom authentication, model discovery, request handling, or streaming. If the service already speaks a supported API, configure it in `models.json` instead.`，提示行 3
 
   ```text
   A provider extension connects Pi to a model service that needs custom authentication, model discovery, request handling, or streaming. If the service already speaks a supported API, configure it in `models.json` instead.
   ```
 
-- [`packages/coding-agent/docs/virtual-models.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/virtual-models.md) — text: `A virtual model is a selectable model that picks a physical model for each request. Use one to route by task, cost, or conversation state. For example, a router can send quick questions to a small model and hard problems to a large one, while the user selects a single model.`，提示行 3
+- [`packages/coding-agent/docs/virtual-models.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/virtual-models.md) — text: `A virtual model is a selectable model that picks a physical model for each request. Use one to route by task, cost, or conversation state. For example, a router can send quick questions to a small model and hard problems to a large one, while the user selects a single model.`，提示行 3
 
   ```text
   A virtual model is a selectable model that picks a physical model for each request. Use one to route by task, cost, or conversation state. For example, a router can send quick questions to a small model and hard problems to a large one, while the user selects a single model.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E086
 
 themes 是最轻的 JSON 配色面；package 是四类资源+主题的运输容器
 
-- [`packages/coding-agent/docs/themes.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/themes.md) — text: `Themes control the colors Pi uses in interactive mode and HTML exports. Pi includes the `system`, `dark`, and `light` themes. You can select one theme, follow your terminal's light or dark appearance, or create your own palette.`，提示行 3
+- [`packages/coding-agent/docs/themes.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/themes.md) — text: `Themes control the colors Pi uses in interactive mode and HTML exports. Pi includes the `system`, `dark`, and `light` themes. You can select one theme, follow your terminal's light or dark appearance, or create your own palette.`，提示行 3
 
   ```text
   Themes control the colors Pi uses in interactive mode and HTML exports. Pi includes the `system`, `dark`, and `light` themes. You can select one theme, follow your terminal's light or dark appearance, or create your own palette.
   ```
 
-- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.`，提示行 3
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/packages.md) — text: `Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.`，提示行 3
 
   ```text
   Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E087
 
 核心不含权限系统：以启动用户/进程权限运行；安全靠运行环境隔离与只装可信来源
 
-- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `Pi does not include a built-in permission system for restricting filesystem, process, network, or credential access. By default, it runs with the permissions of the user and process that launched it.`，提示行 90
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/README.md) — text: `Pi does not include a built-in permission system for restricting filesystem, process, network, or credential access. By default, it runs with the permissions of the user and process that launched it.`，提示行 90
 
   ```text
   Pi does not include a built-in permission system for restricting filesystem, process, network, or credential access. By default, it runs with the permissions of the user and process that launched it.
   ```
 
-- [`packages/coding-agent/docs/security.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/security.md) — text: `Treat model-generated commands and code as untrusted. Pi can read, change, and execute files with the permissions of the account that started it, and it does not ask for approval before every tool call. Extensions, package installers, language servers, and other child processes run with those same permissions unless an operating-system or virtualization boundary restricts them.`，提示行 3
+- [`packages/coding-agent/docs/security.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/security.md) — text: `Treat model-generated commands and code as untrusted. Pi can read, change, and execute files with the permissions of the account that started it, and it does not ask for approval before every tool call. Extensions, package installers, language servers, and other child processes run with those same permissions unless an operating-system or virtualization boundary restricts them.`，提示行 3
 
   ```text
   Treat model-generated commands and code as untrusted. Pi can read, change, and execute files with the permissions of the account that started it, and it does not ask for approval before every tool call. Extensions, package installers, language servers, and other child processes run with those same permissions unless an operating-system or virtualization boundary restricts them.
   ```
 
-- [`packages/coding-agent/docs/security.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/security.md) — text: `Files, comments, instructions, command output, and model responses can steer the model through prompt injection. Project trust controls which project resources load at startup, but it does not make that content or the resulting actions safe.`，提示行 5
+- [`packages/coding-agent/docs/security.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/security.md) — text: `Files, comments, instructions, command output, and model responses can steer the model through prompt injection. Project trust controls which project resources load at startup, but it does not make that content or the resulting actions safe.`，提示行 5
 
   ```text
   Files, comments, instructions, command output, and model responses can steer the model through prompt injection. Project trust controls which project resources load at startup, but it does not make that content or the resulting actions safe.
   ```
 
-- [`packages/coding-agent/docs/containerization.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/containerization.md) — text: `Use an isolated environment to limit the files, credentials, processes, and network services that generated commands can access or affect.`，提示行 3
+- [`packages/coding-agent/docs/containerization.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/containerization.md) — text: `Use an isolated environment to limit the files, credentials, processes, and network services that generated commands can access or affect.`，提示行 3
 
   ```text
   Use an isolated environment to limit the files, credentials, processes, and network services that generated commands can access or affect.
   ```
 
-- [`SECURITY.md`](https://github.com/earendil-works/pi/blob/v1.4.0/SECURITY.md) — text: `Pi treats the local user account and files writable by that account as inside`，提示行 11
+- [`SECURITY.md`](https://github.com/earendil-works/pi/blob/v1.5.0/SECURITY.md) — text: `Pi treats the local user account and files writable by that account as inside`，提示行 11
 
   ```text
   Pi treats the local user account and files writable by that account as inside
   ```
 
-- [`SECURITY.md`](https://github.com/earendil-works/pi/blob/v1.4.0/SECURITY.md) — text: `Pi relies on users installing trustworthy extensions and loading trustworthy`，提示行 19
+- [`SECURITY.md`](https://github.com/earendil-works/pi/blob/v1.5.0/SECURITY.md) — text: `Pi relies on users installing trustworthy extensions and loading trustworthy`，提示行 19
 
   ```text
   Pi relies on users installing trustworthy extensions and loading trustworthy
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## repo-harness/05-session-inspectability.md
 
@@ -2133,115 +2127,115 @@ themes 是最轻的 JSON 配色面；package 是四类资源+主题的运输容�
 
 JSONL 合同：每行一个对象、id/parentId 成树；header 带版本与 cwd，当前版本 3 且旧版自动迁移；prompt/工具变化走 system 消息；compaction 存摘要与 firstKeptEntryId
 
-- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `Sessions are stored as JSONL (JSON Lines) files. Each line is a JSON object with a `type` field. Session entries form a tree structure via `id`/`parentId` fields, enabling in-place branching without creating new files.`，提示行 3
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/session-format.md) — text: `Sessions are stored as JSONL (JSON Lines) files. Each line is a JSON object with a `type` field. Session entries form a tree structure via `id`/`parentId` fields, enabling in-place branching without creating new files.`，提示行 3
 
   ```text
   Sessions are stored as JSONL (JSON Lines) files. Each line is a JSON object with a `type` field. Session entries form a tree structure via `id`/`parentId` fields, enabling in-place branching without creating new files.
   ```
 
-- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `### SessionHeader`，提示行 64
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/session-format.md) — text: `### SessionHeader`，提示行 64
 
   ```text
   ### SessionHeader
   ```
 
-- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `Sessions have a version field in the header:`，提示行 24
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/session-format.md) — text: `Sessions have a version field in the header:`，提示行 24
 
   ```text
   Sessions have a version field in the header:
   ```
 
-- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `A message in the conversation. The `message` field contains an `AgentMessage`. System messages carry the prompt and tool loadout: the first request of a session persists one with every prompt section and tool declaration, and later changes persist as system messages that patch `sections` by name (`null` removes one) and list `toolsAdded`/`toolsRemoved`. Replaying them in order yields the current prompt and tools; there is no separate prompt state entry.`，提示行 80
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/session-format.md) — text: `A message in the conversation. The `message` field contains an `AgentMessage`. System messages carry the prompt and tool loadout: the first request of a session persists one with every prompt section and tool declaration, and later changes persist as system messages that patch `sections` by name (`null` removes one) and list `toolsAdded`/`toolsRemoved`. Replaying them in order yields the current prompt and tools; there is no separate prompt state entry.`，提示行 80
 
   ```text
   A message in the conversation. The `message` field contains an `AgentMessage`. System messages carry the prompt and tool loadout: the first request of a session persists one with every prompt section and tool declaration, and later changes persist as system messages that patch `sections` by name (`null` removes one) and list `toolsAdded`/`toolsRemoved`. Replaying them in order yields the current prompt and tools; there is no separate prompt state entry.
   ```
 
-- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/session-format.md) — text: `### CompactionEntry`，提示行 123
+- [`packages/coding-agent/docs/session-format.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/session-format.md) — text: `### CompactionEntry`，提示行 123
 
   ```text
   ### CompactionEntry
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E089
 
 接续命令面：--continue/--resume、/resume /new、/tree /fork /clone、/compact、/import /export、/share；--no-session 与 --session-dir
 
-- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `pi --continue`，提示行 10
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/sessions.md) — text: `pi --continue`，提示行 10
 
   ```text
   pi --continue
   ```
 
-- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `| `/tree` | Moves within the current session file | Related alternatives should stay together |`，提示行 26
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/sessions.md) — text: `| `/tree` | Moves within the current session file | Related alternatives should stay together |`，提示行 26
 
   ```text
   | `/tree` | Moves within the current session file | Related alternatives should stay together |
   ```
 
-- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `Use `/export` to write the current session as HTML or JSONL. Use `/share` to upload it and get a viewer link. By default, Pi uses a Radius artifact when Radius authentication is configured; otherwise, it uses a private GitHub gist. Set ［`sessionShareDestination`］(settings.md#sessions-and-context) to `gist` or `radius` to force one destination.`，提示行 58
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/sessions.md) — text: `Use `/export` to write the current session as HTML or JSONL. Use `/share` to upload it and get a viewer link. By default, Pi uses a Radius artifact when Radius authentication is configured; otherwise, it uses a private GitHub gist. Set ［`sessionShareDestination`］(settings.md#sessions-and-context) to `gist` or `radius` to force one destination.`，提示行 58
 
   ```text
   Use `/export` to write the current session as HTML or JSONL. Use `/share` to upload it and get a viewer link. By default, Pi uses a Radius artifact when Radius authentication is configured; otherwise, it uses a private GitHub gist. Set [`sessionShareDestination`](settings.md#sessions-and-context) to `gist` or `radius` to force one destination.
   ```
 
-- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `By default, Pi stores sessions under `~/.pi/agent/sessions/`, grouped by working directory. Use `--session-dir`, `PI_CODING_AGENT_SESSION_DIR`, or the `sessionDir` setting to choose another location. The CLI option has highest precedence.`，提示行 50
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/sessions.md) — text: `By default, Pi stores sessions under `~/.pi/agent/sessions/`, grouped by working directory. Use `--session-dir`, `PI_CODING_AGENT_SESSION_DIR`, or the `sessionDir` setting to choose another location. The CLI option has highest precedence.`，提示行 50
 
   ```text
   By default, Pi stores sessions under `~/.pi/agent/sessions/`, grouped by working directory. Use `--session-dir`, `PI_CODING_AGENT_SESSION_DIR`, or the `sessionDir` setting to choose another location. The CLI option has highest precedence.
   ```
 
-- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/compact ［instructions］` | Compact the current context, optionally with custom instructions |`，提示行 30
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/compact ［instructions］` | Compact the current context, optionally with custom instructions |`，提示行 30
 
   ```text
   | `/compact [instructions]` | Compact the current context, optionally with custom instructions |
   ```
 
-- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/import <path>` | Import and resume a JSONL session |`，提示行 31
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/import <path>` |`，提示行 31
 
   ```text
-  | `/import <path>` | Import and resume a JSONL session |
+  | `/import <path>` | Import a JSONL session, preserving its ID and working directory |
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E090
 
 /ir 把 CI 高熵目录的会话取回，重写 cwd、装入当前 session 目录并切换；跨平台时注入说明消息
 
-- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `* The CI job runs in a high-entropy checkout directory; this command rewrites`，提示行 5
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/extensions/import-repro.ts) — text: `The session ran in another checkout (the CI job's high-entropy directory`，提示行 5
 
   ```text
-  * The CI job runs in a high-entropy checkout directory; this command rewrites
+  The session ran in another checkout (the CI job's high-entropy directory, or a  * research VM); this command rewrites the recorded cwd to the local checkout,
   ```
 
-- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/extensions/import-repro.ts) — text: `return "This session was continued on a non-Windows machine; paths are now Unix style.";`，提示行 192
+- [`.pi/extensions/import-repro.ts`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/extensions/import-repro.ts) — text: `return "This session was continued on a non-Windows machine; paths are now Unix style.";`，提示行 192
 
   ```text
   return "This session was continued on a non-Windows machine; paths are now Unix style.";
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E091
 
 作者把日常工作会话发布为公开数据集，README 邀请 OSS 工作者同样分享
 
-- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `I regularly publish my own `pi-mono` work sessions here:`，提示行 194
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/README.md) — text: `I regularly publish my own `pi-mono` work sessions here:`，提示行 194
 
   ```text
   I regularly publish my own `pi-mono` work sessions here:
   ```
 
-- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `- ［badlogicgames/pi-mono on Hugging Face］(https://huggingface.co/datasets/badlogicgames/pi-mono)`，提示行 196
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/README.md) — text: `- ［badlogicgames/pi-mono on Hugging Face］(https://huggingface.co/datasets/badlogicgames/pi-mono)`，提示行 196
 
   ```text
   - [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## repo-harness/02-prompts-as-procedural-contracts.md
 
@@ -2249,145 +2243,145 @@ JSONL 合同：每行一个对象、id/parentId 成树；header 带版本与 cwd
 
 prompt template 机制：文件名即命令名，支持 $ARGUMENTS/$@ 等替换
 
-- [`packages/coding-agent/docs/prompt-templates.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/prompt-templates.md) — text: `The filename becomes the command name, so this template is available as `/review`. The `description` appears in command completion. If it is omitted, Pi uses the first non-empty line.`，提示行 19
+- [`packages/coding-agent/docs/prompt-templates.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/prompt-templates.md) — text: `The filename becomes the command name, so this template is available as `/review`. The `description` appears in command completion. If it is omitted, Pi uses the first non-empty line.`，提示行 19
 
   ```text
   The filename becomes the command name, so this template is available as `/review`. The `description` appears in command completion. If it is omitted, Pi uses the first non-empty line.
   ```
 
-- [`packages/coding-agent/docs/prompt-templates.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/prompt-templates.md) — text: `Templates support these substitutions:`，提示行 38
+- [`packages/coding-agent/docs/prompt-templates.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/prompt-templates.md) — text: `Templates support these substitutions:`，提示行 38
 
   ```text
   Templates support these substitutions:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E093
 
 /is：不信 issue 分析、只提议不实现；CI 下不加标签不认领
 
-- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.`，提示行 14
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/is.md) — text: `3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.`，提示行 14
 
   ```text
   3. Do not trust analysis written in the issue. Independently verify behavior and derive your own analysis from the code and execution path.
   ```
 
-- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `Do NOT implement unless explicitly asked. Analyze and propose only.`，提示行 28
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/is.md) — text: `Do NOT implement unless explicitly asked. Analyze and propose only.`，提示行 28
 
   ```text
   Do NOT implement unless explicitly asked. Analyze and propose only.
   ```
 
-- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/is.md) — text: `1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.`，提示行 9
+- [`.pi/prompts/is.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/is.md) — text: `1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.`，提示行 9
 
   ```text
   1. If running under CI (`CI=true`), do not add the `inprogress` label and do not assign the issue. Otherwise, add the `inprogress` label to the issue via GitHub CLI and assign the issue to the local `gh` user before analysis starts. If either action fails, report that explicitly and continue.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E094
 
 /pr：不切分支、不 checkout，只读 diff 与相关文件；不检查 changelog
 
-- [`.pi/prompts/pr.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/pr.md) — text: `4. Analyze the PR diff without checking out or switching to the PR branch. Use `gh pr diff`, `gh pr view`, `gh api`, and local main-branch files; if PR file contents are needed, use fetched refs with `git show <ref>:<path>` or temporary files. Read all relevant code files in full with no truncation and compare against the diff. Do not fetch PR file blobs unless a file is missing on main or the diff context is insufficient. Include related code paths that are not in the diff but are required to validate behavior.`，提示行 11
+- [`.pi/prompts/pr.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/pr.md) — text: `4. Analyze the PR diff without checking out or switching to the PR branch. Use `gh pr diff`, `gh pr view`, `gh api`, and local main-branch files; if PR file contents are needed, use fetched refs with `git show <ref>:<path>` or temporary files. Read all relevant code files in full with no truncation and compare against the diff. Do not fetch PR file blobs unless a file is missing on main or the diff context is insufficient. Include related code paths that are not in the diff but are required to validate behavior.`，提示行 11
 
   ```text
   4. Analyze the PR diff without checking out or switching to the PR branch. Use `gh pr diff`, `gh pr view`, `gh api`, and local main-branch files; if PR file contents are needed, use fetched refs with `git show <ref>:<path>` or temporary files. Read all relevant code files in full with no truncation and compare against the diff. Do not fetch PR file blobs unless a file is missing on main or the diff context is insufficient. Include related code paths that are not in the diff but are required to validate behavior.
   ```
 
-- [`.pi/prompts/pr.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/pr.md) — text: `5. Do not check for a changelog entry. Per CONTRIBUTING.md, contributor PRs must not edit `CHANGELOG.md` — the maintainer adds the entry when merging.`，提示行 12
+- [`.pi/prompts/pr.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/pr.md) — text: `5. Do not check for a changelog entry. Per CONTRIBUTING.md, contributor PRs must not edit `CHANGELOG.md` — the maintainer adds the entry when merging.`，提示行 12
 
   ```text
   5. Do not check for a changelog entry. Per CONTRIBUTING.md, contributor PRs must not edit `CHANGELOG.md` — the maintainer adds the entry when merging.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E095
 
 /wr：固定免责行；单 issue 时 push 后以 completed 关闭，使 issue-close 工作流运行
 
-- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/wr.md) — text: `This comment is AI-generated by `/wr``，提示行 22
+- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/wr.md) — text: `This comment is AI-generated by `/wr``，提示行 22
 
   ```text
   This comment is AI-generated by `/wr`
   ```
 
-- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/wr.md) — text: `7. If this task is tied to exactly one GitHub issue, explicitly close that issue with reason `completed` after the push so the issue-close workflows in `.github/` run. This applies to issues only, not PRs.`，提示行 28
+- [`.pi/prompts/wr.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/wr.md) — text: `7. If this task is tied to exactly one GitHub issue, explicitly close that issue with reason `completed` after the push so the issue-close workflows in `.github/` run. This applies to issues only, not PRs.`，提示行 28
 
   ```text
   7. If this task is tied to exactly one GitHub issue, explicitly close that issue with reason `completed` after the push so the issue-close workflows in `.github/` run. This applies to issues only, not PRs.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E096
 
 /deslop：删除无当前需求的推测性抽象
 
-- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/deslop.md) — text: `- Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.`，提示行 19
+- [`.pi/prompts/deslop.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/deslop.md) — text: `- Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.`，提示行 19
 
   ```text
   - Remove speculative flexibility, configuration, extension points, and generic machinery that have no current requirement.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E097
 
 /sa：不发布/不改状态/不请求 CVE 除非用户同意或草稿 request_cve；评论不可得时明说、绝不假装读过
 
-- [`.pi/prompts/sa.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/sa.md) — text: `Use `gh` for all GitHub operations. Do not publish the advisory, change its state, or request a CVE unless the user explicitly agrees or the draft markdown explicitly says `request_cve: true`.`，提示行 7
+- [`.pi/prompts/sa.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/sa.md) — text: `Use `gh` for all GitHub operations. Do not publish the advisory, change its state, or request a CVE unless the user explicitly agrees or the draft markdown explicitly says `request_cve: true`.`，提示行 7
 
   ```text
   Use `gh` for all GitHub operations. Do not publish the advisory, change its state, or request a CVE unless the user explicitly agrees or the draft markdown explicitly says `request_cve: true`.
   ```
 
-- [`.pi/prompts/sa.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/sa.md) — text: `GitHub does not expose repository security advisory comments/discussion through the documented REST OpenAPI schema or public GraphQL schema. A 404 from guessed API endpoints such as `api.github.com/repos/.../security-advisories/<GHSA>/comments`, `.../timeline`, or `.../events` is expected and is not, by itself, an auth failure. Do not use a browser session, browser cookies, or cookie extraction to fetch advisory comments. Instead, clearly tell the user that advisory comments were not included and that they can paste any relevant comments if they want them considered.`，提示行 9
+- [`.pi/prompts/sa.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/sa.md) — text: `GitHub does not expose repository security advisory comments/discussion through the documented REST OpenAPI schema or public GraphQL schema. A 404 from guessed API endpoints such as `api.github.com/repos/.../security-advisories/<GHSA>/comments`, `.../timeline`, or `.../events` is expected and is not, by itself, an auth failure. Do not use a browser session, browser cookies, or cookie extraction to fetch advisory comments. Instead, clearly tell the user that advisory comments were not included and that they can paste any relevant comments if they want them considered.`，提示行 9
 
   ```text
   GitHub does not expose repository security advisory comments/discussion through the documented REST OpenAPI schema or public GraphQL schema. A 404 from guessed API endpoints such as `api.github.com/repos/.../security-advisories/<GHSA>/comments`, `.../timeline`, or `.../events` is expected and is not, by itself, an auth failure. Do not use a browser session, browser cookies, or cookie extraction to fetch advisory comments. Instead, clearly tell the user that advisory comments were not included and that they can paste any relevant comments if they want them considered.
   ```
 
-- [`.pi/prompts/sa.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/sa.md) — text: `- Never pretend comments were read.`，提示行 32
+- [`.pi/prompts/sa.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/sa.md) — text: `- Never pretend comments were read.`，提示行 32
 
   ```text
   - Never pretend comments were read.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E098
 
 /cl：跨包把 ai/agent/tui 的用户可见变更复制到 coding-agent；在 [Unreleased] 顶部插入 New Features
 
-- [`.pi/prompts/cl.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/cl.md) — text: `Changes in `ai`, `agent` or `tui` that affect end users should be duplicated to `coding-agent` changelog, since coding-agent is the user-facing package that depends on them.`，提示行 31
+- [`.pi/prompts/cl.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/cl.md) — text: `Changes in `ai`, `agent` or `tui` that affect end users should be duplicated to `coding-agent` changelog, since coding-agent is the user-facing package that depends on them.`，提示行 31
 
   ```text
   Changes in `ai`, `agent` or `tui` that affect end users should be duplicated to `coding-agent` changelog, since coding-agent is the user-facing package that depends on them.
   ```
 
-- [`.pi/prompts/cl.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/cl.md) — text: `- Insert a `### New Features` section at the start of `## ［Unreleased］` in `packages/coding-agent/CHANGELOG.md`.`，提示行 34
+- [`.pi/prompts/cl.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/cl.md) — text: `- Insert a `### New Features` section at the start of `## ［Unreleased］` in `packages/coding-agent/CHANGELOG.md`.`，提示行 34
 
   ```text
   - Insert a `### New Features` section at the start of `## [Unreleased]` in `packages/coding-agent/CHANGELOG.md`.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E099
 
 /dup：查重复的三步检索、同症状同因判据、草稿评论与 AI 披露、禁止 post/label/close
 
-- [`.pi/prompts/dup.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/prompts/dup.md) — text: `description: Find potential duplicates of a GitHub issue`，提示行 2
+- [`.pi/prompts/dup.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/prompts/dup.md) — text: `description: Find potential duplicates of a GitHub issue`，提示行 2
 
   ```text
   description: Find potential duplicates of a GitHub issue
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## repo-harness/07-monorepo-taxonomy.md
 
@@ -2395,112 +2389,103 @@ prompt template 机制：文件名即命令名，支持 $ARGUMENTS/$@ 等替换
 
 README 包表列 7 个包；chord 是 typed host runtime，durable 是可重开续接的持久运行时
 
-- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `| **［@earendil-works/chord］(packages/chord)** | Typed host runtime for hot-reloadable plugins, contracts, replicated state, and RPC over JSON links |`，提示行 78
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/README.md) — text: `| **［@earendil-works/chord］(packages/chord)** | Typed host runtime for hot-reloadable plugins, contracts, replicated state, and RPC over JSON links |`，提示行 78
 
   ```text
   | **[@earendil-works/chord](packages/chord)** | Typed host runtime for hot-reloadable plugins, contracts, replicated state, and RPC over JSON links |
   ```
 
-- [`README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/README.md) — text: `| **［@earendil-works/pi-tui］(packages/tui)** | Terminal UI library with differential rendering |`，提示行 84
+- [`README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/README.md) — text: `| **［@earendil-works/pi-tui］(packages/tui)** | Terminal UI library with differential rendering |`，提示行 84
 
   ```text
   | **[@earendil-works/pi-tui](packages/tui)** | Terminal UI library with differential rendering |
   ```
 
-- [`packages/chord/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/chord/README.md) — text: `Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run.`，提示行 3
+- [`packages/chord/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/chord/README.md) — text: `Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run.`，提示行 3
 
   ```text
   Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run.
   ```
 
-- [`packages/durable/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/durable/README.md) — text: `> **Experimental.** The API changes without notice between releases.`，提示行 3
+- [`packages/durable/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/durable/README.md) — text: `> **Experimental.** The API changes without notice between releases.`，提示行 3
 
   ```text
   > **Experimental.** The API changes without notice between releases.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E101
 
-chord 依赖 pi-telemetry；durable 依赖 chord
+chord 依赖 pi-schema 与 pi-telemetry；durable 依赖 chord（全部精确 pin 同一 release 版本）
 
-- [`packages/chord/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/chord/package.json) — text: `"@earendil-works/pi-telemetry": "1.4.0",`，提示行 88
-
-  ```text
-  "@earendil-works/pi-telemetry": "1.4.0",
-  ```
-
-- [`packages/durable/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/durable/package.json) — text: `"@earendil-works/chord": "1.4.0",`，提示行 153
-
-  ```text
-  "@earendil-works/chord": "1.4.0",
-  ```
-
-核验：`v1.4.0`
+- [`packages/chord/package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/chord/package.json) — pin: `@earendil-works/pi-schema`
+- [`packages/chord/package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/chord/package.json) — pin: `@earendil-works/pi-telemetry`
+- [`packages/durable/package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/durable/package.json) — pin: `@earendil-works/chord`
+核验：`v1.5.0`
 
 ### E102
 
 codemode/mcp/env/evals 不在 README 表：前三个是发布包，evals 私有
 
-- [`packages/codemode/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/codemode/README.md) — text: `Runs model-written JavaScript in a QuickJS VM (compiled to WebAssembly) where the only capability is calling injected tools. Nested tool calls never enter the LLM context; only the script's output and return value do.`，提示行 3
+- [`packages/codemode/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/codemode/README.md) — text: `Runs model-written JavaScript in a QuickJS VM (compiled to WebAssembly) where the only capability is calling injected tools. Nested tool calls never enter the LLM context; only the script's output and return value do.`，提示行 3
 
   ```text
   Runs model-written JavaScript in a QuickJS VM (compiled to WebAssembly) where the only capability is calling injected tools. Nested tool calls never enter the LLM context; only the script's output and return value do.
   ```
 
-- [`packages/mcp/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/mcp/README.md) — text: `A small, standalone Model Context Protocol client. It does not depend on the official MCP SDK or other pi packages.`，提示行 3
+- [`packages/mcp/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/mcp/README.md) — text: `A small, standalone Model Context Protocol client. It does not depend on the official MCP SDK or other pi packages.`，提示行 3
 
   ```text
   A small, standalone Model Context Protocol client. It does not depend on the official MCP SDK or other pi packages.
   ```
 
-- [`packages/env/README.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/env/README.md) — text: `Remote execution environments for ［Pi Durable］(../durable): an agent's tools run on another machine, usually over SSH,`，提示行 3
+- [`packages/env/README.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/env/README.md) — text: `Remote execution environments for ［Pi Durable］(../durable): an agent's tools run on another machine, usually over SSH,`，提示行 3
 
   ```text
   Remote execution environments for [Pi Durable](../durable): an agent's tools run on another machine, usually over SSH,
   ```
 
-- [`packages/evals/package.json`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/evals/package.json) — text: `"private": true,`，提示行 4
+- [`packages/evals/package.json`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/evals/package.json) — text: `"private": true,`，提示行 4
 
   ```text
   "private": true,
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E103
 
 client/protocol/server 三包已删除，不再发布
 
-- `packages/client`：**v1.4.0 起不存在**
-- `packages/protocol`：**v1.4.0 起不存在**
-- `packages/server`：**v1.4.0 起不存在**
-核验：`v1.4.0`
+- `packages/client`：**v1.5.0 起不存在**
+- `packages/protocol`：**v1.5.0 起不存在**
+- `packages/server`：**v1.5.0 起不存在**
+核验：`v1.5.0`
 
 ### E104
 
 宿主向扩展提供五个包，扩展须声明为 peerDependencies 且不打包
 
-- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
 
   ```text
   Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E105
 
 lockstep：所有公开包同一版本，sync-versions 校验集合唯一
 
-- [`scripts/sync-versions.js`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/sync-versions.js) — text: `const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));`，提示行 29
+- [`scripts/sync-versions.js`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/sync-versions.js) — text: `const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));`，提示行 29
 
   ```text
   const versions = new Set(publishedPackages.map((pkg) => pkg.data.version));
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## repo-harness/03-repo-skills.md
 
@@ -2508,103 +2493,103 @@ lockstep：所有公开包同一版本，sync-versions 校验集合唯一
 
 skill 启动时只把 name/description/path 放进系统提示，完整指令按需加载；描述同时写做什么与何时用
 
-- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md) — text: `At startup, Pi scans configured skill locations and adds each skill’s name, description, and path to the system prompt. It does not add the full instructions.`，提示行 43
+- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/skills.md) — text: `At startup, Pi scans configured skill locations and adds each skill’s name, description, and path to the system prompt. It does not add the full instructions.`，提示行 43
 
   ```text
   At startup, Pi scans configured skill locations and adds each skill’s name, description, and path to the system prompt. It does not add the full instructions.
   ```
 
-- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md) — text: `The description determines when the model considers loading the skill. State both what the skill does and when it applies. Avoid descriptions such as “Helps with PDFs,” which do not provide enough routing information.`，提示行 37
+- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/skills.md) — text: `The description determines when the model considers loading the skill. State both what the skill does and when it applies. Avoid descriptions such as “Helps with PDFs,” which do not provide enough routing information.`，提示行 37
 
   ```text
   The description determines when the model considers loading the skill. State both what the skill does and when it applies. Avoid descriptions such as “Helps with PDFs,” which do not provide enough routing information.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E107
 
 github-work 不承载流程，路由到 is/pr/wr 三个 prompt 模板
 
-- [`.pi/skills/github-work.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/github-work.md) — text: `|---|---|`，提示行 11
+- [`.pi/skills/github-work.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/github-work.md) — text: `|---|---|`，提示行 11
 
   ```text
   |---|---|
   ```
 
-- [`.pi/skills/github-work.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/github-work.md) — text: `| Wrap up issue or PR work: changelog, final comment, commit, push, close | `.pi/prompts/wr.md` |`，提示行 14
+- [`.pi/skills/github-work.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/github-work.md) — text: `| Wrap up issue or PR work: changelog, final comment, commit, push, close | `.pi/prompts/wr.md` |`，提示行 14
 
   ```text
   | Wrap up issue or PR work: changelog, final comment, commit, push, close | `.pi/prompts/wr.md` |
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E108
 
 add-llm-provider 是有序检查单：核心类型→实现→懒注册→模型生成→测试矩阵→接线→文档
 
-- [`.pi/skills/add-llm-provider.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/add-llm-provider.md) — text: `A new provider touches multiple files. Work through these steps in order.`，提示行 8
+- [`.pi/skills/add-llm-provider.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/add-llm-provider.md) — text: `A new provider touches multiple files. Work through these steps in order.`，提示行 8
 
   ```text
   A new provider touches multiple files. Work through these steps in order.
   ```
 
-- [`.pi/skills/add-llm-provider.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/add-llm-provider.md) — text: `- For `cross-provider-handoff.test.ts`, add at least one provider/model pair. If the provider exposes multiple model families (e.g. GPT and Claude), add at least one pair per family.`，提示行 43
+- [`.pi/skills/add-llm-provider.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/add-llm-provider.md) — text: `- For `cross-provider-handoff.test.ts`, add at least one provider/model pair. If the provider exposes multiple model families (e.g. GPT and Claude), add at least one pair per family.`，提示行 43
 
   ```text
   - For `cross-provider-handoff.test.ts`, add at least one provider/model pair. If the provider exposes multiple model families (e.g. GPT and Claude), add at least one pair per family.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E109
 
 interactive-testing 给 tmux 配方；release smoke 必须提交真实 prompt 并等模型回复
 
-- [`.pi/skills/interactive-testing.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/interactive-testing.md) — text: `tmux new-session -d -s pi-test -x 80 -y 24`，提示行 11
+- [`.pi/skills/interactive-testing.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/interactive-testing.md) — text: `tmux new-session -d -s pi-test -x 80 -y 24`，提示行 11
 
   ```text
   tmux new-session -d -s pi-test -x 80 -y 24
   ```
 
-- [`.pi/skills/interactive-testing.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/interactive-testing.md) — text: `For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.`，提示行 19
+- [`.pi/skills/interactive-testing.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/interactive-testing.md) — text: `For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.`，提示行 19
 
   ```text
   For release smoke tests, start the tmux session with `-c /tmp` and replace `./pi-test.sh` with the absolute path to the release binary. Test both Node and Bun binaries separately, submit a prompt, and wait for the model reply; startup alone is not a passing smoke test.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E110
 
 release：lockstep、仓外本地 smoke、tag 后不重跑脚本；smoke 未过是 blocker 除非用户显式接受风险
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.`，提示行 10
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `**Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.`，提示行 10
 
   ```text
   **Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.
   ```
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):`，提示行 14
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):`，提示行 14
 
   ```text
   2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):
   ```
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## ［Unreleased］` changelog sections, commits `Add ［Unreleased］ section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.`，提示行 46
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## ［Unreleased］` changelog sections, commits `Add ［Unreleased］ section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.`，提示行 46
 
   ```text
   The release script pins the newest published model catalog for Nix (`nix/model-catalog.json`) and builds the checkout with it as the Nix build does (it fails if that catalog predates main's model changes; publish one first), bumps all package versions, updates changelogs, regenerates release artifacts, runs `npm run check`, commits `Release vX.Y.Z`, tags `vX.Y.Z`, adds fresh `## [Unreleased]` changelog sections, commits `Add [Unreleased] section for next cycle`, then pushes `main` and the tag. Do not rerun the release script after a tag was pushed.
   ```
 
-- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.4.0/.pi/skills/release.md) — text: `Verify both Node and Bun startup, model/account listing, interactive startup, and at least one real prompt with the intended default provider. The bare commands `/tmp/pi-local-release/node/pi` and `/tmp/pi-local-release/bun/pi` start interactive mode; run each in tmux, submit a prompt, and wait for the model reply before considering the interactive smoke test passed. Failures are release blockers unless the user explicitly accepts the risk.`，提示行 33
+- [`.pi/skills/release.md`](https://github.com/earendil-works/pi/blob/v1.5.0/.pi/skills/release.md) — text: `Verify both Node and Bun startup, model/account listing, interactive startup, and at least one real prompt with the intended default provider. The bare commands `/tmp/pi-local-release/node/pi` and `/tmp/pi-local-release/bun/pi` start interactive mode; run each in tmux, submit a prompt, and wait for the model reply before considering the interactive smoke test passed. Failures are release blockers unless the user explicitly accepts the risk.`，提示行 33
 
   ```text
   Verify both Node and Bun startup, model/account listing, interactive startup, and at least one real prompt with the intended default provider. The bare commands `/tmp/pi-local-release/node/pi` and `/tmp/pi-local-release/bun/pi` start interactive mode; run each in tmux, submit a prompt, and wait for the model reply before considering the interactive smoke test passed. Failures are release blockers unless the user explicitly accepts the risk.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## repo-harness/06-scope-discipline-and-cost-contracts.md
 
@@ -2612,85 +2597,85 @@ release：lockstep、仓外本地 smoke、tag 后不重跑脚本；smoke 未过�
 
 核心最小；不属于核心的功能做成扩展，膨胀核心的 PR 会被拒；hook 点也要先讨论
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `First things first: **pi's core is minimal**.`，提示行 7
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `First things first: **pi's core is minimal**.`，提示行 7
 
   ```text
   First things first: **pi's core is minimal**.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.`，提示行 9
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.`，提示行 9
 
   ```text
   If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Pi's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions.  Even hook points for extensions however should be well considered and discussed to avoid adding unmaintainable bloat and complex interactions.`，提示行 11
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `Pi's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions.  Even hook points for extensions however should be well considered and discussed to avoid adding unmaintainable bloat and complex interactions.`，提示行 11
 
   ```text
   Pi's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions.  Even hook points for extensions however should be well considered and discussed to avoid adding unmaintainable bloat and complex interactions.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E112
 
 入口即成本合同：按 entries 声明 maxFiles/forbid/allow 预算，超预算在提交时失败；未列出的入口不受检查
 
-- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `* Entry points are cost contracts.`，提示行 3
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-entry-graphs.mjs) — text: `* Entry points are cost contracts.`，提示行 3
 
   ```text
   * Entry points are cost contracts.
   ```
 
-- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `* Budgets are deliberate. Entries with no budget remain unbounded; each listed entry states the`，提示行 33
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-entry-graphs.mjs) — text: `* Budgets are deliberate. Entries with no budget remain unbounded; each listed entry states the`，提示行 33
 
   ```text
   * Budgets are deliberate. Entries with no budget remain unbounded; each listed entry states the
   ```
 
-- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.4.0/scripts/check-entry-graphs.mjs) — text: `"./models": {`，提示行 38
+- [`scripts/check-entry-graphs.mjs`](https://github.com/earendil-works/pi/blob/v1.5.0/scripts/check-entry-graphs.mjs) — text: `"./models": {`，提示行 38
 
   ```text
   "./models": {
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E113
 
 自动关闭制造审阅缓冲，让维护者按自己的节奏重开达标 issue
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `pi receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality bar in this guide or do not follow CONTRIBUTING.md. Some are slung at the repository mindlessly via an agent instead of being reviewed and shaped by the person submitting them. Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.`，提示行 81
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `pi receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality bar in this guide or do not follow CONTRIBUTING.md. Some are slung at the repository mindlessly via an agent instead of being reviewed and shaped by the person submitting them. Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.`，提示行 81
 
   ```text
   pi receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality bar in this guide or do not follow CONTRIBUTING.md. Some are slung at the repository mindlessly via an agent instead of being reviewed and shaped by the person submitting them. Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E114
 
 第三方 package 以完全权限运行，安装前须审源码；宿主提供包须 peerDependencies 且不打包
 
-- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Project packages are installed and loaded only after project trust is resolved. Packages can execute extension code and can include skills that instruct the model to run programs. Review third-party package source before installing it. Review project package declarations before granting project trust.`，提示行 21
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/packages.md) — text: `Project packages are installed and loaded only after project trust is resolved. Packages can execute extension code and can include skills that instruct the model to run programs. Review third-party package source before installing it. Review project package declarations before granting project trust.`，提示行 21
 
   ```text
   Project packages are installed and loaded only after project trust is resolved. Packages can execute extension code and can include skills that instruct the model to run programs. Review third-party package source before installing it. Review project package declarations before granting project trust.
   ```
 
-- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
 
   ```text
   Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.
   ```
 
-- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Do not list host-provided packages in `dependencies`. A physical copy can bypass Pi's extension module mapping in compiled ESM and create duplicate classes, registries, and initialization work. Pi reports an extension warning when it detects this manifest configuration. Other Pi packages used as dependencies must be included in the published tarball and referenced through their `node_modules` resource paths.`，提示行 90
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/packages.md) — text: `Do not list host-provided packages in `dependencies`. A physical copy can bypass Pi's extension module mapping in compiled ESM and create duplicate classes, registries, and initialization work. Pi reports an extension warning when it detects this manifest configuration. Other Pi packages used as dependencies must be included in the published tarball and referenced through their `node_modules` resource paths.`，提示行 90
 
   ```text
   Do not list host-provided packages in `dependencies`. A physical copy can bypass Pi's extension module mapping in compiled ESM and create duplicate classes, registries, and initialization work. Pi reports an extension warning when it detects this manifest configuration. Other Pi packages used as dependencies must be included in the published tarball and referenced through their `node_modules` resource paths.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## extension-development-model/02-terms-and-mental-models.md
 
@@ -2698,115 +2683,115 @@ release：lockstep、仓外本地 smoke、tag 后不重跑脚本；smoke 未过�
 
 运行时三层：agent core / coding-agent / 扩展运行时；/reload 会计数重载；会话持有模型、工具、队列、压缩与扩展运行时
 
-- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/reload` | Reload keybindings, extensions, skills, templates, themes, and context files |`，提示行 49
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/reload` | Reload keybindings, extensions, skills, templates, themes, and context files |`，提示行 49
 
   ```text
   | `/reload` | Reload keybindings, extensions, skills, templates, themes, and context files |
   ```
 
-- [`packages/coding-agent/docs/sdk.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sdk.md) — text: `## Session lifecycle`，提示行 26
+- [`packages/coding-agent/docs/sdk.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/sdk.md) — text: `## Session lifecycle`，提示行 26
 
   ```text
   ## Session lifecycle
   ```
 
-- [`packages/coding-agent/docs/how-pi-works.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/how-pi-works.md) — text: `Pi coordinates model requests, tool execution, context assembly, and session storage. A session is Pi's record of a conversation, including messages, tool calls and results, model changes, compactions, and other events.`，提示行 3
+- [`packages/coding-agent/docs/how-pi-works.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/how-pi-works.md) — text: `Pi coordinates model requests, tool execution, context assembly, and session storage. A session is Pi's record of a conversation, including messages, tool calls and results, model changes, compactions, and other events.`，提示行 3
 
   ```text
   Pi coordinates model requests, tool execution, context assembly, and session storage. A session is Pi's record of a conversation, including messages, tool calls and results, model changes, compactions, and other events.
   ```
 
-- [`packages/coding-agent/docs/how-pi-works.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/how-pi-works.md) — text: `## Interfaces`，提示行 33
+- [`packages/coding-agent/docs/how-pi-works.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/how-pi-works.md) — text: `## Interfaces`，提示行 33
 
   ```text
   ## Interfaces
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E116
 
 skill 可以是单文件 Markdown，也可以是含 SKILL.md 的目录；启动只注入 name/description/path
 
-- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/skills.md) — text: `Pi accepts some standalone Markdown skills, but a directory containing `SKILL.md` is the portable form and should be preferred. See ［Settings］(settings.md#resources) and ［Pi Packages］(packages.md) for additional locations.`，提示行 63
+- [`packages/coding-agent/docs/skills.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/skills.md) — text: `Pi accepts some standalone Markdown skills, but a directory containing `SKILL.md` is the portable form and should be preferred. See ［Settings］(settings.md#resources) and ［Pi Packages］(packages.md) for additional locations.`，提示行 63
 
   ```text
   Pi accepts some standalone Markdown skills, but a directory containing `SKILL.md` is the portable form and should be preferred. See [Settings](settings.md#resources) and [Pi Packages](packages.md) for additional locations.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E117
 
 生命周期：before_agent_start → 事件 → agent_end；agent_before_settle 是最后可行动边界，agent_settled 仅通知
 
-- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `## Understand the runtime lifecycle`，提示行 54
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) — heading: `Lifecycle Overview`，提示行 54
 
   ```text
-  ## Understand the runtime lifecycle
+  ### Lifecycle Overview
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E118
 
 session_before_compact：扩展可提供自定义摘要（fromHook）并把 usage 计入会话统计
 
-- [`packages/coding-agent/docs/compaction.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/compaction.md) — text: `### session_before_compact`，提示行 297
+- [`packages/coding-agent/docs/compaction.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/compaction.md) — text: `### session_before_compact`，提示行 297
 
   ```text
   ### session_before_compact
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E119
 
 SessionManager 拥有条目树与叶子；分支敏感状态从 getBranch() 重建，不重放文件
 
-- [`packages/coding-agent/docs/sdk.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sdk.md) — text: `## Session lifecycle`，提示行 26
+- [`packages/coding-agent/docs/sdk.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/sdk.md) — text: `## Session lifecycle`，提示行 26
 
   ```text
   ## Session lifecycle
   ```
 
-- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `Reconstruct branch-sensitive state from `ctx.sessionManager.getBranch()` during `session_start`.`，提示行 348
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) — heading: `ctx.sessionManager`，提示行 348
 
   ```text
-  Reconstruct branch-sensitive state from `ctx.sessionManager.getBranch()` during `session_start`.
+  Read-only access to session state: `getCwd()`, `getSessionDir()`, `getSessionId()`, `getSessionFile()`, `getSessionName()`, `getHeader()`, `getEntries()`, `getEntry()`, `getBranch()`, `getTree()`, `getLeafId()`, `getLeafEntry()`, `getLabel()`, `buildContextEntries()`, and `buildSessionProjection()`. See [Session Format](session-format.md) for entry types.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E120
 
 接续命令：--continue/--resume、/resume /new、/tree /fork /clone、/import、/export /share
 
-- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sessions.md) — text: `Pi saves a conversation as a session. The active branch of that session supplies conversation history for the next model request. Use session commands to continue work, explore another branch, or reduce the amount of history sent to the model.`，提示行 3
+- [`packages/coding-agent/docs/sessions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/sessions.md) — text: `Pi saves a conversation as a session. The active branch of that session supplies conversation history for the next model request. Use session commands to continue work, explore another branch, or reduce the amount of history sent to the model.`，提示行 3
 
   ```text
   Pi saves a conversation as a session. The active branch of that session supplies conversation history for the next model request. Use session commands to continue work, explore another branch, or reduce the amount of history sent to the model.
   ```
 
-- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/export ［path］` | Export the session as HTML or JSONL |`，提示行 38
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/export ［path］` | Export the session as HTML or JSONL |`，提示行 38
 
   ```text
   | `/export [path]` | Export the session as HTML or JSONL |
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ### E121
 
 RPC 模式下部分 UI 方法降级：custom() 等需终端直连的方法不可用
 
-- [`packages/coding-agent/docs/rpc-extension-ui.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/rpc-extension-ui.md) — text: `Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:`，提示行 14
+- [`packages/coding-agent/docs/rpc-extension-ui.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/rpc-extension-ui.md) — text: `Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:`，提示行 14
 
   ```text
   Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## repo-harness/00-index.md
 
@@ -2814,25 +2799,25 @@ RPC 模式下部分 UI 方法降级：custom() 等需终端直连的方法不可
 
 agent 从仓库根运行并遵守 AGENTS；CONTRIBUTING 对 AI 生成代码要求理解
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.`，提示行 19
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.`，提示行 19
 
   ```text
   If you use an agent, run it from the `pi` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `Multiple pi sessions may be running in this cwd at the same time, each modifying different files. Git operations that touch unstaged, staged, or untracked files outside your own changes will stomp on other sessions' work. Follow these rules:`，提示行 54
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `Multiple pi sessions may be running in this cwd at the same time, each modifying different files. Git operations that touch unstaged, staged, or untracked files outside your own changes will stomp on other sessions' work. Follow these rules:`，提示行 54
 
   ```text
   Multiple pi sessions may be running in this cwd at the same time, each modifying different files. Git operations that touch unstaged, staged, or untracked files outside your own changes will stomp on other sessions' work. Follow these rules:
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.`，提示行 15
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.`，提示行 15
 
   ```text
   **You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## sdlc-reference/00-index.md
 
@@ -2840,37 +2825,37 @@ agent 从仓库根运行并遵守 AGENTS；CONTRIBUTING 对 AI 生成代码要�
 
 主仓权威位置表：批准文件、nix pin、changelog、MCP baseline 与各 workflow
 
-- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/approve-contributor.yml) — text: `on:`，提示行 3
+- [`.github/workflows/approve-contributor.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/approve-contributor.yml) — text: `on:`，提示行 3
 
   ```text
   on:
   ```
 
-- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/nix.yml) — text: `# The flake builds with the model catalog revision pinned in`，提示行 3
+- [`.github/workflows/nix.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/nix.yml) — text: `# The flake builds with the model catalog revision pinned in`，提示行 3
 
   ```text
   # The flake builds with the model catalog revision pinned in
   ```
 
-- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.4.0/AGENTS.md) — text: `## Changelog`，提示行 102
+- [`AGENTS.md`](https://github.com/earendil-works/pi/blob/v1.5.0/AGENTS.md) — text: `## Changelog`，提示行 102
 
   ```text
   ## Changelog
   ```
 
-- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.4.0/CONTRIBUTING.md) — text: `Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.`，提示行 69
+- [`CONTRIBUTING.md`](https://github.com/earendil-works/pi/blob/v1.5.0/CONTRIBUTING.md) — text: `Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.`，提示行 69
 
   ```text
   Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.
   ```
 
-- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.4.0/.github/workflows/ci.yml) — text: `- name: Install dependencies`，提示行 59
+- [`.github/workflows/ci.yml`](https://github.com/earendil-works/pi/blob/v1.5.0/.github/workflows/ci.yml) — text: `- name: Install dependencies`，提示行 59
 
   ```text
   - name: Install dependencies
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## sdlc-reference/08-applicability-boundary.md
 
@@ -2878,13 +2863,13 @@ agent 从仓库根运行并遵守 AGENTS；CONTRIBUTING 对 AI 生成代码要�
 
 宿主提供包放 peerDependencies 用 "*"，不打包
 
-- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
 
   ```text
   Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## extension-development-model/00-index.md
 
@@ -2892,31 +2877,31 @@ agent 从仓库根运行并遵守 AGENTS；CONTRIBUTING 对 AI 生成代码要�
 
 资源判别（扩展/skill/template）、压缩钩子、host 包合同、RPC UI 降级
 
-- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.`，提示行 3
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) — text: `Extensions are TypeScript modules that extend Pi's behavior. They can subscribe to lifecycle events, register custom tools callable by the LLM, add commands, and more.`，提示行 3
 
   ```text
-  Extensions are TypeScript modules that add executable behavior to Pi. Use one when a workflow needs tools, commands, event handlers, model providers, session state, or terminal UI rather than instructions alone.
+  Extensions are TypeScript modules that extend Pi's behavior. They can subscribe to lifecycle events, register custom tools callable by the LLM, add commands, and more.
   ```
 
-- [`packages/coding-agent/docs/compaction.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/compaction.md) — text: `### session_before_compact`，提示行 297
+- [`packages/coding-agent/docs/compaction.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/compaction.md) — text: `### session_before_compact`，提示行 297
 
   ```text
   ### session_before_compact
   ```
 
-- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/packages.md) — text: `Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.`，提示行 88
 
   ```text
   Declare the host-provided packages listed above in `peerDependencies` with a `"*"` range and do not bundle them. Pi suppresses automatic peer installation for managed npm packages and git packages installed with npm, pnpm, or Bun. Local packages are not installed or modified, so their dependency tree remains the package author's responsibility.
   ```
 
-- [`packages/coding-agent/docs/rpc-extension-ui.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/rpc-extension-ui.md) — text: `Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:`，提示行 14
+- [`packages/coding-agent/docs/rpc-extension-ui.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/rpc-extension-ui.md) — text: `Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:`，提示行 14
 
   ```text
   Some `ExtensionUIContext` methods are not supported or degraded in RPC mode because they require direct terminal UI access:
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`
 
 ## extension-development-model/01-new-extension-repository.md
 
@@ -2924,28 +2909,28 @@ agent 从仓库根运行并遵守 AGENTS；CONTRIBUTING 对 AI 生成代码要�
 
 jiti 加载、agent dir 与 project trust、工具合同、faux 测试、package 分发与干净安装验证
 
-- [`packages/coding-agent/docs/cli.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/cli.md) — text: `- `-ne`, `--no-extensions`<br>`，提示行 196
+- [`packages/coding-agent/docs/cli.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/cli.md) — text: `- `-ne`, `--no-extensions`<br>`，提示行 196
 
   ```text
   - `-ne`, `--no-extensions`<br>
   ```
 
-- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/trust` | Save a project trust decision for future Pi processes |`，提示行 48
+- [`packages/coding-agent/docs/slash-commands.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/slash-commands.md) — text: `| `/trust` | Save a project trust decision for future Pi processes |`，提示行 48
 
   ```text
   | `/trust` | Save a project trust decision for future Pi processes |
   ```
 
-- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) — text: `### Tools`，提示行 245
+- [`packages/coding-agent/docs/extensions.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) — heading: `Custom Tools`，提示行 245
 
   ```text
-  ### Tools
+  ## Custom Tools
   ```
 
-- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/packages.md) — text: `Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.`，提示行 3
+- [`packages/coding-agent/docs/packages.md`](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/packages.md) — text: `Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.`，提示行 3
 
   ```text
   Pi packages install and distribute extensions, skills, prompt templates, and themes as one unit. Use a package when a customization should be shared through npm or git, or when several resources belong together.
   ```
 
-核验：`v1.4.0`
+核验：`v1.5.0`

@@ -1,6 +1,6 @@
 # Monorepo 分类：`packages/` 的角色表
 
-`packages/` 下有 11 个包。根 `README.md` 的包表列出其中 7 个，其余 4 个（codemode、mcp、evals、env）存在于仓库但不进该表。全部包共享同一版本号（lockstep，见 [03](./03-repo-skills.md)）。本页角色描述依据根 README 包表与各包 README 首部；对扩展作者的意义在文末。
+`packages/` 下有 **12** 个包（本基线新增 `schema`，v1.4.0 为 11）。根 `README.md` 的包表列出其中 7 个，其余 5 个（codemode、mcp、evals、env、`schema`）存在于仓库但不进该表。本基线新增的 `packages/schema`（`@earendil-works/pi-schema`）是**校验底座**：TypeBox 从校验器的位置退场，但扩展源码仍可 `import { Type } from "@earendil-works/pi-ai"`——写法不变，变的是校验一律走 pi-schema。全部包共享同一版本号（lockstep，见 [03](./03-repo-skills.md)）。本页角色描述依据根 README 包表与各包 README 首部；对扩展作者的意义在文末。
 
 ## 七个 README 表列包
 
@@ -37,13 +37,13 @@ evals 包值得单独一提：它把「文档有没有用」变成可测量的�
 
 ## 发布面与私有面
 
-基线时点：11 个包中 10 个是公开 npm 发布包，唯一私有的是 evals。codemode、mcp、env 与 durable 一起构成「实验面」（API 变化不另行通知），与稳定的核心栈（ai/agent-core/coding-agent/tui）区分开。
+基线时点（v1.5.0）：**12 个包中 11 个是公开 npm 发布包**，唯一私有的是 evals。（v1.4.0 为 11 个包 / 10 个公开；v1.5.0 新增 `schema`，公开。）codemode、mcp、env 与 durable 一起构成「实验面」（API 变化不另行通知），与稳定的核心栈（ai/agent-core/coding-agent/tui）区分开。
 
 > **相对 v1.0.3 的包集合变化**：v1.0.3 有 13 个包，v1.2.0 有 11 个。删除了 `packages/client`、`packages/protocol`、`packages/server`（experimental 远程会话三件套，连同 `PROTOCOL_VERSION = 8` 的 CBOR 协议线一并移除，不再发布）；新增 `packages/env`（远程执行环境：SSH daemon、PTY、`listFiles`）。本页旧版曾把 client/protocol/server 列为现存包与「独立底座」。
 
 [E103](../_evidence/render.md#e103)
 
-分层看，11 个包分四类角色：
+分层看，12 个包分四类角色：
 
 | 类别 | 包 | 与 Pi 本体的关系 |
 |---|---|---|

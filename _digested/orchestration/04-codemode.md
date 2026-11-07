@@ -4,7 +4,7 @@ codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模�
 
 > **⚠️ v1.2.0：codemode 有**两份平行实现**，不是一次迁移。** 本页主体描述的是 **coding-agent 侧**（`packages/codemode` 独立包 + `packages/coding-agent/src/extensions/codemode/` 内置扩展）。v1.2.0 在 **durable 侧**又**独立新增**了一套 `packages/durable/src/codemode/`——它**不是**上述实现的下移或替代，两者并存、互不继承。差异见下节。
 >
-> **v1.3.0/v1.4.0 增量**：worker 生命周期语义变了（`acquireWorker`/`onWorkerStarted`；`close()` 与实际退出解耦），coding-agent 侧加了"等空闲 worker"的准入（上限 2 / 60 s / `PI_CODEMODE_MAX_WORKERS`）。详见 [worker 生命周期与准入](#worker-生命周期与准入v13v14)。
+> **v1.3.0/v1.4.0 增量**：worker 生命周期语义变了（`acquireWorker`/`onWorkerStarted`；`close()` 与实际退出解耦），coding-agent 侧加了"等空闲 worker"的准入（上限 2 / 60 s / `PI_CODEMODE_MAX_WORKERS`）。详见 [worker 生命周期与准入](#worker-生命周期与准入v130v140)。
 
 > **应用合同局部复核**：`cb18c7cbc89d5becbb4ea2e490a6e7ad0e989f04`。下文部分细节属于独立 `CodemodeSandbox` 包，不能直接当 coding-agent 默认值：应用 `codemode` 工具默认 inactive，需显式启用；成功的 `store` 写会话 custom entry，失败写入不保留；应用还注入 `models`、工具搜索等能力，脚本未指定超时则无默认期限。见 [应用 codemode 文档](../../packages/coding-agent/docs/codemode.md)、[启用设置](../../packages/coding-agent/docs/settings.md#tools)。
 

@@ -30,7 +30,7 @@
 
 ## 3. 扩展提供有边界的变化入口
 
-**一手合同**：[extensions:73–88](../../packages/coding-agent/docs/extensions.md#choose-an-integration-point)列出事件、工具、命令、UI、消息、provider 等 API；[事件合同](../../packages/coding-agent/docs/extensions.md#events-and-concurrency)规定顺序、返回值效果、并发与 context 变换；精确类型见 [ExtensionAPI 声明](../../packages/coding-agent/src/core/extensions/types.ts)。
+**一手合同**：[extensions:73–88](../../packages/coding-agent/docs/extensions.md#choose-where-it-loads)列出事件、工具、命令、UI、消息、provider 等 API；[事件合同](../../packages/coding-agent/docs/extensions.md#events-and-concurrency)规定顺序、返回值效果、并发与 context 变换；精确类型见 [ExtensionAPI 声明](../../packages/coding-agent/src/core/extensions/types.ts)。
 
 **性质**：入口与合同是事实；“扩展面深”“变化优先从扩展进入”是结构解释。不能只凭接口存在就证明任何组合正确或跨版本稳定。
 
@@ -70,7 +70,7 @@
 - [agent-loop](../../packages/agent/src/agent-loop.ts)和[工具合同](../../packages/agent/src/types.ts)：工具执行错误转换为模型可见错误结果。
 - [settings:125–133](../../packages/coding-agent/docs/settings.md#network-and-retries)：agent-level retry 默认开启、最多 3 次，provider 重试另有配置。
 - [E208](../_evidence/render.md#e208)处理重试与压缩后的续跑；[E209](../_evidence/render.md#e209)执行预算、指数退避及事件通知。
-- [extensions:62–67](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)：`agent_end` 后仍可能有自动工作；`agent_settled` 才是最终通知边界。
+- [extensions:62–67](../../packages/coding-agent/docs/extensions.md#understand-the-lifecycle)：`agent_end` 后仍可能有自动工作；`agent_settled` 才是最终通知边界。
 
 **性质**：当前行为事实。工具业务重试常由模型选择，但“Pi 从不自动恢复/裁决”是错误的全局归纳。
 
@@ -78,7 +78,7 @@
 
 **一手合同**：
 
-- [README:88–96](../../README.md#permissions--containerization)：默认进程权限，没有内置 OS 访问限制系统。
+- [README:88–96](../../README.md#permissions-containerization)：默认进程权限，没有内置 OS 访问限制系统。
 - [安全文档](../../packages/coding-agent/docs/security.md)、[隔离方案](../../packages/coding-agent/docs/containerization.md)：项目信任、凭据与全进程/工具级隔离的区别。
 - [CONTRIBUTING:15–19](../../CONTRIBUTING.md#the-one-rule)：理解代码是贡献前提；[人工最终审查:91–93](../../CONTRIBUTING.md#why-not-let-ai-triage-everything)说明 AI 只是辅助。
 
@@ -86,7 +86,7 @@
 
 ## 9. 组装与维护成本：能证明到哪里？
 
-**一手支撑**：[扩展生命周期](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)、[package](../../packages/coding-agent/docs/packages.md)、[贡献纪律](../../CONTRIBUTING.md#philosophy)说明用户与维护者仍需管理资源、选择能力并理解交互。
+**一手支撑**：[扩展生命周期](../../packages/coding-agent/docs/extensions.md#understand-the-lifecycle)、[package](../../packages/coding-agent/docs/packages.md)、[贡献纪律](../../CONTRIBUTING.md#philosophy)说明用户与维护者仍需管理资源、选择能力并理解交互。
 
 [E210](../_evidence/render.md#e210)与[E211](../_evidence/render.md#e211)显示 examples 多数参加类型检查，但 gondolin 明确排除。类型兼容也不保证运行语义正确。[E212](../_evidence/render.md#e212)直接反驳“Pi 门禁从不测负例”。
 

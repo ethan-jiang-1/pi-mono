@@ -61,6 +61,27 @@ function matchLocator(content, locator) {
 			return { ok: false, detail: `invalid regex: ${error.message}` };
 		}
 	}
+	if (locator.kind === "pin") {
+		// A dependency line whose version changes every release: match the key and read
+		// whatever version follows, so the claim survives a re-pin. `locator.at` may name
+		// an exact version when a particular one is being asserted.
+		const key = `"${value}"`;
+		const at = content.indexOf(key);
+		if (at < 0) return { ok: false, detail: `pin "${value}"` };
+		let i = at + key.length;
+		while (i < content.length && /\s/u.test(content[i])) i += 1;
+		if (content[i] !== ":") return { ok: false, detail: `pin "${value}" has no value` };
+		i += 1;
+		while (i < content.length && /\s/u.test(content[i])) i += 1;
+		if (content[i] !== '"') return { ok: false, detail: `pin "${value}" is not a string` };
+		const end = content.indexOf('"', i + 1);
+		if (end < 0) return { ok: false, detail: `pin "${value}" unterminated` };
+		const version = content.slice(i + 1, end);
+		if (locator.at !== undefined && version !== locator.at) {
+			return { ok: false, detail: `pin "${value}" is ${version}, expected ${locator.at}` };
+		}
+		return { ok: true, detail: `pin "${value}" = ${version}` };
+	}
 	return { ok: false, detail: `unknown locator kind "${locator.kind}"` };
 }
 

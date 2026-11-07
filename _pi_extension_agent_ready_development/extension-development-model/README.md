@@ -16,4 +16,4 @@
 | 需要核对 Pi 某条规则的准确条件或例外 | [SDLC Reference](../sdlc-reference/README.md)：按问题查阅，不是本卷的必读前置 |
 | 想看 pi-mono 自己怎样组织 agent 参与 | [Development Harness](../repo-harness/README.md)：按任务进入，不是必读前置 |
 
-需要具体 API 签名和示例代码时，继续 Pi 的 [Extensions 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/extensions.md) 与 [SDK 文档](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/sdk.md)。本卷不另造未经执行的脚手架命令。
+需要具体 API 签名和示例代码时，继续 Pi 的 [Extensions 文档](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) 与 [SDK 文档](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/sdk.md)。本卷不另造未经执行的脚手架命令。

@@ -221,3 +221,46 @@ pi **读**项目层的 `.pi/settings.json`，且项目值覆盖 agent-dir 值（
 **例证 1（skills 数组的效果）**：在 `settings.json` 加 `"skills": ["~/.claude/skills"]` → 不需要拷贝文件，37 个技能直接出现在 pi 的 `/skill:` 补全中。
 
 **例证 2（defaultTools 白名单的效果）**：设置 `"defaultTools": ["read", "grep", "find", "ls"]` 但不要 `bash` → agent 只能读文件和搜索，不能执行命令。配合 `--tools` CLI 可临时恢复；v1.0.0 起也可以用增量写法 `"defaultTools": ["+codemode"]` 在默认 4 个之上追加而不整列替换。
+## v1.5.0 新增的四个设置面
+
+> 基线 v1.5.0（`f9a263655`）。四个都与「谁来决定生命周期」有关：两个管内容何时落盘与哪些通知出现，两个管外部凭据与自更新的执行方式。
+
+### 1. `settings.progress.persistWithinMs`（durable，默认 `1000`）
+
+流式内容（partial answer、运行中的工具输出）的提交被 **deferred**：watches/views 立即可见，但 Storage 只在「下一次读 `pi.live` 的提交」时一并拿到，**最迟**在此毫秒数之后。
+
+- 收益：32 路流 over SQLite 时事务少约 **5.7×**、磁盘写少约 **2.9×**；长回答 **27×**/**9×**；CPU 约 **−25%**。
+- 代价：**崩溃最多丢约 1 秒流式内容**（原 ~100 ms）。
+- 设 `0` 恢复「每个 partial 立刻存」（代价是每个 partial 一次存储事务）。
+
+来源：`packages/durable/src/harness/agent.ts:37`。
+
+### 2. `oauth.clientRegistration`（MCP，默认 `"auto"`）
+
+MCP OAuth 登录现在**优先用 Pi 的 Client ID Metadata Document**（授权服务器支持 public client 时），否则动态注册——与 Codex / Claude Code / opencode 的做法一致。
+
+- `"auto"`（默认）：仅当设了 `clientName` 或非默认 `callbackUrl` 时注册。
+- `"dcr"`：总是动态注册。
+- 此前注册过的客户端在 **redirect URI 仍匹配**时继续使用。
+
+CLI：`pi mcp add --oauth-client-registration`。配套的安全修复：授权端点与其他 OAuth metadata URL 现在**只接受 `http:` / `https:`**，否则恶意 server 可塞 `file:` 或自定义协议给平台 URL 处理器。
+
+### 3. `selfUpdateCommand` / `PI_SELF_UPDATE_COMMAND`（coding-agent）
+
+`pi update` 可以通过包装器或别的包管理器执行。设 `selfUpdateCommand`（全局设置）或 `PI_SELF_UPDATE_COMMAND` 环境变量，例如：
+
+```
+mise use -g npm:{packageName}@{version}
+```
+
+pi.dev 报出更新时执行它，并填充 `{packageName}`、`{version}`、`{installSpec}` 三个占位符。这是给「pi 不是由 npm 全局安装」的场景（mise、asdf、Nix 包装等）用的。
+
+### 4. `collapseChangelog`（扩展包，默认关闭）
+
+扩展包现在可以**在更新后展示自己的 changelog**：Pi 从包的 `package.json` 读 `pi.changelogPath`，或退回到包根目录的 `CHANGELOG.md`，在**下一次全新启动**时把比「上次见到的版本」更新的条目显示在 "Extension Updates" 下。`collapseChangelog` 把它压缩成「一个包一行」。
+
+> 注意「下一次全新启动」：不是 `--continue` 也不是 `/reload`，是新的进程启动。
+
+### 顺带：模型目录的定义位置
+
+`models.json` 的权威全字段参考在 `packages/coding-agent/docs/models-configuration.md`（v1.4.0 已有）。但**内建目录的生成源**在 v1.5.0 从 `scripts/generate-models.ts` 搬到了 `packages/ai/catalog/`（57 文件，数据源 models.dev v2）——改内建模型要改那里，不是改 `models.generated.ts`。

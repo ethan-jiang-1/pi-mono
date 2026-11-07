@@ -43,7 +43,7 @@ Pi 的“最小”是被动缺失，还是主动控制范围？当我需要计�
 
 ### 3. 安全按覆盖范围选，不按审批弹窗数量选
 
-[权限声明](../../README.md#permissions--containerization)说明默认启动权限。需要隔离时，先问：只隔离内置工具，还是整个 Pi 进程、扩展代码、网络和凭据？[containerization](../../packages/coding-agent/docs/containerization.md)列出的方案覆盖面不同。工具 allowlist 是收窄能力，不是完整 sandbox。
+[权限声明](../../README.md#permissions-containerization)说明默认启动权限。需要隔离时，先问：只隔离内置工具，还是整个 Pi 进程、扩展代码、网络和凭据？[containerization](../../packages/coding-agent/docs/containerization.md)列出的方案覆盖面不同。工具 allowlist 是收窄能力，不是完整 sandbox。
 
 ### 4. 控制权需要理解与维护
 
@@ -55,7 +55,7 @@ Pi 的“最小”是被动缺失，还是主动控制范围？当我需要计�
 
 1. **核心纪律**：贡献规则说膨胀 core 的 PR “will likely be rejected”，不是说任何核心新功能都必拒。先说明能力为什么属于 core，再讨论实现。
 2. **过程可检查**：会话记录中能看到 prompt/tool 声明变化与消息；扩展仍可能做请求级 context 变换，因此不把账本称为完整网络抓包。
-3. **完成边界**：模型一轮结束后，程序可能自动重试或压缩续跑。外部宿主需要 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)，而非仅 `agent_end`。
+3. **完成边界**：模型一轮结束后，程序可能自动重试或压缩续跑。外部宿主需要 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#understand-the-lifecycle)，而非仅 `agent_end`。
 
 ## 与已有维度的关系
 

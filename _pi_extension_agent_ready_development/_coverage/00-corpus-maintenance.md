@@ -3,8 +3,9 @@
 ## 钉定基线
 
 - 仓库：`earendil-works/pi`
-- 基线：release tag `v1.4.0`，commit `4a080252f`（`Release v1.4.0`）。
-- 上一基线：`v1.2.0`，commit `06a466935`。0015 轮从 `v1.2.0` re-pin 到 `v1.4.0`（跨 v1.3.0）。
+- 基线：release tag `v1.5.0`，commit `f9a263655`（`Release v1.5.0`）。
+- 上一基线：`v1.4.0`，commit `4a080252f`。0017 轮从 `v1.4.0` re-pin 到 `v1.5.0`（见本文件 0017 轮）。
+- 更早基线：`v1.2.0`，commit `06a466935`。0015 轮从 `v1.2.0` re-pin 到 `v1.4.0`（跨 v1.3.0）。
 - 更早基线：`v1.0.3`，commit `d78dc83d6`（0006 轮从 `v1.0.3` re-pin 到 `v1.2.0`）。
 - 这是本轮核验版本，不是永久前提。Pi 处于活跃开发期，接口与主仓制度都会演进；更新版本时应逐条复核并改写过时结论，不能只替换链接。
 
@@ -310,3 +311,57 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 5. `node _digested/_evidence/tools/check-prose.mjs --repo .` 与 `node verify.mjs` 收尾。
 
 `_faq_on_digested` 同构（`--corpus _faq_on_digested`，台账在 `_faq_on_digested/_evidence/`）。`_digested` 仍按“增量改写”处理：正文 `#L` 已清零，但不强制去除历史版本号。
+
+---
+
+## 0017 轮：re-pin v1.4.0 → v1.5.0
+
+基线 `4a080252f`（v1.4.0 tag）→ `f9a263655`（v1.5.0 tag）。区间 308 commit / 1,578 文件 / +211,745−14,707，是 0015 轮的 4–6 倍。
+
+### 一、盲跑结论：211k 行的增量，只打到 22.8% 的台账
+
+三个语料在**未做任何正文修改**的情况下重钉，stale 计数：
+
+| 语料 | 条目 | 源 | 盲跑 stale | 重钉后 |
+|---|---|---|---|---|
+| `_digested` | 34 | 34 | 2 | 0 |
+| `_faq_on_digested` | 213 | 213 | 51 | 0 |
+| `_pi_extension_agent_ready_development` | 126 | 360 | 32 | 0 |
+| **合计** | 373 | 607 | **85（22.8%）** | **0** |
+
+**这不是措辞问题，是台账设计问题，结论要写进方法学**：台账记的是"**旧断言的现值**"。本轮 211k 行增量里，绝大部分落在**此前不存在的新面**——新包 `packages/schema`（259 文件 / +41,224 / −0）、chord 的 `src/next` + `src/next-node`（188 文件 / +36,221 / −0）。新面没有旧断言，所以永远不会让台账 stale。**stale 率低 ≠ 变化小**。
+
+由此确立本轮第一条常设规则（已写入 `_digested/_evidence/PLAN.md`）：
+
+> **新增面不进台账，只进正文。** 新包/新子路径在台账里没有旧断言，重钉必然是 0 stale。新面必须在正文写；为此新增台账条目是浪费——下次 release 它只会变成一条要维护的噪声。
+
+### 二、32 条 extension stale 的分布：15 条 claim、17 个衍生源
+
+改的是 15 条 claim（E004、E022、E034、E041、E047、E048、E083、E084、E089、E090、E101、E117、E119、E125、E126），但 stale 数是 32，因为一条 claim 可挂多个源。修法三类：
+
+1. **纯坐标移动**（行号变了，正文不动）：改 `claims.json` 的 locator，**不产生正文 diff**——这是 claim-first 重构（0016 轮）本要买到的性质，本轮验证成立。
+2. **语义换位**（同一路径下语义已变）：正文必须改。典型是 `docs/extensions.md` 本轮被重写回完整指南（约 3,100 行恢复，PR #11498），**大批旧标题消失**，虽然 `<a id="...">` 垫片保住了旧锚点（如 `understand-the-lifecycle`→`### Lifecycle Overview`、`register-tools`→`## Custom Tools`、`tool-rendering`→`## Custom Rendering`），但指向旧标题的引文会失效。
+3. **版本 pin 失效**：见下节。
+
+### 三、verifier 缺陷：含版本号的引文每个 release 都会假 stale
+
+`E101` 原本把三处依赖版本写成行内引文（`"@earendil-works/pi-schema": "1.5.0"` 之类）。每次 release 版本号变，引文就不匹配，**哪怕依赖关系一个字没改**。这是引文粒度过细导致的系统性假阳性。
+
+修法：给 `_digested/_evidence/tools/verify-evidence.mjs` 新增 **`pin` locator kind**——匹配一个 JSON key，读它后面跟的版本值；`locator.at` 可选，写了就断言精确版本，不写就只校验「该 key 存在且有版本值」。`E101` 的三处行内引文转成三个 `pin` 源。
+
+> 实现备注：两次正则尝试都失败了（一次字符类写坏，一次模板字符串里的 `\s` 变成非法转义），**最终用纯字符串扫描**（`indexOf` + 手写空白/冒号/引号步进），无正则。负向测试确认 `at: "9.9.9"` 对实际 `1.5.0` 报 stale。
+
+由此确立第二条常设规则（已写入 `_digested/_evidence/PLAN.md`）：
+
+> **引文含版本号的，截断到版本号之前，再用 `expect`/`pin` 断言版本。**
+
+### 四、其余三件事
+
+- **`verify.mjs` 的 `BASELINE_TAG`** 从 `v1.4.0` 改成 `v1.5.0`；45 个语料 md 全部通过。改的是常量，不是正文。
+- **`corpus.json`** 三个语料的 `baseline.tag`/`commit` 同步到 `v1.5.0`/`f9a263655`。
+- **`_digested` 的两条 stale** 是 `package.json` 与 `tsconfig.json` 的真实变化：`package.json` 的 build/build:offline 链新增 `cd ../schema && npm run build`、check 链新增 `tsc --noEmit -p packages/coding-agent/examples/tsconfig.json`；`tsconfig.json` 的 `include` 新增 `packages/ai/catalog/**/*`。（E001、E002）
+
+### 五、本轮不做、且要明确记录的两件
+
+1. **post-tag 的 270 commit 不追**（`085c84e98` 起，含 p2 web UI 重构）。本轮 pin 的是 release tag `v1.5.0`，不是 `upstream/main`。留给 0012 轮，并且必须在那里重新决定"pin tag 还是 pin main"这条口径。
+2. **FAQ 的 P3.5 完整 `#L` 锚点迁移仍不做**（六个热点页、404 个锚点）。本轮只做重钉与内容层修正。

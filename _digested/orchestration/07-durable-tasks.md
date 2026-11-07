@@ -6,7 +6,7 @@
 >
 > - **内建 Code Mode**（`README.md` §Code Mode，**:259**）：durable 侧**独立**实现了一套 codemode（`packages/durable/src/codemode/`，5 个文件），以 `pi.codemode.journal` + 时钟值做**确定性重放**——与 coding-agent 侧的 codemode 是**两份平行实现，不是迁移**。详见 [`04-codemode.md`](./04-codemode.md)。
 > - **`abandonOnRestart`**（**v1.4.0 `README.md:353`**）：只被创建者内存中 await、且重启后创建者不再恢复的任务可标此位；Harness 重新调度时若发现它仍 live，会以 `abortReason: "restart"` 连同它拥有的一切一起 abort，然后才继续。非 replay-safe 的嵌套工具调用自动获得该标记。
-> - **`abortOwned` / `ownedTasks`**（`TaskRuntime`，**v1.4.0 `types.ts:291`/`:296`**；README 未记载）：任务级**直接**所有权索引的读写面，见下方 [abortOwned / ownedTasks](#abortowned--ownedtasks所有权索引的读写面)。
+> - **`abortOwned` / `ownedTasks`**（`TaskRuntime`，**v1.4.0 `types.ts:291`/`:296`**；README 未记载）：任务级**直接**所有权索引的读写面，见下方 [abortOwned / ownedTasks](#abortowned-ownedtasks所有权索引的读写面)。
 > - **嵌套工具调用与 structured output**、`callers`、`ToolExecutionApi`/`HookApi` 暴露 `models`。
 > - **tool-search**（BM25）与 **images** 能力面：`src/tool-search/`、`src/search.ts`、`src/images/`。
 > - **调度器有界性**（两笔彼此独立的修复，经 `git show` 核实）：① `cb4375493` 消灭了**每轮 reconcile 的全量扫描**——原先每个 pass 从每个 live task 上溯到 root 找 cancelling owner，且 owned live work / idle scopes / chain loads / reservation / finalization / failFast 各自再扫一遍全部 live task，n 个 held task 的链约 **n³** 步（500 个要 12 秒，20,000 个跑不完）；改为在内存里维护 `#below`/`#intent`/`#unloaded`/`#finalizeChecks`/`#runnable`/`#waiters` 六个索引（open 时重建），任何 walk 都不再递归，500 个 held task 由 12.3 s 降到 **50 ms**。**所有权语义未变**。② `ea448f454` 让这些所有权索引**随 live work 收缩**（`indexSizes`，`:1238-1241`）——owner 边与已结束任务的 ownership 字段只在仍有用时保留。**注意「长 sleep 分片」不属于这两笔**：它是 `MAX_TIMER_DELAY = 2_147_483_647`（`scheduler.ts:54`，"Longest delay `setTimeout` supports; longer sleeps wait in several steps"），由 `da866ada1` 引入。③ 等待环拒绝：`#commitState`（**v1.4.0 `scheduler.ts:1942`**）在任务转入 `waiting` 时先调 `#validateWait`（**`:1973`**），对具名环**抛错直接拒绝**而不是挂死——错误文本 `Task ${current.id} cannot wait on ${cycle[0]}: ... is a wait cycle`（**`:1997`**），环检测 `#waitCycle`（**`:2009`**）。**（v1.2.0 时本节曾写"没有 `runtime.commit()`"，v1.4.0 已不成立）**：`TaskRuntime.commit(change, context)` 是现行 API（`types.ts:272`），`sleeping` 等下一状态都经它提交；等待环仍由 `runtime.commit()` 里的校验具名拒绝。（`eb2fce43d`）
@@ -15,11 +15,22 @@
 > - **Compaction 失败语义变更**：阻塞/阈值 compaction 失败现在**直接让该次生成以 `model_error` 失败**（`89e5c2c07`），并通过 `pi.live.compactionFailure` 保留最后一次失败；摘要生成**去掉 thinking**（`15e7bdc14`）。详见 [`../agent/03-Memory/3.1_Compaction.md`](../agent/03-Memory/3.1_Compaction.md)。
 > **v1.4.0 追加（sync-0010）**：本节以上是 v1.2.0 的能力面；v1.4.0 改的是**运行时语义**，原文若干处已失效：
 >
-> - **新增 `sleeping` 状态**（`types.ts:219`、`scheduler.ts:67`、`task-graph.ts:29`），活跃状态集变五个；`TaskRuntime.sleep()` **删除**，改为 `sleepUntil(until, checkpoint, ctx)`（`types.ts:324-330`）或 `commit({status:"sleeping",until,checkpoint})`。详见 [sleep / wake](#sleep--wake把等待变成状态v140)。
+> - **新增 `sleeping` 状态**（`types.ts:219`、`scheduler.ts:67`、`task-graph.ts:29`），活跃状态集变五个；`TaskRuntime.sleep()` **删除**，改为 `sleepUntil(until, checkpoint, ctx)`（`types.ts:324-330`）或 `commit({status:"sleeping",until,checkpoint})`。详见 [sleep / wake](#sleep-wake把等待变成状态v140)。
 > - **crash-loop guard**：连续 `restartLimit`（默认 5）次崩溃/驱逐未提交新状态的任务会被 park，`blocked.reason="restart_limit"`，`Harness.retryTask(id)` 放行。
 > - **长 sleep 的 timer 常量搬家**：`MAX_TIMER_DELAY` 从 `scheduler.ts` 移到 `src/timers.ts:4`；`HarnessOptions.setTimer`/`now` 让它可以跑在宿主时钟上，`wake()`/`onWake` 让 Cloudflare DO 靠 alarm 唤醒而不持 timer。
 > - **SQLite schema v2**：`sleeping` 需要重建 tasks 表；迁过的库不能被 1.3.0 或更早打开。见 [durable-and-storage](../architecture-next/durable-and-storage.md)。
 > - 其余行号：`scheduler.ts` 1,953→**2,507** 行，`README.md` 751→**876** 行。
+>
+> **⚠️ v1.5.0：一次重写，34 条 Breaking（sync-0011）**。这是 durable 自 1.0.0 以来最大的单次破坏面——占全仓 41 条 Breaking 的 **83%**。四条主线，**按因果分组读，不要按 changelog 顺序读**：
+>
+> | 组 | 干了什么 | 你要改什么 |
+> |---|---|---|
+> | **(A) 提交模型** | `Storage.commit(writes, adopt, ctx)` → `commit(batches, receive, ctx)` 返回 `CommitResult` | 自定义 `Storage` 实现必须迁移；测试播种用 `commitWrites()` |
+> | **(B) 观察模型** | `watchEvents()` 整套**删除**，改为「渲染状态」 | 用 `Conversation.watch()` / `watchDoc()` / `observeCommits()`；`ConversationView` 现在是**窗口** |
+> | **(C) watch 换形** | 跟随 chord 的新 watch 形状（tagged call、`retired` 变字段） | 所有 `watch.start((value, ops, ctx) => …)` 改签名 |
+> | **(D) 持久化时机** | partial answer / 运行中工具输出改为 **deferred** | 设 `progress.persistWithinMs`；展示进度改用 watch 而非 `subscribeCommits` |
+>
+> 细节见下方 [v1.5.0 的四组重写](#v150-的四组重写)，完整清单见 [`_change_log/0011`](../_change_log/0011-v1.4.0-to-v1.5.0.md)。
 
 
 ## 为什么是这个形状:设计考量
@@ -54,7 +65,7 @@ subagent 工具在 `api.commit()` 里以 `ownership: { kind: "task", taskId }` �
 
 ### TaskGraph:读时派生的投影
 
-`harness.taskGraph()` 返回全部活跃任务的单一 Chord 状态,`watchTaskGraph()` 提供推送;节点带 owner 边、状态、background/abort 标记与拥有的 conversations(README Task Graph 节)。投影由 commit publications 增量推进(`task-graph.ts:151-190`:terminal 即删节点、conversation 归属在任务变更之后补),**图是派生视图,不是第二个权威**——被丢弃就由存储重建(`#build`,`:131-148`),这与 todo 随 branch 重建是同一条纪律的重装版。
+`harness.watchTaskGraph()` / `observeTaskGraph()` 提供全部活跃任务的单一 Chord 状态（v1.5.0 起同步 getter `taskGraph()` 已删除）;节点带 owner 边、状态、background/abort 标记与拥有的 conversations(README Task Graph 节)。投影由 commit publications 增量推进(`task-graph.ts:151-190`:terminal 即删节点、conversation 归属在任务变更之后补),**图是派生视图,不是第二个权威**——被丢弃就由存储重建(`#build`,`:131-148`),这与 todo 随 branch 重建是同一条纪律的重装版。
 
 ### abortOwned / ownedTasks:所有权索引的读写面
 
@@ -116,7 +127,91 @@ v1.2.0 把调度器的内存占用从"见过的全部"改成"当前 live 的"（
 - 达到 `settings.restartLimit`（默认 **5**，`harness/types.ts:572-577`、`agent.ts:57`）：任务被 park，`inspect()` 与 task graph 的 `blocked.reason` 是 `"restart_limit"`（`harness/types.ts:695-699`），`wake()` 不把它算作 active，`onReport` 报一次 `task_parked`。
 - `Harness.retryTask(id)`（`harness/types.ts:823`）清计数并重新允许调度。abort handler 被这样截断到限额则任务直接 `faulted`。
 
-### 能力面延伸:工具跑远端,事实留本地(v1.2.0 起在 release 内)
+### v1.5.0 的四组重写
+
+#### (A) 提交模型：一次调用存一组提交
+
+`Storage.commit()` 换了签名（`packages/durable/src/types.ts:1340-1346`）：
+
+```typescript
+// v1.4.0
+commit(writes, adopt, context): Promise<Seq>
+
+// v1.5.0
+commit(
+  batches: readonly (readonly StorageWrite[])[],
+  receive: (index: number, seq: Seq) => void,
+  context: Context,
+): Promise<CommitResult>
+```
+
+`CommitResult = { readonly stored: number; readonly refused?: unknown }`（`types.ts:1313`）。语义三条：
+
+1. **每个 batch 是一次独立原子提交**，各自一个 seq，且检查**看得到前面 batch 的写入**。
+2. **遇第一个被 Durable 自身检查拒绝的 batch 就停**：它之前的已持久，它和之后的都不存；`refused` 带回原因。
+3. **其他任何失败**（驱动 / IO / `COMMIT` 失败）**整体 reject** 并视为未知结果；此前发生的 `receive` 回执仍然有效。
+
+`receive(index, seq)` 是**持久化回执，不是发布**：所有 batch 落盘后按序、同步、在下一次 commit 开始前各调一次。发布由 Session 后做，可选钩子 `publishing(publish, ctx)`（`types.ts:1352`）把发布放进 storage 自己的 scope。
+
+连带三条：`mintId()` 的契约**收窄**（大于本次打开以来铸过的、以及所有已存的 ID，跨 reopen 也成立）；`commitSeries` 新增在 chord v2 的 store 上（`chord/src/next/store/store.ts:323`）并被 `StoreStorage` 用作 Session 提交的实现；测试播种改用 `commitWrites(storage, writes, context)`（单 batch，resolve seq，拒绝时抛错）。
+
+#### (B) 观察模型：`watchEvents()` 没了
+
+`watchEvents()` 及 `AgentEvent` / `AgentEventStream` / `SnapshotEvent` / `MessageChange` / `ToolEventCall` **整套删除**（spec §9.4 一并删）。全仓唯一提及它的是 `test/harness-view-run.test.ts:2` 的一句注释：「This replaced the event stream (`watchEvents`, #11327)」。
+
+替代思路是**渲染状态，而不是把事件重新拼成状态**：事件里渲染器会画的东西全部进了 conversation view，新信息以 view 字段的形式加入，而不是新增一种事件类型让每个客户端都学一遍。
+
+三个 state getter 也删了：`Session.documentState()`、`Conversation.viewState()`、`Harness.taskGraph()` 及 `DocumentState` 类型。改用 `watchDoc()`、`Conversation.watch()`、`Harness.watchTaskGraph()`。
+
+`ConversationView.entries` 现在是 transcript 的**窗口**而不是活跃 transcript：初始给最新 50 条，新条目是 append，超 100 条时最旧的以一次 splice 降到 50，并把「窗口前那条的 ID」写进新增的 `ConversationView.before`。要读模型看到的活跃 transcript 用 `Conversation.context()`；要分页读更早的用 `Conversation.entries()`；客户端合并用 `ConversationTranscript`。
+
+#### (C) watch 换形：跟地址走，不跟「化身」走
+
+从 chord v1 继承新形状（durable 转导出 `WatchHandle` / `WatchCall` / `WatchEnd` / `WatchChange` / `NativeWatchChange`）：
+
+```typescript
+// v1.4.0
+watch.start(async (value, ops, ctx) => …)
+
+// v1.5.0：一次 change 对象在前，context 在后；值/失败是 tagged
+watch.start(async (call, ctx) => {
+  if (call.kind === "failed") return;
+  const { value, ops, retired } = call;
+  …
+})
+```
+
+四条语义变化：
+
+1. **`retired` 变成 change 的字段，不再是 watch 的结束原因**。文档退休时，下一次回调带 `retired: true`、给最后一次值、无 ops；**watch 继续活着**——之后在同一地址新建的文档会在**同一条 watch** 上以 `[["r", value]]` 到达（可能就在同一次回调里）。判定「watch 结束」与「文档退休」不再靠 `null` 值或 end reason。
+2. **listener 忙时的帧会折叠**：append 合并成一次、同字段 set 取最后一次、超 **10,000** 个挂起操作退化为一次整根替换。
+3. **`subscribeCommits(listener)` → `observeCommits(observer)`**（`types.ts:1262`），观察者形状见 `types.ts:1118`。
+4. **`FileSystem.watch()` 的 change 类型改名 `WatchChange` → `FileChange`**（`@earendil-works/pi-durable/env`），避免与 watch listener 的 change 重名。
+
+#### (D) 持久化时机：流式内容延后落盘
+
+partial answer 与运行中工具输出的节流提交现在**被延后**（`CommitPersistence`，spec §4.1）：
+
+- **watches / views 立即可见**（渲染不受影响）；
+- **Storage 在「下一次读 `pi.live` 的提交」时一起拿到**（回答结束、工具 settle、run 结束），**最迟**在 `settings.progress.persistWithinMs` 之后（默认 **1,000 ms**，`packages/durable/src/harness/agent.ts:37`）。
+
+收益：32 路流 over SQLite 时存储事务少约 **5.7×**、磁盘写少约 **2.9×**；长回答少 **27×** / **9×**；CPU 约 **−25%**。
+
+代价必须写清楚：**崩溃现在最多丢约 1 秒的流式内容**（之前约 100 ms）；若某条流在首次落盘前就崩，它的 aborted 条目和 usage 都不会被记录。
+
+两个迁移要点：
+
+- `subscribeCommits()` 现在**只在这些提交真正落盘后**才收到，且**只含落盘的内容**。拿它展示实时进度的监听者应改用 `watchDoc()` / `Conversation.watch()`；做存储镜像的监听者不受影响。
+- 想回到「每个 partial 立刻存」，设 `settings.progress.persistWithinMs: 0`（代价是每个 partial 一次存储事务）。
+
+#### 另外四条零散但会打到读者的
+
+- **restart-limited 的任务不再 park 而直接结束**：连续 `settings.restartLimit` 次未提交新状态即终止，`Harness.retryTask()` 的放行路径随之改变。
+- **`pi.live` 在无答案结束时不再为空**：保留 `runFailure`（`RunFailure` / `RunFailureReason`）直到下一次 run 开始；判定空闲应看 `run === undefined`。`RunFailureReason` 新增 `nothing_to_answer` / `turn_limit` / `interrupted`。
+- **`pi.live.run` 新增必需字段 `turns`**（本轮 run 至今的工具轮次）；手工写 `run` 的代码要补。
+- **`afterTool` 对每个工具结果都跑**，不只对已执行调用：错误结果也跑；调用了请求里没提供的工具时也生成 `pi.tool` 任务，带 `unoffered: true`。
+
+### 能力面延伸：工具跑远端，事实留本地（v1.2.0 起在 release 内）
 
 v1.0.3 之后 durable 的执行环境抽象(`ExecutionEnv`,`src/env/`)长出了第二个官方实现:新包 `@earendil-works/pi-env` 把"agent 的工具在另一台机器上执行"做成包级能力——pi-env README 的定位原文:"an agent's tools run on another machine, usually over SSH, while the Durable worker, its storage and credentials stay local"(`packages/env/README.md:3-4`)。即**工具的文件操作与命令执行整体上远端,而 Durable worker、存储与凭据留本地**——持久事实层与执行层可以拆到两台机器上。依赖方向是 env → durable(pi-env 实现 durable 的接口,反向不成立),该包自 **v1.2.0 起随 release 发布**（v1.4.0 时与其它包同为 1.4.0，依赖改为精确 pin；`98d2e1947` 时还是 1.0.3 且 Unreleased),monorepo 内仍无其它包依赖它。这是 durable 线的能力延伸证据,但不改变下面的 experimental 定位结论。
 

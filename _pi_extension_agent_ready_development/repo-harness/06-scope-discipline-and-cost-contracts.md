@@ -28,7 +28,7 @@ pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」
 >
 > —
 
-文件头注释给出了动机：一个多余的 `export *` 能让一个 1 文件的纯函数入口拖动整个 barrel——经 barrel 导入要付出约 37 MB 的模块求值图，而且直到有人测量之前什么都不失败。脚本遍历每个声明入口的值导入图（`import type` 被擦除、不计入），对列出的入口强制 `maxFiles`、`forbid` 与可选 `allow` 预算：`packages/ai` 的 `./models` 入口限 **20** 文件、禁触 `providers/`、`models.generated.ts` 等，并 `allow` `packages/telemetry/src/index.ts`（完整清单见下表）；`./utils/*` 限 3 文件；`packages/durable` 的根入口限 **73** 文件且禁触 `packages/ai/src/index.ts`。
+文件头注释给出了动机：一个多余的 `export *` 能让一个 1 文件的纯函数入口拖动整个 barrel——经 barrel 导入要付出约 37 MB 的模块求值图，而且直到有人测量之前什么都不失败。脚本遍历每个声明入口的值导入图（`import type` 被擦除、不计入），对列出的入口强制 `maxFiles`、`forbid` 与可选 `allow` 预算：`packages/ai` 的 `./models` 入口限 **20** 文件、禁触 `providers/`、`models.generated.ts` 等，并 `allow` `packages/telemetry/src/index.ts`（完整清单见下表）；`./utils/*` 限 3 文件；`packages/durable` 的根入口限 **123** 文件且禁触 `packages/ai/src/index.ts`（v1.4.0 为 73；本基线因参数/契约校验改走 `pi-schema` 而重算预算——脚本注释明说 pi-schema 是"replace TypeBox, which this walk did not count"的 39 个文件）。
 
 [E112](../_evidence/render.md#e112)
 
@@ -38,7 +38,7 @@ pi-mono 用三层机制控制「仓库变大、变慢、变得没人能维护」
 |---|---|---|
 | `packages/ai` → `./models` | **20** | `providers/`、`models.generated.ts`、`index.ts` 等；`allow` telemetry |
 | `packages/ai` → `./utils/*` | 3 | `providers/`、`api/`、`index.ts` |
-| `packages/durable` → `.`（根入口） | **73** | `packages/ai/src/index.ts`、typebox helpers |
+| `packages/durable` → `.`（根入口） | **123** | `packages/ai/src/index.ts`、`packages/ai/src/utils/string-enum.ts`、`packages/durable/src/images/`（**v1.4.0 为 73**；本基线起 `pi-schema` 取代 TypeBox 进图） |
 
 预算的边界同样是显式的（主仓实践）：
 

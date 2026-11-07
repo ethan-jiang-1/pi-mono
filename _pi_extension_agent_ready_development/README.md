@@ -2,7 +2,7 @@
 
 本语料面向独立开发 Pi 扩展与 Pi package 的仓库，说明怎样沿用 Pi 的原生机制组织意图、实现、验证与交付判断。目标不是复制 pi-mono 主仓库的内部治理，而是让扩展作者复用 Pi 可验证的扩展点、组合方式和测试形态。
 
-本目录是一套可独立使用的语料。三卷分别解释扩展开发模型、pi-mono 的精确流程机制和仓库自身作为开发 harness 的组织方式；每卷均以 Pi 仓库 `earendil-works/pi` 固定 release tag `v1.4.0`（`4a080252f`）的源码、文档、规则、prompts、skills、workflows 为一手来源，不依赖其它研究材料。Pi 没有声明采用一套统一开发方法，本语料不把综合模型写成官方方法。
+本目录是一套可独立使用的语料。三卷分别解释扩展开发模型、pi-mono 的精确流程机制和仓库自身作为开发 harness 的组织方式；每卷均以 Pi 仓库 `earendil-works/pi` 固定 release tag `v1.5.0`（`f9a263655`）的源码、文档、规则、prompts、skills、workflows 为一手来源，不依赖其它研究材料。Pi 没有声明采用一套统一开发方法，本语料不把综合模型写成官方方法。
 
 ## 目标读者与适用边界
 
@@ -14,7 +14,7 @@
 
 ## 独立使用与发行
 
-复制本目录的全部内容并保留相对目录结构，即可独立阅读和验证；不需要 pi-mono 的其它研究目录。必要术语在卷一[术语页](./extension-development-model/02-terms-and-mental-models.md)解释。核对一手事实需要访问 tag `v1.4.0` 的 Pi 仓库；离线核对可另备该版本的 checkout。
+复制本目录的全部内容并保留相对目录结构，即可独立阅读和验证；不需要 pi-mono 的其它研究目录。必要术语在卷一[术语页](./extension-development-model/02-terms-and-mental-models.md)解释。核对一手事实需要访问 tag `v1.5.0` 的 Pi 仓库；离线核对可另备该版本的 checkout。
 
 独立读者建议先看[新仓起步](./extension-development-model/01-new-extension-repository.md)，遇到陌生词查[术语页](./extension-development-model/02-terms-and-mental-models.md)，再按问题选择另外两卷。
 
@@ -26,11 +26,11 @@
 | [SDLC Reference](./sdlc-reference/README.md) | pi-mono 的精确条件、状态和例外是什么？哪些可移用？ | 按问题查阅，并遵守适用边界 |
 | [Development Harness](./repo-harness/README.md) | pi-mono 仓库自身怎样组织 agent 参与？能借鉴什么原则？ | 按参与任务查阅 |
 
-三卷各有 README 与入口页，只依赖 `v1.4.0` 一手来源，彼此不构成前置阅读顺序。
+三卷各有 README 与入口页，只依赖 `v1.5.0` 一手来源，彼此不构成前置阅读顺序。
 
 ## 理解从哪里来
 
-本语料对 Pi 的全部理解只从 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.4.0) tag `v1.4.0` 的一手内容挖出：源码、`packages/coding-agent/docs/`、`AGENTS.md`、`CONTRIBUTING.md`、`.pi/`、`.github/` 与该 tag 的发布产物形态。目录外链接只指向该 tag，因此可以独立发行，同时保留回到原始证据的路径。
+本语料对 Pi 的全部理解只从 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.5.0) tag `v1.5.0` 的一手内容挖出：源码、`packages/coding-agent/docs/`、`AGENTS.md`、`CONTRIBUTING.md`、`.pi/`、`.github/` 与该 tag 的发布产物形态。目录外链接只指向该 tag，因此可以独立发行，同时保留回到原始证据的路径。
 
 具体做法：结论在正文讲清楚，关键规则以 Markdown blockquote 摘录仓库原文，并给出该 tag 的可核对链接；仓库没有声明的制度一律表述为「可观察机制的综合」。Pi 处于活跃开发期，接口与主仓制度都会演进；更新基线时应逐条复核并改写过时结论，不能只替换链接。基线与重审记录由[维护页](./_coverage/00-corpus-maintenance.md)拥有。
 

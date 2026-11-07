@@ -1,6 +1,6 @@
 # pi-mono Agent 架构手册
 
-> **v1.4.0 基线（sync 0010）**：源码锚点对应 tag `4a080252f`。本区间对 Agent 内核影响最小（`packages/agent` 只加 `AgentOptions.identity`），影响集中在 harness/session 层：durable 加 `sleeping` 状态（`TaskRuntime.sleep()` 删除）、SQLite schema v2、crash-loop guard、IndexedDB 后端；详见 [0010](../_change_log/0010-v1.2.0-to-v1.4.0.md)。
+> **基线 v1.5.0（`f9a263655`，sync 0011）；本目录页头曾按 v1.4.0 重锚（sync 0010）**：v1.4.0 锚点对应 tag `4a080252f`。本区间对 Agent 内核影响最小（`packages/agent` 只加 `AgentOptions.identity`），影响集中在 harness/session 层：durable 加 `sleeping` 状态（`TaskRuntime.sleep()` 删除）、SQLite schema v2、crash-loop guard、IndexedDB 后端；详见 [0010](../_change_log/0010-v1.2.0-to-v1.4.0.md)。
 
 > **⚠️ v0.84.3 基线（2026-08-25）**：本仓库代码已同步到 v0.84.3（tag `4e58f324f`，merge `6f8312a52`），源码锚点对应工作树。v0.84.0 重点变化：① **session v4**——agent 包 session 模型整体重写（lane-based，旧 JSONL/in-memory repo API 删除），新专题 [3.5_Session_v4.md](./03-Memory/3.5_Session_v4.md)；② **`AgentHarness` 去泛型化重设计为 `AgentLane` 骨架**（多数操作 `HarnessNotImplemented`），4.1 已按 v0.84.2 完全重写；③ `FileSystem.renameFile()` 变必需；④ `message_update` wire 事件改纯 delta；⑤ auth 一批 breaking（见 5.2 警示）。v0.84.3 为渐进迭代（PowerShell 工具、compaction 加固、jiti 四模式等），各篇顶部已补 v0.84.3 警示。
 >

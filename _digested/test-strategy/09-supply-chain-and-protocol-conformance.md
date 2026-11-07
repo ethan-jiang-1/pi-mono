@@ -92,14 +92,14 @@ const BUDGETS = {
     "./models": {
       // Request telemetry reaches pi-telemetry's root; identity reaches utils/identity.ts.
       maxFiles: 20,
-      forbid: ["providers/", "models.generated.ts", "index.ts", "utils/validation.ts", "utils/typebox-helpers.ts"],
+      forbid: ["providers/", "models.generated.ts", "index.ts", "utils/validation.ts", "utils/string-enum.ts"],
       allow: ["packages/telemetry/src/index.ts"],
     },
     "./utils/*": { maxFiles: 3, forbid: ["providers/", "api/", "index.ts"] },
   },
   "packages/durable": {
-    ".": { maxFiles: 73, forbid: ["packages/ai/src/index.ts", "packages/ai/src/utils/typebox-helpers.ts", "packages/durable/src/images/"] },
-    "./tools": { maxFiles: 17, forbid: ["packages/durable/src/images/"] },
+    ".": { maxFiles: 123, forbid: ["packages/ai/src/index.ts", "packages/ai/src/utils/string-enum.ts", "packages/durable/src/images/"] },
+    "./tools": { maxFiles: 27, forbid: ["packages/durable/src/images/", "packages/schema/src/formats/"] },
   },
 };
 ```

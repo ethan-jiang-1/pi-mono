@@ -1,6 +1,6 @@
 # 00 索引：按问题选页
 
-本页回答两个问题：遇到具体问题读哪页；从 v1.4.0 一手机制看，pi-mono 在研发流程上表现出哪三条组织立场。全部机制事实独立依据 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.4.0) tag `v1.4.0`（commit `4a080252f`）的一手来源（workflows、scripts、`package.json`、`CONTRIBUTING.md`、`.pi/` 内容），不依赖二手分析。
+本页回答两个问题：遇到具体问题读哪页；从 v1.5.0 一手机制看，pi-mono 在研发流程上表现出哪三条组织立场。全部机制事实独立依据 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.5.0) tag `v1.5.0`（commit `f9a263655`）的一手来源（workflows、scripts、`package.json`、`CONTRIBUTING.md`、`.pi/` 内容），不依赖二手分析。
 
 ## 按问题选页
 

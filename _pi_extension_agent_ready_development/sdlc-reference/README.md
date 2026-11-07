@@ -8,7 +8,7 @@
 
 ## 证据基线
 
-一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.4.0) git tag `v1.4.0`（commit `4a080252f`）核对。引用任何 workflow、脚本或 `package.json` 行为时，均以该 tag 的文件版本与行号为准；正文链接钉在 `v1.4.0` 的 blob 路径上。
+一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.5.0) git tag `v1.5.0`（commit `f9a263655`）核对。引用任何 workflow、脚本或 `package.json` 行为时，均以该 tag 的文件版本与行号为准；正文链接钉在 `v1.4.0` 的 blob 路径上。
 
 本卷不运行任何 build、test 或发布命令；全部结论来自对 tag 版本配置与代码的静态核对。需要自行核对时，用 `git show v1.4.0:<路径>` 读取 tag 版本（行号与正文锚点一致），不要直接读工作树文件。
 

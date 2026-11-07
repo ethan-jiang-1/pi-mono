@@ -53,11 +53,11 @@
 
 ### 2. 工作流可塑：扩展是有合同的能力入口
 
-[扩展文档](../../packages/coding-agent/docs/extensions.md#choose-an-integration-point)列出工具、命令、事件、消息、持久化、provider、MCP 和 UI 等入口。其价值是不用为了每种用户工作流都扩大核心，而不是“核心可以任意拼成任何运行时”。
+[扩展文档](../../packages/coding-agent/docs/extensions.md#choose-where-it-loads)列出工具、命令、事件、消息、持久化、provider、MCP 和 UI 等入口。其价值是不用为了每种用户工作流都扩大核心，而不是“核心可以任意拼成任何运行时”。
 
 例如，计划或任务扩展可以把状态写到会话条目；不同用户也可以直接维护计划文件。两者都是选择，不是只有文件才符合 Pi 哲学。
 
-扩展并非无约束：[事件合同](../../packages/coding-agent/docs/extensions.md#events-and-concurrency)规定加载顺序、返回值效果与并发行为；[生命周期合同](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)要求正确启动、关闭资源。这些合同帮助理解当前行为，**不构成跨版本兼容承诺**。
+扩展并非无约束：[事件合同](../../packages/coding-agent/docs/extensions.md#events-and-concurrency)规定加载顺序、返回值效果与并发行为；[生命周期合同](../../packages/coding-agent/docs/extensions.md#understand-the-lifecycle)要求正确启动、关闭资源。这些合同帮助理解当前行为，**不构成跨版本兼容承诺**。
 
 ### 3. 上下文可控：可编辑的输入，不是“不管理状态”
 
@@ -89,7 +89,7 @@ Pi 也会自动管理状态：会话持久化、上下文压缩、请求恢复�
 
 ### 安全：不内置 OS 隔离，不等于没有安全机制
 
-[README 的权限声明](../../README.md#permissions--containerization)说 Pi 默认使用启动它的用户和进程权限，不内置限制文件、进程、网络或凭据访问的 permission system。
+[README 的权限声明](../../README.md#permissions-containerization)说 Pi 默认使用启动它的用户和进程权限，不内置限制文件、进程、网络或凭据访问的 permission system。
 
 当前仍有[项目资源信任控制与安全建议](../../packages/coding-agent/docs/security.md#understand-project-trust)、[工具拦截合同](../../packages/coding-agent/docs/extensions.md#events-and-concurrency)。它们不等同于 OS 隔离。若需要更强边界，应核对[隔离文档](../../packages/coding-agent/docs/containerization.md)：全进程容器与只把内置工具转到 VM 的扩展，覆盖范围不同；后者不自动隔离 host 上的其它扩展代码。
 
@@ -97,7 +97,7 @@ Pi 也会自动管理状态：会话持久化、上下文压缩、请求恢复�
 
 工具失败通常以 `isError` 返回模型，模型可以选择改参数或换方案；但 coding-agent 对瞬时请求失败有**默认开启的自动重试**，也有自动压缩与溢出恢复。见 [settings](../../packages/coding-agent/docs/settings.md#network-and-retries)。
 
-因此，“harness 报告，模型/人裁决”只适合描述部分业务选择，不能作为全局定律。集成宿主判断完成时，应等待 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#understand-the-runtime-lifecycle)，不能仅看到 `agent_end` 就认为自动工作结束。
+因此，“harness 报告，模型/人裁决”只适合描述部分业务选择，不能作为全局定律。集成宿主判断完成时，应等待 [`agent_settled`](../../packages/coding-agent/docs/extensions.md#understand-the-lifecycle)，不能仅看到 `agent_end` 就认为自动工作结束。
 
 ## 五、代价是什么？
 

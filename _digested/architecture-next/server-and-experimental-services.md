@@ -33,9 +33,9 @@
 `packages/chord` 在本区间经历 chord2 重写（`0104fef1e` — *replace the facet and service runtime with the chord2 host runtime*，85 文件、+14,743/−8,921）：
 
 - `src/facets/host.ts` 的 facet/service 运行时被 `src/host.ts`（1010 行）的 **typed host runtime** 取代；`src/` 变平（`contract.ts`、`record.ts`、`reload.ts`、`registry.ts`、`remote.ts`、`websocket.ts` 等）。
-- exports 由多子路径收敛为 `.`、`./context`、`./delta`、`./node`、`./package.json`（v1.4.0 又增 `./output`、`./sqlite*`、`./telemetry-sqlite`）——**`./facets` 与 `./bundler` 子路径不再存在**，`esbuild` 依赖移除；v1.4.0 依赖为 `typebox` + `pi-telemetry`。
+- exports 由多子路径收敛为 `.`、`./context`、`./delta`、`./node`、`./package.json`（v1.4.0 又增 `./output`、`./sqlite*`、`./telemetry-sqlite`；**v1.5.0 再增 `./next`，共 11 条**）——**`./facets` 与 `./bundler` 子路径不再存在**，`esbuild` 依赖移除；v1.4.0 依赖为 `typebox` + `pi-telemetry`，**v1.5.0 为 `pi-schema` + `pi-telemetry`**。
 - 新增 `docs/{guide,spec,tutorial}.md` 与 `CHANGELOG.md`；删除 `PLANNING.md`。
-- 硬约束自述（`docs/spec.md:5-9`）：运行时只依赖自身 `delta` 模块、Node/浏览器内建与 `typebox`，**不依赖任何其它 Pi 包**。
+- 硬约束自述（`docs/spec.md:5-9`）：运行时只依赖自身 `delta` 模块、Node/浏览器内建，外加 `@earendil-works/pi-telemetry`（遥测）与 `@earendil-works/pi-schema`（schema），随后自述 **No other Pi packages**——即把这两个名字排除在“其它 Pi 包”之外。v1.4.0 时这一句写的是 `typebox`，v1.5.0 换成了 `pi-schema`；**该自述与其自身依赖清单相互矛盾**（依赖里明明有 telemetry 与 schema），本页沿用 `chord.md` 的口径记下这处冲突。
 
 chord 的消费者也随之收窄：v1.2.0 只有 `packages/durable` 与 `packages/env` 依赖它，**`packages/coding-agent` 不再依赖 chord**。
 

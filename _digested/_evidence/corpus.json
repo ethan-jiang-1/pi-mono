@@ -1,3 +1,7 @@
 {
-	"baseline": { "repo": "earendil-works/pi", "tag": "v1.4.0", "commit": "4a080252f" }
+	"baseline": {
+		"repo": "earendil-works/pi",
+		"tag": "v1.5.0",
+		"commit": "f9a263655"
+	}
 }

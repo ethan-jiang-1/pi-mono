@@ -1,7 +1,7 @@
 # 03 — 虚拟模型驱动内核与 Agent 会话测试：faux.ts 与 harness.ts 深度解密
 
 > **源码锚点**：
-> - 官方 Faux Provider 内核：`packages/ai/src/providers/faux.ts`（727 行；v1.0.3 时为 711）
+> - 官方 Faux Provider 内核：`packages/ai/src/providers/faux.ts`（v1.5.0 为 732 行；v1.0.3 时为 711）
 > - Agent 会话集成测试套件驱动：`packages/coding-agent/test/suite/harness.ts`（278 行，v1.4.0）
 > - 核心驱动范例：`packages/coding-agent/test/test-harness.test.ts`
 
@@ -19,7 +19,7 @@ Pi-mono 给出了一套工业级解法：**全真宿主骨架 + 确定性虚拟�
 
 ---
 
-## 二、解密 packages/ai/src/providers/faux.ts：727 行的虚拟模型引擎
+## 二、解密 packages/ai/src/providers/faux.ts：732 行的虚拟模型引擎
 
 `packages/ai/src/providers/faux.ts` 不是玩具级的静态桩，而是一个在数据结构和协议上完全遵循 `Provider` 接口的完整微内核。
 
@@ -150,3 +150,18 @@ test("harness runs multi-turn tool calling deterministically", async () => {
    一个包含 5 轮多代理交互、2 次工具调用拦截和 1 次会话分支压缩的复杂测试，在 Harness 下执行**只需不到 15 毫秒**。
 3. **Coding Agent 的自愈调试天堂**：
    当负责维护仓库的 Coding Agent 重构了工具注册逻辑时，它只需运行该测试，毫秒级即可获知参数格式、钩子触发顺序是否被破坏，彻底摆脱外部网络的干扰。
+
+## v1.5.0 增补：faux provider 现在产出真实的 partial 参数
+
+> 基线 v1.5.0（`f9a263655`）。
+
+**变化**：faux provider 现在**流式输出 tool-call 参数的部分增量**，所以 `toolcall_delta` 事件里能看到逐步增长的参数，与真实 provider 一致（v1.4.0 及以前，faux 一次性给出完整参数）。
+
+**为什么这事重要**：任何断言「部分参数如何增长」或「渲染器在流式期间如何更新」的测试，在 v1.4.0 用 faux provider 是**测不到真实行为**的——它会把「参数一次到位」当成事实写进断言。v1.5.0 起这类测试才有意义。
+
+**配套的测试面变化**：
+
+- 所有 provider（含 faux）都走 `ToolCallArgumentsStream` 增量累积，所以「每个 delta 只读一次」这件事可以被测试直接覆盖。
+- 交互式 tool renderer 现在**每帧最多执行一次**——测试若依赖「每个 delta 渲染一次」的计数需要改。
+
+**注意**：本轮 `packages/durable` 的测试面变化更大（`watchEvents()` 删除、`subscribeCommits`→`observeCommits`、watch 签名换形、deferred 进度），与 faux provider 无关但同属 v1.5.0 的测试适配面，见 [durable 的四组重写](../orchestration/07-durable-tasks.md#v150-的四组重写)。

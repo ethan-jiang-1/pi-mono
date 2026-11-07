@@ -49,6 +49,12 @@ handler 按扩展加载与注册顺序运行；不同事件的能力不同（通
 - **annotations**：MCP 语义的工具提示（readOnly/destructive/idempotent/openWorld），未被验证，供权限类扩展决策。
 - **嵌套执行**：`ctx.executeTool()` 经过与模型调用相同的校验与事件，id 由 Pi 派生，不进 transcript；调用方工具自行上报结果与 usage。
 
+- **参数 schema**：工具的 `parameters` 现在接受**任意 JSON Schema 对象**。**本基线起校验底座换了**，正确的说法分三层，缺一层就误导：
+  1. **写法**：仍可 `import { Type } from "@earendil-works/pi-ai"`（coding-agent 映射到 compat 入口 + 内置 TypeBox），内置工具工厂返回 `TypeBoxAgentTool`。**源码层面没变**。
+  2. **校验**：一律走 `@earendil-works/pi-schema`（`compile(schema, { coerce: true }).parse()`）。JSON Schema 之外的 TypeBox 特性**不生效**：`Format.Set()` 注册的**自定义** format 不检查（**标准 format 仍校验**）、`Type.Refine()` 不跑、codec 不解码。
+  3. **新代码建议**：用 pi-schema builders（`obj`/`str`/`num`/`arr`/`oneOf`），`obj()` **默认 closed**，要开放需 `{ open: true }`。
+  反向是放宽：纯 JSON Schema 工具（含 MCP）现在也获得强制转换。所以**"TypeBox 被删除了"是错的**——它只是离开了校验器的位置。
+
 ## 六、会话词汇
 
 - **SessionManager**：拥有持久化或内存中的条目树与活动叶子。分支改变叶子而不删除废弃分支——废弃分支代表替代历史，重建分支敏感状态用 `getBranch()`，不要重放全部文件条目（运行时事实，见 与 ）。

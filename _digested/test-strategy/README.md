@@ -1,6 +1,6 @@
 # test-strategy/ — Pi-mono 官方测试策略与工程纪律的消化层
 
-> **基线**：pi-mono **`v1.4.0`（tag `4a080252f`）**。本区间测试面变化：durable 加 `sleeping`/crash-loop/telemetry/IndexedDB 四组测试、TUI 加 `exit-restore`/`markdown`/`autocomplete`/`terminal-image`、模型数据新增 `check:model-catalog-compat`（发布前用最新 release 的 pi-ai 校验目录）、`check-entry-graphs` 预算调整。
+> **基线**：pi-mono **`v1.5.0`（tag `f9a263655`）**。**v1.5.0 测试面变化**：faux provider 现在流式输出 tool-call 参数的 partial 增量（此前一次给全，所以"部分参数如何增长"这类断言此前测不到真实行为）；durable 侧测试面大改——`watchEvents()` 删除、`subscribeCommits`→`observeCommits`、watch 签名换形、deferred 进度。历史增量（v1.2.0–v1.4.0）：durable 加 `sleeping`/crash-loop/telemetry/IndexedDB 四组测试、TUI 加 `exit-restore`/`markdown`/`autocomplete`/`terminal-image`、模型数据新增 `check:model-catalog-compat`、`check-entry-graphs` 预算调整。
 >
 > **上一基线**：`v1.2.0`（tag `06a466935`）。此前为 `v1.0.0`（tag `a13d35a74`）。本区间（v1.0.3 → v1.2.0）测试面的主要变化：`scripts/coding-agent-consumer.mjs` 拆为 `check-package-install.mjs` + `package-artifacts.mjs` + `local-package-install.mjs` + `coding-agent-smoke.mjs`；`durable-env.yml` 改名 `env.yml` 并扩为**四** job（`daemons`/`check`/`release-daemons`/`tests`；v1.0.3 为 `check`+`env-tests` 两个，`tests` 是 `env-tests` 的改名续存体）；`env-daemons.yml` 增 8 目标交叉构建；新增 `packages/env` 的 Rust daemon 构建与 pack 校验。详见 [`_change_log/0009`](../_change_log/0009-v1.0.3-to-v1.2.0.md)。本目录是 `_digested/` 下对 **Pi-mono 官方测试体系与工程纪律** 的全景解剖层，全面覆盖其测试宪法、分层架构、仿真内核、持久化验证与端到端发布门禁。
 
@@ -26,14 +26,14 @@ Pi-mono 是一个以极简、高执行速度与强嵌入性著称的 AI Coding A
 | **测试执行脚本** | 根目录 `test.sh`（强隔离沙箱）、`pi-test.sh`（30+ API Key 抹除器）、`pi-test.bat`/`ps1`（Windows 宿主支持） |
 | **测试配置文件** | **12** 份 Vitest 配置（1 份根目录 `vitest.base.ts` + 11 份包级配置：agent / ai / codemode / coding-agent / durable（`vitest.config.ts` + `vitest.benchmark.config.ts` + `test-workers/vitest.config.ts`）/ env / evals（`vitest.evals.config.ts` + `vitest.test.config.ts`）/ mcp）。**订正**：原写"13 份（1 根 + 12 子包）"是 v1.0.0 的旧值；v1.2.0 随三包删除降为 11，v1.4.0 因新增 `packages/durable/test-workers/vitest.config.ts` 回到 12 |
 | **测试用例分布** | 覆盖全部 **11** 个子包（`packages/` 仅 11 个目录：agent / ai / chord / codemode / coding-agent / durable / env / evals / mcp / telemetry / tui；其中 `chord`、`telemetry` 无独立 vitest 配置，由根配置覆盖），集中于 `packages/*/test/`、`packages/durable/test/`（40+ 份高阶持久化与自愈状态机单测） |
-| **虚拟模型内核** | `packages/ai/src/providers/faux.ts`（727 行代码，提供剧本化事件流与 `FauxResponseStep`） |
+| **虚拟模型内核** | `packages/ai/src/providers/faux.ts`（v1.5.0 为 732 行代码，提供剧本化事件流与 `FauxResponseStep`） |
 | **Agent 状态机驱动** | `packages/coding-agent/test/suite/harness.ts` 与 `test-harness.ts`（全生命周期 AgentSession 模拟器） |
 | **TUI 独立测试车道** | `packages/tui/test/`（**脱离 Vitest，独占采用 Node.js 原生 `node:test` 引擎**） |
 | **二进制与冒烟资产** | `scripts/smoke-test-codemode-binary.mjs`（本地微型 SSE 流服务器）+ `.pi/skills/interactive-testing.md`（tmux 虚拟终端控制） |
 | **模型能力评测车道** | `packages/evals/`（独立评测包，与基础 CI 严格物理隔离，使用独立 `vitest-evals` 运行） |
 | **协议合规证据锁** | `packages/coding-agent/test/mcp-conformance/`（运行官方 `@modelcontextprotocol/conformance`，以 `baseline.json` 强锁防退化） |
 | **供应链与工程守卫** | `scripts/check-runtime-deps.mjs`（AST 幽灵依赖审计）、`check-entry-graphs.mjs`（图预算）、`check-package-install.mjs` + `package-artifacts.mjs`（真实 Tarball 逐包隔离消费验证） |
-| **存储通用一致性** | `packages/durable/src/testing/storage-conformance.ts`（1,682 行，跨 Memory / JSONL / SQLite / IndexedDB 四后端的参数化等价性套件；v1.0.3 时为 1,583） |
+| **存储通用一致性** | `packages/durable/src/testing/storage-conformance.ts`（v1.5.0 为 2,099 行，跨 Memory / JSONL / SQLite / IndexedDB 四后端的参数化等价性套件；v1.0.3 时为 1,583） |
 
 ---
 

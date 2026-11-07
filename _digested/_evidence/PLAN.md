@@ -24,6 +24,17 @@
 | P4 | 流程切换 + lint（正文禁 `#L`/版本） | 待开始 |
 | P5 | v1.2.0→v1.4.0 重放度量 | **完成**：bump 到 v1.3.0 时正文 0 文件变化；stale 仅 9（extension）/29（FAQ）条真实变更 |
 | 加项 | `_digested` 正文 `#L` 清零（34 条，地址解析到各自 render） | 完成 |
+| R11-P0 | v1.5.0 代码合入（`git merge --no-ff v1.5.0` → `82fa18e67`，0 冲突） | 完成 |
+| R11-P1 | Discovery：`_change_log/0011` + `_summary-v1.5.0` | 完成 |
+| R11-P2 | 三台账重钉到 v1.5.0（`_digested` 2→0、extension 32→0、FAQ 51→0 stale） | 完成 |
+| R11-P3 | verifier 新增 `pin` locator（版本 pin 不再随 release 失效） | 完成 |
+| R11-P4 | 16 处内容层新增/重写（含新建 `architecture-next/chord-v2.md`） | 完成 |
+| R11-P5 | 本轮流程与工具更新（本表、`_coverage/00-corpus-maintenance.md`、`README.md` 基线块） | 完成 |
+
+### 两条新的常设规则（v1.5.0 轮确立）
+
+1. **新增面不进台账，只进正文。** 台账（`render.json`/`claims.json`）记的是"现值断言"，靠 git tag 解析；新包（如 v1.5.0 的 `packages/schema`）或新子路径（`chord/next`）**没有旧断言可失效**，所以重钉时必然是 0 stale——这不代表没变化。新面必须在正文写，台账不必为它新增条目。本轮实测：v1.5.0 增量 211k 行，三台账盲跑只 stale 85 条（22.8%），因为绝大部分增量落在新面。
+2. **引文含版本号的，截断到版本号之前，再用 `expect` 断言版本。** 例：`"@earendil-works/pi-schema": "1.5.0"` 这类版本 pin 若整句入引文，每次 release 都会 stale。改用 `locator: {kind: "pin", key: "...", at: "1.5.0"}`（不写 `at` 则只校验"该 key 存在且有版本值"），正文引文写到冒号为止。v1.5.0 轮把 `E101` 的三处行内版本引文全部转成了 pin 源。
 
 ## P3：extension 语料逐页清单
 

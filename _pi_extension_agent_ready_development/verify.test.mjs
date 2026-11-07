@@ -18,7 +18,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
-import { verifyCorpus } from "./verify.mjs";
+import { verifyCorpus, BASELINE_TAG } from "./verify.mjs";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
 const work = mkdtempSync(join(tmpdir(), "pi-corpus-verify-test-"));
@@ -45,7 +45,7 @@ function mutate(name, fn) {
 		writeFileSync(file, `link to [nowhere](https://example.com/other)\n`);
 	});
 	const { errors } = verifyCorpus(dir);
-	assert.ok(errors.some((e) => e.includes("pinned v1.4.0")), `expected pinned-link rejection, got: ${errors.join("; ")}`);
+	assert.ok(errors.some((e) => e.includes(`pinned ${BASELINE_TAG}`)), `expected pinned-link rejection, got: ${errors.join("; ")}`);
 }
 
 // 3. Missing anchor in a relative link is rejected.

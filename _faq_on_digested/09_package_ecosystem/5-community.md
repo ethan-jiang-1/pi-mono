@@ -16,7 +16,7 @@
 ![三层结构](svg/layers.svg)
 
 - **~30 个生命周期事件**：input 拦截、before_agent_start 注入、context 改写、tool_call 可拦截/终止、tool_result 可改写、session fork/compact/tree 可取消、ui_prompt_start/end、before_provider_*。
-- **注册面**：registerTool（TypeBox schema，可覆盖内置工具）、registerCommand/Shortcut/Flag（扩展可加 CLI flag）、registerProvider（完整 pi-ai provider + OAuth config-form）、Message/EntryRenderer、MarkdownTransformer。
+- **注册面**：registerTool（TypeBox schema——**本基线源码写法仍可用，但校验走 `pi-schema`**，可覆盖内置工具）、registerCommand/Shortcut/Flag（扩展可加 CLI flag）、registerProvider（完整 pi-ai provider + OAuth config-form）、Message/EntryRenderer、MarkdownTransformer。
 - **ctx**：ctx.ui.custom() 全功能 TUI 组件、ctx.sessionManager（fork/树导航/切换）、ctx.compact()、ctx.reload() 热重载。
 - **分发**：npm/git/path 三源、`pi -e` 临时试用、项目级覆盖全局、`pi-package` keyword 进 gallery。
 - **示范**：40+ 官方示例扩展（git-checkpoint、confirm-destructive、dynamic-tools、custom-compaction、kimi-deferred-tools、doom-overlay…）。

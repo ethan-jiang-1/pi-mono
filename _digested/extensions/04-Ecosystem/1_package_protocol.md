@@ -32,7 +32,7 @@
 
 - 第三方运行时依赖 → `dependencies`；pi 从 npm/git 装包时**自动跑 `npm install`**（v1.4.0 `packages.md:78`；v0.85.1 时为 :169）。
 - **pi 核心包**（`@earendil-works/pi-ai`/`pi-agent-core`/`pi-coding-agent`/`pi-tui`/`typebox`）→ 必须放 `peerDependencies` 且 range 为 `"*"`，**不许打包**——由宿主统一供版本（`packages.md:100-111`）。
-  > **v1.5.0**：`typebox` **仍在** host-provided 清单里（`packages.md:110`），扩展写 TypeBox 依然合法。但校验已改走 `@earendil-works/pi-schema`：`Type.Refine()` 不跑、codec 不解码、`Format.Set()` 注册的自定义 format 不检查（标准 format 仍校验）。新代码建议用 pi-schema builders。详见 [1.3 的“TypeBox 退场后的三层事实”](../../agent/01-Anatomy/1.3_Tool_Registry.md#参数-schematypebox-退场后的三层事实v150)。
+  > **注意**：`typebox` **仍在** host-provided 清单里（`packages.md:110`），扩展写 TypeBox 依然合法。但校验已改走 `@earendil-works/pi-schema`：`Type.Refine()` 不跑、codec 不解码、`Format.Set()` 注册的自定义 format 不检查（标准 format 仍校验）。新代码建议用 pi-schema builders。详见 [1.3 的“TypeBox 退场后的三层事实”](../../agent/01-Anatomy/1.3_Tool_Registry.md#参数-schematypebox-退场后的三层事实v150)。
 - **依赖其他 pi 包** → `dependencies` + `bundledDependencies`，并通过 `node_modules/...` 路径引用其资源（v1.4.0 `packages.md:90`；v0.85.1 时为 :173-186）。
 - 底层保证："Pi loads packages with separate module roots, so separate installs do not collide or share modules"（v1.4.0 `packages.md:92`；v0.85.1 时为 :173）——每个包独立模块根，同名依赖不同版本共存。
 

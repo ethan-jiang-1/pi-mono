@@ -1,6 +1,6 @@
 # extensions/ — pi 的扩充思路：极简核 + 靠扩展长能力
 
-> **当前基线：`v1.5.0`（tag `f9a263655`）**。v1.4.0 时本页写的是"扩展 API 面无结构变化（`core/extensions/types.ts` 逐字节未变）"——**v1.5.0 已不成立**：该文件 +27/−3，新增 `KeybindingHints` 接口（`keyText`/`keyHint`），并让 `ToolRenderContext` / `MessageRenderOptions` / `EntryRenderOptions` 三者 **extends 它**；内联组件新增 `blocked`（OSC 7501 program status），`MessageRenderOptions` 新增 `messageId` / `timestamp`。
+> v1.4.0 时本页写的是"扩展 API 面无结构变化（`core/extensions/types.ts` 逐字节未变）"——**v1.5.0 已不成立**：该文件 +27/−3，新增 `KeybindingHints` 接口（`keyText`/`keyHint`），并让 `ToolRenderContext` / `MessageRenderOptions` / `EntryRenderOptions` 三者 **extends 它**；内联组件新增 `blocked`（OSC 7501 program status），`MessageRenderOptions` 新增 `messageId` / `timestamp`。
 >
 > 更重要的变化不在类型面而在**校验底座**：TypeBox 离开校验器的位置，参数校验一律走 `@earendil-works/pi-schema`——但**源码写法不变**（`import { Type } from "@earendil-works/pi-ai"` 仍可用）。三层事实见 [`agent/01-Anatomy/1.3_Tool_Registry.md`](../agent/01-Anatomy/1.3_Tool_Registry.md)。
 >

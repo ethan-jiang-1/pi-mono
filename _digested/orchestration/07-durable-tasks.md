@@ -21,7 +21,7 @@
 > - **SQLite schema v2**：`sleeping` 需要重建 tasks 表；迁过的库不能被 1.3.0 或更早打开。见 [durable-and-storage](../architecture-next/durable-and-storage.md)。
 > - 其余行号：`scheduler.ts` 1,953→**2,507** 行，`README.md` 751→**876** 行。
 >
-> **⚠️ v1.5.0：一次重写，34 条 Breaking（sync-0011）**。这是 durable 自 1.0.0 以来最大的单次破坏面——占全仓 41 条 Breaking 的 **83%**。四条主线，**按因果分组读，不要按 changelog 顺序读**：
+> **⚠️ 一次重写，34 条 Breaking（sync-0011）**。这是 durable 自 1.0.0 以来最大的单次破坏面——占全仓 41 条 Breaking 的 **83%**。四条主线，**按因果分组读，不要按 changelog 顺序读**：
 >
 > | 组 | 干了什么 | 你要改什么 |
 > |---|---|---|
@@ -65,7 +65,7 @@ subagent 工具在 `api.commit()` 里以 `ownership: { kind: "task", taskId }` �
 
 ### TaskGraph:读时派生的投影
 
-`harness.watchTaskGraph()` / `observeTaskGraph()` 提供全部活跃任务的单一 Chord 状态（v1.5.0 起同步 getter `taskGraph()` 已删除）;节点带 owner 边、状态、background/abort 标记与拥有的 conversations(README Task Graph 节)。投影由 commit publications 增量推进(`task-graph.ts:151-190`:terminal 即删节点、conversation 归属在任务变更之后补),**图是派生视图,不是第二个权威**——被丢弃就由存储重建(`#build`,`:131-148`),这与 todo 随 branch 重建是同一条纪律的重装版。
+`harness.watchTaskGraph()` / `observeTaskGraph()` 提供全部活跃任务的单一 Chord 状态（同步 getter `taskGraph()` 已删除）;节点带 owner 边、状态、background/abort 标记与拥有的 conversations(README Task Graph 节)。投影由 commit publications 增量推进(`task-graph.ts:151-190`:terminal 即删节点、conversation 归属在任务变更之后补),**图是派生视图,不是第二个权威**——被丢弃就由存储重建(`#build`,`:131-148`),这与 todo 随 branch 重建是同一条纪律的重装版。
 
 ### abortOwned / ownedTasks:所有权索引的读写面
 
@@ -173,7 +173,7 @@ commit(
 // v1.4.0
 watch.start(async (value, ops, ctx) => …)
 
-// v1.5.0：一次 change 对象在前，context 在后；值/失败是 tagged
+// 一次 change 对象在前，context 在后；值/失败是 tagged
 watch.start(async (call, ctx) => {
   if (call.kind === "failed") return;
   const { value, ops, retired } = call;

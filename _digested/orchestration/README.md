@@ -1,8 +1,7 @@
 # orchestration/ — pi 的工作编排原语阶梯(驾驶座视角)
 
-> **当前基线：`v1.5.0`（tag `f9a263655`）**，上一基线 `v1.4.0`（tag `4a080252f`）、更早 `v1.2.0`（tag `06a466935`）。
 >
-> **v1.5.0 对编排层是一次重写**：durable 的 34 条 Breaking（占全仓 41 条的 83%）归四组——提交模型（`Storage.commit(batches, receive, ctx)`）、观察模型（`watchEvents()` 整套删除，改 `ConversationView` 窗口化）、watch 换形（`FileChange` 改名）、持久化时机（`progress.persistWithinMs` 默认 1 s）。详见 [`07-durable-tasks.md`](./07-durable-tasks.md#v150-的四组重写)。
+> **对编排层是一次重写**：durable 的 34 条 Breaking（占全仓 41 条的 83%）归四组——提交模型（`Storage.commit(batches, receive, ctx)`）、观察模型（`watchEvents()` 整套删除，改 `ConversationView` 窗口化）、watch 换形（`FileChange` 改名）、持久化时机（`progress.persistWithinMs` 默认 1 s）。详见 [`07-durable-tasks.md`](./07-durable-tasks.md#v150-的四组重写)。
 >
 > 历史增量（v1.2.0–v1.4.0）：durable 加 `sleeping` 状态与 crash-loop guard、codemode 加 worker 准入与生命周期语义、`--tools +name/-name` 在恢复会话时叠加。
 >

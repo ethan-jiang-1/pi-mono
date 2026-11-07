@@ -1,6 +1,6 @@
 # trajectory/ — 会话轨迹：model-visible 状态的事实源、可回放性与录制夹具
 
-> **当前基线：`v1.5.0`（tag `f9a263655`）**。v1.4.0 时本页写"`core/session-manager.ts` 与轨迹格式未变"——**v1.5.0 该文件已改**（+30/−14），主要变化是 `projectContextEntry()` 转为 **export**（轨迹投影成为公开面）。轨迹**格式**本身在本区间仍未变。历史增量：`--tools +name/-name` 在恢复会话时叠加；durable 侧 `sleeping` 让一次 run 跨进程边界暂停。
+> v1.4.0 时本页写"`core/session-manager.ts` 与轨迹格式未变"——**v1.5.0 该文件已改**（+30/−14），主要变化是 `projectContextEntry()` 转为 **export**（轨迹投影成为公开面）。轨迹**格式**本身在本区间仍未变。历史增量：`--tools +name/-name` 在恢复会话时叠加；durable 侧 `sleeping` 让一次 run 跨进程边界暂停。
 >
 > **更早基线**：`v1.2.0`（tag `06a466935`），上一基线 `v1.0.3`（tag `d78dc83d6`）。`core/session-manager.ts` 在 v1.0.3→v1.2.0 区间**逐字节未变**，轨迹格式与 `SessionMessage` 形状不变。本区间对该层的唯一增量是 `AgentToolCallOutcome` 与 `tool_execution_end` 事件新增可选 **`durationMs?`**（单调时钟测得的 `execute()` 耗时，工具未运行时缺省；`packages/agent/src/types.ts:454`、`:538`）。下文行号为专题写作时的树实测。
 >

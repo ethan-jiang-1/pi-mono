@@ -1,7 +1,7 @@
 # 03 — 虚拟模型驱动内核与 Agent 会话测试：faux.ts 与 harness.ts 深度解密
 
 > **源码锚点**：
-> - 官方 Faux Provider 内核：`packages/ai/src/providers/faux.ts`（v1.5.0 为 732 行；v1.0.3 时为 711）
+> - 官方 Faux Provider 内核：`packages/ai/src/providers/faux.ts`（732 行；v1.0.3 时为 711）
 > - Agent 会话集成测试套件驱动：`packages/coding-agent/test/suite/harness.ts`（278 行，v1.4.0）
 > - 核心驱动范例：`packages/coding-agent/test/test-harness.test.ts`
 
@@ -153,7 +153,6 @@ test("harness runs multi-turn tool calling deterministically", async () => {
 
 ## v1.5.0 增补：faux provider 现在产出真实的 partial 参数
 
-> 基线 v1.5.0（`f9a263655`）。
 
 **变化**：faux provider 现在**流式输出 tool-call 参数的部分增量**，所以 `toolcall_delta` 事件里能看到逐步增长的参数，与真实 provider 一致（v1.4.0 及以前，faux 一次性给出完整参数）。
 

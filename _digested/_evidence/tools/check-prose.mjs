@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 /**
- * Prose guard: corpus pages must not carry line coordinates or the baseline version.
+ * Prose guard: corpus pages must not carry line coordinates or a per-page baseline banner.
  *
- * Fails on `#L<number>` and on the current baseline tag (from each corpus.json).
+ * Fails on `#L<number>`, on a page-header baseline banner (the baseline is declared
+ * once, in `_digested/README.md` and each `_evidence/corpus.json`), and on the baseline
+ * tag from each corpus.json.
  * Skips `_evidence/`, `_coverage/` and blocks marked with `<!-- archive -->`.
+ *
+ * Once all three corpora are migrated, drop `--include-digested` and make the
+ * `_digested` sweep unconditional.
  *
  * usage: node check-prose.mjs [--repo <dir>]
  *
@@ -49,6 +54,14 @@ for (const corpus of corpora) {
 			if (archived) continue;
 			if (/#L\d/.test(line)) failures.push(`${relative(repo, page)}:${lineNumber}: line anchor "${line.match(/#L\d+/)[0]}"`);
 			if (tag && line.includes(tag) && !/基线|baseline|\btag\b|release tag/u.test(line)) failures.push(`${relative(repo, page)}:${lineNumber}: baseline version "${tag}"`);
+			// A per-page *current* baseline banner duplicates the single declaration in
+			// `_digested/README.md`. Only currency claims drift with every bump, so only
+			// those are flagged: `当前基线：v1.2.3` / `本页基线：v1.2.3`.
+			// Research-provenance records (`基　线：pi-mono v0.85.1（upstream tag …）`) are
+			// frozen history and deliberately out of scope.
+			if (/(?:当前|本页|本目录页[首头])基线\s*[:：]/u.test(line) && /v\d+\.\d+\.\d+/u.test(line)) {
+				failures.push(`${relative(repo, page)}:${lineNumber}: per-page baseline banner`);
+			}
 			if (/[（，]\s*:\d{2,4}/u.test(line) || /在\s*:\d{2,4}/u.test(line)) {
 				failures.push(`${relative(repo, page)}:${lineNumber}: bare line reference`);
 			}

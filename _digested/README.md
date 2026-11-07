@@ -45,7 +45,7 @@ pi-mono 可以作为终端 coding agent 使用，也能通过 SDK/RPC 被其它�
 | `packages/mcp` | **独立 MCP 客户端**（v1.0.0 新增）：传输中立核心 + stdio/Streamable HTTP + OAuth（零 pi 依赖）；v1.0.1+ 补 CIMD 与 DCR application_type | 集成 |
 | `packages/codemode` | **QuickJS-WASM 沙箱**（v1.0.0 新增）：worker 线程跑模型写的 JS，注入工具暴露为 `tools.<name>(args)`；v1.0.1+ 输出封顶 + built-ins lockdown | 集成 |
 | `packages/env` | **SSH 远程执行环境**（v1.2.0 起在 release 内，此前为 Unreleased）：durable `ExecutionEnv` 的跨机器实现——TS 客户端（Connection/RemoteExecutionEnv/ssh bootstrap）+ Rust daemon（8 目标交叉构建，SHA-256 命名部署），语义等价有 conformance/differential 合同 | 集成 |
-| `packages/schema` | **校验底座**（v1.5.0 新增，259 文件 / +41,224 / −0）：`@earendil-works/pi-schema`——vendored TypeBox formats + LICENSE，导出 `compile()` / `Validator` / `CoercingValidator`，子路径仅 `.` 与 `./formats`。**TypeBox 从此只提供源码写法，校验一律走它** | 基础设施 |
+| `packages/schema` | **校验底座**（新增，259 文件 / +41,224 / −0）：`@earendil-works/pi-schema`——vendored TypeBox formats + LICENSE，导出 `compile()` / `Validator` / `CoercingValidator`，子路径仅 `.` 与 `./formats`。**TypeBox 从此只提供源码写法，校验一律走它** | 基础设施 |
 | `packages/telemetry` | **横切层**（v1.4.0）：vendor-neutral 的 span/metric/link/propagation 契约 + `TelemetryStore` + `/render`；ai/chord/durable 三包共用，chord 把 `Context.telemetry` 设为必需成员 | 辅助（横切） |
 | `packages/evals` | eval harness | 辅助 |
 

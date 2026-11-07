@@ -1,6 +1,6 @@
 # chord v2：experimental 的第二运行时（v1.5.0）
 
-> **本页基线：v1.5.0（`f9a263655`）。** 本页在 v1.5.0 新建。v1.5.0 之前 chord v2 只存在于 `src/next/`，**没有 package export**（v1.4.0 的 CHANGELOG 明写"experimental and not exported yet"）。v1.5.0 起 `@earendil-works/chord/next` 首次成为正式入口，标注 experimental。
+> 本页新建。此前 chord v2 只存在于 `src/next/`，**没有 package export**（v1.4.0 的 CHANGELOG 明写"experimental and not exported yet"）。v1.5.0 起 `@earendil-works/chord/next` 首次成为正式入口，标注 experimental。
 >
 > **先读这一句**：chord 在 v1.5.0 之后是**双运行时并存**——现役的是 `@earendil-works/chord`（v1，见 [chord.md](./chord.md)），v2 是并列的第二套，不是它的升级。两者共享 `Context`/`JsonValue`/`Draft`/watch 类型这些底座，但对象模型、host 契约、存储与插件模型都是重写的。
 
@@ -89,7 +89,7 @@
 
 ## 依赖面
 
-`packages/chord/package.json` 在 v1.5.0：
+`packages/chord/package.json`：
 
 ```json
 "dependencies": {

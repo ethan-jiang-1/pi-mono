@@ -26,7 +26,7 @@
 | [SDLC Reference](./sdlc-reference/README.md) | pi-mono 的精确条件、状态和例外是什么？哪些可移用？ | 按问题查阅，并遵守适用边界 |
 | [Development Harness](./repo-harness/README.md) | pi-mono 仓库自身怎样组织 agent 参与？能借鉴什么原则？ | 按参与任务查阅 |
 
-三卷各有 README 与入口页，只依赖 `v1.5.0` 一手来源，彼此不构成前置阅读顺序。
+三卷各有 README 与入口页，只依赖一手来源，彼此不构成前置阅读顺序。
 
 ## 理解从哪里来
 

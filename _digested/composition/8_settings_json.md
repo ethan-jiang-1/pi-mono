@@ -223,7 +223,7 @@ pi **读**项目层的 `.pi/settings.json`，且项目值覆盖 agent-dir 值（
 **例证 2（defaultTools 白名单的效果）**：设置 `"defaultTools": ["read", "grep", "find", "ls"]` 但不要 `bash` → agent 只能读文件和搜索，不能执行命令。配合 `--tools` CLI 可临时恢复；v1.0.0 起也可以用增量写法 `"defaultTools": ["+codemode"]` 在默认 4 个之上追加而不整列替换。
 ## v1.5.0 新增的四个设置面
 
-> 基线 v1.5.0（`f9a263655`）。四个都与「谁来决定生命周期」有关：两个管内容何时落盘与哪些通知出现，两个管外部凭据与自更新的执行方式。
+> 四个都与「谁来决定生命周期」有关：两个管内容何时落盘与哪些通知出现，两个管外部凭据与自更新的执行方式。
 
 ### 1. `settings.progress.persistWithinMs`（durable，默认 `1000`）
 

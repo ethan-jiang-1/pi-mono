@@ -1,10 +1,10 @@
 # architecture-next：v0.85.x–1.5.0 沉淀出的新架构层
 
-> **本页基线：v1.5.0（`f9a263655`）。** chord 现在有**三页**：`chord.md` 写现役 v1 运行时（协议 4、placement、async get、telemetry/sqlite），**`chord-v2.md`（v1.5.0 新增）**写 experimental 的 `@earendil-works/chord/next`（首次有 export，**146** 个 `src/next` + **29** 个 `src/next-node` 的 `.ts` 文件）；`durable-and-storage.md` 已补 sleeping 状态、SQLite v2、IndexedDB 与 sqlite 驱动下沉，并在 v1.5.0 重写了存储提交契约。
+> chord 现在有**三页**：`chord.md` 写现役 v1 运行时（协议 4、placement、async get、telemetry/sqlite），**`chord-v2.md`（新增）**写 experimental 的 `@earendil-works/chord/next`（首次有 export，**146** 个 `src/next` + **29** 个 `src/next-node` 的 `.ts` 文件）；`durable-and-storage.md` 已补 sleeping 状态、SQLite v2、IndexedDB 与 sqlite 驱动下沉，并在 v1.5.0 重写了存储提交契约。
 >
 > **上一基线：v1.2.0（`06a466935`）。** 此前基于 v1.0.3+23（`98d2e1947`）working tree。本区间（v1.0.3 → v1.2.0）该层发生**两次整块删除**，本目录三页的处置各不相同，见下表。
 >
-> 状态：**experimental 定性仍成立，形态继续分化**。**v1.5.0 新增第四种形态**：chord 自己分化出 v1（现役，稳定面）与 v2（`@earendil-works/chord/next`，experimental 子路径）——同一个包内并存两种稳定性承诺，这是本仓第一次出现。v2 的 experimental 性由**子路径**表达，不是由包名表达。其余三种形态不变：`pi-durable` 是公开发布的 npm 包，README 自带 "**Experimental.** The API changes without notice between releases." 横幅（`packages/durable/README.md`）。1.0.0 曾把 0.87.0–0.99.2 的 16 条 Breaking 历史重置为一条 "Initial release"，**自 1.0.1 起恢复逐版本规范记录**（v1.2.0 时 CHANGELOG 已有 129 行）。chord 在 v1.2.0 **首次获得 CHANGELOG.md**——此前"replicated state 破坏性改形零记录"的缺口已闭合。
+> 状态：**experimental 定性仍成立，形态继续分化**。**第四种形态**：chord 自己分化出 v1（现役，稳定面）与 v2（`@earendil-works/chord/next`，experimental 子路径）——同一个包内并存两种稳定性承诺，这是本仓第一次出现。v2 的 experimental 性由**子路径**表达，不是由包名表达。其余三种形态不变：`pi-durable` 是公开发布的 npm 包，README 自带 "**Experimental.** The API changes without notice between releases." 横幅（`packages/durable/README.md`）。1.0.0 曾把 0.87.0–0.99.2 的 16 条 Breaking 历史重置为一条 "Initial release"，**自 1.0.1 起恢复逐版本规范记录**（v1.2.0 时 CHANGELOG 已有 129 行）。chord 在 v1.2.0 **首次获得 CHANGELOG.md**——此前"replicated state 破坏性改形零记录"的缺口已闭合。
 >
 > coding-agent 侧的 experimental 面则**整体消失**：`src/experimental/` 目录只剩一个无关的 `source-resolver.ts`，不再有任何 experimental 子路径需要 source-only 豁免。
 
@@ -15,7 +15,7 @@
 | experimental server 栈：`packages/{server,client,protocol}` + `coding-agent/src/experimental/{services,durable,session-catalog,session-worker}.ts` | `7472cda0d` | 161 文件，+32/−21,561 | 远程会话产品线终结；`packages/` 13→11 |
 | chord 的 facet/service 运行时 | `0104fef1e` | 85 文件，+14,743/−8,921 | 换成 chord2 typed host runtime；`PLANNING.md` 被删 |
 
-**四页处置（v1.5.0）**：本 README 与 [`durable-and-storage.md`](./durable-and-storage.md) 更新到 **v1.5.0**；[`chord-v2.md`](./chord-v2.md) **新建**（v2 的权威描述，以 `packages/chord/docs/next/design.md` + `decisions.md` + `slices.md` 为准）；[`server-and-experimental-services.md`](./server-and-experimental-services.md) **整页作废，保留为删除记录**；[`chord.md`](./chord.md) 在 v1.4.0 重写为现状（contracts/objects/refs、placement、async get、协议 4、telemetry/sqlite），v1.5.0 补了**与 v2 的分界指引**，不再是 chord1 的失效清单。
+**四页处置**：本 README 与 [`durable-and-storage.md`](./durable-and-storage.md) 均已更新；[`chord-v2.md`](./chord-v2.md) **新建**（v2 的权威描述，以 `packages/chord/docs/next/design.md` + `decisions.md` + `slices.md` 为准）；[`server-and-experimental-services.md`](./server-and-experimental-services.md) **整页作废，保留为删除记录**；[`chord.md`](./chord.md) 在 v1.4.0 重写为现状（contracts/objects/refs、placement、async get、协议 4、telemetry/sqlite），v1.5.0 补了**与 v2 的分界指引**，不再是 chord1 的失效清单。
 
 `_digested/` 其余部分覆盖的是 stable 面（coding-agent / tui / agent / ai）。本轮 v1.0.0 sync（`_change_log/0007`）没有让这层消失，反而完成了它的**收编**：v0.86.x 时 pi-agent-core 里并行的 harness/session/pico3 实验层被整包删除（agent 收缩为 Agent+loop+proxy，7fd478a2e），由 `packages/durable` 长成正式运行时接盘——harness、session 事实层、存储后端全部落入一个包。跨包、低 changelog 记录的特征**在 v1.2.0 前**成立（chord 当时无 CHANGELOG；session-backends 被删除且全仓无记录；durable 历史在 1.0.0 被重置——此点自 1.0.1 起已缓解，durable 恢复逐版本记录）。
 
@@ -27,13 +27,13 @@
 
 v1.0.0 的变化是把"持久会话事实层"从一套纸面 contracts 变成接盘者：`packages/agent` 的 harness/session/pico3 已删除，`packages/durable` 现在自带 Harness 运行时（task runtime、compaction、extensions、task graph view）和三种存储后端。
 
-## 三个新面（v1.2.0 后现存两个，v1.5.0 起 chord 分 v1/v2 两页）
+## 三个新面（v1.2.0 后现存两个，chord 自 v1.5.0 起分 v1/v2 两页）
 
 | 面 | 位置 | 角色 | 详见 |
 |---|------|------|------|
 | chord（v1，现役） | `packages/chord` | standalone 应用组合运行时：contracts/objects/refs/placement、replicated state、JSON delta（唯一不可变 tracker）、link/RPC、sqlite 驱动。v1.2.0 经 chord2 重写、**v1.3.0 再改公开面（协议 4）**、v1.4.0 起依赖 `pi-telemetry`；**v1.5.0 依赖 `pi-schema` + `pi-telemetry` 两包，watch 换形（7 条 Breaking）**。 | [chord.md](./chord.md) |
-| **chord v2（experimental）** | `packages/chord/src/next` + `src/next-node` | **v1.5.0 新增的第二运行时**：`@earendil-works/chord/next` 首次出现在 exports（**146 + 29** 个 `.ts`）。五个新面：plugins、registries、HTTP、workers、store `commitSeries`。可选 peer `esbuild` / `ws`。**与 v1 并存，不是升级**。 | [chord-v2.md](./chord-v2.md) |
-| durable | `packages/durable` | 完整 durable harness 运行时（src **v1.5.0 为 97** 个 `.ts`）：Session/Harness/Tasks/Documents + Memory/JSONL/SQLite/IndexedDB 四后端；v1.0.3 起有**执行环境契约层**（pi-env 的契约上游）；v1.2.0 新增 `src/codemode/`（与 coding-agent 的 codemode 是两套实现）；**v1.4.0 加 `sleeping`、SQLite v2、crash-loop guard、telemetry，sqlite 驱动交给 chord**；spec 在包内 `docs/spec.md`（**v1.5.0 为 6,531** 行） | [durable-and-storage.md](./durable-and-storage.md) |
+| **chord v2（experimental）** | `packages/chord/src/next` + `src/next-node` | **第二运行时**：`@earendil-works/chord/next` 首次出现在 exports（**146 + 29** 个 `.ts`）。五个新面：plugins、registries、HTTP、workers、store `commitSeries`。可选 peer `esbuild` / `ws`。**与 v1 并存，不是升级**。 | [chord-v2.md](./chord-v2.md) |
+| durable | `packages/durable` | 完整 durable harness 运行时（src 97 个 `.ts`）：Session/Harness/Tasks/Documents + Memory/JSONL/SQLite/IndexedDB 四后端；v1.0.3 起有**执行环境契约层**（pi-env 的契约上游）；v1.2.0 新增 `src/codemode/`（与 coding-agent 的 codemode 是两套实现）；**v1.4.0 加 `sleeping`、SQLite v2、crash-loop guard、telemetry，sqlite 驱动交给 chord**；spec 在包内 `docs/spec.md`（6,531 行） | [durable-and-storage.md](./durable-and-storage.md) |
 | ~~server + experimental services~~ | ~~`packages/server` + `packages/coding-agent/src/experimental/services/`~~ | **v1.2.0 整体删除**（`7472cda0d`，−21,561 行）。原角色：server 只做路由与 fencing，业务语义在 coding-agent 侧服务切片 | [server-and-experimental-services.md](./server-and-experimental-services.md)（删除记录） |
 
 第四个支撑面在 v1.0.0 收缩为一个：`packages/session-backends/sqlite-node` **整包删除**（−4,397，全仓 changelog 无记录），SQLite 能力由 `packages/durable/src/storage/sqlite/` 内置吸收并异步化；agent 侧 pico3 kernel（`packages/agent/src/harness/pico3/`，export `./experimental/pico3`）随 harness 整体删除——pi-agent-core 的 exports 只剩 `.`（`packages/agent/package.json:8-14`），durable 是唯一事实承接。CBOR 协议线**已随 `packages/protocol` 一并删除**（`PROTOCOL_VERSION = 8` 不再存在，consumer `packages/client` 同批移除）。
@@ -42,7 +42,7 @@ v1.0.0 的变化是把"持久会话事实层"从一套纸面 contracts 变成接
 
 1. **内容跨 3+ 包**，塞不进任何现有 per-package 条目；chord 还是 standalone 包，按包归属会误导。
 2. **CHANGELOG 记录已明显改善**（v1.2.0）：`packages/chord` **首次有了 CHANGELOG.md**，chord2 重写的破坏性改形有了正式记录——此前"replicated state 破坏性改形零记录"的缺口闭合。`packages/durable` 自 1.0.1 起逐版本记录，v1.2.0 时 129 行。仍无记录的仅剩历史遗留：`packages/session-backends` 的删除（v1.0.0 前）与 durable 被重置的 0.87.0–0.99.2 段。
-3. **入口是 SPEC，不再是服务 README**：`packages/coding-agent/src/experimental/services/README.md`（原服务切片表 + TODO 能力缺口清单）**已随栈删除**。现存唯一权威入口是 `packages/durable/docs/spec.md`（v1.2.0 时 5,340 行，**v1.4.0 为 5,618 行，v1.5.0 为 6,531 行**；§1 列 Session 原子提交不变量），durable 的 README 是 751 行（v1.4.0 为 **876** 行，**v1.5.0 为 973 行**）experimental usage guide，可作 spec 前的入门。chord 侧新增 `docs/{guide,spec,tutorial}.md`——这是 v1.2.0 才有的，规格开头即声明「文档与代码不一致时，以不一致为 bug」。
+3. **入口是 SPEC，不再是服务 README**：`packages/coding-agent/src/experimental/services/README.md`（原服务切片表 + TODO 能力缺口清单）**已随栈删除**。现存唯一权威入口是 `packages/durable/docs/spec.md`（v1.2.0 时 5,340 行，**v1.4.0 为 5,618 行，6,531 行；§1 列 Session 原子提交不变量），durable 的 README 是 751 行（v1.4.0 为 **876** 行，973 行）experimental usage guide，可作 spec 前的入门。chord 侧新增 `docs/{guide,spec,tutorial}.md`——这是 v1.2.0 才有的，规格开头即声明「文档与代码不一致时，以不一致为 bug」。
 
 ## 怎么跑起来
 

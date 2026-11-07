@@ -1,8 +1,8 @@
 # chord：应用组合运行时（v1.4.0 重写，v1.5.0 增 `./next`）、与 v2 的边界
 
-> **本页基线：v1.5.0（`f9a263655`）。** 本页写**现役 v1 运行时**（`@earendil-works/chord`）。v1.4.0 时本页重写了一次：旧版本（v1.2.0 的 chord2 重写）是一份“哪些 API 失效了”的清单，而 v1.2.0→v1.3.0 之间公开面又整体画了一遍（`Ref`/placement/async get/协议 4）。
+> 本页写**现役 v1 运行时**（`@earendil-works/chord`）。v1.4.0 时本页重写了一次：旧版本（v1.2.0 的 chord2 重写）是一份“哪些 API 失效了”的清单，而 v1.2.0→v1.3.0 之间公开面又整体画了一遍（`Ref`/placement/async get/协议 4）。
 >
-> **v1.5.0 两件事必须知道：**
+> **两件事必须知道：**
 > 1. **chord 成为双运行时**——`@earendil-works/chord/next` 首次出现在 exports，是 experimental 的第二代运行时（plugins / registries / HTTP / workers / store `commitSeries`）。它的权威描述在 **[`chord-v2.md`](./chord-v2.md)**。本页描述的 v1 仍然在役，两者**并存**，不是“升级”。
 > 2. **v1 本身也在变**（7 条 Breaking）：契约校验换到 `pi-schema`；watch 换形（`retired` 变成 change 的**字段**而不再是结束原因、`WatchCall` 变 tagged union、`cancel()`→`abort()`、`retire()` 删除、新增 `endAfterDelivery()`、`traceIn` 参数顺序、`runCounted()`）；依赖从“零 Pi 依赖”变成依赖 `pi-schema` + `pi-telemetry` 两个包。
 >
@@ -20,7 +20,7 @@
 
 ### 契约：四种契约形态 + placement
 
-`local` / `remote` / `method` / `opaque`（`src/contract.ts`）。契约是运行期值（**v1.5.0 起是 `@earendil-works/pi-schema` schema**，`src/contract.ts` 从 `pi-schema` import `obj`/`str`/`map` 等 builder；TypeBox 已不在校验路径上），既用于类型推导，也用于 fingerprint。
+`local` / `remote` / `method` / `opaque`（`src/contract.ts`）。契约是运行期值（**`@earendil-works/pi-schema` schema**，`src/contract.ts` 从 `pi-schema` import `obj`/`str`/`map` 等 builder；TypeBox 已不在校验路径上），既用于类型推导，也用于 fingerprint。
 
 **v1.3.0 起 remote 契约必须声明对象在哪台 host 上**（placement）：
 
@@ -110,6 +110,6 @@ hot reload 仍是硬要求。host 同时保留两个 code version，reload 分 p
 - `packages/chord/package.json`：**11** 条 exports（`.`、`./context`、`./delta`、**`./next`**、`./node`、`./output`、`./package.json`、`./sqlite`、`./sqlite/cloudflare`、`./sqlite/node`、`./telemetry-sqlite`）、依赖 **`@earendil-works/pi-schema`** + `@earendil-works/pi-telemetry`（**v1.5.0 起 `typebox` 已从依赖中移除**，且 `./next` 是 v1.5.0 新增的 v2 入口）；peerDependencies 为可选的 `esbuild` / `ws`
 - `packages/chord/CHANGELOG.md`：1.2.0 / 1.3.0 / 1.4.0 / **1.5.0** 四段（1.3.0 是 Breaking 集中版；**1.5.0 是双运行时分界**——7 条 Breaking 加 `./next` 首次导出）
 - `packages/chord/docs/spec.md`（协议与语义的规范文本，§1 概念、§2 contracts、§5 lifetime、§7 reload、§9 hosts and links、§10 host manager、§11 测试覆盖、§12 已知限制）；`docs/spec.md:6` 的"无其它 Pi 包"已过时
-- `packages/chord/src/host.ts`（v1.5.0 为 1,305 行）、`contract.ts`、`object.ts`、`connection.ts`、`wire.ts`、`link.ts`、`reload.ts`、`remote.ts`
-- `packages/chord/README.md`（v1.5.0 为 267 行）
+- `packages/chord/src/host.ts`（1,305 行）、`contract.ts`、`object.ts`、`connection.ts`、`wire.ts`、`link.ts`、`reload.ts`、`remote.ts`
+- `packages/chord/README.md`（267 行）
 - 状态：experimental（`docs/spec.md` 自述"文档与代码不一致是 bug"）。

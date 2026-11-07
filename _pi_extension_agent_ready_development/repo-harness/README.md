@@ -49,4 +49,4 @@ git show <baseline>:<path> | sed -n '<N>p'
 
 ## 与其它卷的关系
 
-本卷只依赖 `v1.5.0` 一手来源，不依赖语料其它卷。扩展开发的概念与完整变更路径见[扩展开发模型](../extension-development-model/README.md)；语料整体定位见[语料根 README](../README.md)。
+本卷只依赖一手来源，不依赖语料其它卷。扩展开发的概念与完整变更路径见[扩展开发模型](../extension-development-model/README.md)；语料整体定位见[语料根 README](../README.md)。

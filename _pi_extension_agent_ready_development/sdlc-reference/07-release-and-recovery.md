@@ -106,7 +106,7 @@ Nix 线的同类规则不同：**tag 不能修**。若 Nix 构建失败，`stabl
 
 ## 权威位置与人工判断
 
-| 事实 | 当前基线上的位置 | 由谁决定 |
+| 事实 | 位置 | 由谁决定 |
 |---|---|---|
 | 版本号与范围语义 | 各包 `package.json`，靠 `sync-versions.js` 校验 lockstep | 脚本校验 + 维护者选 patch/minor |
 | 已发布版本记录 | npm registry 的包元数据与 tarball | CI 写入 |

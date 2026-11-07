@@ -37,7 +37,7 @@ evals 包值得单独一提：它把「文档有没有用」变成可测量的�
 
 ## 发布面与私有面
 
-基线时点（v1.5.0）：**12 个包中 11 个是公开 npm 发布包**，唯一私有的是 evals。（v1.4.0 为 11 个包 / 10 个公开；v1.5.0 新增 `schema`，公开。）codemode、mcp、env 与 durable 一起构成「实验面」（API 变化不另行通知），与稳定的核心栈（ai/agent-core/coding-agent/tui）区分开。
+基线时点：**12 个包中 11 个是公开 npm 发布包**，唯一私有的是 evals。（v1.4.0 为 11 个包 / 10 个公开；v1.5.0 新增 `schema`，公开。）codemode、mcp、env 与 durable 一起构成「实验面」（API 变化不另行通知），与稳定的核心栈（ai/agent-core/coding-agent/tui）区分开。
 
 > **相对 v1.0.3 的包集合变化**：v1.0.3 有 13 个包，v1.2.0 有 11 个。删除了 `packages/client`、`packages/protocol`、`packages/server`（experimental 远程会话三件套，连同 `PROTOCOL_VERSION = 8` 的 CBOR 协议线一并移除，不再发布）；新增 `packages/env`（远程执行环境：SSH daemon、PTY、`listFiles`）。本页旧版曾把 client/protocol/server 列为现存包与「独立底座」。
 

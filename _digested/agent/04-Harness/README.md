@@ -1,5 +1,7 @@
 # 04-Harness：内部接线层
 
+## 版本史
+
 > **⚠️ v0.84.2 基线（2026-08-17；v0.86.1 增补；v1.0.0 再增补）**：本节从 v0.75.3 语义进化，多处描述需以 4.1 的复核为准。核心变化：**`AgentHarness` 已在 v0.83/v0.84 两次重构**——v0.83 加泛型 `TContext`、v0.84 又移除并去泛型化为 `AgentLane` 骨架。在 v0.84.2 里 `AgentHarness` **是一个 stub/骨架**：绝大多数操作抛 `HarnessNotImplemented`（`prompt`/`skill`/`compact` 等经 `unavailable()` reject）、`create()` 对非空 session 抛错、hooks/events 由 `UnavailableRegistry` 直接 throw，真正可跑的行为在 `AgentSession` / SDK。**v0.86.1 更正（`_change_log/0006`）**：v0.85.x–0.86.x 的 WP00–WP09 已把这套骨架填成完整的 **durable drive 运行时**——`HarnessNotImplemented` 删除（剩 `SliceNotImplemented`，仅个别 slice），`prompt`/`skill`/`compact`/`abort` 等均为持久化操作的真实实现（见 4.1 重写版）。下方"一句话总览"已按 4.1 修正，不再把 AgentHarness 描述成完整运作层。**v1.0.0 更正（`_change_log/0007`）**：上 述 runtime 已于 v1.0.0 整体移出 pi-agent-core（`packages/agent/src/harness/` 不复存在），4.1 已按 pi-durable 现实整篇重写；本目录中 4.2（skills）/4.7（harness tools）描述的 pi-agent-core 实现同样已删除，现役实现在 coding-agent。
 >
 > 关于本目录标题里的 "harness"：它是顶层 README 四种含义里的 **① 内部能力 harness**（扩展/Skill/工具如何进入 agent loop），**不是** ③ 的 `AgentHarness` 类。二者抽象层次不同，勿混淆。

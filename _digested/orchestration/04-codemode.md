@@ -1,5 +1,7 @@
 # 04 · codemode:模型写代码编排工具调用
 
+## 版本史
+
 codemode 是 v1.0.0 新增的官方包与 coding-agent 内置扩展能力。模型写 JS，在 QuickJS-WASM 中调用宿主注入能力；它编排的是工具调用，不是专用子代理原语。
 
 > **⚠️ v1.2.0：codemode 有**两份平行实现**，不是一次迁移。** 本页主体描述的是 **coding-agent 侧**（`packages/codemode` 独立包 + `packages/coding-agent/src/extensions/codemode/` 内置扩展）。v1.2.0 在 **durable 侧**又**独立新增**了一套 `packages/durable/src/codemode/`——它**不是**上述实现的下移或替代，两者并存、互不继承。差异见下节。

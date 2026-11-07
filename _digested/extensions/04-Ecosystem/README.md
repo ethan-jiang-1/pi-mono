@@ -1,5 +1,7 @@
 # 04-Ecosystem：极简核长出来的生态——现状、治理与发展
 
+## 版本史
+
 > **数据快照**：2026-09-21（pi.dev/packages 显示 **5372 个包**）。生态数据时效性极强，数字只代表快照当天；机制与治理结构相对稳定。
 >
 > **v1.0.0（2026-10-02 同步）生态事实修正**：① 官方**一级支持 MCP 客户端**——独立包 `packages/mcp`（零 pi 依赖 + OAuth）+ 内置 `mcp` 扩展（`/mcp`、`pi mcp add|list|login|logout`、`mcp.json`），下文"MCP 桥是核外补位"的论断相应软化，详见 [`_digested/harness/02-Boundaries/2.2_no_interop_protocol.md`](../../harness/02-Boundaries/2.2_no_interop_protocol.md) 的 v1.0.0 再评价；② 官方文档 `docs/providers.md` 更名 "Providers"、Radius 置顶（commit `c2f65d8f1`）。

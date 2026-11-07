@@ -1,5 +1,7 @@
 # 02-Boundaries — 扩展的边界：四条短板，以及"吸纳新东西"的真实代价
 
+## 版本史
+
 > 本节回答 `harness/` 的第二个问题：**好不好扩展，边界在哪。** [01-Architecture](../01-Architecture/README.md) 证明了"结构优秀"，本节专门讲**反方向**——哪些能力"理论上能做，但没护栏 / 没契约 / 只挂在 experimental 路径上"，避免高估 pi 的开放度。
 >
 > **2026-09-10 基线升到 `v0.85.1`：2.3 整篇重写。** 它原来的短板论断（内层 harness 是半成品）被 upstream 反证——`UnavailableRegistry`/`HarnessNotImplemented`/`coding-agent/src/server/` 全部不存在，22 个公开方法只剩 `watchSession` 一个 stub。边界**没有消失，而是上移了一层**：从"能不能跑"变成"跑在谁的路径上、有没有兼容承诺"。

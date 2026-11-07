@@ -1,5 +1,7 @@
 # harness/ — pi 作为 harness 平台的评价层
 
+## 版本史
+
 > v1.4.0 时写的是"本区间事件面无新增（`types.ts` 逐字节未变）"——**v1.5.0 已不成立**：`core/extensions/types.ts` +27/−3（三笔提交：`#11630` keybinding hints、`#11471` blocked program status、messageId/timestamp）。本轮 harness 侧真正的变化在 **durable**：`watchEvents()`/`AgentEvent` 整套删除，改 `ConversationView` 窗口化 + `observeCommits()`；`Storage.commit()` 换形；进度写入 deferred。行号与计数按 v1.5.0 重锚。
 >
 > **上一基线**：`v1.2.0`（tag `06a466935`）。此前为 `v1.0.0`（tag `a13d35a74`）。源码锚点对应 v1.4.0 tag；本区间内的实质变化见下条。本目录是 2026-08-24 新增的评价维度，与 [`agent/`](../agent/)（机制解剖）和 [`integration/`](../integration/)（外部嵌入）并列。

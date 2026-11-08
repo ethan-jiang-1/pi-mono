@@ -1,8 +1,8 @@
 # 07 · durable tasks:实验性的持久编排层
 
-## 版本史
-
 `packages/durable` 是 pi 阶梯上唯一把**编排状态本身变成持久事实**的一级:任务、对话、工具调用全部先落存储再展示,"If the process dies mid-turn, reopening the storage picks the work up where it stopped"(`packages/durable/README.md:3-5`)。它提供 child tasks、join policy、owned conversations(subagent)与自底向上 abort——pi 版"重型编排"的完整形态,但 **experimental,API 随版本变动不另行通知**(`README.md:3`)。
+
+## 版本史
 
 > **⚠️ v1.2.0：durable 不再只是"任务运行时",已扩成"工具执行内核"（sync-0009）**。本区间把 durable 的能力面显著加宽，本页原有结论仍然成立但**不完整**。新增面（均为 v1.2.0 in-tag）：
 >

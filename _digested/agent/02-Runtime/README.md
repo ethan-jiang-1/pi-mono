@@ -1,11 +1,5 @@
 # 02-Runtime: Agent 运行时
 
-## 版本史
-
-> **⚠️ v0.84.2 基线（2026-08-17）**：本节正文基于 v0.75.3 编写，v0.83.0/v0.84.0 有重大 API 演进（`AgentEvent`→`AgentSessionEvent`、`ExecutionEnv`→`Models`、`Engine`→`Agent` 等），各篇以警示标注为准；`v0.84` 新增 `2.7_Cancellation`。
-
-本节拆解 pi-mono `@earendil-works/pi-agent-core` 包中 Agent 的一次完整 prompt→response→tool→response 回合是如何被驱动、流转与约束的。七篇文档分别聚焦一个横切关注点，按问题驱动的阅读路径组织。
-
 ## 问题驱动阅读路径
 
 ### "为什么一次回答会拆成多个 turn？"
@@ -43,3 +37,11 @@ Session 是一个 append-only 树形结构。**注意模型归属**：coding-age
 | 2.5 | Session Service | Session tree 模型、SessionStorage 接口、JSONL 存储、上下文重建 |
 | 2.6 | Queue Modes | steering/followUp 双队列、QueueMode（all/one-at-a-time）、SingleFlight |
 | 2.7 | Cancellation | AbortController 传播链、abort 后的事件表面、扩展 abort 支持 |
+
+---
+
+## 版本史
+
+> **⚠️ v0.84.2 基线（2026-08-17）**：本节正文基于 v0.75.3 编写，v0.83.0/v0.84.0 有重大 API 演进（`AgentEvent`→`AgentSessionEvent`、`ExecutionEnv`→`Models`、`Engine`→`Agent` 等），各篇以警示标注为准；`v0.84` 新增 `2.7_Cancellation`。
+
+本节拆解 pi-mono `@earendil-works/pi-agent-core` 包中 Agent 的一次完整 prompt→response→tool→response 回合是如何被驱动、流转与约束的。七篇文档分别聚焦一个横切关注点，按问题驱动的阅读路径组织。

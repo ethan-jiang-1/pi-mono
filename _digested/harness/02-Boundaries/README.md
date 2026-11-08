@@ -1,13 +1,5 @@
 # 02-Boundaries — 扩展的边界：四条短板，以及"吸纳新东西"的真实代价
 
-## 版本史
-
-> 本节回答 `harness/` 的第二个问题：**好不好扩展，边界在哪。** [01-Architecture](../01-Architecture/README.md) 证明了"结构优秀"，本节专门讲**反方向**——哪些能力"理论上能做，但没护栏 / 没契约 / 只挂在 experimental 路径上"，避免高估 pi 的开放度。
->
-> **2026-09-10 基线升到 `v0.85.1`：2.3 整篇重写。** 它原来的短板论断（内层 harness 是半成品）被 upstream 反证——`UnavailableRegistry`/`HarnessNotImplemented`/`coding-agent/src/server/` 全部不存在，22 个公开方法只剩 `watchSession` 一个 stub。边界**没有消失，而是上移了一层**：从"能不能跑"变成"跑在谁的路径上、有没有兼容承诺"。
->
-> **v1.0.0（2026-10-02，见 [`_change_log/0007`](../../_change_log/0007-v0.86.1-to-v1.0.0.md)）**：2.2 重写为"MCP 采纳与互操作"——MCP 客户端已落地（`packages/mcp` + 内置扩展），ACP 仍缺席；2.3 的内层 harness 整体移出 pi-agent-core、由独立包 `packages/durable` 事实承接。两条短板都换了位置，详见各篇。
-
 ## 本节的立场
 
 "结构优秀"和"能安全吸纳陌生人的东西"是两件事。本节用一个统一的分辨器看待每条短板：
@@ -28,3 +20,13 @@
 - **每条短板必做"severity 分层"**：对"自用"是什么级别、对"吸纳陌生人"是什么级别，不能一概而论。
 - **每条短板必问"缓解路径"**：pi 有没有留出口（哪怕是 opt-in 的 example）、留了口但为什么不是默认。
 - 硬事实（源码可核）与评价（判断）分开标；机制回指 `../../agent/` 与 `../01-Architecture/`。
+
+---
+
+## 版本史
+
+> 本节回答 `harness/` 的第二个问题：**好不好扩展，边界在哪。** [01-Architecture](../01-Architecture/README.md) 证明了"结构优秀"，本节专门讲**反方向**——哪些能力"理论上能做，但没护栏 / 没契约 / 只挂在 experimental 路径上"，避免高估 pi 的开放度。
+>
+> **2026-09-10 基线升到 `v0.85.1`：2.3 整篇重写。** 它原来的短板论断（内层 harness 是半成品）被 upstream 反证——`UnavailableRegistry`/`HarnessNotImplemented`/`coding-agent/src/server/` 全部不存在，22 个公开方法只剩 `watchSession` 一个 stub。边界**没有消失，而是上移了一层**：从"能不能跑"变成"跑在谁的路径上、有没有兼容承诺"。
+>
+> **v1.0.0（2026-10-02，见 [`_change_log/0007`](../../_change_log/0007-v0.86.1-to-v1.0.0.md)）**：2.2 重写为"MCP 采纳与互操作"——MCP 客户端已落地（`packages/mcp` + 内置扩展），ACP 仍缺席；2.3 的内层 harness 整体移出 pi-agent-core、由独立包 `packages/durable` 事实承接。两条短板都换了位置，详见各篇。

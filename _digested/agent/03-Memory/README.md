@@ -1,10 +1,6 @@
 # 03-Memory: 上下文管理与记忆压缩
 
-## 版本史
-
 本节拆解 pi-mono 如何在有限的 LLM context window 内管理日益增长的对话历史。五篇文档覆盖从"什么时候该压缩"到"压缩什么"到"怎么算 token"到"树的记忆结构"再到 v0.84 新的 session 存储模型的完整链路。
-
-> **⚠️ v0.84.2 基线说明**：3.1–3.3 已对照 v0.84.2 复核（各篇正文顶部声明"已复核至 v0.84.2"）但行号未逐篇逐行核对——关键锚点行号准确，部分行号可能因版本漂移略有偏差；3.4 描述的 agent 包 session 模型已被 v0.84.0 的 session v4 整体取代，接替分析见 3.5。
 
 ## 文件索引
 
@@ -43,3 +39,9 @@ Memory 系统与 02-Runtime 紧密耦合：
 - **Compaction 决策时机：** AgentSession 在 `agent_end` 后调用 `_checkCompaction()`，检查是否需要 auto-compaction。
 - **transformContext 钩子：** Runtime 的 `AgentLoopConfig.transformContext` 是另一个上下文裁剪的插入点（AgentMessage 级别，在 LLM 转换之前）。
 - **Session 树 vs Runtime 队列：** Runtime 的双循环（2.1）和双队列（2.6）产生消息 → Session 树（3.4）持久化所有消息和状态变化 → Compaction（3.1）在树路径上做截断。
+
+---
+
+## 版本史
+
+> **⚠️ v0.84.2 基线说明**：3.1–3.3 已对照 v0.84.2 复核（各篇正文顶部声明"已复核至 v0.84.2"）但行号未逐篇逐行核对——关键锚点行号准确，部分行号可能因版本漂移略有偏差；3.4 描述的 agent 包 session 模型已被 v0.84.0 的 session v4 整体取代，接替分析见 3.5。

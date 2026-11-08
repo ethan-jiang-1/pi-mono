@@ -1,10 +1,5 @@
 # 10i. 第八根轴：进程 / 环境轴
 
-## 版本史
-
-> 本篇 2026-09-10 追加（基线 v0.85.1）。前七条轴（10a-10g）切的是"往哪个口子挂能力"；本篇切的是另一个问题——"**这段代码跑在哪个进程 / 环境**"。
-> **⚠️ v1.0.0 增补**：进程轴的现实落点已变——pi-agent-core 的 harness/session 移入 `packages/durable`；experimental 侧 mini/micro 前端删除，现役演示是 `experimental/durable/`（单进程 durable Harness + SQLite + TUI）与 `pi-test.sh server|client`（worker 持 per-session SQLite）。机制叙述仍以 v0.85.1 取证为骨架，具体入口以 [`../architecture-next/README.md`](../../architecture-next/README.md) 与 [`../../integration/07-chord-and-facets.md`](../../integration/07-chord-and-facets.md) 的 v1.0.0 版为准。
-
 ## 用户问题
 
 我能不能不把 agent、UI、server 权威都塞在一个进程里？durable agent 跑在 worker 里、UI 跑在客户端、server 另有一份权威状态——这种时候"扩展"这个概念还成立吗？
@@ -74,3 +69,10 @@
 **例证 2（横切而非并列）**：`pi-example-plugin` 的 TUI 那份 bundle 里仍然要"注册一个 `/hello` 命令"（轴 1）。所以轴 8 不是替代轴 1，而是给轴 1 加上"跑在哪个进程"的标签。
 
 **例证 3（状态决定配置）**：不需要配任何东西——因为目前没有可安装的产品面。看到别处把 facet 描述成"pi 的扩展方式之一"时，先回去看那篇文档标的是规格还是现状。
+
+---
+
+## 版本史
+
+> 本篇 2026-09-10 追加（基线 v0.85.1）。前七条轴（10a-10g）切的是"往哪个口子挂能力"；本篇切的是另一个问题——"**这段代码跑在哪个进程 / 环境**"。
+> **⚠️ v1.0.0 增补**：进程轴的现实落点已变——pi-agent-core 的 harness/session 移入 `packages/durable`；experimental 侧 mini/micro 前端删除，现役演示是 `experimental/durable/`（单进程 durable Harness + SQLite + TUI）与 `pi-test.sh server|client`（worker 持 per-session SQLite）。机制叙述仍以 v0.85.1 取证为骨架，具体入口以 [`../architecture-next/README.md`](../../architecture-next/README.md) 与 [`../../integration/07-chord-and-facets.md`](../../integration/07-chord-and-facets.md) 的 v1.0.0 版为准。

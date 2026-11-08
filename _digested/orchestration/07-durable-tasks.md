@@ -138,7 +138,7 @@ v1.2.0 把调度器的内存占用从"见过的全部"改成"当前 live 的"（
 // v1.4.0
 commit(writes, adopt, context): Promise<Seq>
 
-// v1.5.0
+// 新旧对照
 commit(
   batches: readonly (readonly StorageWrite[])[],
   receive: (index: number, seq: Seq) => void,

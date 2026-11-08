@@ -151,7 +151,7 @@ test("harness runs multi-turn tool calling deterministically", async () => {
 3. **Coding Agent 的自愈调试天堂**：
    当负责维护仓库的 Coding Agent 重构了工具注册逻辑时，它只需运行该测试，毫秒级即可获知参数格式、钩子触发顺序是否被破坏，彻底摆脱外部网络的干扰。
 
-## v1.5.0 增补：faux provider 现在产出真实的 partial 参数
+## faux provider 现在产出真实的 partial 参数
 
 
 **变化**：faux provider 现在**流式输出 tool-call 参数的部分增量**，所以 `toolcall_delta` 事件里能看到逐步增长的参数，与真实 provider 一致（v1.4.0 及以前，faux 一次性给出完整参数）。
@@ -163,4 +163,4 @@ test("harness runs multi-turn tool calling deterministically", async () => {
 - 所有 provider（含 faux）都走 `ToolCallArgumentsStream` 增量累积，所以「每个 delta 只读一次」这件事可以被测试直接覆盖。
 - 交互式 tool renderer 现在**每帧最多执行一次**——测试若依赖「每个 delta 渲染一次」的计数需要改。
 
-**注意**：本轮 `packages/durable` 的测试面变化更大（`watchEvents()` 删除、`subscribeCommits`→`observeCommits`、watch 签名换形、deferred 进度），与 faux provider 无关但同属 v1.5.0 的测试适配面，见 [durable 的四组重写](../orchestration/07-durable-tasks.md#v150-的四组重写)。
+**注意**：本轮 `packages/durable` 的测试面变化更大（`watchEvents()` 删除、`subscribeCommits`→`observeCommits`、watch 签名换形、deferred 进度），与 faux provider 无关但同属本轮的测试适配面，见 [durable 的四组重写](../orchestration/07-durable-tasks.md#v150-的四组重写)。

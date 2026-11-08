@@ -27,7 +27,7 @@
 
 v1.0.0 的变化是把"持久会话事实层"从一套纸面 contracts 变成接盘者：`packages/agent` 的 harness/session/pico3 已删除，`packages/durable` 现在自带 Harness 运行时（task runtime、compaction、extensions、task graph view）和三种存储后端。
 
-## 三个新面（v1.2.0 后现存两个，chord 自 v1.5.0 起分 v1/v2 两页）
+## 三个新面（chord 分 v1/v2 两页）
 
 | 面 | 位置 | 角色 | 详见 |
 |---|------|------|------|

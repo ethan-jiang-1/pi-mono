@@ -52,7 +52,7 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 
 | 上游变化 | 需要复核的页 |
 |---|---|
-| 新 release tag 发布 | 全语料：逐页复核机制事实与行号，更新本页基线，不能只替换 URL |
+| 新 release tag 发布 | 全语料：逐页复核机制事实与行号，不能只替换 URL。基线版本号只在 `_digested/README.md` 与各 `_evidence/corpus.json` 声明，页内不重复 |
 | `ExtensionAPI` / `extensions/types.ts` 变化 | 卷一全部；卷三的扩展点地图 |
 | packages.md 发现规则、`pi` manifest、host 提供包清单变化 | 卷一新仓起步、术语页；卷三扩展点地图 |
 | `.pi/` prompts/skills 增减或合同变化 | 卷三对应页 |
@@ -304,13 +304,27 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 
 **同步流程（本目录）**
 
-1. 改 `_evidence/corpus.json` 的基线 tag/commit。
+1. 改 `_evidence/corpus.json` 的基线 tag/commit。基线版本号**只在这里声明**，页内不写。
 2. `node _digested/_evidence/tools/verify-evidence.mjs --corpus _pi_extension_agent_ready_development --repo .`：失败项 = 该 tag 里 locator 或引文变了，逐条改台账。
 3. `node _digested/_evidence/tools/render-evidence.mjs --corpus _pi_extension_agent_ready_development` 重生成附录。
 4. 正文**只在某条 claim 被证伪时**才改；纯坐标移动不产生正文 diff。
 5. `node _digested/_evidence/tools/check-prose.mjs --repo .` 与 `node verify.mjs` 收尾。
 
-`_faq_on_digested` 同构（`--corpus _faq_on_digested`，台账在 `_faq_on_digested/_evidence/`）。`_digested` 仍按“增量改写”处理：正文 `#L` 已清零，但不强制去除历史版本号。
+`_faq_on_digested` 同构（`--corpus _faq_on_digested`，台账在 `_faq_on_digested/_evidence/`）。
+
+**版本号放置规则（三个语料共通）**
+
+一个版本号只能出现在它确实承载信息的位置。页首横幅与正文的“当前基线”声明不算，它们只会在下次 bump 时过期。
+
+| 写什么 | 写在哪 |
+|---|---|
+| 当前基线 | `_digested/README.md` 的唯一声明源 + 各 `_evidence/corpus.json` 的 `baseline.tag` |
+| 某版本的机制变化、Breaking、因果 | `_digested/_change_log/NNNN-*.md` |
+| 页内“本页曾在 vX 是什么样” | 该页 `## 版本史` 节 |
+| 行号所属版本（如 `:121` 的版本坐标） | 保留版本号，否则坐标失去含义 |
+| 冻结的研究溯源（“本文取证于 vX”） | 保留，它是历史事实不是当前声明 |
+
+`check-prose.mjs` 会拒绝页内“当前基线/本页基线”字样。`_digested` 目前按 `--include-digested` 增量处理：正文 `#L` 已清零，历史版本号保留。
 
 ---
 

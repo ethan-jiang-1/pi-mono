@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Qwen Token Plan Individual now lists `qwen4-max` instead of the retired `qwen4-max-preview`
 ## [1.6.1] - 2026-11-25
 
 ### Added

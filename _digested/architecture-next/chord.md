@@ -33,7 +33,7 @@
 | 查询 | live queries（`self.query`，commit 步内重跑、只发 diff，按索引跳过不可能受影响的 read）；named queries（slice 14：contract 声明 `queries()`，owner 用 `self.queries` 实现）；`self.list`（固定书签分页、`more` 增量）；column sets（跨插件 `exists`/join） | 根 export（store 面） |
 | sync（experimental） | store outbox → remote slots：`uploadSession`/`pullSession`/`foldSession`/`FlushScheduler`；`diverged`/`behind`/`remote_empty`（1.6.1 起 writer epochs 已删除） | `./sync` |
 
-## 入口点（27 条 exports，全部核验自 `package.json`）
+## 入口点（26 条内容 exports + `./package.json` 指针，全部核验自 `package.json`）
 
 分组（运行位置见 `README.md` 的表）：**双端** `.`（contracts/errors/hosts/facets/documents/derives/natives/jobs/links/registries/store/client 共享面）、`./context`、`./delta`、`./json`、`./watch`、`./output`、`./sync`、`./sqlite`、`./telemetry-sqlite`、`./telemetry-ingest`；**存储适配** `./sqlite/node`、`./sqlite/cloudflare`、`./telemetry-sqlite/node`；**Node 侧** `./http`、`./workers`、`./compression`、`./workers/child`、`./plugins`、`./plugins/runtime`、`./app`、`./app/files`、`./surfaces`、`./tui/launcher`；**客户端** `./web`、`./react`、`./tui`。
 
@@ -55,11 +55,11 @@
 | v1 的 placement `hostNamed`/`hostFamily`、`GetOptions.at` | v2 的 host 归属在 contract 上声明（design §3/§5） |
 | v1 的 `PROTOCOL_VERSION = 4`、帧形状、window/pendingCap | v2 的 wire 在 design §22（`PROTOCOL_VERSION = 1`，1.5.1 加 `old`/trace 位时未 bump） |
 | v1 的 cell/`linger`/`retire`/async `get` 语义 | v2 的 documents/state/references（§6–§9、§11） |
-| 模块 `src/next`（146 `.ts`）+ `src/next-node`（29） | `src/` 21 个模块 + 根部 5 个 `.ts`，共 **315** 个 `.ts`（`node/` 72：app 23、http 13、plugins 12、surfaces 8、tui 7、workers 8） |
+| 模块 `src/next`（146 `.ts`）+ `src/next-node`（29） | `src/` 21 个模块 + 根部 5 个 `.ts`，共 **315** 个 `.ts`（`node/` 72：app 23、http 13、plugins 12、surfaces 8、tui 7、workers 8、根部 `compression.ts` 1） |
 
 ## 锚点
 
-- `packages/chord/package.json`：27 条 exports；deps `pi-schema` + `pi-telemetry`（pin 1.6.1）；optional peers `esbuild`/`ws`/`react`（ranges）
+- `packages/chord/package.json`：26 条内容 exports + `./package.json` 指针；deps `pi-schema` + `pi-telemetry`（pin 1.6.1）；optional peers `esbuild`/`ws`/`react`（ranges）
 - `packages/chord/CHANGELOG.md`：8 段（1.2.0–1.6.1；1.5.1 是"v2 转正 + v1 删除 + slices 9–13"集中版）
 - `packages/chord/README.md`：对象模型摘要 + 全部入口点表（写本页时的对照基准）
 - `packages/chord/docs/`：28 篇 md + 17 个目录（design/decisions/slices/plugin-authoring + 专题目录）

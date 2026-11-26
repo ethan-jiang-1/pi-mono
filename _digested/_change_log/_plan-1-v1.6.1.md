@@ -5,7 +5,7 @@
 **起始基线**: `v1.5.0` = `f9a263655`（本仓库 `ethan` 分支）
 **合入**: merge tag `v1.6.1` → `a1e6c97e6`（**零冲突**；本地 127 commits 全 docs，upstream 不触碰）
 **追加 cherry-pick**: `b18ec60b2`（= upstream `22f5f2995`，#12552）。原因：models.dev 在 v1.6.1 发布后给 `@cf/moonshotai/kimi-k2.6`/`kimi-k2.7-code`（Cloudflare 11-20 弃用）与 `qwen4-max-preview`（11-25 退役）打了 deprecated 标，catalog 的 `skipDeprecated: true` 把它们从再生成数据里跳过，v1.6.1 自带的 tracked 测试引用即失败——**v1.6.1 tag 本身已无法通过 `npm run check`**，upstream 在 post-tag 当天修复。这是对"不追 main tip"口径的**最小例外**（仅此一个纯修复 commit，经用户确认 changelog 冲突解法后落地；`packages/*/CHANGELOG.md` 冲突按"只取本 commit 条目"解决，不引入同批无关条目）。
-**本地缓存注记**：`data/together.json`（gitignored）另手工补回 `openai/gpt-oss-120b` 与 `deepseek-ai/DeepSeek-V4-Pro-0813` 两条——models.dev 数据仍在但已标 deprecated 被 skip，tracked 测试引用它们；条目取自实时 models.dev 真实数据并按 catalog 规则烘焙 compat/thinkingLevelMap，仅绕过 skip 过滤。下次全量 hydrate 会再清掉，届时以 upstream 对 together 的正式修复为准（upstream main 现同样坏着）。
+**together 处置（终版，取代早先的手补缓存方案）**：`togetherai` 在 models.dev 仍有 27 个模型，但 `openai/gpt-oss-120b` 与 `deepseek-ai/DeepSeek-V4-Pro-0813` 被标 deprecated，被 `skipDeprecated: true` 跳过 → tracked 的 `together-models.test.ts` 引用失败。手补 gitignored 缓存的方案被否决——`npm run build` 与 ai 包测试套件都会触发再生成，补丁必被清掉（实测两次）。最终修复走 upstream 同款路：**改测试本身**——两个用例改引用现存模型（`Qwen/Qwen4-Max`、`deepseek-ai/DeepSeek-V4.1-Flash`，均非 deprecated、regen 稳定），断言按实时数据派生值重写，附 drift 注释。tracked 漂移 2 个用例，与 upstream 将来的 together 修复方向一致。
 **Discovery 记录**: `0012-v1.5.0-to-v1.5.1.md` / `0013-v1.5.1-to-v1.5.2.md` / `0014-v1.5.2-to-v1.6.0.md` / `0015-v1.6.0-to-v1.6.1.md`（先于执行产出，合入后补记"合入范围"行）
 **摘要**: 未单列（四篇 Discovery 记录即摘要；本计划即执行台账）
 

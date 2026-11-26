@@ -12,6 +12,7 @@ import type { PiMessagesOptions } from "./api/pi-messages.ts";
 import type {
 	AnthropicMessagesCompat,
 	BedrockCompat,
+	GoogleCompat,
 	MistralConversationsCompat,
 	OpenAICompletionsCompat,
 	OpenAIResponsesCompat,
@@ -36,6 +37,7 @@ export type {
 	AnthropicMessagesCompat,
 	BedrockCompat,
 	ChatTemplateKwargValue,
+	GoogleCompat,
 	MistralConversationsCompat,
 	OpenAICompletionsCompat,
 	OpenAIResponsesCompat,
@@ -83,7 +85,8 @@ export type KnownClassifierApi =
 	| "typesafe-system-one"
 	| "cloudflare-workers-ai-system-one"
 	| "llama-cpp-classify"
-	| "openai-decisions";
+	| "openai-decisions"
+	| "pi-decision";
 
 export type ClassifierApi = KnownClassifierApi | (string & {});
 
@@ -126,6 +129,7 @@ export type KnownProvider =
 	| "qwen-token-plan"
 	| "qwen-token-plan-cn"
 	| "qwen-token-plan-individual"
+	| "qwen-token-plan-individual-cn"
 	| "xiaomi"
 	| "xiaomi-token-plan-cn"
 	| "xiaomi-token-plan-ams"
@@ -180,7 +184,9 @@ export interface ProviderRequestOptions<TModel = Model<Api>> {
 	 */
 	onPayload?: (payload: unknown, model: TModel) => unknown | undefined | Promise<unknown | undefined>;
 	/**
-	 * Optional callback invoked after an HTTP response is received.
+	 * Optional callback invoked after each HTTP response is received, including error responses and
+	 * responses to retried attempts. Coverage depends on provider and transport: some report empty headers or
+	 * only some responses.
 	 */
 	onResponse?: (response: ProviderResponse, model: TModel) => void | Promise<void>;
 	/**
@@ -219,8 +225,9 @@ export interface ProviderRequestOptions<TModel = Model<Api>> {
 
 export interface StreamOptions extends ProviderRequestOptions<Model<Api>> {
 	/**
-	 * Optional callback invoked after an HTTP response is received and before
-	 * its body stream is consumed.
+	 * Optional callback invoked after each HTTP response is received, including error responses and
+	 * responses to retried attempts. Successful responses are reported before their body stream is consumed.
+	 * Coverage depends on provider and transport: some report empty headers or only some responses.
 	 */
 	onResponse?: (response: ProviderResponse, model: Model<Api>) => void | Promise<void>;
 	/**
@@ -255,6 +262,13 @@ export interface StreamOptions extends ProviderRequestOptions<Model<Api>> {
 	 * session-aware features. Ignored by providers that don't support it.
 	 */
 	sessionId?: string;
+	/**
+	 * Do not use or record server-side continuation state for this request (for example
+	 * Anthropic message threads). Set this for replays such as cache warming, which must not
+	 * replace the state of the real conversation. Providers that do not keep continuation
+	 * state ignore it.
+	 */
+	disableContinuation?: boolean;
 	/**
 	 * WebSocket connect timeout in milliseconds for providers that support
 	 * WebSocket transports. This covers the connection/open handshake only;
@@ -735,8 +749,13 @@ export interface ClassifierResult {
 	provider: ProviderId;
 	model: string;
 	answers: Record<string, ClassifierAnswer>;
-	/** Token usage and its cost at the model's catalog price, when the service reports token counts. */
+	/**
+	 * Token usage and its cost, when the service reports token counts. The cost is the model's catalog price,
+	 * or the billed amount (`cost.totalFromProvider`) when the service reports one, such as OpenRouter.
+	 */
 	usage?: Usage;
+	/** Provider-specific response identifier when the service reports one, such as OpenRouter's generation ID. */
+	responseId?: string;
 	stopReason: ClassifierStopReason;
 	errorMessage?: string;
 	timestamp: number; // Unix timestamp in milliseconds
@@ -885,7 +904,9 @@ export interface Model<TApi extends Api> extends BaseModel<TApi> {
 					? BedrockCompat
 					: TApi extends "mistral-conversations"
 						? MistralConversationsCompat
-						: never;
+						: TApi extends "google-generative-ai" | "google-vertex"
+							? GoogleCompat
+							: never;
 }
 
 /** Image-generation model: usable with `generateImages()` only. */

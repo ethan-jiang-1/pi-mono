@@ -250,3 +250,11 @@ v1.2.0 新增 OSC 7501 程序状态上报：支持的终端与 agent dashboard �
 - **退出时恢复终端模式**（#11170）：不调 `stop()` 的退出路径（如 `process.exit()`）此前会把 mouse tracking / focus reporting / Kitty keyboard / alternate screen 留在终端里；本基线 用 `process.on("exit")` 同步写恢复序列（`src/tui.ts:953,575-590`、`terminal.ts:527-540`）。**硬杀/原生崩溃仍不覆盖**。
 - **Markdown**：未闭合 `$$` 不再吞掉后续 GFM 表格（`markdown.ts:107,122-136`）；CJK 标点旁的粗/斜体改用 `marked-cjk-friendly` 覆盖 tokenizer（`:194-197`）。
 - **`@` 补全**：修的是 fd 正则被 `[`/`(` 破坏后返回空（`autocomplete.ts:24` 加 `escapeRegex`）；模糊匹配本身未变。
+
+## sync-0012–0015 增量（v1.5.1→v1.6.1，基线 v1.6.1）
+
+- **`Ctrl+P` 轮换语义修复（v1.5.1，#11806）**：活动模型在作用域外时，Ctrl+P 切到作用域内唯一模型（此前误报 "Only one model in scope"）；从作用域外模型前向循环也会选中第一个作用域内模型而不是跳过。上表"轮换到下一个模型"的描述在单模型作用域下行为已修正。
+- **Windows/WSL 粘贴快捷键（v1.5.1，#11765）**：`Ctrl+V` 与 `Alt+V` 都是默认粘贴快捷键（此前 Ctrl+V 在 Windows/WSL 不生效）；Tabby 终端右键粘贴双写的冲突也已修（v1.6.1 #12406）。
+- **`Ctrl+O` 展开状态（v1.5.1，#11875 / v1.6.1）**：agent 运行中 `!`/`!!` 命令输出也能展开/折叠；新输出继承当前展开状态，compaction//reload//resume//tree 后保持。
+- **SIGTSTP 挂起恢复（v1.6.0，#12283）**：`kill -TSTP` 外部挂起现在等同 Ctrl+Z——恢复终端状态、`fg` 后重绘（此前留下 mouse tracking/Kitty 报告污染 shell）。`TUI.setSuspendSignalHandler()` 为嵌入方暴露同一能力。
+- **启动前对话框也上报程序状态（v1.6.1，#12439）**：项目信任、首次设置等启动前对话框现在发 OSC 7501 blocked（`kind=permission`）；`ctx.ui.select()/confirm()/input()` 增 `blockedKind`（`"permission"/"question"/"login"`）。

@@ -3,8 +3,8 @@
 ## 钉定基线
 
 - 仓库：`earendil-works/pi`
-- 基线：release tag `v1.5.0`，commit `f9a263655`（`Release v1.5.0`）。
-- 上一基线：`v1.4.0`，commit `4a080252f`。0017 轮从 `v1.4.0` re-pin 到 `v1.5.0`（见本文件 0017 轮）。
+- 基线：release tag `v1.6.1`，commit `ef4a1cfcc`（`Release v1.6.1`）。
+- 上一基线：`v1.5.0`，commit `f9a263655`。0018 轮从 `v1.5.0` re-pin 到 `v1.6.1`（见本文件 0018 轮）。
 - 更早基线：`v1.2.0`，commit `06a466935`。0015 轮从 `v1.2.0` re-pin 到 `v1.4.0`（跨 v1.3.0）。
 - 更早基线：`v1.0.3`，commit `d78dc83d6`（0006 轮从 `v1.0.3` re-pin 到 `v1.2.0`）。
 - 这是本轮核验版本，不是永久前提。Pi 处于活跃开发期，接口与主仓制度都会演进；更新版本时应逐条复核并改写过时结论，不能只替换链接。
@@ -390,3 +390,14 @@ re-pin 的**机械替换部分**只改了 362 条外链的 tag 段，并修掉�
 
 1. **post-tag 的 270 commit 不追**（`085c84e98` 起，含 p2 web UI 重构）。本轮 pin 的是 release tag `v1.5.0`，不是 `upstream/main`。留给 0012 轮，并且必须在那里重新决定"pin tag 还是 pin main"这条口径。
 2. **FAQ 的 P3.5 完整 `#L` 锚点迁移仍不做**（六个热点页、404 个锚点）。本轮只做重钉与内容层修正。
+
+## 0018 轮：re-pin v1.5.0 → v1.6.1
+
+基线 `f9a263655`（v1.5.0 tag）→ `ef4a1cfcc`（v1.6.1 tag）。区间跨 4 个 release（v1.5.1/v1.5.2/v1.6.0/v1.6.1）：878 commit / 4,598 文件 / +425,371−51,106；merge tag `v1.6.1` 进本仓库 `ethan` 分支为 `a1e6c97e6`（零冲突）。上游逐项 Discovery 见 `_digested/_change_log/0012`–`0015`（语料外路径，不建链接）。
+
+- **台账 re-pin**（`_evidence/claims.json`，共享 `_digested/_evidence/tools/verify-evidence.mjs`）：10 条 stale 全部修复——`AGENTS.md` Commands 两条规则引文（v1.5.1 措辞）、`package.json` 的 `version:patch`/`test`（`--workspaces` → `--workspace packages`）、`release.mjs` 步骤 1（新增 npm 11 检查）与 `Main flow` 锚点、`issue-triage-labels.yml` 的 `not_planned` 关闭逻辑（该文件瘦身 87 行，行为移出）、`codemode.md` 首句（新增决策/图像模型表述）、根 README 与 chord README 的 chord 行/首段（chord v2 转正）。**E071 删除**：`scripts/issues/` 已于 v1.5.1 整体删除，条目与其在卷二 02 页的引用一并移除（页面改为历史横幅）。全量 `checkedAt` → `v1.6.1`；盲跑 0 stale。
+- **`verify.mjs` 的 `BASELINE_TAG`** 从 `v1.5.0` 改成 `v1.6.1`；语料 md 全部通过。
+- **`corpus.json`** `baseline.tag`/`commit` 同步到 `v1.6.1`/`ef4a1cfcc`。
+- **外链 tag 段**：7 处 `tree|blob|commit/v1.5.0` 机械改写为 `v1.6.1`（根 README、三卷 README、00-index）；各卷"基线时点"声明同步。
+- **随基线变更改写的正文结论**：卷三 01 页 build 规则引文补 Chord/Durable 完整套件需先 build 的说明、新增 apps/p2 在根检查之外的 blockquote；卷二 07 页 `version:patch` 现文（`--workspace packages` + `--no-workspaces-update` + lockfile 刷新）与步骤 1（npm 11）；卷二 04 页根 `npm test` 构成现文；卷二 01 页 `issue-triage-labels` 的 `not_planned` 关闭行为移出、关单标签清理改由 `remove-labels-on-close.yml`（新增于 v1.6.0）承担；卷二 02 页 `scripts/issues` 历史横幅；卷三 07 页包表括注更新（v1.6.1 仍为 12 包 / 11 公开）。
+- **`AGENTS.md` 四轮新增规则**（禁运行时检查类型已保证值 / 修法先看 sibling / tagged union 禁 `in` / Reviews 节）与 **Chord v2 Code Style 绑定范围 `src/next/` → `src/`** 已在卷三 01 页的规则清单语境内核对，正文引用的规则以 blockquote 为准。

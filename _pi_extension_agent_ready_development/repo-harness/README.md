@@ -8,7 +8,7 @@
 
 ## 证据基线
 
-一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.5.0) tag `v1.5.0`（commit `f9a263655`）核对。关键规则以 blockquote 摘录仓库原文，并附该 tag 的钉版链接（行号锚点以 tag 实际行号为准）。当前工作树的 HEAD 在该 tag 之后，个别文件已漂移；本卷不引用工作树版本。需要自行核对时使用：
+一切机制事实对着 [`earendil-works/pi`](https://github.com/earendil-works/pi/tree/v1.6.1) tag `v1.6.1`（commit `ef4a1cfcc`）核对。关键规则以 blockquote 摘录仓库原文，并附该 tag 的钉版链接（行号锚点以 tag 实际行号为准）。当前工作树的 HEAD 在该 tag 之后，个别文件已漂移；本卷不引用工作树版本。需要自行核对时使用：
 
 ```sh
 git show <baseline>:<path>
@@ -45,7 +45,7 @@ git show <baseline>:<path> | sed -n '<N>p'
 
 ## 本卷不做什么
 
-本卷不复制 Pi 的 API 文档：需要 `ExtensionAPI` 签名、事件清单或示例代码时，直接读 [extensions.md](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md) 与其它官方文档，本卷只讲它们在「仓库作为 harness」里的角色。本卷也不把 pi-mono 的贡献制度（auto-close、`lgtm`、lockstep 发布）推荐为扩展仓制度——那是主仓在自身流量与维护者带宽下的选择，扩展仓应按自己的规模自定（仓库自定）。更长的计划与设计讨论见主仓指向的 RFC 索引（`rfc.earendil.com/keyword/pi/`），其内容不属于本卷证据链。
+本卷不复制 Pi 的 API 文档：需要 `ExtensionAPI` 签名、事件清单或示例代码时，直接读 [extensions.md](https://github.com/earendil-works/pi/blob/v1.6.1/packages/coding-agent/docs/extensions.md) 与其它官方文档，本卷只讲它们在「仓库作为 harness」里的角色。本卷也不把 pi-mono 的贡献制度（auto-close、`lgtm`、lockstep 发布）推荐为扩展仓制度——那是主仓在自身流量与维护者带宽下的选择，扩展仓应按自己的规模自定（仓库自定）。更长的计划与设计讨论见主仓指向的 RFC 索引（`rfc.earendil.com/keyword/pi/`），其内容不属于本卷证据链。
 
 ## 与其它卷的关系
 

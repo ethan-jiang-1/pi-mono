@@ -154,7 +154,7 @@ commit(
 
 `receive(index, seq)` 是**持久化回执，不是发布**：所有 batch 落盘后按序、同步、在下一次 commit 开始前各调一次。发布由 Session 后做，可选钩子 `publishing(publish, ctx)`（`types.ts:1352`）把发布放进 storage 自己的 scope。
 
-连带三条：`mintId()` 的契约**收窄**（大于本次打开以来铸过的、以及所有已存的 ID，跨 reopen 也成立）；`commitSeries` 新增在 chord v2 的 store 上（`chord/src/next/store/store.ts:323`）并被 `StoreStorage` 用作 Session 提交的实现；测试播种改用 `commitWrites(storage, writes, context)`（单 batch，resolve seq，拒绝时抛错）。
+连带三条：`mintId()` 的契约**收窄**（大于本次打开以来铸过的、以及所有已存的 ID，跨 reopen 也成立）；`commitSeries` 新增在 chord v2 的 store 上（v1.5.1 起 v2 转正，路径从 `src/next/store/` 升为 `chord/src/store/`；返回值 `SeriesResult` 自 1.6.1 是 tagged union）并被 `StoreStorage` 用作 Session 提交的实现；测试播种改用 `commitWrites(storage, writes, context)`（单 batch，resolve seq，拒绝时抛错）。
 
 #### (B) 观察模型：`watchEvents()` 没了
 

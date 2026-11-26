@@ -178,3 +178,14 @@ const { session } = await createAgentSession({
 - **`kimi-coding` 改走 OpenAI Chat Completions**（`https://api.kimi.com/coding/v1`）：对 `models.json` 的 base URL 覆盖现在**必须带 `/v1`**，否则请求打错路径。
 - **切模型时丢弃旧模型的 thinking block**（v1.3.0）：不再把它当纯文本发给新模型；否则新模型会看到旧模型的推理并可能写进正文。GPT-6（API key）中途改 thinking level 则保留 prompt cache。
 - 新增 `MiniMax-M3.1-Flash`（minimax / minimax-cn，thinking low…max；**不能关闭**思考）。
+
+## sync-0012–0015 增量（v1.5.1→v1.6.1，基线 v1.6.1）
+
+- **默认模型两轮大换（v1.5.1 + v1.6.0）**：Anthropic → **Claude Opus 5.5**（原 Opus 4.8）；`openai`/`azure`/`openai-codex` → **GPT-6.2 Sol**（原 GPT-6.1 Sol，v1.6.0）。同轮多 provider 默认平移：amazon-bedrock → Claude Opus 5.5；google/google-vertex → Gemini 4 Argon；vercel-ai-gateway/baseten → GLM 5.3；minimax(-cn) → MiniMax-M3；qwen-token-plan(-cn) → Qwen3.8 Max；opencode-go → Kimi K3.1 Pro；moonshotai(-cn)/huggingface/opencode/openrouter/cloudflare-* → Kimi K2.7 Code（原 K2.6）。依赖"某 provider 默认是 X"的脚本需再复核。
+- **`/login` 列表重排（v1.5.1）**：伙伴 Radius 与 OpenRouter 排最前（✦ 标记、品牌色高亮），其余按字母序。
+- **Ctrl+P 单模型作用域修复（v1.5.1，#11806）**：活动模型在作用域外时，Ctrl+P 现在切到作用域内唯一模型（此前误报"Only one model in scope"）；从作用域外模型前向循环也会选中第一个作用域内模型。
+- **选择器抗后台刷新（v1.5.1，#9109）**：模型选择器与 llama.cpp HF 搜索不再因后台 catalog 刷新/搜索结果到达而跳动。
+- **搜索高亮修复（v1.6.0，#12245）**：`/login`、`/logout`、`/scoped-models`、`/resume` 搜索时高亮 best match（此前停在滚动前位置）；方向键在搜索框移动光标不再把高亮重置到第一项。
+- **模型恢复提示全模式化（v1.6.0）**：`Could not restore model <provider>/<model>` 在 print/JSON/RPC 也上报（此前仅 interactive 启动时）；resume/fork 到模型已消失的 session 不再静默换模型。
+- **目录退役清理（v1.6.1，#12202）**：移除已关闭的 `gpt-5-chat-latest`（openai/azure）、Groq `llama-3.1-8b-instant`/`llama-3.3-70b-versatile`/`qwen/qwen3.6-27b`、未文档化的 `mistral-medium-3.5`；Mistral 默认 → `mistral-medium-latest`（Devstral 退役）。
+- **决策模型进入模型面（v1.5.1/v1.6.1）**：GitHub Copilot `microsoft-decision-1` → `gpt-6-luna-decisions`（可带图像），Radius 决策模型；登录后只列账号可用的决策模型（修不可用模型导致的 400，#12395）。codemode `models.classify()` 可调用，结果带 `responseId`。

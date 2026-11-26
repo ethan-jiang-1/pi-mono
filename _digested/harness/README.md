@@ -2,6 +2,8 @@
 
 ## 版本史
 
+> **sync-0012–0015（v1.5.1→v1.6.1，基线 v1.6.1 `ef4a1cfcc`）**：本目录的受影响面在 **AGENTS.md 与 check 链**（评价对象是治理面）——四轮新增三条 Code Quality 规则（禁运行时检查类型已保证值 / 修法先看 sibling / tagged union 禁 `in`）与 Reviews 节；Chord v2 Code Style 绑定范围从 `src/next/` 扩到全包（路径 `docs/next`→`docs`、`test/next/examples`→`test/examples`）；新三节为 apps 层立法（p2 插件 / p2 Web UI / p3）；`apps/p2` 划出根 check/测试，Chord/Durable 完整套件需先 `npm run build`；check 链 8→9 步（v1.5.0 加 examples tsc），v1.6.0 增链外 `check:released-changelogs`。durable 的 ToolPark/Signals/Gates 等机制变化记在 [`../architecture-next/durable-and-storage.md`](../architecture-next/durable-and-storage.md)，本目录不复述机制。[3.4](03-Discipline/3.4_engineering_rules.md) 已补"sync-0012–0015 规则变化"节；其余篇目经影响矩阵核对无受影响断言。
+>
 > v1.4.0 时写的是"本区间事件面无新增（`types.ts` 逐字节未变）"——**v1.5.0 已不成立**：`core/extensions/types.ts` +27/−3（三笔提交：`#11630` keybinding hints、`#11471` blocked program status、messageId/timestamp）。本轮 harness 侧真正的变化在 **durable**：`watchEvents()`/`AgentEvent` 整套删除，改 `ConversationView` 窗口化 + `observeCommits()`；`Storage.commit()` 换形；进度写入 deferred。行号与计数按 v1.5.0 重锚。
 >
 > **上一基线**：`v1.2.0`（tag `06a466935`）。此前为 `v1.0.0`（tag `a13d35a74`）。源码锚点对应 v1.4.0 tag；本区间内的实质变化见下条。本目录是 2026-08-24 新增的评价维度，与 [`agent/`](../agent/)（机制解剖）和 [`integration/`](../integration/)（外部嵌入）并列。

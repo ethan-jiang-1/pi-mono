@@ -4,8 +4,10 @@
 >
 > **三条存储层变化**（sync-0011，详见 [orchestration/07](../orchestration/07-durable-tasks.md#v150-的四组重写)）：
 > 1. **`Storage.commit(batches, receive, context)`** 取代 `commit(writes, adopt, context)`；每个 batch 各自一个 seq、各自原子，检查看得到前面的 batch；首个被拒的 batch 不入库而其前的入库；其他失败整体 reject。（`packages/durable/src/types.ts:1340-1346`）
-> 2. **`StoreStorage`**：Durable 的 `Storage` 落在 Chord v2 的 store 上，每次 Session commit 经 `ChordStore.commitSeries()`（`chord/src/next/store/store.ts:323`）走一次后端事务。
+> 2. **`StoreStorage`**：Durable 的 `Storage` 落在 Chord v2 的 store 上，每次 Session commit 经 `ChordStore.commitSeries()`（v1.5.1 起 `chord/src/next/` 升为 `chord/src/store/`；`SeriesResult` 自 1.6.1 是 tagged union `{ kind: "stored" | "refused" }`）走一次后端事务。
 > 3. **进度写入 deferred**：`settings.progress.persistWithinMs`（默认 1,000 ms）决定流式内容最迟何时落盘；SQLite 事务少约 5.7×，代价是崩溃最多丢约 1 秒流式内容。
+>
+> **sync-0012–0015（v1.5.1→v1.6.1）四轮增量**：v1.5.1 加 `Tx.submission(id)`、按会话 compaction 设置（`configure({ compaction })`）、JSONL `{ readOnly: true }` 打开、`SqliteStorage.commit()` 成本下调；v1.6.0 落地**可挂起工具**（ToolPark/Signals/Gates/Hooks 派生任务，见下文专节；`pi.tool` v4 / `pi.generation` v3，新库不可被旧 Harness 打开）；v1.6.1 全 API **tagged-union 扫荡**（`CommitResult`/`ToolPark`/`Wrap`/`SignalState` 等改 `{ kind: ... }`，`submit(tx, draft)` 事务形式改名 `admit(tx, draft)`）。变更史：[_change_log/0012–0015](../_change_log/0012-v1.5.0-to-v1.5.1.md)。
 
 ## 它解决什么问题
 
@@ -48,19 +50,29 @@ v1.0.0 起它不再只是契约层：pi-agent-core 的 harness/session/pico3 被
 ### 运行时面（v1.0.0 主线，v1.4.0 改状态机）
 
 - **task runtime**：`defineTask`（`src/tasks.ts:4`）；registry 持有内置任务 Generation/Tool/Compaction（`src/harness/registry.ts:10`），应用经 `createRegistry()`（`registry.ts:112-114`）创建——`Harness.open` 校验注册表缺内置任务即抛错（`src/harness/harness.ts:538-563`）。
-- **状态机（v1.4.0 变更）**：`pending | running | waiting | sleeping | completing | terminal`（完整定义 `src/types.ts:599-641`；`:219` 只是 `NextTaskState`）。`sleeping` 是 v1.4.0 新增：任务结束 phase 但不持 invocation，`until` 到点后从 checkpoint 继续；`TaskGraphState` 加 `{status:"sleeping"}`（`harness/task-graph.ts:29`），`TaskInspection` 加 `{kind:"sleeping",until}`（`harness/types.ts:688`）。`completing` 是既有中间态，别漏。
+- **状态机（v1.4.0 变更）**：`pending | running | waiting | sleeping | completing | terminal`（完整定义 `src/types.ts:599-641`；`:219` 只是 `NextTaskState`）。`sleeping` 是 v1.4.0 新增：任务结束 phase 但不持 invocation，`until` 到点后从 checkpoint 继续（v1.6.0 起 `until` 可选：一次睡眠可以只等信号）；`TaskGraphState` 加 `{status:"sleeping"}`（`harness/task-graph.ts:29`），`TaskInspection` 加 `{kind:"sleeping",until}`（`harness/types.ts:688`）。`completing` 是既有中间态，别漏。
 - **等待 API（Breaking）**：`TaskRuntime.sleep()` 删除。替代是 `sleepUntil(until, checkpoint, ctx)`（`types.ts:324-330`）或从 `commit()` 返回 `{status:"sleeping",until,checkpoint}`（`:217-220,622-631`）；相位内的节拍用 `setTimer(cb, delayMs)`（`:312-317`，不持久）。
 - **crash-loop guard**：`settings.restartLimit` 默认 5（`harness/types.ts:572-577`、`agent.ts:57`）；`TaskRecord.restarts`（`types.ts:681-686`）在 open 时计数（`scheduler.ts:381-419`），达限 park（`blocked.reason="restart_limit"`），`Harness.retryTask(id)` 放行（`harness/types.ts:823`）。
 - **时钟与唤醒**：`HarnessOptions.setTimer`/`now`（`harness/types.ts:640-647`）让 sleep、progress 节流、idle 回收都跑在宿主时钟上；`Harness.wake()`/`onWake`（`:648-656,790-796`）让 Cloudflare DO 这类宿主体眠、靠 alarm 唤醒。
 - **失败后的队列策略**：`settings.afterFailedRun`（`:566-571`）= `keep`（默认）/`continue`/`withdraw`。
 - **结构化并发**：`TaskScheduler` 串行化于 Session line，任务/会话构成 ownership 树，abort 级联 + `completing` hold（`src/harness/scheduler.ts`，3,158 行）。
 - **compaction**：`CompactionTask`（`src/harness/compaction.ts:112`）+ `selectCut`（`:279`）；`settings.compaction.modelOverrides` 按 `"provider/modelId"` 给不同窗口的模型配阈值（`harness/types.ts:516-521`）；默认策略在 `src/harness/agent.ts:20-38`。
-- **extensions**：`defineExtension/defineTool/section/hook/wrapTool/wrapSection`（`src/harness/define.ts:6-43`）；安装制 registry：`install/uninstall` 按名替换/移除（`registry.ts:73-86`）；`Extension` 类型（`src/harness/types.ts:365`）。
+- **extensions**：`defineExtension/defineTool/section/hook/wrapTool/wrapSection`（`src/harness/define.ts:6-43`）；1.6.0 起 `afterTools`/`onYield` 可返回 `{ tasks }` 派生任务、`beforeTool` 可 park 调用，`RunEndTask`/`runEndTask` 因此改名 **`HookTask`/`hookTask`**；1.6.1 起 `Wrap`/`onYield` 结果/`beforeCompact` 结果全部 tagged；安装制 registry：`install/uninstall` 按名替换/移除（`registry.ts:73-86`）；`Extension` 类型（`src/harness/types.ts:365`）。
 - **documents**：`defineDoc`/`defineDocFamily` 现在**必须**给 `checkpointWhen`（`types.ts:78`，提交时直接调用而非可选链：`session/transaction.ts:868`）；内置 doc 分别用 `()=>true`（agent/provider/usage/inbox/live）与 `()=>false`（tool/codemode）。
 - **telemetry**：`HarnessOptions.telemetry`（`harness/types.ts:611`）接 `TelemetryContext`；`DURABLE_TELEMETRY_SCHEMA`（`harness/telemetry.ts:50`）定义 `pi.durable.submit`/`pi.durable.phase` 与三个 metric，phase 的 span 会透传给 pi-ai 请求（`harness/generation.ts:224-231`）。见 [5.3 Telemetry](../agent/05-Infra/5.3_Telemetry_Layer.md)。
 - **inbox/usage/view**：`InboxDoc`（`pi.inbox`，`src/harness/inbox.ts:21`）、`UsageDoc`（`pi.usage`，`src/harness/usage.ts:14`）、`ConversationView`（`src/harness/view.ts:25`；挂载表含 `ProviderDoc`）。
 - **task graph view**：`Harness.watchTaskGraph()`/`observeTaskGraph()`（**`taskGraph()` 已删除**；`src/harness/harness.ts:378-385`），从 commit publication 推进 owner 边/status，并把 `blocked` 原因暴露出来（`task-graph.ts:38-46`）。
 - **conformance**：`src/testing/storage-conformance.ts`（2,099 行）+ benchmark，经 `registerStorageConformance`（`runner.ts:13`）接入任意 Vitest/Jest 兼容 runner；第二条线 `src/testing/env-conformance.ts`（633 行，`registerEnvConformance`，`runner.ts:28`）验证执行环境，被 `pi-env` 的 conformance/ssh-external 测试直接消费。
+
+### 可挂起工具与信号（v1.6.0 落地，1.6.1 改 tagged flat）
+
+设计文档先于实现一个 release 落地（v1.5.2 的 `docs/suspendable/`）。核心：**工具的等待从任务睡眠下沉到工具自己会 park**。
+
+- **ToolPark**：`execute()` 返回 `Promise<ToolExecutionResult | ToolPark>`（`harness/types.ts:466`；类型 `:265`，机制在 `harness/parks.ts`）。park 形态 v1.6.1 起 tagged flat：`{ kind: "sleep", checkpoint?, until?, signals? }` 与 `{ kind: "wait", checkpoint?, on, policy }`（1.6.0 changelog 展示的 `{ sleep: ... }` 嵌套形式已废；result 无 `kind`）。被唤醒后带 `api.wake`/`api.checkpoint` 重跑 `execute()`。
+- **Signals**：`defineSignal({ name, version, schema, migrate? })`（`src/signals.ts`）定义类型化 JSON 值；`harness.signal(taskId, token, key, value, context)` 或 `tx.signal()` 从外部投递给活任务。睡眠可以只等信号（`until` 可选）；wait 可 `policy: "any"`（`on` 中任一任务结束即醒）。`SignalState` 1.6.1 起 tagged（`{ kind: "value" | "expired" }`）。
+- **Gates**：`beforeTool` hook 可返回 `{ sleep }` 把调用在运行前 park 住（审批 gate 的实现位）；每次唤醒、每次 registry publication、每次 open run 都会**整体重跑 `call` 阶段**。
+- **组合件**：`executeTool(name, args, context, { wait: false })` 返回 `{ taskId, result(context) }` 让工具 park 在嵌套调用上；`api.createTask()` 带 `key` 复用；`SubmissionDraft.notify: { taskId, key }` 在提交结算的 commit 里投递内建 `SubmissionSettled` 信号（subagent 工具 park 等待的基础件）。示例 38–46 随 1.6.0 入库（signals、问一个人、等 webhook、轮询、并行嵌套调用、等待的 subagent、审批 gate、yield 时 review、afterTools 任务）。
+- **契约代价**：`pi.tool` schema v4、`pi.generation` v3——本版写的数据库**不可被旧 Harness 打开**（老任务 `task_too_old` 阻塞、无 `until` 睡眠当错误）；`durationMs` 语义变为从工具任务第一次 run 到结果（跨 park 总时长）。
 
 ### MemoryStorage 与 IndexedDB
 
@@ -76,7 +88,7 @@ v0.86.x 时 SQLite 后端是独立包 `@earendil-works/pi-session-backend-sqlite
 - **驱动在 chord**：`SqliteExecutor`/`SqliteDatabase` 契约（`chord/src/sqlite/database.ts`）、串行队列 + barrier、statement cache、`BEGIN IMMEDIATE` 事务、`wal_checkpoint(TRUNCATE)`、WAL/busy timeout 配置（`chord/src/sqlite/node.ts`）、`DurableObjectSqliteDatabase`（`cloudflare.ts`）、`validateSqliteSchemaPrefix`（`schema.ts`）。
 - **迁移 runner 也在 chord**，带版本下界守卫：库的版本 > 代码支持版本直接抛 `SQLite schema version N is newer than supported version …`（`chord/src/sqlite/migrations.ts:34-36`）。这就是"v2 之后不能回退到 1.3.0"的实现点。
 - **schema v2（v1.4.0）**：重建 tasks 表放开 status 的 CHECK 约束以容纳 `sleeping`（`storage/sqlite/migrations.ts:91-115`：建 `tasks_v2` → `INSERT…SELECT` → `DROP` → `RENAME` → 重建 5 个索引）。**打开即迁移**（`storage.ts:170-171`），没有 opt-in。
-- **namespacing（v1.3.0）**：`SqliteStorage.open(database, { prefix })` 给每张表/索引加前缀，供"与宿主表共库"的场景；Cloudflare DO 适配器对同一 storage 对象协调操作。JSONL 后端不变（`storage/jsonl/storage.ts` 907 行，目录 927 行；sidecar 回收见 spec §11.3）。
+- **namespacing（v1.3.0）**：`SqliteStorage.open(database, { prefix })` 给每张表/索引加前缀，供"与宿主表共库"的场景；Cloudflare DO 适配器对同一 storage 对象协调操作。JSONL 后端：v1.5.1 起支持 `{ readOnly: true }` 打开（查看另一进程写的目录；可写打开在恢复时截断断行与未确认 sidecar 记录），其余不变（`storage/jsonl/storage.ts`；sidecar 回收见 spec §11.3）。
 
 ## ExecutionEnv：执行环境契约层（v1.0.3 大扩，硬事实）
 
@@ -87,7 +99,7 @@ v1.0.0 时 `src/env/` 只是"够 bash 工具用"的本地抽象；v1.0.3 一晚�
 - **输出窗口**：`ShellExecOptions.window`（`:315`，v1.0.3 时为 `:266`；`ShellOutputWindow` `:322`：maxBytes/maxLines/minIntervalMs/bytesPerSecond）让环境知道调用方保留的尾部窗口，允许它省略窗口外的输出并经 `ShellOutputInfo.skipped`（`:347`）**精确报告省略量**（字节数/换行数/是否以换行结尾，`ShellOutputSkip` `:338`）。约束收得很紧：省略量必须比窗口多至少一字节或一行、后续输出全部在同一 chunk 送达——被省略的文本**永远不可能**进入保留尾部（spec `spec.md:2823-2839` 一带）。这是为慢链路（远程环境）设计的。
 - **有界读**：`openBinaryReader()`（`:231`）对单个已打开普通文件定位读（文件被改名后读到的仍是打开时的那个文件，`noFollow` 拒绝末段符号链接）；`openDirReader()`（`:256`）目录分页列举（`DirReader.next` 契约 `:160-170`：中途消失的 entry 跳过）。`BinaryReader.scanLines()`（`:106`，未变；返回 `LineScan` `:140`）：环境内一次扫描定位并度量一段行，**解码语义与整文件解码完全一致**——实现（`LineScanner`，`env/line-scan.ts`）连同 `rangeDecoder()`/`StreamDecoder`/`startsWithBom`（`env/decode.ts`）一起从 `./env` 导出（`env/index.ts:376-377`），供其他环境（pi-env 的 daemon）复刻同样语义。
 - **watch**：`FileSystem.watch()`（`:262`）；`WatchTarget`（`:111`）可以不存在、创建即变化、recursive + exclude hidden/names、不跟随子树内符号链接；`WatchChange = {paths} | {overflow} | {error}`（`:127`）；`FileWatcher.mode: "native" | "polling"`（`:129`）。spec 明确 "Durable itself never calls it"（`spec.md:2859-2860`）——这是给加载 instructions/skills 的宿主用的，不是 durable 自身。
-- **NodeExecutionEnv**（`src/env/node.ts`）是本地 Node 参考实现：字符串命令在 Windows 上自动找 Git Bash，argv 命令直接 spawn。
+- **NodeExecutionEnv**（`src/env/node.ts`）是本地 Node 参考实现：字符串命令在 Windows 上经 `git var GIT_SHELL_PATH`（Git 2.47+，v1.6.1 起）定位 Git Bash（不再误走 WSL `bash.exe`），argv 命令直接 spawn。
 - **NodeFileWatcher**（`src/env/node-watch.ts:139`）的设计核心：**原生事件只触发防抖 rescan，变化 = 快照差分 + 事件路径**（类文档 `node-watch.ts:132-138`）——替换文件、改名父目录、带内容新建的目录，都不依赖平台发了什么事件；新目录在下次扫描**前**先装 watcher，装 watcher 前写进去的内容不会漏。平台差异内建：Windows 上原生 watcher 会让被监视目录保持打开、从而破坏 `rename(parent)`，模式选择默认 win32 取 polling（`node-watch.ts:174-186`）；macOS FSEvents 启动竞态（`fs.watch` 返回时流未 live、紧随其后的变化会丢）用装完 500ms 再 rescan 一次兜底（`FSEVENTS_SETTLE_MS`，`node-watch.ts:52`）。目录预算 `DEFAULT_MAX_DIRECTORIES = 10_000`（`:54`），超限报 `FileError "invalid"`。
 
 这四批扩张（argv exec + 有界 reader、window/skipped、scanLines + BOM 语义、watch）在 `packages/durable/CHANGELOG.md` 的 [1.0.3] 段（`:147-150`）记为 **4 条接口级 Breaking**——全部是"自定义环境实现者必须实现"的接口义务。
@@ -105,7 +117,7 @@ durable 在 v1.2.0 长出了一个**图像处理**子系统，以子路径导出
 - 核心是 **Photon**（Rust → WASM）图像管线：`createPhotonImages(wasm)`（`src/images/index.ts`），EXIF 方向自动纠正（`src/images/exif.ts`）。
 - **三种宿主适配**：`/images/node` 把 Photon 放在 worker 线程里跑（`node.ts`，`idleMs` 默认 **30 秒**后回收，失败时回退到进程内）；`/images/cloudflare` 走 Wrangler 的 `CompiledWasm`（`cloudflare.ts`，注释明说其它 bundler 请直接用 `createPhotonImages()`）。
 - **默认限额** `DEFAULT_IMAGE_LIMITS = { maxWidth: 2000, maxHeight: 2000, maxBytes: 4.5 MiB }`（注意定义在 `src/tools/image-processor.ts:11`，不是 `src/images/`）。
-- 消费方式：`createCodingTools({ images })` 注入；**durable 的 `read` 工具因此能把图片作为 image block 返回**，而不是 `unsupported_image`（`src/tools/read.ts` 引用 `DEFAULT_IMAGE_LIMITS`）。
+- 消费方式：`createCodingTools({ images })` 注入；**durable 的 `read` 工具因此能把图片作为 image block 返回**，而不是 `unsupported_image`（`src/tools/read.ts` 引用 `DEFAULT_IMAGE_LIMITS`）。v1.6.0 新增 `./images/fit` 子路径：入会话图像在存储前按目标模型限制适配（编码 agent 同款行为的 durable 侧导出）。
 
 **为什么放在 durable 而不是 coding-agent**：与 `ExecutionEnv` 同样的理由——图像编解码需要在**与工具执行相同的沙箱语义**下发生（浏览器/Worker/Node 三种宿主都要能跑），所以它是 durable 侧的能力面，coding-agent 通过 `createCodingTools` 消费。
 

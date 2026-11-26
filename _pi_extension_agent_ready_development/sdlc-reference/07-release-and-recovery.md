@@ -8,7 +8,7 @@ pi-mono 的发布不是「一条命令把包推到 npm」，而是一条跨本�
 
 > **Lockstep versioning**: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.
 
-版本同步有独立校验：`scripts/sync-versions.js` 收集非 private 的 workspace 包，若版本集合大于 1 就直接报错并提示运行 `version:patch/minor/major`；`scripts/publish.mjs` 在发布前再断言一次 lockstep。发布脚本 `release.mjs` 的 bump 步骤是先 `npm version --workspaces --no-git-tag-version` 再跑 `sync-versions.js` 同步内部依赖范围。
+版本同步有独立校验：`scripts/sync-versions.js` 收集非 private 的 workspace 包，若版本集合大于 1 就直接报错并提示运行 `version:patch/minor/major`；`scripts/publish.mjs` 在发布前再断言一次 lockstep。发布脚本 `release.mjs` 的 bump 步骤（v1.6.1 现文）是 `npm version patch --workspace packages --no-git-tag-version --no-workspaces-update`，再跑 `sync-versions.js` 同步内部依赖范围、`npm install --package-lock-only --ignore-scripts` 刷新 lockfile。
 
 [E023](../_evidence/render.md#e023)
 
@@ -37,7 +37,7 @@ pi-mono 的发布不是「一条命令把包推到 npm」，而是一条跨本�
 
 `scripts/release.mjs` 的文件头把流程列为十步，实际执行顺序与之对应：
 
-1. 检查工作树干净，有未提交改动即退出。
+1. 检查 npm 版本（需 npm 11+，v1.6.1 起：旧 npm 写 lockfile 会丢 `libc` 字段）与工作树干净，有未提交改动即退出。
 2. **先验证所有公开 workspace 包已在 npm 注册**，再动工作树；缺注册的包直接列出并失败（，调用点 ）。
 3. **pin 最新已发布的模型目录并用它构建**（v1.3.0 起，不再是 `--if-stale` 的「顺手刷新」）：`pinAndBuildWithNewestModelCatalog()` 无条件 pin → `hydrateModelCatalogBytes` → `npm run build:offline`；失败会恢复已提交的 pin，并提示「先发布一版目录」（实现 ）。理由：Nix 构建必须用 release 时代最新的模型数据，而 pin 一旦随 tag 落地就不可改。
 4. bump 或设置显式版本，并清理 npm version 留下的陈旧 workspace lock 条目、刷新 lockfile、`npm ci --ignore-scripts` 重新水合。

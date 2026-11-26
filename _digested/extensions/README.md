@@ -1,5 +1,7 @@
 # extensions/ — pi 的扩充思路：极简核 + 靠扩展长能力
 
+> **sync-0012–0015（v1.5.1→v1.6.1，基线 v1.6.1）**：扩展面四个契约级变化，已落入对应篇目的版本史节——`Component.render()` 返回 `readonly string[]` 且 Container 缓存（v1.6.0 Breaking，[2.3](02-Expansion/2.3_presentation.md)）；`registerMarkdownTransformer` 增 `{ messageTypes }`（v1.5.1，[2.3](02-Expansion/2.3_presentation.md)）；对话框 blocked/blockedKind 程序状态（v1.5.1/v1.6.1，[2.3](02-Expansion/2.3_presentation.md)）；`Extension.namespace` 声明式 codemode 命名空间与 `GrepOperations.readFile` 只剩 execute 级换后端（v1.6.0/v1.5.1，[2.2](02-Expansion/2.2_register_surface.md)）。facet 第二轴的现役描述收缩为单一 chord v2 页（v1 删除，[2.5](02-Expansion/2.5_second_axis_facets.md)）。
+>
 > v1.4.0 时本页写的是"扩展 API 面无结构变化（`core/extensions/types.ts` 逐字节未变）"——**v1.5.0 已不成立**：该文件 +27/−3，新增 `KeybindingHints` 接口（`keyText`/`keyHint`），并让 `ToolRenderContext` / `MessageRenderOptions` / `EntryRenderOptions` 三者 **extends 它**；内联组件新增 `blocked`（OSC 7501 program status），`MessageRenderOptions` 新增 `messageId` / `timestamp`。
 >
 > 更重要的变化不在类型面而在**校验底座**：TypeBox 离开校验器的位置，参数校验一律走 `@earendil-works/pi-schema`——但**源码写法不变**（`import { Type } from "@earendil-works/pi-ai"` 仍可用）。三层事实见 [`agent/01-Anatomy/1.3_Tool_Registry.md`](../agent/01-Anatomy/1.3_Tool_Registry.md)。

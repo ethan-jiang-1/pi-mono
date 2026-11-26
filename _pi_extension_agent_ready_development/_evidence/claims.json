@@ -4,7 +4,7 @@
       "id": "E001",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "agent 必须从仓库根运行，才会自动拾取 AGENTS.md 并遵守其规则",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -22,7 +22,7 @@
       "id": "E002",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "提问先答后改；散文直接、简洁、无套话",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -50,7 +50,7 @@
       "id": "E003",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "改代码后跑 npm run check，全量输出、不允许只截尾；check 不跑测试",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -68,16 +68,16 @@
       "id": "E004",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "未经用户请求不得运行 npm test；需要构建产物（dist/）时可以运行 npm run build，但不得用它做类型检查——类型检查是 npm run check",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
           "locator": {
-            "kind": "heading",
-            "value": "Commands"
+            "kind": "text",
+            "value": "- Run `npm run build` whenever something needs built output (`dist/`): tests or benchmarks that import built packages, Durable's workerd sui"
           },
-          "quote": "- Run `npm run build` whenever something needs built output (`dist/`): tests or benchmarks that import built packages, Durable's workerd suite. Never use it to type check or lint: that is `npm run check`, the preferred check.",
-          "hintLine": 33,
+          "quote": "- Run `npm run build` whenever something needs built output (`dist/`): tests or benchmarks that import built packages, Durable's workerd suite. The full suites of Chord and Durable need it: Chord's tests that start Node processes or bundle with esbuild load workspace packages from `dist/` (the rest run from source by its vitest config), and Durable imports pi-ai's `utils/*`, which have no source export. Never use it to type check or lint: that is `npm run check`, the preferred check.",
+          "hintLine": 55,
           "volatility": "medium"
         }
       ]
@@ -86,16 +86,16 @@
       "id": "E005",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "不得直接跑全量 vitest（含 e2e）；非 e2e 用 ./test.sh，或从包根跑单文件",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
           "locator": {
-            "kind": "heading",
-            "value": "Commands"
+            "kind": "text",
+            "value": "- Never run the full vitest suite directly: it includes e2e tests that activate when endpoint/auth env vars are present. For all non-e2e tes"
           },
-          "quote": "- Never run the full vitest suite directly: it includes e2e tests that activate when endpoint/auth env vars are present. For all non-e2e tests, run `./test.sh` from the repo root. Otherwise run specific tests from the package root:",
-          "hintLine": 34,
+          "quote": "- Never run the full vitest suite directly: it includes e2e tests that activate when endpoint/auth env vars are present. For all non-e2e tests, run `./test.sh` from the repo root. It runs `packages/*` only. Otherwise run specific tests from the package root:",
+          "hintLine": 57,
           "volatility": "medium"
         }
       ]
@@ -104,7 +104,7 @@
       "id": "E006",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "coding-agent test/suite 必须用 test/suite/harness.ts + faux provider，禁止真实 key",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -122,7 +122,7 @@
       "id": "E007",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "修 issue 的回归测试旁必须写 issue 号注释",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -140,7 +140,7 @@
       "id": "E008",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "临时脚本写入 /tmp 文件再跑，不内嵌多行脚本",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -158,7 +158,7 @@
       "id": "E009",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "直接 registry 依赖（含内部 workspace 包）必须精确版本",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -176,7 +176,7 @@
       "id": "E010",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "本地用 npm install --ignore-scripts 水合，CI 用 npm ci；不得擅自跑 lifecycle 脚本",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -194,7 +194,7 @@
       "id": "E011",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "带安装脚本的新依赖须评审并进显式 allowlist；lockfile 提交被 pre-commit 拦截",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -222,7 +222,7 @@
       "id": "E012",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "除非用户要求，否则不提交",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -240,7 +240,7 @@
       "id": "E013",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "只提交本次自己改的文件；显式暂存路径，禁止 git add -A/.",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -268,7 +268,7 @@
       "id": "E014",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "禁止 reset --hard、checkout .、clean -fd、stash 与 --no-verify；永不 force push",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -296,7 +296,7 @@
       "id": "E015",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "commit message 格式固定为 {feat,fix,docs}[(scope)]: <message>",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -314,7 +314,7 @@
       "id": "E016",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "pi 的核保持最小；不属于核的功能应做成扩展，膨胀核的 PR 会被拒",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -342,7 +342,7 @@
       "id": "E017",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "提交者必须理解自己的代码；不理解而提交 AI 产物会被关闭",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -370,7 +370,7 @@
       "id": "E018",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "新贡献者的 issue 与 PR 默认自动关闭",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -388,7 +388,7 @@
       "id": "E019",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "lgtmi/lgtm 解锁贡献资格，命令须在回复开头或结尾；只有 lgtm 允许开 PR",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -426,7 +426,7 @@
       "id": "E020",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "开 PR 前必须已获 lgtm；npm run check 与 ./test.sh 都必须通过",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -464,7 +464,7 @@
       "id": "E021",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "贡献者不得改 CHANGELOG.md，条目由维护者添加",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -482,7 +482,7 @@
       "id": "E022",
       "page": "repo-harness/01-agent-entry-rules.md",
       "claim": "模型目录定义在 packages/ai/catalog/，不得直接改 models.generated.ts；生成数据目录被 gitignore，不得暂存",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -534,15 +534,15 @@
           "path": "package.json",
           "locator": {
             "kind": "text",
-            "value": "\"version:patch\": \"npm version patch --workspaces --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts\","
+            "value": "\"version:patch\": \"npm version patch --workspace packages --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm"
           },
-          "quote": "\"version:patch\": \"npm version patch --workspaces --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts\",",
+          "quote": "\"version:patch\": \"npm version patch --workspace packages --no-git-tag-version --no-workspaces-update && node scripts/sync-versions.js && npm install --package-lock-only --ignore-scripts\",",
           "hintLine": 43,
           "volatility": "medium"
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E024",
@@ -570,7 +570,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E025",
@@ -598,7 +598,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E026",
@@ -608,9 +608,9 @@
           "path": "scripts/release.mjs",
           "locator": {
             "kind": "text",
-            "value": "* 1. Check for uncommitted changes"
+            "value": "* 1. Check the npm version and for uncommitted changes"
           },
-          "quote": "* 1. Check for uncommitted changes",
+          "quote": "* 1. Check the npm version and for uncommitted changes",
           "hintLine": 10,
           "volatility": "medium"
         },
@@ -618,9 +618,9 @@
           "path": "scripts/release.mjs",
           "locator": {
             "kind": "text",
-            "value": "// 1. Check for uncommitted changes"
+            "value": "// The release rewrites package-lock.json. npm 10 (bundled with Node 22) drops the `libc`"
           },
-          "quote": "// 1. Check for uncommitted changes",
+          "quote": "// The release rewrites package-lock.json. npm 10 (bundled with Node 22) drops the `libc`",
           "hintLine": 258,
           "volatility": "medium"
         },
@@ -716,7 +716,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E027",
@@ -734,7 +734,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E028",
@@ -762,7 +762,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E029",
@@ -840,7 +840,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E030",
@@ -908,7 +908,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E031",
@@ -926,7 +926,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E032",
@@ -974,7 +974,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E033",
@@ -1012,7 +1012,7 @@
         }
       ],
       "page": "sdlc-reference/07-release-and-recovery.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E034",
@@ -1056,7 +1056,7 @@
         }
       ],
       "page": "sdlc-reference/04-ci-matrix.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E035",
@@ -1084,7 +1084,7 @@
         }
       ],
       "page": "sdlc-reference/04-ci-matrix.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E036",
@@ -1094,9 +1094,9 @@
           "path": "package.json",
           "locator": {
             "kind": "text",
-            "value": "\"test\": \"npm run test:scripts && npm run test --workspaces --if-present\","
+            "value": "\"test\": \"npm run test:scripts && npm run test --workspace packages --if-present\","
           },
-          "quote": "\"test\": \"npm run test:scripts && npm run test --workspaces --if-present\",",
+          "quote": "\"test\": \"npm run test:scripts && npm run test --workspace packages --if-present\",",
           "hintLine": 40,
           "volatility": "medium"
         },
@@ -1122,7 +1122,7 @@
         }
       ],
       "page": "sdlc-reference/04-ci-matrix.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E037",
@@ -1180,7 +1180,7 @@
         }
       ],
       "page": "sdlc-reference/04-ci-matrix.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E038",
@@ -1238,7 +1238,7 @@
         }
       ],
       "page": "sdlc-reference/04-ci-matrix.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E039",
@@ -1286,7 +1286,7 @@
         }
       ],
       "page": "sdlc-reference/04-ci-matrix.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E040",
@@ -1384,7 +1384,7 @@
         }
       ],
       "page": "sdlc-reference/04-ci-matrix.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E041",
@@ -1402,7 +1402,7 @@
         }
       ],
       "page": "sdlc-reference/04-ci-matrix.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E042",
@@ -1460,7 +1460,7 @@
         }
       ],
       "page": "sdlc-reference/05-testing-layers.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E043",
@@ -1488,7 +1488,7 @@
         }
       ],
       "page": "sdlc-reference/05-testing-layers.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E044",
@@ -1566,7 +1566,7 @@
         }
       ],
       "page": "sdlc-reference/05-testing-layers.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E045",
@@ -1614,7 +1614,7 @@
         }
       ],
       "page": "sdlc-reference/05-testing-layers.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E046",
@@ -1632,7 +1632,7 @@
         }
       ],
       "page": "sdlc-reference/05-testing-layers.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E047",
@@ -1700,7 +1700,7 @@
         }
       ],
       "page": "sdlc-reference/05-testing-layers.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E048",
@@ -1718,7 +1718,7 @@
         }
       ],
       "page": "sdlc-reference/03-check-pipeline.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E049",
@@ -1756,7 +1756,7 @@
         }
       ],
       "page": "sdlc-reference/03-check-pipeline.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E050",
@@ -1774,7 +1774,7 @@
         }
       ],
       "page": "sdlc-reference/03-check-pipeline.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E051",
@@ -1802,7 +1802,7 @@
         }
       ],
       "page": "sdlc-reference/03-check-pipeline.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E052",
@@ -1840,7 +1840,7 @@
         }
       ],
       "page": "sdlc-reference/03-check-pipeline.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E053",
@@ -1868,7 +1868,7 @@
         }
       ],
       "page": "sdlc-reference/03-check-pipeline.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E054",
@@ -1896,7 +1896,7 @@
         }
       ],
       "page": "sdlc-reference/03-check-pipeline.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E055",
@@ -1934,7 +1934,7 @@
         }
       ],
       "page": "sdlc-reference/03-check-pipeline.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E056",
@@ -1992,7 +1992,7 @@
         }
       ],
       "page": "sdlc-reference/03-check-pipeline.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E057",
@@ -2040,7 +2040,7 @@
         }
       ],
       "page": "sdlc-reference/01-contribution-gates.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E058",
@@ -2068,7 +2068,7 @@
         }
       ],
       "page": "sdlc-reference/01-contribution-gates.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E059",
@@ -2116,7 +2116,7 @@
         }
       ],
       "page": "sdlc-reference/01-contribution-gates.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E060",
@@ -2174,11 +2174,11 @@
         }
       ],
       "page": "sdlc-reference/01-contribution-gates.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E061",
-      "claim": "untriaged 标签由 issue-triage-labels 维护：重开/标记时清理，last-read 前进时关闭未处理项",
+      "claim": "untriaged 标签由 issue-triage-labels 维护（重开/标记时清理）；关单时 inprogress/untriaged 由 remove-labels-on-close 摘除",
       "sources": [
         {
           "path": ".github/workflows/issue-triage-labels.yml",
@@ -2191,18 +2191,18 @@
           "volatility": "medium"
         },
         {
-          "path": ".github/workflows/issue-triage-labels.yml",
+          "path": ".github/workflows/remove-labels-on-close.yml",
           "locator": {
             "kind": "text",
-            "value": "state_reason: 'not_planned',"
+            "value": "Remove inprogress and untriaged labels"
           },
-          "quote": "state_reason: 'not_planned',",
-          "hintLine": 165,
+          "quote": "// Closing an issue ends work on it and handles it if it was waiting for review. The issue gate's close keeps // untriaged: it uses the workflow token, whose changes start no workflow runs. const present = new Set((context.payload.issue.labels ?? []).map((label) => label.name)); for (const name of ['inprogress', 'untriaged'].filter((label) => present.has(label))) { await github.rest.issues.removeLabel({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, name, }); console.log(`Removed ${name} from #${context.issue.number}`); }",
+          "hintLine": 17,
           "volatility": "medium"
         }
       ],
       "page": "sdlc-reference/01-contribution-gates.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E062",
@@ -2250,7 +2250,7 @@
         }
       ],
       "page": "sdlc-reference/01-contribution-gates.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E063",
@@ -2308,7 +2308,7 @@
         }
       ],
       "page": "sdlc-reference/01-contribution-gates.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E064",
@@ -2366,7 +2366,7 @@
         }
       ],
       "page": "sdlc-reference/01-contribution-gates.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E065",
@@ -2394,7 +2394,7 @@
         }
       ],
       "page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E066",
@@ -2421,18 +2421,18 @@
           "volatility": "medium"
         },
         {
-          "path": ".github/workflows/remove-inprogress-on-close.yml",
+          "path": ".github/workflows/remove-labels-on-close.yml",
           "locator": {
             "kind": "text",
-            "value": "on:"
+            "value": "// Closing an issue ends work on it and handles it if it was waiting for review. The issue gate's close keeps // untriaged: it uses the work"
           },
-          "quote": "on:",
-          "hintLine": 3,
+          "quote": "// Closing an issue ends work on it and handles it if it was waiting for review. The issue gate's close keeps // untriaged: it uses the workflow token, whose changes start no workflow runs. const present = new Set((context.payload.issue.labels ?? []).map((label) => label.name)); for (const name of ['inprogress', 'untriaged'].filter((label) => present.has(label))) { await github.rest.issues.removeLabel({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, name, }); console.log(`Removed ${name} from #${context.issue.number}`); }",
+          "hintLine": 17,
           "volatility": "medium"
         }
       ],
       "page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E067",
@@ -2460,7 +2460,7 @@
         }
       ],
       "page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E068",
@@ -2498,7 +2498,7 @@
         }
       ],
       "page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E069",
@@ -2596,7 +2596,7 @@
         }
       ],
       "page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E070",
@@ -2654,25 +2654,7 @@
         }
       ],
       "page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
-      "checkedAt": "v1.5.0"
-    },
-    {
-      "id": "E071",
-      "claim": "scripts/issues：本机批量 triage，每个 issue 一个 durable 会话，15 类分类，环境变量控制模型/并发/端口",
-      "sources": [
-        {
-          "path": "scripts/issues/README.md",
-          "locator": {
-            "kind": "text",
-            "value": "| `TRIAGE_MODEL` | `openai-codex/gpt-5.6-sol` | `provider/model`. Supported providers: `openai-codex`, `anthropic`. |"
-          },
-          "quote": "| `TRIAGE_MODEL` | `openai-codex/gpt-5.6-sol` | `provider/model`. Supported providers: `openai-codex`, `anthropic`. |",
-          "hintLine": 45,
-          "volatility": "medium"
-        }
-      ],
-      "page": "sdlc-reference/02-issue-diagnosis-and-session-import.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E072",
@@ -2700,7 +2682,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E073",
@@ -2738,7 +2720,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E074",
@@ -2796,7 +2778,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E075",
@@ -2824,7 +2806,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E076",
@@ -2882,7 +2864,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E077",
@@ -2920,7 +2902,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E078",
@@ -2948,7 +2930,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E079",
@@ -2976,7 +2958,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E080",
@@ -2994,7 +2976,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E081",
@@ -3042,7 +3024,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E082",
@@ -3080,7 +3062,7 @@
         }
       ],
       "page": "sdlc-reference/06-review-and-human-role.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E083",
@@ -3118,7 +3100,7 @@
         }
       ],
       "page": "repo-harness/04-extension-points-map.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E084",
@@ -3166,7 +3148,7 @@
         }
       ],
       "page": "repo-harness/04-extension-points-map.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E085",
@@ -3186,9 +3168,9 @@
           "path": "packages/coding-agent/docs/codemode.md",
           "locator": {
             "kind": "text",
-            "value": "The `codemode` tool lets the model write a JavaScript script that calls pi's other tools and runs non-LLM models, such as classifiers and image models. Only the script's output reaches the model, so a script can run calls in parallel and filter large results before the model sees them. To turn it on, see [Enable codemode](cli.md#enable-codemode)."
+            "value": "The `codemode` tool lets the model write a JavaScript script that calls pi's other tools and runs non-LLM models, such as decision models an"
           },
-          "quote": "The `codemode` tool lets the model write a JavaScript script that calls pi's other tools and runs non-LLM models, such as classifiers and image models. Only the script's output reaches the model, so a script can run calls in parallel and filter large results before the model sees them. To turn it on, see [Enable codemode](cli.md#enable-codemode).",
+          "quote": "The `codemode` tool lets the model write a JavaScript script that calls pi's other tools and runs non-LLM models, such as decision models and image models. Only the script's output reaches the model, so a script can run calls in parallel and filter large results before the model sees them. To turn it on, see [Enable codemode](cli.md#enable-codemode).",
           "hintLine": 3,
           "volatility": "medium"
         },
@@ -3214,7 +3196,7 @@
         }
       ],
       "page": "repo-harness/04-extension-points-map.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E086",
@@ -3242,7 +3224,7 @@
         }
       ],
       "page": "repo-harness/04-extension-points-map.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E087",
@@ -3310,7 +3292,7 @@
         }
       ],
       "page": "repo-harness/04-extension-points-map.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E088",
@@ -3368,7 +3350,7 @@
         }
       ],
       "page": "repo-harness/05-session-inspectability.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E089",
@@ -3436,7 +3418,7 @@
         }
       ],
       "page": "repo-harness/05-session-inspectability.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E090",
@@ -3464,7 +3446,7 @@
         }
       ],
       "page": "repo-harness/05-session-inspectability.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E091",
@@ -3492,7 +3474,7 @@
         }
       ],
       "page": "repo-harness/05-session-inspectability.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E092",
@@ -3520,7 +3502,7 @@
         }
       ],
       "page": "repo-harness/02-prompts-as-procedural-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E093",
@@ -3558,7 +3540,7 @@
         }
       ],
       "page": "repo-harness/02-prompts-as-procedural-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E094",
@@ -3586,7 +3568,7 @@
         }
       ],
       "page": "repo-harness/02-prompts-as-procedural-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E095",
@@ -3614,7 +3596,7 @@
         }
       ],
       "page": "repo-harness/02-prompts-as-procedural-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E096",
@@ -3632,7 +3614,7 @@
         }
       ],
       "page": "repo-harness/02-prompts-as-procedural-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E097",
@@ -3670,7 +3652,7 @@
         }
       ],
       "page": "repo-harness/02-prompts-as-procedural-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E098",
@@ -3698,7 +3680,7 @@
         }
       ],
       "page": "repo-harness/02-prompts-as-procedural-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E099",
@@ -3716,19 +3698,19 @@
         }
       ],
       "page": "repo-harness/02-prompts-as-procedural-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E100",
-      "claim": "README 包表列 7 个包；chord 是 typed host runtime，durable 是可重开续接的持久运行时",
+      "claim": "README 包表列出全部包；chord 是跨进程对象运行时（contracts/documents/store/links/plugins/HTTP/workers/clients），durable 是可重开续接的持久运行时（Experimental 横幅）",
       "sources": [
         {
           "path": "README.md",
           "locator": {
             "kind": "text",
-            "value": "| **[@earendil-works/chord](packages/chord)** | Typed host runtime for hot-reloadable plugins, contracts, replicated state, and RPC over JSON links |"
+            "value": "| **[@earendil-works/chord](packages/chord)** | Object runtime for apps across processes: contracts, documents, a store, links, plugins with"
           },
-          "quote": "| **[@earendil-works/chord](packages/chord)** | Typed host runtime for hot-reloadable plugins, contracts, replicated state, and RPC over JSON links |",
+          "quote": "| **[@earendil-works/chord](packages/chord)** | Object runtime for apps across processes: contracts, documents, a store, links, plugins with hot reload, HTTP, workers, web and terminal clients |",
           "hintLine": 78,
           "volatility": "medium"
         },
@@ -3746,9 +3728,9 @@
           "path": "packages/chord/README.md",
           "locator": {
             "kind": "text",
-            "value": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run."
+            "value": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and keep running while their p"
           },
-          "quote": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run.",
+          "quote": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and keep running while their plugins are **reloaded**. - An **object type** is a contract: a name, params that select the instance, the host it lives on, its members (state and methods) and a version. Contracts are runtime values described with JSON Schema, written with the builders of `@earendil-works/pi-schema`. - A **facet** is a plugin's declarations for one host: the types it serves and its contributions to registries. A factory only declares; Chord activates. - Everyone gets a **reference**, never the object. A reference is live and hydrated once its `get` resolves, works the same locally and across links, and keeps its object alive. - **Documents** are named JSON values an object owns, written in transactions and persisted in Chord's store; **derives** compute values from watchables; **jobs** are owned work that outlives the call that started it.",
           "hintLine": 3,
           "volatility": "medium"
         },
@@ -3764,7 +3746,7 @@
         }
       ],
       "page": "repo-harness/07-monorepo-taxonomy.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E101",
@@ -3796,7 +3778,7 @@
         }
       ],
       "page": "repo-harness/07-monorepo-taxonomy.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E102",
@@ -3844,7 +3826,7 @@
         }
       ],
       "page": "repo-harness/07-monorepo-taxonomy.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E103",
@@ -3867,7 +3849,7 @@
         }
       ],
       "page": "repo-harness/07-monorepo-taxonomy.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E104",
@@ -3885,7 +3867,7 @@
         }
       ],
       "page": "repo-harness/07-monorepo-taxonomy.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E105",
@@ -3903,7 +3885,7 @@
         }
       ],
       "page": "repo-harness/07-monorepo-taxonomy.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E106",
@@ -3931,7 +3913,7 @@
         }
       ],
       "page": "repo-harness/03-repo-skills.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E107",
@@ -3959,7 +3941,7 @@
         }
       ],
       "page": "repo-harness/03-repo-skills.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E108",
@@ -3987,7 +3969,7 @@
         }
       ],
       "page": "repo-harness/03-repo-skills.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E109",
@@ -4015,7 +3997,7 @@
         }
       ],
       "page": "repo-harness/03-repo-skills.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E110",
@@ -4063,7 +4045,7 @@
         }
       ],
       "page": "repo-harness/03-repo-skills.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E111",
@@ -4101,7 +4083,7 @@
         }
       ],
       "page": "repo-harness/06-scope-discipline-and-cost-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E112",
@@ -4139,7 +4121,7 @@
         }
       ],
       "page": "repo-harness/06-scope-discipline-and-cost-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E113",
@@ -4157,7 +4139,7 @@
         }
       ],
       "page": "repo-harness/06-scope-discipline-and-cost-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E114",
@@ -4195,7 +4177,7 @@
         }
       ],
       "page": "repo-harness/06-scope-discipline-and-cost-contracts.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E115",
@@ -4243,7 +4225,7 @@
         }
       ],
       "page": "extension-development-model/02-terms-and-mental-models.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E116",
@@ -4261,7 +4243,7 @@
         }
       ],
       "page": "extension-development-model/02-terms-and-mental-models.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E117",
@@ -4279,7 +4261,7 @@
         }
       ],
       "page": "extension-development-model/02-terms-and-mental-models.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E118",
@@ -4297,7 +4279,7 @@
         }
       ],
       "page": "extension-development-model/02-terms-and-mental-models.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E119",
@@ -4325,7 +4307,7 @@
         }
       ],
       "page": "extension-development-model/02-terms-and-mental-models.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E120",
@@ -4353,7 +4335,7 @@
         }
       ],
       "page": "extension-development-model/02-terms-and-mental-models.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E121",
@@ -4371,7 +4353,7 @@
         }
       ],
       "page": "extension-development-model/02-terms-and-mental-models.md",
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E122",
@@ -4409,7 +4391,7 @@
           "volatility": "medium"
         }
       ],
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E123",
@@ -4467,7 +4449,7 @@
           "volatility": "medium"
         }
       ],
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E124",
@@ -4485,7 +4467,7 @@
           "volatility": "medium"
         }
       ],
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E125",
@@ -4533,7 +4515,7 @@
           "volatility": "medium"
         }
       ],
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     },
     {
       "id": "E126",
@@ -4581,7 +4563,7 @@
           "volatility": "medium"
         }
       ],
-      "checkedAt": "v1.5.0"
+      "checkedAt": "v1.6.1"
     }
   ]
 }

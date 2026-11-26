@@ -188,3 +188,11 @@ pi-mono 里模型身份是 **`provider` + `id` 二元组**；"同名冲突"只�
 - **自定义 provider 命中 `opencode.ai` 时**：`x-opencode-session` 现在也会发送（`packages/ai/src/models.ts:883`），不再只限内置 OpenCode provider；attribution 开启时还会发 `x-opencode-client`。
 - **UA 统一**：`pi/<version> (<platform>; <runtime>; <arch>)`（`formatUserAgent()`）；Cloudflare 不再发 `pi-coding-agent`。
 - 指向旧 base URL 的 `kimi-coding` 覆盖需补 `/v1`（见 01 篇）。
+
+## sync-0012–0015 增量（v1.5.1→v1.6.1，基线 v1.6.1）
+
+- **`"tools": []` 不再发送（v1.5.1 Breaking，#11843）**：无工具但历史含工具调用的请求不再发空 `tools` 数组——修 vLLM 0.20+（含 LiteLLM 后端）的 400。若你的中转**需要**带工具历史就带 `tools`（如旧版 LiteLLM 前置 Anthropic），在 models.json 给该模型设 `compat.requiresToolsWithToolHistory: true`。
+- **新增三个 compat 开关（v1.5.1）**：`compat.requiresNonNullAssistantContent`（工具调用 assistant 消息用空串替代 null，#8118）；`compat.promptCacheKeyMode`（`"auto"/"enabled"/"disabled"`，接受/拒绝 prompt cache key 的端点，#9442）；`compat.supportsMessageThreads`（Anthropic message threads：v1.5.1 起 `anthropic` provider 默认开，v1.6.0 起凡 baseUrl 在 `api.anthropic.com` 的 provider 都默认开——转发 `thread` 字段的网关可开，其余不受影响；单请求退出用 `StreamOptions.disableContinuation`）。
+- **strict 工具边界继续收窄**：schema 含无 `type` 节点（`items: {}`、`Type.Unknown()`）改以 non-strict 发送（v1.6.0 #12049）；strict-prefer 被 Claude 拒后同 session 直接 non-strict（v1.5.1 #11626）；Mistral 默认不收 strict（需 `compat.supportsStrictMode`，v1.6.0 #12148）；non-strict Anthropic schema 保留根 `$defs`/`definitions`/`additionalProperties`（v1.5.1 #9557、v1.6.0 #12067）、Draft 7 tuple 的 `$schema` 保留（v1.6.1 #12212）；**Google 系新增 `compat.supportsStrictMode`**（v1.6.1 #12321，无版本前缀 ID 的 Gemini 3+ 可用 strict）。
+- **重试分类器大幅扩容（v1.5.1–v1.6.1）**：`read ECONNRESET`/`write EPIPE`/`connect ETIMEDOUT`、"Connection closed."、Cloudflare 525、网关 "temporarily unavailable"/partial-response、Anthropic 流中 `api_error`、OpenRouter 空响应/`finish_reason: "error"`、"request rate increased too quickly" 均自动重试——中转的瞬时故障不再断轮。`isContextOverflow` 不再被 `plugin_request_too_large` 类长标识符误触发 compact-and-retry（#12343）。
+- **决策协议（v1.6.1）**：ai 层新增 `pi-decision` API（`POST <baseUrl>/decision`），与 `pi-messages` 并列——网关型 provider 可按它实现决策模型端点（Radius 在用）。

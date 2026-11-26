@@ -109,6 +109,8 @@ session.subscribe((event: AgentSessionEvent) => {
 
 ### session 管理操作
 
+> **会话替换的诊断与事件（v1.6.0）**：`/new` `/resume` `/fork` 及 RPC `new_session`/`switch_session`/`fork` 替换会话时发现的问题（扩展加载失败、`enabledModels` 不匹配等）在所有模式上报一次；SDK 宿主用 `AgentSessionRuntime.takeUnreportedDiagnostics()` 在启动与每次替换后取走（#11264）。RPC `new_session`/`switch_session`/`fork`/`clone` 不再把扩展 `session_start`/`resources_discover` 跑两遍，且 RPC 客户端能收到 `session_start` handler 发出的事件（如 `entry_appended`）；`--mode json` 同修（#10470）。
+
 > 方法名已对照 v0.86.1 源码逐条核对（`agent-session.ts`）。两处名称差异：**`bash()` 实际是 `executeBash()`**（`agent-session.ts:3125`，带 `onChunk` 回调、`operations` 可插拔）；**`cloneSession()` 不存在**——SDK 层 fork/switch 在 **`AgentSessionRuntime`** 上（`core/agent-session-runtime.ts`，`fork()` :262、`switchSession()` :196；RPC 的 `clone` 走 `runtimeHost.fork(leafId, { position: "at" })`，rpc-mode.ts:616-631）。
 
 ```ts
@@ -139,6 +141,7 @@ await session.exportToHtml({ outputPath: "/tmp/session.html" }) // 实际方法�
 await session.exportToJsonl("/tmp/session.jsonl")  // 返回 string（agent-session.ts:3610）
 
 // Bash 直接执行
+// 信号退出码（v1.6.0，#12088）：被信号结束的命令报 128+n（143/SIGTERM、137/SIGKILL），不再恒报 0——executeBash 与扩展 pi.exec() 同修
 const bashResult = await session.executeBash("npm test")  // 方法名是 executeBash，不是 bash（agent-session.ts:3125）
 
 // 工具管理
@@ -171,6 +174,8 @@ node dist/cli.js --mode rpc --provider anthropic --model claude-sonnet-4-6
 ```
 
 进程启动后，通过 stdin 发送命令，stdout 读取响应。
+
+> **shutdown 语义（v1.5.1，#11599）**：扩展 `ctx.shutdown()` 空闲时立即生效；shutdown 已开始后 stdin EOF 或单个信号不再打断（二次信号才立即退）——Paseo/systemd 类进程管理器同时送 EOF+SIGTERM 时不再丢收尾（如 MCP token 刷新）；退出时等待进行中的 token 刷新落盘（修 OAuth `invalid_grant`，#11692）。
 
 RPC 客户端封装在 [`packages/coding-agent/src/modes/rpc/rpc-client.ts`](../../packages/coding-agent/src/modes/rpc/rpc-client.ts)，非 JS 宿主需要自己实现 JSONL 成帧。
 

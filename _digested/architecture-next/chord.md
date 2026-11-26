@@ -1,115 +1,67 @@
-# chord：应用组合运行时、与 v2 的边界
+# chord：应用组合运行时（v2，唯一运行时）
 
-> 本页写**现役 v1 运行时**（`@earendil-works/chord`）。v1.4.0 时本页重写了一次：旧版本（v1.2.0 的 chord2 重写）是一份“哪些 API 失效了”的清单，而 v1.2.0→v1.3.0 之间公开面又整体画了一遍（`Ref`/placement/async get/协议 4）。
+> **v1.5.1 起本页只有一个主角**：`@earendil-works/chord` 的根 export 就是 **chord v2**。v1（cell/cluster/connection 那套 API）在同一 release 内两步走——先整体移到 `@earendil-works/chord/old`，随即连 `src/old`/`test/old`/`docs/old` 一起删除；仍跑 v1 的 app 只能 pin `@earendil-works/chord@1.5.0`（npm 上 v1 的最后一版）。**没有迁移路径**。
 >
-> **两件事必须知道：**
-> 1. **chord 成为双运行时**——`@earendil-works/chord/next` 首次出现在 exports，是 experimental 的第二代运行时（plugins / registries / HTTP / workers / store `commitSeries`）。它的权威描述在 **[`chord-v2.md`](./chord-v2.md)**。本页描述的 v1 仍然在役，两者**并存**，不是“升级”。
-> 2. **v1 本身也在变**（7 条 Breaking）：契约校验换到 `pi-schema`；watch 换形（`retired` 变成 change 的**字段**而不再是结束原因、`WatchCall` 变 tagged union、`cancel()`→`abort()`、`retire()` 删除、新增 `endAfterDelivery()`、`traceIn` 参数顺序、`runCounted()`）；依赖从“零 Pi 依赖”变成依赖 `pi-schema` + `pi-telemetry` 两个包。
+> 因此：旧版本页写的"现役 v1"（协议 4、placement `hostNamed`/`hostFamily`、async get、cell/linger、`PROTOCOL_VERSION = 4`）描述的是**已删除的代码**，全部作废；chord-v2.md（已删除）的"双运行时并存"分界同样作废，其"三份文档并读"与模块地图已并入本页。变更史：[_change_log/0012](../_change_log/0012-v1.5.0-to-v1.5.1.md)（v2 转正 + slices 9–13）、[0014](../_change_log/0014-v1.5.2-to-v1.6.0.md)（slice 14：named queries/admission）、[0015](../_change_log/0015-v1.6.0-to-v1.6.1.md)（tagged-union 扫荡）。
 >
-> 变更史见 [_change_log/0011](../_change_log/0011-v1.4.0-to-v1.5.0.md)（本轮）与 [_change_log/0010](../_change_log/0010-v1.2.0-to-v1.4.0.md)。
-
-> **依赖关系（硬事实，注意与 chord 自己的 spec 冲突）**：**v1.5.0 的 chord 依赖 `@earendil-works/pi-schema` + `@earendil-works/pi-telemetry`**（两者均 pin `1.5.0`），peerDependencies 是可选的 `esbuild`/`ws`。**`typebox` 已在 v1.5.0 从依赖中移除**——v1.4.0 时它确实在（`Context.telemetry` 需要 `TelemetrySpan`，那是 telemetry 的缘起，与 typebox 无关）。`docs/spec.md` 开头仍写 chord 运行时"只依赖自己的 `delta` 模块"——**那是过时陈述**（连续两轮了：v1.4.0 加 telemetry、v1.5.0 加 schema 都没更新这一句）。消费者只有 `packages/durable` 与 `packages/env`（各自 pin `"@earendil-works/chord": "1.5.0"`）；`packages/coding-agent` 不依赖 chord。
+> **依赖关系（硬事实）**：chord 依赖 **`@earendil-works/pi-schema` + `@earendil-works/pi-telemetry`**（均 pin `1.6.1`）；**optional peer** 三个——`esbuild ^0.28.2`（`/plugins`、`/surfaces`、`/workers`）、`ws ^8.21.0`（`/http`、`/tui/launcher`）、`react ^19.3.0`（`/react`），只在对应子路径按需 import（`/app` 用到除 react 外全部）。peer 从精确版本改 ranges 是 1.6.0 的修复（#12008）。消费者四个：`packages/durable`、`packages/env`、`apps/p2`、`apps/p3`（均 pin `1.6.1`）；**`packages/coding-agent` 不依赖 chord**。
 
 ## 它解决什么问题
 
-一个应用 feature（一组对象 + 一块 UI + 一份共享状态）要同时跑在多个环境里（主进程、子进程、浏览器、远程 host）。每个环境写一份胶水会漂移。chord 把"对象怎么被找到、怎么被调用、状态怎么同步、代码怎么热替换"做成通用机器。
+应用由若干 **objects** 组成，object 活在多个进程里（server、workers、浏览器 tab），并且在其插件被 **reload** 时持续运行。chord 负责"对象怎么被找到、状态怎么同步、代码怎么热替换、谁能调用"，不负责 UI、业务与持久化。
 
-它不负责 UI、不负责持久化、不负责业务——只负责组合。
+## 核心模型（权威文本：`docs/design.md`，3,691 行，30 章）
 
-## 核心机制
+- **object type = contract**：名字、选择实例的 params、宿主 host、成员（state 与 methods）、版本；契约是运行期 JSON Schema 值，用 `@earendil-works/pi-schema` 的 builders 写（§5）。
+- **facet**：插件对一个 host 的声明——它 serve 哪些类型、对 registries 贡献什么。factory 只声明，Chord 负责激活（§16）。
+- **reference**：所有人拿到的都是 reference 而非对象；`get` resolve 后即 live 且已 hydrate，本地与跨 link 同形，并维持对象存活（§7）。
+- **documents**（§9）／**derives**（§12）／**natives**（§13）／**routines**（§14）／**jobs**（§15，可持久化、活得比发起它的调用久）／**registries**（§17）。
+- **principal**：每个调用都有；link 盖章、应用定型，对象按 principal key 分实例保存（§4）。chord 不发明 principal，由应用注入。
+- **reload/rollout**（§21）：插件代码在运行中的 app 里换装，**按 host 逐个 rollout**。1.5.1 起语义是"reload 重启变更插件的每个活对象"（旧的纯 in-place swap 已删）：旧 work 在旧 attempt 上跑完（有 `reloadDrainTimeout`，默认 5 s，超时切 `released` 并报 `drain_timeout`），新调用在新代码上等；`RolloutHost` 在 1.6.1 是 tagged union（`{ kind: "reloaded"|"stopped"|"failed", ... }`）。
+- **admission**（slice 14，1.6.0）：contract 可声明 `admission: schema`；`host.serve`/`host.route`/`createWorkers` 的 `admit(params, principal, self)` 在解析/转发**之前**做每 principal+address 一次的决定——被拒的 caller 不会启动 worker（拒绝为 `forbidden`）。
 
-### 契约：四种契约形态 + placement
+## 能力面（slice 9–14，1.5.1–1.6.0 落地）
 
-`local` / `remote` / `method` / `opaque`（`src/contract.ts`）。契约是运行期值（**`@earendil-works/pi-schema` schema**，`src/contract.ts` 从 `pi-schema` import `obj`/`str`/`map` 等 builder；TypeBox 已不在校验路径上），既用于类型推导，也用于 fingerprint。
+| 面 | 内容 | 入口 |
+|---|---|---|
+| telemetry | `CHORD_TELEMETRY_SCHEMA`、host adapter、`chord.call`/`chord.method`/`chord.commit` 等 span 面；page/worker 在内存记录、批量上送 server 的 `ingest`（页面批次严格校验、上限 1,200 spans/分钟、盖 `chord.host: browser`）；SQLite store 微秒时间戳（store v2 就地迁移） | `./telemetry-sqlite`、`./telemetry-sqlite/node`、`./telemetry-ingest` |
+| HTTP | Web 标准 fetch handler、默认拒绝（无 principal 且非 `public: true` → 401）、CSP nonce、签 cookies、links endpoint 心跳 | `./http` |
+| workers | 按 host kind 地址 fork worker，按需启动/空闲停止；base 用 esbuild 打进私有临时目录再 fork（源码中途编辑不影响已起的 worker）；1.6.0 起要求 `store` | `./workers`、`./workers/child` |
+| plugins | esbuild 构建 + `vm.Script` 求值 + mapStack + 按 host 成批 rollout；版本化 API import 检查、`<name>.<kind>.<ext>` 文件、git/npm `installPlugin`、`testPlugin` | `./plugins`、`./plugins/runtime` |
+| app kit | `startServer`（数据目录布局、sessions、owner link/token/设备配对、0700/0600、`Files`、`exportData`/`importData`）、`startWorker`、可选 facet `defineUsers`/`inviteFacet`/`ephemeralLoginFacet`（§25） | `./app`、`./app/files` |
+| surfaces | `webSurface`/`tuiSurface`（内容哈希 base bundle + 插件 facet 自注册脚本）；`startPage` 连接循环与插件就地换装；`startTerminal` 在**沙箱子进程**跑 app 的终端代码（Node permission model，无 fs/网络/SQLite；`requireSandboxNode`）；主题与 i18n 的 client 侧 | `./surfaces`、`./web`、`./react`、`./tui`、`./tui/launcher` |
+| 查询 | live queries（`self.query`，commit 步内重跑、只发 diff，按索引跳过不可能受影响的 read）；named queries（slice 14：contract 声明 `queries()`，owner 用 `self.queries` 实现）；`self.list`（固定书签分页、`more` 增量）；column sets（跨插件 `exists`/join） | 根 export（store 面） |
+| sync（experimental） | store outbox → remote slots：`uploadSession`/`pullSession`/`foldSession`/`FlushScheduler`；`diverged`/`behind`/`remote_empty`（1.6.1 起 writer epochs 已删除） | `./sync` |
 
-**v1.3.0 起 remote 契约必须声明对象在哪台 host 上**（placement）：
+## 入口点（27 条 exports，全部核验自 `package.json`）
 
-```ts
-remote("session", { input, host: hostNamed("server"), ... })
-remote("session", { input, host: hostFamily("session:", "session"), ... })
-```
+分组（运行位置见 `README.md` 的表）：**双端** `.`（contracts/errors/hosts/facets/documents/derives/natives/jobs/links/registries/store/client 共享面）、`./context`、`./delta`、`./json`、`./watch`、`./output`、`./sync`、`./sqlite`、`./telemetry-sqlite`、`./telemetry-ingest`；**存储适配** `./sqlite/node`、`./sqlite/cloudflare`、`./telemetry-sqlite/node`；**Node 侧** `./http`、`./workers`、`./compression`、`./workers/child`、`./plugins`、`./plugins/runtime`、`./app`、`./app/files`、`./surfaces`、`./tui/launcher`；**客户端** `./web`、`./react`、`./tui`。
 
-`hostNamed` 给固定 host 名，`hostFamily` 用 "前缀 + input 的某个必填字符串字段" 拼 host 名（`contract.ts:50-82,103-108`）。`GetOptions.at` 已删除——调用方不再指定 host，`get` 归一化 input 后按 placement 解析。
+## 三份文档并读（不要只读 design.md）
 
-placement 进入 description 与 fingerprint；`accepts` 适配器不能跨 placement 桥接。serve 一个不属于本机的类型会被拒（`host.ts:455-458`），hold 一个错位地址也会被拒（`connection.ts:899-902`）。
+| 文件 | 行数 | 回答什么 |
+|---|---|---|
+| `docs/design.md` | 3,691（30 章） | **是什么**：§3 hosts/links、§6 objects、§9 documents、§10 store、§21 reload、§23 optional components、§29 telemetry、§30 cost model |
+| `docs/decisions.md` | 3,779 | **为什么不是另一种做法**：被否掉的方案与理由 |
+| `docs/slices.md` | 380（slice 1–14+） | **怎么分步建** + 每个 slice 的 Carry-over（AGENTS.md 规定 carry-over 必须随同一 change 落地） |
 
-### object / reference / lifetime
+另有 `docs/plugin-authoring.md`（插件作者指南）与 17 个专题目录（`http-workers/`、`guide-plugins-hosts/`、`i18n/`、`theming/`、`store/`、`tutorial/` 等）。可运行示例：`test/examples/` **72 个条目 / 递归 236 个 `.ts`**（durable `test/examples/` 同格式）。
 
-- **object**：按 `(type, canonicalInput, principalKey, contractFingerprint)` 稳定标识，持 state cells / resources / listeners / tasks，**跨 reload 存活**。旧文档叫 record，源码文件叫 `object.ts`（`record.ts` 已删）。
-- **reference（`Ref`）**：`get`/`hold` 的返回值，late-bound；`RefStatus` 是它的状态。
-- **lifetime**：`"referenced"`（默认，第一个 `get` 创建，最后一个 reference 释放后 dispose）或 `"host"`（facet 加载时创建，host 关闭或 reload 移除 facet 时销毁；只允许无必填 input 的 local 类型，且不能与 `linger` 同用）（`Lifetime` 定义 `object.ts:76`，两个分支 `:51`/`:59`）。
-- **linger**：provider 对象在最后一个 reference 释放后再保留一段时间；consumer 侧的远程 binding 也有 `HostOptions.linger`（按 type，cap 默认 4）（`host.ts:138-144`）。
+## 与 v1 的断裂（读旧材料时的对照表）
 
-### principal 由应用注入
-
-chord **不发明 principal**：
-
-- `createHost<P>({ self })`（`host.ts:251`）：`self` 是必填项（`HostOptions.self`，`:121`），表示 host 自己代码的 principal。
-- `connect(link, { principal })`：父 host 的请求以谁的身份发出（`host.ts:154-157`）。
-- `Route.principal`、`accept({ principal })` 同样必填。
-
-host 自己的 principal 按 `principalKey` 识别（不是对象身份）。`createHost<P>`/`defineFacet<P>`/`Serve<P>` 等泛型让工厂、方法、监听器、任务都能直接收窄到应用的 principal 类型。
-
-### 状态：cell、init 与按 variant 的 state
-
-- `self.state(name, schema, initial, { version?, migrate? })` 返回一个 cell；cell 的版本与迁移是**每个 cell 自己的**，`ServeOptions.state` 的全局版本已删除。
-- `self.state(name, schema, { init }, options?)`：第一次值由 `init(ctx)` 提供。init 在 resources open、references live 之后、对象 live 之前跑，保证没有方法/监听器/任务看到中间值；reload 保留 cell 不重跑 init，新增 cell 在 prepare 阶段跑（`object.ts:151-153,164-171`）。
-- state 成员类型是 `T`（v1.2.0 是 `T | undefined`）。未 hydrate 读会抛 `not_ready`，不在当前 variant 抛 `not_in_variant`。
-- 远程 reference 按 `variant` 判别联合；跨 variant 的成员必须先收窄。
-- 其余声明式设施：`self.resource(name, { version, deps?, exclusive?, open, close? })`、`self.on(name, source, [select,] handler)`、`self.derive(sources, fn)`、`self.task(fn)`。
-
-### get 是 async 的
-
-`ctx.get` 与 `host.get` 返回 `Promise<Ref>`：等 reference live **且该 variant 的每个 state 成员都有首个快照**才 resolve；超时抛 `unavailable/ready_timeout`（`HostOptions.readyTimeout` 默认 60 s，`host.ts:203-212,907`）。失败只释放那一个 reference。
-
-- 同步形态是 `host.hold`（可能处于 `loading`），给 UI 运行时用。
-- `self.get` 保持同步：对象只有在 references ready 且 hydrate 完成后才 live。
-- `GetOptions.state: false` 得到"只要方法不要状态"的 reference。
-
-### reload：两个 code version 并存
-
-hot reload 仍是硬要求。host 同时保留两个 code version，reload 分 prepare/commit：
-
-- 提交后旧版本的对象由 `retire` 流程退役：等旧 roots 结束，最多 `retireDeadline`（默认 5 s）；超时先 abort 旧 roots（reason `superseded`，给 1 s 宽限）再关只属于旧代码的资源（`reload.ts:256-278`）。
-- 对象的 tasks 在新一轮启动前先停旧的：`HostOptions.taskStopDeadline`（默认 5 s），超时上报后照样启动（`host.ts:128-132`、`object.ts:1404-1434`）。
-- `FacetApi.signal` 在该 run 被替换/移除、reload abort 或 host close 时 abort（`host.ts:75-80`）。prepare 期间旧、新 run 同时 live。
-- 跨 reload 保留的 resource 在 commit 时采用最新声明（`object.ts:276-284`），旧代码闭包随之可回收。
-
-## 通信：protocol 4
-
-`PROTOCOL_VERSION = 4`（`src/wire.ts:24`）。v1.2.0 **没有**这个常量；它先以 2 引入，随后 2→3、3→4 两次 bump，全部发生在 v1.2.0→v1.3.0 之间；`wire.ts` 在 v1.3.0..v1.4.0 零改动。
-
-- `hello` 带 protocol；**没有协议字段的旧 peer 视为 1，直接 mismatch**：`(frame.protocol ?? 1) !== 4` → `onProtocolMismatch({local:4,peer})` 并以 `protocol-version 4` 关闭（`connection.ts:832-835,654-663`）。没有协商。
-- protocol 4 的帧形状：`hold` 隐含该 variant 的 state（`state:false` 退出，`sub` 再开，`unsub` 停）；provider 以 unit 应答（`shape.state` 列出 consumer 缺的成员，随后逐个 snapshot）；`state` 帧是 `{hold, m, as:"snap"|"reset"|"ops"|"error", value?}`；`resync` 要求重发；`again` 标记断链后的重 hold；`origin` 标识 client 连接（`wire.ts:74-140`）。
-- **端到端流控**：peer 用 `ack` 帧确认已处理的帧（`hello.acks`），未确认帧超过 `LinkOptions.window`（默认 256 KiB）时 state 帧在发送端等待并按订阅合并；每个订阅的等待有界（`pendingCap`，默认 4 个窗口），超了变 reset（中继向下游发 `resync`）。call/result/控制帧**不受流控**，所以高负载下 result 可能先于它之前的 state 变化到达（`connection.ts:12-32,322-348,460-619`）。
-- `AcceptOptions.maxCalls` 限制对端同时在途的调用数，超了直接回 `unavailable/too_many_calls`，link 不断。
-- **打包**：JSON 超过 `PACK_THRESHOLD`（64K 字符，`link.ts:113`）的 call 参数/结果/state 快照走 deflate；IPC 用 base64 字段，WebSocket 用二进制 envelope；中继原样转发，使用方解压。`webSocketLink(socket, { compress, acceptPacked })` 控制开关（签名 `link.ts:414`，选项类型 `:354-359`）。
-- 同一对象的多个远程 reference **共享一个 binding**（一次 hold、每个 state 成员一条 stream、call 复用同一 hold），各自只保留 status/observer/release（`remote.ts:70-80`）。
-
-## 附属面
-
-| 子路径 | 内容 |
+| 旧（v1，已删除） | 现（v2） |
 |---|---|
-| `@earendil-works/chord/output` | `OutputBuffer`（head/tail 窗口）、`Progress`（按大小节流的提交）、`ProgressClock`、`boundOutput`/`sanitizeOutput`/`characterEnd`/`utf8ByteLength`（v1.3.0 从 durable 迁入，`output.ts`） |
-| `@earendil-works/chord/sqlite` | `SqliteDatabase`/`SqliteExecutor`/`SqliteValue`、迁移 runner（带"库版本比代码新就拒绝"的守卫）、schema prefix 校验 |
-| `@earendil-works/chord/sqlite/node` | `NodeSqliteDatabase`、`openNodeSqliteDatabase`（串行队列、statement cache、WAL、busy timeout） |
-| `@earendil-works/chord/sqlite/cloudflare` | `DurableObjectSqliteDatabase` |
-| `@earendil-works/chord/telemetry-sqlite` | `createSqliteTelemetry`：`SqliteTelemetry` 同时实现 `TelemetryContext` 与 `TelemetryStore` |
-| `@earendil-works/chord/node` | `nodeLoader` + host manager（fork driver、processLock、control channel） |
-
-`./delta`（JSON delta 引擎）自 v0.86.x 起是唯一实现（不可变 tracker），本页不重复；见 `src/delta/README.md`。
-
-## 为什么值得记
-
-- 它是 monorepo 里**唯一通用运行时**：不服务于 Pi 的业务，durable 与 env 只是它的消费者。
-- v1.4.0 的 chord 已经不是一个零依赖的独立库：它把 telemetry 作为运行时的必需上下文，同时把 sqlite 驱动下沉给它——这两件事让 chord 变成"基础设施的公共底座"。
-- 读 Pi 源码时遇到 chord，注意三点：(1) 术语是 object/reference/placement，不是旧的 record/handle/service；(2) 协议 4 与旧 peer 不互通；(3) 自定义 `Context` 必须提供 `telemetry`。
+| `@earendil-works/chord` 根 export = v1；`./next` = v2 | 根 export = v2；`./next` 导出**不存在** |
+| v1 的 placement `hostNamed`/`hostFamily`、`GetOptions.at` | v2 的 host 归属在 contract 上声明（design §3/§5） |
+| v1 的 `PROTOCOL_VERSION = 4`、帧形状、window/pendingCap | v2 的 wire 在 design §22（`PROTOCOL_VERSION = 1`，1.5.1 加 `old`/trace 位时未 bump） |
+| v1 的 cell/`linger`/`retire`/async `get` 语义 | v2 的 documents/state/references（§6–§9、§11） |
+| 模块 `src/next`（146 `.ts`）+ `src/next-node`（29） | `src/` 21 个模块 + 根部 5 个 `.ts`，共 **315** 个 `.ts`（`node/` 72：app 23、http 13、plugins 12、surfaces 8、tui 7、workers 8） |
 
 ## 锚点
 
-- `packages/chord/package.json`：**11** 条 exports（`.`、`./context`、`./delta`、**`./next`**、`./node`、`./output`、`./package.json`、`./sqlite`、`./sqlite/cloudflare`、`./sqlite/node`、`./telemetry-sqlite`）、依赖 **`@earendil-works/pi-schema`** + `@earendil-works/pi-telemetry`（**v1.5.0 起 `typebox` 已从依赖中移除**，且 `./next` 是 v1.5.0 新增的 v2 入口）；peerDependencies 为可选的 `esbuild` / `ws`
-- `packages/chord/CHANGELOG.md`：1.2.0 / 1.3.0 / 1.4.0 / **1.5.0** 四段（1.3.0 是 Breaking 集中版；**1.5.0 是双运行时分界**——7 条 Breaking 加 `./next` 首次导出）
-- `packages/chord/docs/spec.md`（协议与语义的规范文本，§1 概念、§2 contracts、§5 lifetime、§7 reload、§9 hosts and links、§10 host manager、§11 测试覆盖、§12 已知限制）；`docs/spec.md:6` 的"无其它 Pi 包"已过时
-- `packages/chord/src/host.ts`（1,305 行）、`contract.ts`、`object.ts`、`connection.ts`、`wire.ts`、`link.ts`、`reload.ts`、`remote.ts`
-- `packages/chord/README.md`（267 行）
-- 状态：experimental（`docs/spec.md` 自述"文档与代码不一致是 bug"）。
+- `packages/chord/package.json`：27 条 exports；deps `pi-schema` + `pi-telemetry`（pin 1.6.1）；optional peers `esbuild`/`ws`/`react`（ranges）
+- `packages/chord/CHANGELOG.md`：8 段（1.2.0–1.6.1；1.5.1 是"v2 转正 + v1 删除 + slices 9–13"集中版）
+- `packages/chord/README.md`：对象模型摘要 + 全部入口点表（写本页时的对照基准）
+- `packages/chord/docs/`：28 篇 md + 17 个目录（design/decisions/slices/plugin-authoring + 专题目录）
+- 消费者：`packages/durable`、`packages/env`、`apps/p2`、`apps/p3`（pin 1.6.1）；`packages/coding-agent` **无** chord 依赖
+- 状态：包本身按 semver 记录；`/sync` 仍标注 experimental

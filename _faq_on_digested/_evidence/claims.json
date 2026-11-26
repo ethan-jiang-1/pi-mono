@@ -4,7 +4,7 @@
       "id": "E001",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "round-trip 测试断言持久化的 JSON 重放出相同的工具声明",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/test/system-prompt-updates.test.ts",
@@ -22,7 +22,7 @@
       "id": "E002",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "faux 的 deferred 状态记录请求模型、待取次数与取消标记",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/providers/faux.ts",
@@ -40,7 +40,7 @@
       "id": "E003",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "faux 把工具调用参数按 token 尺寸分块流式推送",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/providers/faux.ts",
@@ -58,7 +58,7 @@
       "id": "E004",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "faux 的流最终以完整的 assistant message 结算",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/providers/faux.ts",
@@ -76,7 +76,7 @@
       "id": "E005",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "faux 在开始流之前通过 onResponse 回调报告状态与响应头",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/providers/faux.ts",
@@ -94,7 +94,7 @@
       "id": "E006",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "faux 在 error/aborted 结算时推 error 事件并结束流，不再推 done",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/providers/faux.ts",
@@ -112,7 +112,7 @@
       "id": "E007",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "faux 的模型定义带 maxTokens 上限（示例为 16384）",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/providers/faux.ts",
@@ -130,7 +130,7 @@
       "id": "E008",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "SessionManager.open(path, sessionDir?, cwdOverride?) 打开既有会话",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/session-manager.ts",
@@ -148,7 +148,7 @@
       "id": "E009",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "导出会话未给路径时生成带时间戳的 JSONL 文件名",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/session-export.ts",
@@ -166,7 +166,7 @@
       "id": "E010",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "分享会话时把 session.jsonl 以 application/x-ndjson 上传",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/bug-report.ts",
@@ -184,7 +184,7 @@
       "id": "E011",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "migrateV1ToV2 就地补出 id/parentId 树结构",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/session-manager.ts",
@@ -202,7 +202,7 @@
       "id": "E012",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "测试 harness 的 sessionManager 选项用于续接会话或测试 resume",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/test/suite/harness.ts",
@@ -220,7 +220,7 @@
       "id": "E013",
       "page": "13_recorded_session_snapshots/answer.md",
       "claim": "before_provider_request 钩子可以修改消息后交给模型",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/extensions/types.ts",
@@ -238,7 +238,7 @@
       "id": "E014",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "round-trip 测试断言工具声明在 JSON 往返后不变",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/test/system-prompt-updates.test.ts",
@@ -256,7 +256,7 @@
       "id": "E015",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "compaction entry 携带被压缩 system message 的重放状态",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/compaction/compaction.ts",
@@ -274,7 +274,7 @@
       "id": "E016",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "测试 harness 的选项覆盖 provider、模型与 settings",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/test/suite/harness.ts",
@@ -292,7 +292,7 @@
       "id": "E017",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "SessionManager.open 用路径打开会话，可覆盖 sessionDir 与 cwd",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/session-manager.ts",
@@ -310,7 +310,7 @@
       "id": "E018",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "每次 LLM 调用前的钩子可以改写 transcript 消息",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/extensions/types.ts",
@@ -328,7 +328,7 @@
       "id": "E019",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "emitBeforeProviderRequest 允许扩展替换或保留请求 payload",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/extensions/runner.ts",
@@ -346,7 +346,7 @@
       "id": "E020",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "SessionHeader 的 version 可缺省，缺省即 v1 旧会话",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/session-manager.ts",
@@ -364,7 +364,7 @@
       "id": "E021",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "导出未指定路径时用时间戳生成 session JSONL 文件名",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/session-export.ts",
@@ -382,7 +382,7 @@
       "id": "E022",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "斜杠命令参数解析按首个空白切分",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/modes/interactive/interactive-mode.ts",
@@ -400,7 +400,7 @@
       "id": "E023",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "bug-report 把临时目录里的 session.jsonl 打进诊断包",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/modes/interactive/session-share.ts",
@@ -418,7 +418,7 @@
       "id": "E024",
       "page": "13_recorded_session_snapshots/research.md",
       "claim": "分享包把 session.jsonl 作为 application/x-ndjson 上传",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/bug-report.ts",
@@ -436,7 +436,7 @@
       "id": "E025",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`CONTRIBUTING.md#L5-L11`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -454,7 +454,7 @@
       "id": "E026",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`CONTRIBUTING.md#L13-L19`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -472,7 +472,7 @@
       "id": "E027",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`CONTRIBUTING.md#L21-L34`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -490,7 +490,7 @@
       "id": "E028",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`CONTRIBUTING.md#L36-L48`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -508,7 +508,7 @@
       "id": "E029",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`CONTRIBUTING.md#L56-L71`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -526,7 +526,7 @@
       "id": "E030",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`issue-gate.yml#L3-L5`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/issue-gate.yml",
@@ -543,17 +543,17 @@
     {
       "id": "E031",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`issue-gate.yml#L18-L26`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`issue-gate.yml#L25-L33`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/issue-gate.yml",
           "locator": {
             "kind": "text",
-            "value": "const APPROVED_FILE = '.github/APPROVED_CONTRIBUTORS'; const VALID_CAPABILITIES = new Set(['issue', 'pr']); const TRUSTE"
+            "value": "const APPROVED_FILE = '.github/APPROVED_CONTRIBUTORS'; const VALID_CAPABILITIES = new Set(['issue', 'pr']); const TRUSTED_BOT_AUTHORS = new Set(['depe"
           },
-          "quote": "const APPROVED_FILE = '.github/APPROVED_CONTRIBUTORS'; const VALID_CAPABILITIES = new Set(['issue', 'pr']); const TRUSTED_BOT_AUTHORS = new Set(['dependabot[bot]', 'sentry[bot]', 'claude[bot]']); const issueAuthor = context.payload.issue.user.login; const defaultBranch = context.payload.repository.default_branch; const isBotAuthor = issueAuthor.endsWith('[bot]'); if (TRUSTED_BOT_AUTHORS.has(issueAuthor)) { console.log(`Skipping trusted bot: ${issueAuthor}`);",
-          "hintLine": 18,
+          "quote": "const APPROVED_FILE = '.github/APPROVED_CONTRIBUTORS'; const VALID_CAPABILITIES = new Set(['issue', 'pr']); const TRUSTED_BOT_AUTHORS = new Set(['dependabot[bot]', 'sentry[bot]', 'claude[bot]']); const issue = context.eventName === 'workflow_dispatch' ? ( await github.rest.issues.get({ owner: context.repo.owner, repo: context.repo.repo,",
+          "hintLine": 25,
           "volatility": "high"
         }
       ]
@@ -561,17 +561,17 @@
     {
       "id": "E032",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`issue-gate.yml#L84-L97`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`issue-gate.yml#L102-L116`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/issue-gate.yml",
           "locator": {
             "kind": "text",
-            "value": "const permission = await getPermission(issueAuthor); if (!isBotAuthor && ['admin', 'maintain', 'write'].includes(permiss"
+            "value": "const permission = await getPermission(issueAuthor); if (!isBotAuthor && ['admin', 'maintain', 'write'].includes(permission)) { console.log(`${issueAu"
           },
-          "quote": "const permission = await getPermission(issueAuthor); if (!isBotAuthor && ['admin', 'maintain', 'write'].includes(permission)) { console.log(`${issueAuthor} is a collaborator with ${permission} access`); return; } const approvedContent = await getTextFile(APPROVED_FILE); const approvedUsers = parseApprovedUsers(approvedContent); const capability = approvedUsers.get(issueAuthor.toLowerCase()); if (!isBotAuthor && (capability === 'issue' || capability === 'pr')) { console.log(`${issueAuthor} is approved for ${capability}`); return; }",
-          "hintLine": 84,
+          "quote": "const permission = await getPermission(issueAuthor); if (!isBotAuthor && ['admin', 'maintain', 'write'].includes(permission)) { console.log(`${issueAuthor} is a collaborator with ${permission} access`); return; } const approvedContent = await getTextFile(APPROVED_FILE); const approvedUsers = parseApprovedUsers(approvedContent); const capability = approvedUsers.get(issueAuthor.toLowerCase()); // Every issue from someone without write access waits for review: labeled untriaged. Those from approved // contributors stay open, the others are closed until a maintainer reopens them. await github.rest.issues.addLabels({ owner: context.repo.owner, repo: context.repo.repo,",
+          "hintLine": 102,
           "volatility": "high"
         }
       ]
@@ -579,17 +579,17 @@
     {
       "id": "E033",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`issue-gate.yml#L99-L129`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`issue-gate.yml#L127-L158`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/issue-gate.yml",
           "locator": {
             "kind": "text",
-            "value": "const message = [ 'This issue was auto-closed. All issues from new contributors are auto-closed by default.', '', `Maint"
+            "value": "'This issue was auto-closed. All issues from new contributors are auto-closed by default.', '', `Maintainers review auto-closed issues daily and reope"
           },
-          "quote": "const message = [ 'This issue was auto-closed. All issues from new contributors are auto-closed by default.', '', `Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar in [CONTRIBUTING.md](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${defaultBranch}/CONTRIBUTING.md) will not be reopened or receive a reply.`, '', 'If a maintainer replies `lgtmi` on one of your issues, your future issues will stay open. If a maintainer replies `lgtm`, your future issues and PRs will stay open. The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end.', '', `See [CONTRIBUTING.md](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${defaultBranch}/CONTRIBUTING.md).`, ].join('\\n'); await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: message, }); await github.rest.issues.addLabels({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, labels: ['untriaged'], }); await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, state: 'closed', state_reason: 'not_planned', });",
-          "hintLine": 99,
+          "quote": "'This issue was auto-closed. All issues from new contributors are auto-closed by default.', '', `Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar in [CONTRIBUTING.md](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${defaultBranch}/CONTRIBUTING.md) will not be reopened or receive a reply.`, '', 'If a maintainer replies `lgtmi` on one of your issues, your future issues will stay open. If a maintainer replies `lgtm`, your future issues and PRs will stay open. The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end.', '', `See [CONTRIBUTING.md](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${defaultBranch}/CONTRIBUTING.md).`, ].join('\\n'); await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number, body: message, }); await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number, state: 'closed', state_reason: 'not_planned', });",
+          "hintLine": 127,
           "volatility": "high"
         }
       ]
@@ -598,7 +598,7 @@
       "id": "E034",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`pr-gate.yml#L3-L5`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/pr-gate.yml",
@@ -616,7 +616,7 @@
       "id": "E035",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`pr-gate.yml#L19-L29`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/pr-gate.yml",
@@ -634,7 +634,7 @@
       "id": "E036",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`pr-gate.yml#L101-L128`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/pr-gate.yml",
@@ -652,7 +652,7 @@
       "id": "E037",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`approve-contributor.yml#L3-L5`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/approve-contributor.yml",
@@ -670,7 +670,7 @@
       "id": "E038",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`approve-contributor.yml#L27-L60`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/approve-contributor.yml",
@@ -688,7 +688,7 @@
       "id": "E039",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`approve-contributor.yml#L133-L183`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/approve-contributor.yml",
@@ -706,7 +706,7 @@
       "id": "E040",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`issue-gate.yml#L43-L55`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/issue-gate.yml",
@@ -724,7 +724,7 @@
       "id": "E041",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`pr-gate.yml#L44-L56`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/pr-gate.yml",
@@ -741,16 +741,16 @@
     {
       "id": "E042",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`AGENTS.md#L15-L28`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`AGENTS.md#L15-L31`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
           "locator": {
             "kind": "text",
-            "value": "## Code Quality"
+            "value": "## Code Quality - Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or "
           },
-          "quote": "## Code Quality\n\n- Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes.\n- No `any` unless absolutely necessary.\n- Inline single-line helpers that have only one call site.\n- Check node_modules for external API types; don't guess.\n- **No inline imports** (`await import()`, `import(\"pkg\").Type`, dynamic type imports). Top-level imports only.\n- In `packages/coding-agent`, resolve package assets through helpers in `src/config.ts`. Do not use `__dirname` directly; the helpers account for source checkouts, npm installations, and standalone binaries.\n- Never remove or downgrade code to fix type errors from outdated deps; upgrade the dep instead.\n- Use only erasable TypeScript syntax (Node strip-only mode) in code checked by the root config (`packages/*/src`, `packages/*/test`, `packages/coding-agent/examples`): no parameter properties, `enum`, `namespace`/`module`, `import =`, `export =`, or other constructs needing JS emit. Use explicit fields with constructor assignments.\n- Always ask before removing functionality or code that appears intentional.\n- Do not preserve backward compatibility unless the user asks for it.\n- Never hardcode key checks (e.g. `matchesKey(keyData, \"ctrl+x\")`). Add defaults to `DEFAULT_EDITOR_KEYBINDINGS` or `DEFAULT_APP_KEYBINDINGS` so they stay configurable.\n- Never modify `packages/ai/src/models.generated.ts` directly; update the catalog definitions in `packages/ai/catalog/` instead (see its README), then regenerate. Including the resulting `models.generated.ts` diff is always OK, even if regeneration includes unrelated upstream model metadata changes. The generated model data in `packages/ai/src/providers/data/` is gitignored: never stage it, and don't look for it in git history.\n",
+          "quote": "## Code Quality - Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes. - Before recommending a fix design, check how sibling implementations (other adapters, providers, commands) handle the same concern, and follow that pattern. If you deviate, say why. - No `any` unless absolutely necessary. - Never tell the members of a typed union apart with `in` (`\"report\" in entry`): make it a tagged union (a `kind` field) and switch on the tag. `in` is only for values of unknown type at a trust boundary (wire input, files, Node errors), for feature detection, and for stored or frozen wire formats that a version bump would have to change (say so in a comment). - No runtime checks of values whose types TypeScript already guarantees (no `typeof`/`instanceof`/`Array.isArray`/shape guards on typed parameters, typed callback results or typed declarations). Validate only at decided trust boundaries (wire input, schema-checked arguments and params). - Inline single-line helpers that have only one call site. - Check node_modules for external API types; don't guess. - **No inline imports** (`await import()`, `import(\"pkg\").Type`, dynamic type imports). Top-level imports only. - In `packages/coding-agent`, resolve package assets through helpers in `src/config.ts`. Do not use `__dirname` directly; the helpers account for source checkouts, npm installations, and standalone binaries. - Never remove or downgrade code to fix type errors from outdated deps; upgrade the dep instead. - Use only erasable TypeScript syntax (Node strip-only mode) in code checked by the root config (`packages/*/src`, `packages/*/test`, `packages/coding-agent/examples`): no parameter properties, `enum`, `namespace`/`module`, `import =`, `export =`, or other constructs needing JS emit. Use explicit fields with constructor assignments. - Always ask before removing functionality or code that appears intentional. - Do not preserve backward compatibility unless the user asks for it. - Never hardcode key checks (e.g. `matchesKey(keyData, \"ctrl+x\")`). Add defaults to `DEFAULT_EDITOR_KEYBINDINGS` or `DEFAULT_APP_KEYBINDINGS` so they stay configurable. - Never modify `packages/ai/src/models.generated.ts` directly; update the catalog definitions in `packages/ai/catalog/` instead (see its README), then regenerate. Including the resulting `models.generated.ts` diff is always OK, even if regeneration includes unrelated upstream model metadata changes. The generated model data in `packages/ai/src/providers/data/` is gitignored: never stage it, and don't look for it in git history.",
           "hintLine": 15,
           "volatility": "high"
         }
@@ -759,17 +759,17 @@
     {
       "id": "E043",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`AGENTS.md#L30-L41`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`AGENTS.md#L51-L66`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
           "locator": {
             "kind": "text",
-            "value": "## Commands"
+            "value": "## Commands - After code changes (not docs): `npm run check` (full output, no tail). Fix all errors, warnings, and infos before committing. Does not r"
           },
-          "quote": "## Commands\n\n- After code changes (not docs): `npm run check` (full output, no tail). Fix all errors, warnings, and infos before committing. Does not run tests.\n- Run `npm run build` whenever something needs built output (`dist/`): tests or benchmarks that import built packages, Durable's workerd suite. Never use it to type check or lint: that is `npm run check`, the preferred check.\n- Never run `npm test` unless requested by the user.\n- Never run the full vitest suite directly: it includes e2e tests that activate when endpoint/auth env vars are present. For all non-e2e tests, run `./test.sh` from the repo root. Otherwise run specific tests from the package root:\n  - Vitest: `node \"$(git rev-parse --show-toplevel)/node_modules/vitest/dist/cli.js\" --run test/specific.test.ts`\n  - `packages/tui` (`node:test`): `node --test test/specific.test.ts`\n- If you create or modify a test file, run it and iterate on test or implementation until it passes.\n- For `packages/coding-agent/test/suite/`, use `test/suite/harness.ts` + the faux provider. No real provider APIs, keys, or paid tokens.\n- When regressions tests for fixing a github issue, add a comment with the github issue number next to the test.\n- For ad-hoc scripts, `write` them to a temp file (e.g. `/tmp`), run, edit if needed, remove when done. Don't embed multi-line scripts in `bash` commands.\n- Never commit unless the user asks.\n\n## Dependency and Install Security",
-          "hintLine": 30,
+          "quote": "## Commands - After code changes (not docs): `npm run check` (full output, no tail). Fix all errors, warnings, and infos before committing. Does not run tests. - `apps/p2` is outside the root check and the root tests. After p2 changes also run `cd apps/p2 && npm run check`; p2's suite is `cd apps/p2 && npm test` (TUI tests need Node 26, browser tests need `CHROMIUM_BIN`). - Run `npm run build` whenever something needs built output (`dist/`): tests or benchmarks that import built packages, Durable's workerd suite. The full suites of Chord and Durable need it: Chord's tests that start Node processes or bundle with esbuild load workspace packages from `dist/` (the rest run from source by its vitest config), and Durable imports pi-ai's `utils/*`, which have no source export. Never use it to type check or lint: that is `npm run check`, the preferred check. - Never run `npm test` unless requested by the user. - Never run the full vitest suite directly: it includes e2e tests that activate when endpoint/auth env vars are present. For all non-e2e tests, run `./test.sh` from the repo root. It runs `packages/*` only. Otherwise run specific tests from the package root: - Vitest: `node \"$(git rev-parse --show-toplevel)/node_modules/vitest/dist/cli.js\" --run test/specific.test.ts` - `packages/tui` (`node:test`): `node --test test/specific.test.ts` - If you create or modify a test file, run it and iterate on test or implementation until it passes. - For `packages/coding-agent/test/suite/`, use `test/suite/harness.ts` + the faux provider. No real provider APIs, keys, or paid tokens. - When regressions tests for fixing a github issue, add a comment with the github issue number next to the test. - For ad-hoc scripts, `write` them to a temp file (e.g. `/tmp`), run, edit if needed, remove when done. Don't embed multi-line scripts in `bash` commands. - Never commit unless the user asks. ## Dependency and Install Security",
+          "hintLine": 51,
           "volatility": "high"
         }
       ]
@@ -778,7 +778,7 @@
       "id": "E044",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`AGENTS.md#L43-L50`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "AGENTS.md",
@@ -796,7 +796,7 @@
       "id": "E045",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`package.json#L20-L27`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "package.json",
@@ -814,7 +814,7 @@
       "id": "E046",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-pinned-deps.mjs#L4-L7`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-pinned-deps.mjs",
@@ -832,7 +832,7 @@
       "id": "E047",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-pinned-deps.mjs#L24-L34`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-pinned-deps.mjs",
@@ -850,7 +850,7 @@
       "id": "E048",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-pinned-deps.mjs#L40-L59`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-pinned-deps.mjs",
@@ -868,7 +868,7 @@
       "id": "E049",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-runtime-deps.mjs#L26-L43`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.mjs",
@@ -886,7 +886,7 @@
       "id": "E050",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-runtime-deps.mjs#L45-L80`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.mjs",
@@ -904,7 +904,7 @@
       "id": "E051",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-runtime-deps.mjs#L83-L123`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.mjs",
@@ -922,7 +922,7 @@
       "id": "E052",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/generate-coding-agent-install-lock.mjs#L278-L375`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/generate-coding-agent-install-lock.mjs",
@@ -940,7 +940,7 @@
       "id": "E053",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/generate-coding-agent-install-lock.mjs#L429-L447`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/generate-coding-agent-install-lock.mjs",
@@ -958,7 +958,7 @@
       "id": "E054",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`.husky/pre-commit#L3-L17`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".husky/pre-commit",
@@ -976,7 +976,7 @@
       "id": "E055",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`.husky/pre-commit#L19-L35`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".husky/pre-commit",
@@ -994,7 +994,7 @@
       "id": "E056",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-lockfile-commit.mjs#L5-L6`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-lockfile-commit.mjs",
@@ -1012,7 +1012,7 @@
       "id": "E057",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-lockfile-commit.mjs#L77-L103`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-lockfile-commit.mjs",
@@ -1030,7 +1030,7 @@
       "id": "E058",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-lockfile-commit.mjs#L117-L120`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-lockfile-commit.mjs",
@@ -1047,17 +1047,17 @@
     {
       "id": "E059",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`ci.yml#L32-L45`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`ci.yml#L30-L43`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/ci.yml",
           "locator": {
             "kind": "text",
-            "value": "- name: Install dependencies"
+            "value": "run: npm ci --ignore-scripts - name: Build run: npm run build # Previews are published for main, release tags and PRs from branches of this repo only "
           },
-          "quote": "      - name: Install dependencies\n        run: npm ci --ignore-scripts\n\n      - name: Build\n        run: npm run build\n\n      # Previews are published for main and PRs from branches of this repo only (see preview-packages.yml).\n      - name: Pack preview packages\n        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository\n        env:\n          # Pull request runs check out a merge commit; tarballs are keyed by the PR head commit.\n          SHA: ${{ github.event.pull_request.head.sha || github.sha }}\n        run: node scripts/preview-packages.mjs pack --sha \"$SHA\" --out \"$RUNNER_TEMP/preview-packages\"\n\n      - name: Upload preview packages",
-          "hintLine": 32,
+          "quote": "run: npm ci --ignore-scripts - name: Build run: npm run build # Previews are published for main, release tags and PRs from branches of this repo only (see preview-packages.yml). - name: Pack preview packages if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository env: # Pull request runs check out a merge commit; tarballs are keyed by the PR head commit. SHA: ${{ github.event.pull_request.head.sha || github.sha }} run: node scripts/preview-packages.mjs pack --sha \"$SHA\" --out \"$RUNNER_TEMP/preview-packages\" - name: Upload preview packages",
+          "hintLine": 30,
           "volatility": "high"
         }
       ]
@@ -1065,17 +1065,17 @@
     {
       "id": "E060",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`ci.yml#L3-L7`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`ci.yml#L4-L9`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/ci.yml",
           "locator": {
             "kind": "text",
-            "value": "on: push: branches: [main] pull_request: branches: [main]"
+            "value": "push: branches: [main] # The release commit is pushed together with the next commit, so a push to main never builds it; the tag run does, # and previe"
           },
-          "quote": "on: push: branches: [main] pull_request: branches: [main]",
-          "hintLine": 3,
+          "quote": "push: branches: [main] # The release commit is pushed together with the next commit, so a push to main never builds it; the tag run does, # and preview-packages.yml releases its packages on pkg.earendil.com. tags: ['v*.*.*'] pull_request:",
+          "hintLine": 4,
           "volatility": "high"
         }
       ]
@@ -1084,7 +1084,7 @@
       "id": "E061",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`ci.yml#L14-L45`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/ci.yml",
@@ -1101,16 +1101,16 @@
     {
       "id": "E062",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`package.json#L38-L40`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`package.json#L38-L42`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "package.json",
           "locator": {
             "kind": "text",
-            "value": "\"profile:tui\": \"node scripts/profile-coding-agent-node.mjs --mode tui\", \"profile:rpc\": \"node scripts/profile-coding-agen"
+            "value": "\"profile:tui\": \"node scripts/profile-coding-agent-node.mjs --mode tui\", \"profile:rpc\": \"node scripts/profile-coding-agent-node.mjs --mode rpc\", \"test\""
           },
-          "quote": "\"profile:tui\": \"node scripts/profile-coding-agent-node.mjs --mode tui\", \"profile:rpc\": \"node scripts/profile-coding-agent-node.mjs --mode rpc\", \"test\": \"npm run test:scripts && npm run test --workspaces --if-present\",",
+          "quote": "\"profile:tui\": \"node scripts/profile-coding-agent-node.mjs --mode tui\", \"profile:rpc\": \"node scripts/profile-coding-agent-node.mjs --mode rpc\", \"test\": \"npm run test:scripts && npm run test --workspace packages --if-present\", \"test:scripts\": \"node --test scripts/*.test.mjs scripts/*.test.ts\", \"test:mcp-conformance\": \"node packages/coding-agent/test/mcp-conformance/run.ts\",",
           "hintLine": 38,
           "volatility": "high"
         }
@@ -1120,7 +1120,7 @@
       "id": "E063",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`packages/agent/package.json#L19-L23`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/package.json",
@@ -1138,7 +1138,7 @@
       "id": "E064",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`packages/coding-agent/package.json#L39-L47`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/package.json",
@@ -1156,7 +1156,7 @@
       "id": "E065",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`packages/tui/package.json#L7-L14`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/tui/package.json",
@@ -1174,7 +1174,7 @@
       "id": "E066",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`ci.yml#L47-L65`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/ci.yml",
@@ -1192,7 +1192,7 @@
       "id": "E067",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`test.sh#L4-L37`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "test.sh",
@@ -1210,15 +1210,15 @@
       "id": "E068",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`test.sh#L39-L64`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "test.sh",
           "locator": {
             "kind": "text",
-            "value": "# Start from an empty environment and allow only required platform and test settings. test_env=( \"PATH=$PATH\" \"PWD=$PWD\""
+            "value": "# Start from an empty environment and allow only required platform and test settings. test_env=( \"PATH=$PATH\" \"PWD=$PWD\" \"HOME=$test_root/home\" \"USERP"
           },
-          "quote": "# Start from an empty environment and allow only required platform and test settings. test_env=( \"PATH=$PATH\" \"PWD=$PWD\" \"HOME=$test_root/home\" \"USERPROFILE=$test_root/home\" \"TMPDIR=$test_root/tmp\" \"TMP=$test_root/tmp\" \"TEMP=$test_root/tmp\" \"XDG_CONFIG_HOME=$test_root/home/.config\" \"XDG_CACHE_HOME=$test_root/cache\" \"LANG=C\" \"LC_ALL=C\" \"TZ=UTC\" \"GIT_CONFIG_NOSYSTEM=1\" \"GIT_CONFIG_GLOBAL=/dev/null\" \"GIT_TERMINAL_PROMPT=0\" \"GIT_ASKPASS=$git_askpass\" \"GIT_EDITOR=true\" \"GIT_SEQUENCE_EDITOR=true\" \"NPM_CONFIG_USERCONFIG=$test_root/npm-userconfig\" \"NPM_CONFIG_GLOBALCONFIG=$test_root/npm-globalconfig\" \"NPM_CONFIG_CACHE=$test_root/cache/npm\" \"PI_NO_LOCAL_LLM=1\" \"AWS_EC2_METADATA_DISABLED=true\" ) # Native Windows needs these inherited values to launch child processes. for name in SystemRoot SYSTEMROOT WINDIR COMSPEC PATHEXT; do value=\"${!name-}\" [[ -z \"$value\" ]] || test_env+=(\"$name=$value\") done # Trust extra certificates of proxies that inspect HTTPS (corporate proxies, sandboxes). # Network tests fail with self-signed certificate errors without it. value=\"${NODE_EXTRA_CA_CERTS-}\" [[ -z \"$value\" ]] || test_env+=(\"NODE_EXTRA_CA_CERTS=$value\") # Preserve CI detection only for runner behavior and test reporting. for name in CI GITHUB_ACTIONS; do value=\"${!name-}\"",
+          "quote": "# Start from an empty environment and allow only required platform and test settings. test_env=( \"PATH=$PATH\" \"PWD=$PWD\" \"HOME=$test_root/home\" \"USERPROFILE=$test_root/home\" \"TMPDIR=$test_root/tmp\" \"TMP=$test_root/tmp\" \"TEMP=$test_root/tmp\" \"XDG_CONFIG_HOME=$test_root/home/.config\" \"XDG_CACHE_HOME=$test_root/cache\" \"LANG=C\" \"LC_ALL=C\" \"TZ=UTC\" \"GIT_CONFIG_NOSYSTEM=1\" \"GIT_CONFIG_GLOBAL=/dev/null\" \"GIT_TERMINAL_PROMPT=0\" \"GIT_ASKPASS=$git_askpass\" \"GIT_EDITOR=true\" \"GIT_SEQUENCE_EDITOR=true\" \"NPM_CONFIG_USERCONFIG=$test_root/npm-userconfig\" \"NPM_CONFIG_GLOBALCONFIG=$test_root/npm-globalconfig\" \"NPM_CONFIG_CACHE=$test_root/cache/npm\" \"PI_NO_LOCAL_LLM=1\" \"AWS_EC2_METADATA_DISABLED=true\" )",
           "hintLine": 39,
           "volatility": "high"
         }
@@ -1228,7 +1228,7 @@
       "id": "E069",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`env.yml#L6-L13`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/env.yml",
@@ -1246,7 +1246,7 @@
       "id": "E070",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`env.yml#L25-L72`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/env.yml",
@@ -1264,7 +1264,7 @@
       "id": "E071",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`env.yml#L74-L127`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/env.yml",
@@ -1282,7 +1282,7 @@
       "id": "E072",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`env.yml#L128-L200`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/env.yml",
@@ -1300,7 +1300,7 @@
       "id": "E073",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`nix.yml#L15-L40`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/nix.yml",
@@ -1318,7 +1318,7 @@
       "id": "E074",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`nix.yml#L120-L151`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/nix.yml",
@@ -1336,7 +1336,7 @@
       "id": "E075",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`npm-audit.yml#L3-L6`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/npm-audit.yml",
@@ -1354,7 +1354,7 @@
       "id": "E076",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`npm-audit.yml#L24-L31`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/npm-audit.yml",
@@ -1372,7 +1372,7 @@
       "id": "E077",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/npm-audit.mjs#L9-L21`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/npm-audit.mjs",
@@ -1390,7 +1390,7 @@
       "id": "E078",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/npm-audit.mjs#L43-L83`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/npm-audit.mjs",
@@ -1408,7 +1408,7 @@
       "id": "E079",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`packages/evals/README.md#L22-L35`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/evals/README.md",
@@ -1426,7 +1426,7 @@
       "id": "E080",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`packages/evals/package.json#L6-L12`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/evals/package.json",
@@ -1444,7 +1444,7 @@
       "id": "E081",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L131-L208`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -1462,7 +1462,7 @@
       "id": "E082",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-pinned-deps.mjs#L25-L39`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-pinned-deps.mjs",
@@ -1480,7 +1480,7 @@
       "id": "E083",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-pinned-deps.mjs#L48-L56`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-pinned-deps.mjs",
@@ -1498,7 +1498,7 @@
       "id": "E084",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "`packages/coding-agent` 的直接外部依赖以精确版本钉住（exact pin），不是 range",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/package.json",
@@ -1522,7 +1522,7 @@
       "id": "E085",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`package-lock.json#L1-L6`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "package-lock.json",
@@ -1540,7 +1540,7 @@
       "id": "E086",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`package-lock.json#L31-L42`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "package-lock.json",
@@ -1558,7 +1558,7 @@
       "id": "E087",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`ci.yml#L32-L34`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/ci.yml",
@@ -1576,7 +1576,7 @@
       "id": "E088",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/generate-coding-agent-install-lock.mjs#L84-L115`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/generate-coding-agent-install-lock.mjs",
@@ -1593,16 +1593,16 @@
     {
       "id": "E089",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`scripts/generate-coding-agent-install-lock.mjs#L17-L21`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`scripts/generate-coding-agent-install-lock.mjs#L17-L19`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/generate-coding-agent-install-lock.mjs",
           "locator": {
             "kind": "text",
-            "value": "const allowedInstallScriptPackages = new Map([ [\"@google/genai@2.21.0\", \"preinstall is a no-op in the published package\""
+            "value": "const allowedInstallScriptPackages = new Map([ [\"protobufjs@7.6.6\", \"postinstall only warns about protobufjs version scheme mismatches\"], ]);"
           },
-          "quote": "const allowedInstallScriptPackages = new Map([ [\"@google/genai@2.21.0\", \"preinstall is a no-op in the published package\"], [\"protobufjs@7.6.6\", \"postinstall only warns about protobufjs version scheme mismatches\"], ]);",
+          "quote": "const allowedInstallScriptPackages = new Map([ [\"protobufjs@7.6.6\", \"postinstall only warns about protobufjs version scheme mismatches\"], ]);",
           "hintLine": 17,
           "volatility": "high"
         }
@@ -1612,7 +1612,7 @@
       "id": "E090",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/generate-coding-agent-install-lock.mjs#L320-L339`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/generate-coding-agent-install-lock.mjs",
@@ -1629,17 +1629,17 @@
     {
       "id": "E091",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`scripts/release.mjs#L251-L266`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`scripts/release.mjs#L250-L263`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/release.mjs",
           "locator": {
             "kind": "text",
-            "value": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Ch"
+            "value": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check the npm version and for un"
           },
-          "quote": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check for uncommitted changes console.log(\"Checking for uncommitted changes...\"); const status = run(\"git status --porcelain\", { silent: true }); if (status && status.trim()) { console.error(\"Error: Uncommitted changes detected. Commit or stash first.\"); console.error(status); process.exit(1); } console.log(\" Working directory clean\\n\");",
-          "hintLine": 251,
+          "quote": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check the npm version and for uncommitted changes // The release rewrites package-lock.json. npm 10 (bundled with Node 22) drops the `libc` // fields that tell npm which native packages are glibc and which are musl builds. console.log(\"Checking npm version...\"); const npmVersion = run(\"npm --version\", { silent: true }).trim(); if (Number(npmVersion.split(\".\")[0]) < 11) { console.error(`Error: the release needs npm 11 or newer to write package-lock.json; found npm ${npmVersion}.`);",
+          "hintLine": 250,
           "volatility": "high"
         }
       ]
@@ -1648,7 +1648,7 @@
       "id": "E092",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L363-L376`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -1666,7 +1666,7 @@
       "id": "E093",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`ci.yml#L35-L45`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/ci.yml",
@@ -1684,7 +1684,7 @@
       "id": "E094",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`.pi/skills/release.md#L8-L16`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".pi/skills/release.md",
@@ -1702,7 +1702,7 @@
       "id": "E095",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`.pi/skills/release.md#L14-L35`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".pi/skills/release.md",
@@ -1719,17 +1719,17 @@
     {
       "id": "E096",
       "page": "12_pi_philosophy/sdlc_evidence.md",
-      "claim": "证据：`scripts/release.mjs#L215-L266`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`scripts/release.mjs#L216-L268`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/release.mjs",
           "locator": {
             "kind": "text",
-            "value": "} function updateChangelogsForRelease(version) { const date = new Date().toISOString().split(\"T\")[0]; const changelogs ="
+            "value": "function updateChangelogsForRelease(version) { const date = new Date().toISOString().split(\"T\")[0]; const changelogs = getChangelogs(); for (const cha"
           },
-          "quote": "} function updateChangelogsForRelease(version) { const date = new Date().toISOString().split(\"T\")[0]; const changelogs = getChangelogs(); for (const changelog of changelogs) { const content = readFileSync(changelog, \"utf-8\"); if (!content.includes(\"## [Unreleased]\")) { console.log(` Skipping ${changelog}: no [Unreleased] section`); continue; } const updated = content.replace( \"## [Unreleased]\", `## [${version}] - ${date}` ); writeFileSync(changelog, updated); console.log(` Updated ${changelog}`); } } function addUnreleasedSection() { const changelogs = getChangelogs(); const unreleasedSection = \"## [Unreleased]\\n\\n\"; for (const changelog of changelogs) { const content = readFileSync(changelog, \"utf-8\"); // Insert after \"# Changelog\\n\\n\" const updated = content.replace( /^(# Changelog\\n\\n)/, `$1${unreleasedSection}` ); writeFileSync(changelog, updated); console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check for uncommitted changes console.log(\"Checking for uncommitted changes...\"); const status = run(\"git status --porcelain\", { silent: true }); if (status && status.trim()) { console.error(\"Error: Uncommitted changes detected. Commit or stash first.\"); console.error(status); process.exit(1); } console.log(\" Working directory clean\\n\");",
-          "hintLine": 215,
+          "quote": "function updateChangelogsForRelease(version) { const date = new Date().toISOString().split(\"T\")[0]; const changelogs = getChangelogs(); for (const changelog of changelogs) { const content = readFileSync(changelog, \"utf-8\"); if (!content.includes(\"## [Unreleased]\")) { console.log(` Skipping ${changelog}: no [Unreleased] section`); continue; } const updated = content.replace( \"## [Unreleased]\", `## [${version}] - ${date}` ); writeFileSync(changelog, updated); console.log(` Updated ${changelog}`); } } function addUnreleasedSection() { const changelogs = getChangelogs(); const unreleasedSection = \"## [Unreleased]\\n\\n\"; for (const changelog of changelogs) { const content = readFileSync(changelog, \"utf-8\"); // Insert after \"# Changelog\\n\\n\" const updated = content.replace( /^(# Changelog\\n\\n)/, `$1${unreleasedSection}` ); writeFileSync(changelog, updated); console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check the npm version and for uncommitted changes // The release rewrites package-lock.json. npm 10 (bundled with Node 22) drops the `libc` // fields that tell npm which native packages are glibc and which are musl builds. console.log(\"Checking npm version...\"); const npmVersion = run(\"npm --version\", { silent: true }).trim(); if (Number(npmVersion.split(\".\")[0]) < 11) { console.error(`Error: the release needs npm 11 or newer to write package-lock.json; found npm ${npmVersion}.`); console.error(\"Run `npm install -g npm@11` or use a Node version that bundles npm 11 or newer.\"); process.exit(1); } console.log(` npm ${npmVersion}\\n`);",
+          "hintLine": 216,
           "volatility": "high"
         }
       ]
@@ -1738,7 +1738,7 @@
       "id": "E097",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/release.mjs#L268-L292`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/release.mjs",
@@ -1756,7 +1756,7 @@
       "id": "E098",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`nix.yml#L3-L13`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/nix.yml",
@@ -1774,7 +1774,7 @@
       "id": "E099",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`nix.yml#L67-L83`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/nix.yml",
@@ -1792,7 +1792,7 @@
       "id": "E100",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L3-L16`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -1810,7 +1810,7 @@
       "id": "E101",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L52-L121`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -1828,7 +1828,7 @@
       "id": "E102",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L210-L301`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -1846,7 +1846,7 @@
       "id": "E103",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L312-L384`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -1864,7 +1864,7 @@
       "id": "E104",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/publish.mjs#L13-L28`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish.mjs",
@@ -1882,7 +1882,7 @@
       "id": "E105",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/publish-release-announcement.mjs#L70-L126`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish-release-announcement.mjs",
@@ -1900,7 +1900,7 @@
       "id": "E106",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/publish-release-announcement.mjs#L224-L240`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish-release-announcement.mjs",
@@ -1918,7 +1918,7 @@
       "id": "E107",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/publish-release-announcement.mjs#L254-L266`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish-release-announcement.mjs",
@@ -1936,7 +1936,7 @@
       "id": "E108",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L427-L455`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -1954,7 +1954,7 @@
       "id": "E109",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L457-L481`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -1972,7 +1972,7 @@
       "id": "E110",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`.pi/skills/release.md#L44-L50`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".pi/skills/release.md",
@@ -1990,7 +1990,7 @@
       "id": "E111",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/publish.mjs#L44-L53`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish.mjs",
@@ -2008,7 +2008,7 @@
       "id": "E112",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/publish-release-announcement.mjs#L291-L329`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish-release-announcement.mjs",
@@ -2026,7 +2026,7 @@
       "id": "E113",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`nix.yml#L135-L151`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/nix.yml",
@@ -2044,7 +2044,7 @@
       "id": "E114",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`.pi/skills/release.md#L47-L50`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".pi/skills/release.md",
@@ -2062,7 +2062,7 @@
       "id": "E115",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L279-L293`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -2080,7 +2080,7 @@
       "id": "E116",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`publish-model-catalog.yml#L1-L33`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/publish-model-catalog.yml",
@@ -2098,7 +2098,7 @@
       "id": "E117",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`publish-model-catalog.yml#L38-L75`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/publish-model-catalog.yml",
@@ -2116,7 +2116,7 @@
       "id": "E118",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`publish-model-catalog.yml#L41-L81`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/publish-model-catalog.yml",
@@ -2134,7 +2134,7 @@
       "id": "E119",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/publish-model-catalog.mjs#L25-L34`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish-model-catalog.mjs",
@@ -2152,7 +2152,7 @@
       "id": "E120",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/publish-model-catalog.mjs#L290-L324`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish-model-catalog.mjs",
@@ -2170,7 +2170,7 @@
       "id": "E121",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`check-lockfile-commit.mjs#L77-L120`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-lockfile-commit.mjs",
@@ -2188,7 +2188,7 @@
       "id": "E122",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`ci.yml#L13-L65`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/ci.yml",
@@ -2206,7 +2206,7 @@
       "id": "E123",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/check-pinned-deps.mjs#L25-L56`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-pinned-deps.mjs",
@@ -2224,7 +2224,7 @@
       "id": "E124",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`build-binaries.yml#L427-L481`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -2242,7 +2242,7 @@
       "id": "E125",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`scripts/publish-release-announcement.mjs#L105-L126`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish-release-announcement.mjs",
@@ -2260,7 +2260,7 @@
       "id": "E126",
       "page": "12_pi_philosophy/sdlc_evidence.md",
       "claim": "证据：`publish-model-catalog.yml#L74-L147`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/publish-model-catalog.yml",
@@ -2278,7 +2278,7 @@
       "id": "E127",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-entry-graphs.mjs#L4-L12`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-entry-graphs.mjs",
@@ -2296,7 +2296,7 @@
       "id": "E128",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-entry-graphs.mjs#L11-L12`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-entry-graphs.mjs",
@@ -2314,7 +2314,7 @@
       "id": "E129",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-entry-graphs.mjs#L20-L30`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-entry-graphs.mjs",
@@ -2332,7 +2332,7 @@
       "id": "E130",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-entry-graphs.mjs#L53-L74`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-entry-graphs.mjs",
@@ -2350,7 +2350,7 @@
       "id": "E131",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-entry-graphs.mjs#L32-L50`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-entry-graphs.mjs",
@@ -2368,7 +2368,7 @@
       "id": "E132",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-entry-graphs.mjs#L107-L147`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-entry-graphs.mjs",
@@ -2386,15 +2386,15 @@
       "id": "E133",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/durable/package.json#L8-L69`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/durable/package.json",
           "locator": {
             "kind": "text",
-            "value": "\"exports\": { \".\": { \"source\": \"./src/index.ts\", \"types\": \"./dist/index.d.ts\", \"import\": \"./dist/index.js\", \"default\": \"."
+            "value": "\"exports\": { \".\": { \"source\": \"./src/index.ts\", \"types\": \"./dist/index.d.ts\", \"import\": \"./dist/index.js\", \"default\": \"./dist/index.js\" }, \"./env\": { "
           },
-          "quote": "\"exports\": { \".\": { \"source\": \"./src/index.ts\", \"types\": \"./dist/index.d.ts\", \"import\": \"./dist/index.js\", \"default\": \"./dist/index.js\" }, \"./env\": { \"source\": \"./src/env/index.ts\", \"types\": \"./dist/env/index.d.ts\", \"import\": \"./dist/env/index.js\", \"default\": \"./dist/env/index.js\" }, \"./env/node\": { \"source\": \"./src/env/node.ts\", \"types\": \"./dist/env/node.d.ts\", \"import\": \"./dist/env/node.js\", \"default\": \"./dist/env/node.js\" }, \"./codemode\": { \"source\": \"./src/codemode/index.ts\", \"types\": \"./dist/codemode/index.d.ts\", \"import\": \"./dist/codemode/index.js\", \"default\": \"./dist/codemode/index.js\" }, \"./tool-search\": { \"source\": \"./src/tool-search/index.ts\", \"types\": \"./dist/tool-search/index.d.ts\", \"import\": \"./dist/tool-search/index.js\", \"default\": \"./dist/tool-search/index.js\" }, \"./tools\": { \"source\": \"./src/tools/index.ts\", \"types\": \"./dist/tools/index.d.ts\", \"import\": \"./dist/tools/index.js\", \"default\": \"./dist/tools/index.js\" }, \"./images\": { \"source\": \"./src/images/index.ts\", \"types\": \"./dist/images/index.d.ts\", \"import\": \"./dist/images/index.js\", \"default\": \"./dist/images/index.js\" }, \"./images/node\": { \"source\": \"./src/images/node.ts\", \"types\": \"./dist/images/node.d.ts\", \"import\": \"./dist/images/node.js\", \"default\": \"./dist/images/node.js\" }, \"./images/cloudflare\": { \"source\": \"./src/images/cloudflare.ts\", \"types\": \"./dist/images/cloudflare.d.ts\", \"import\": \"./dist/images/cloudflare.js\", \"default\": \"./dist/images/cloudflare.js\" }, \"./storage/memory\": { \"source\": \"./src/storage/memory.ts\", \"types\": \"./dist/storage/memory.d.ts\", \"import\": \"./dist/storage/memory.js\", \"default\": \"./dist/storage/memory.js\" }, \"./storage/indexeddb\": {",
+          "quote": "\"exports\": { \".\": { \"source\": \"./src/index.ts\", \"types\": \"./dist/index.d.ts\", \"import\": \"./dist/index.js\", \"default\": \"./dist/index.js\" }, \"./env\": { \"source\": \"./src/env/index.ts\", \"types\": \"./dist/env/index.d.ts\", \"import\": \"./dist/env/index.js\", \"default\": \"./dist/env/index.js\" }, \"./env/node\": { \"source\": \"./src/env/node.ts\", \"types\": \"./dist/env/node.d.ts\", \"import\": \"./dist/env/node.js\", \"default\": \"./dist/env/node.js\" }, \"./codemode\": { \"source\": \"./src/codemode/index.ts\", \"types\": \"./dist/codemode/index.d.ts\", \"import\": \"./dist/codemode/index.js\", \"default\": \"./dist/codemode/index.js\" }, \"./tool-search\": { \"source\": \"./src/tool-search/index.ts\", \"types\": \"./dist/tool-search/index.d.ts\", \"import\": \"./dist/tool-search/index.js\", \"default\": \"./dist/tool-search/index.js\" }, \"./tools\": { \"source\": \"./src/tools/index.ts\", \"types\": \"./dist/tools/index.d.ts\", \"import\": \"./dist/tools/index.js\", \"default\": \"./dist/tools/index.js\" }, \"./images\": { \"source\": \"./src/images/index.ts\", \"types\": \"./dist/images/index.d.ts\", \"import\": \"./dist/images/index.js\", \"default\": \"./dist/images/index.js\" }, \"./images/fit\": { \"source\": \"./src/images/fit.ts\", \"types\": \"./dist/images/fit.d.ts\", \"import\": \"./dist/images/fit.js\", \"default\": \"./dist/images/fit.js\" }, \"./images/node\": { \"source\": \"./src/images/node.ts\", \"types\": \"./dist/images/node.d.ts\", \"import\": \"./dist/images/node.js\", \"default\": \"./dist/images/node.js\" }, \"./images/cloudflare\": { \"source\": \"./src/images/cloudflare.ts\", \"types\": \"./dist/images/cloudflare.d.ts\", \"import\": \"./dist/images/cloudflare.js\", \"default\": \"./dist/images/cloudflare.js\" }, \"./storage/memory\": { \"source\": \"./src/storage/memory.ts\", \"types\": \"./dist/storage/memory.d.ts\", \"import\": \"./dist/storage/memory.js\",",
           "hintLine": 8,
           "volatility": "high"
         }
@@ -2404,15 +2404,15 @@
       "id": "E134",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/chord/package.json#L8-L34`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/chord/package.json",
           "locator": {
             "kind": "text",
-            "value": "\"exports\": { \".\": { \"source\": \"./src/index.ts\", \"types\": \"./dist/index.d.ts\", \"import\": \"./dist/index.js\" }, \"./context\""
+            "value": "\"exports\": { \".\": { \"source\": \"./src/index.ts\", \"types\": \"./dist/index.d.ts\", \"import\": \"./dist/index.js\" }, \"./context\": { \"source\": \"./src/context/i"
           },
-          "quote": "\"exports\": { \".\": { \"source\": \"./src/index.ts\", \"types\": \"./dist/index.d.ts\", \"import\": \"./dist/index.js\" }, \"./context\": { \"source\": \"./src/context/index.ts\", \"types\": \"./dist/context/index.d.ts\", \"import\": \"./dist/context/index.js\" }, \"./output\": { \"source\": \"./src/output.ts\", \"types\": \"./dist/output.d.ts\", \"import\": \"./dist/output.js\" }, \"./delta\": { \"source\": \"./src/delta/index.ts\", \"types\": \"./dist/delta/index.d.ts\", \"import\": \"./dist/delta/index.js\" }, \"./node\": { \"source\": \"./src/node.ts\", \"types\": \"./dist/node.d.ts\", \"import\": \"./dist/node.js\" }, \"./telemetry-sqlite\": {",
+          "quote": "\"exports\": { \".\": { \"source\": \"./src/index.ts\", \"types\": \"./dist/index.d.ts\", \"import\": \"./dist/index.js\" }, \"./context\": { \"source\": \"./src/context/index.ts\", \"types\": \"./dist/context/index.d.ts\", \"import\": \"./dist/context/index.js\" }, \"./delta\": { \"source\": \"./src/delta/index.ts\", \"types\": \"./dist/delta/index.d.ts\", \"import\": \"./dist/delta/index.js\" }, \"./json\": { \"source\": \"./src/json.ts\", \"types\": \"./dist/json.d.ts\", \"import\": \"./dist/json.js\" }, \"./watch\": { \"source\": \"./src/watch.ts\", \"types\": \"./dist/watch.d.ts\", \"import\": \"./dist/watch.js\" }, \"./output\": { \"source\": \"./src/output.ts\", \"types\": \"./dist/output.d.ts\", \"import\": \"./dist/output.js\" }, \"./sqlite\": { \"source\": \"./src/sqlite/index.ts\", \"types\": \"./dist/sqlite/index.d.ts\", \"import\": \"./dist/sqlite/index.js\" }, \"./sqlite/node\": { \"source\": \"./src/sqlite/node.ts\", \"types\": \"./dist/sqlite/node.d.ts\", \"import\": \"./dist/sqlite/node.js\" }, \"./sqlite/cloudflare\": { \"source\": \"./src/sqlite/cloudflare.ts\", \"types\": \"./dist/sqlite/cloudflare.d.ts\", \"import\": \"./dist/sqlite/cloudflare.js\" }, \"./telemetry-sqlite\": { \"source\": \"./src/telemetry-sqlite/index.ts\", \"types\": \"./dist/telemetry-sqlite/index.d.ts\", \"import\": \"./dist/telemetry-sqlite/index.js\" }, \"./telemetry-sqlite/node\": { \"source\": \"./src/telemetry-sqlite/node.ts\", \"types\": \"./dist/telemetry-sqlite/node.d.ts\", \"import\": \"./dist/telemetry-sqlite/node.js\" }, \"./telemetry-ingest\": {",
           "hintLine": 8,
           "volatility": "high"
         }
@@ -2422,7 +2422,7 @@
       "id": "E135",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/durable/test/storage-runtime-boundary.test.ts#L25-L47`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/durable/test/storage-runtime-boundary.test.ts",
@@ -2440,7 +2440,7 @@
       "id": "E136",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：browser smoke：durable 与选择性 provider",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-browser-smoke.mjs",
@@ -2458,7 +2458,7 @@
       "id": "E137",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/durable-browser-smoke-entry.ts#L1-L8`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/durable-browser-smoke-entry.ts",
@@ -2476,7 +2476,7 @@
       "id": "E138",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/agent-treeshake-smoke-entry.ts#L1-L13`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/agent-treeshake-smoke-entry.ts",
@@ -2494,7 +2494,7 @@
       "id": "E139",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-runtime-deps.mjs#L26-L43`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.mjs",
@@ -2512,7 +2512,7 @@
       "id": "E140",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-runtime-deps.mjs#L45-L80`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.mjs",
@@ -2530,7 +2530,7 @@
       "id": "E141",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-runtime-deps.mjs#L105-L123`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.mjs",
@@ -2548,7 +2548,7 @@
       "id": "E142",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-runtime-deps.test.mjs#L27-L34`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.test.mjs",
@@ -2566,7 +2566,7 @@
       "id": "E143",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-runtime-deps.test.mjs#L57-L71`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.test.mjs",
@@ -2584,7 +2584,7 @@
       "id": "E144",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-runtime-deps.test.mjs#L89-L100`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.test.mjs",
@@ -2602,7 +2602,7 @@
       "id": "E145",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../scripts/check-runtime-deps.test.mjs#L73-L87`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.test.mjs",
@@ -2620,7 +2620,7 @@
       "id": "E146",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/agent/src/types.ts#L193-L224`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/src/types.ts",
@@ -2638,7 +2638,7 @@
       "id": "E147",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/agent/src/agent-loop.ts#L377-L407`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/src/agent-loop.ts",
@@ -2655,17 +2655,17 @@
     {
       "id": "E148",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
-      "claim": "证据：`../../packages/ai/src/types.ts#L728-L751`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`../../packages/ai/src/types.ts#L748-L772`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/types.ts",
           "locator": {
             "kind": "text",
-            "value": "answers: Record<string, ClassifierAnswer>;"
+            "value": "api: ClassifierApi; provider: ProviderId; model: string; answers: Record<string, ClassifierAnswer>; /** * Token usage and its cost, when the service r"
           },
-          "quote": "provider: ProviderId;\n\tmodel: string;\n\tanswers: Record<string, ClassifierAnswer>;\n\t/** Token usage and its cost at the model's catalog price, when the service reports token counts. */\n\tusage?: Usage;\n\tstopReason: ClassifierStopReason;",
-          "hintLine": 728,
+          "quote": "api: ClassifierApi; provider: ProviderId; model: string; answers: Record<string, ClassifierAnswer>; /** * Token usage and its cost, when the service reports token counts. The cost is the model's catalog price, * or the billed amount (`cost.totalFromProvider`) when the service reports one, such as OpenRouter. */ usage?: Usage; /** Provider-specific response identifier when the service reports one, such as OpenRouter's generation ID. */ responseId?: string; stopReason: ClassifierStopReason; errorMessage?: string; timestamp: number; // Unix timestamp in milliseconds } /** OpenAI grammar variants for constrained sampling. */ export type GrammarFormat = \"openai_lark\" | \"openai_regex\"; export type GrammarVariants = Partial<Record<GrammarFormat, string>>; /** * Optional provider-side constrained sampling configs for a tool. * * The `json_schema` value roughly maps to the concept of `strict` in APIs which is",
+          "hintLine": 748,
           "volatility": "high"
         }
       ]
@@ -2674,7 +2674,7 @@
       "id": "E149",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/src/utils/transcript.ts#L25-L33`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/utils/transcript.ts",
@@ -2692,7 +2692,7 @@
       "id": "E150",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/src/utils/transcript.ts#L57-L65`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/utils/transcript.ts",
@@ -2710,7 +2710,7 @@
       "id": "E151",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/src/utils/transcript.ts#L68-L120`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/utils/transcript.ts",
@@ -2728,7 +2728,7 @@
       "id": "E152",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/src/api/transform-messages.ts#L59-L74`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/api/transform-messages.ts",
@@ -2746,7 +2746,7 @@
       "id": "E153",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/src/api/transform-messages.ts#L92-L145`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/api/transform-messages.ts",
@@ -2764,7 +2764,7 @@
       "id": "E154",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/test/transform-messages-copilot-openai-to-anthropic.test.ts#L49-L88`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/test/transform-messages-copilot-openai-to-anthropic.test.ts",
@@ -2782,7 +2782,7 @@
       "id": "E155",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/test/transform-messages-copilot-openai-to-anthropic.test.ts#L96-L151`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/test/transform-messages-copilot-openai-to-anthropic.test.ts",
@@ -2799,17 +2799,17 @@
     {
       "id": "E156",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
-      "claim": "证据：`../../packages/agent/src/agent-loop.ts#L707-L776`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`../../packages/agent/src/agent-loop.ts#L694-L705`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/src/agent-loop.ts",
           "locator": {
             "kind": "text",
-            "value": "} const preparedArguments = tool.prepareArguments(toolCall.arguments); if (preparedArguments === toolCall.arguments) { r"
+            "value": "function prepareToolCallArguments(tool: AgentTool<any>, toolCall: AgentToolCall): AgentToolCall { if (!tool.prepareArguments) { return toolCall; } con"
           },
-          "quote": "} const preparedArguments = tool.prepareArguments(toolCall.arguments); if (preparedArguments === toolCall.arguments) { return toolCall; } return { ...toolCall, arguments: preparedArguments as Record<string, any>, }; } async function prepareToolCall( currentContext: AgentContext, assistantMessage: AssistantMessage, toolCall: AgentToolCall, config: ToolCallHooks, signal: AbortSignal | undefined, tools: readonly AgentTool<any>[] = currentContext.tools ?? [], ): Promise<PreparedToolCall | ImmediateToolCallOutcome> { const tool = tools.find((t) => t.name === toolCall.name); if (!tool) { return { kind: \"immediate\", result: createErrorToolResult(`Tool ${toolCall.name} not found`), isError: true, }; } try { const preparedToolCall = prepareToolCallArguments(tool, toolCall); const validatedArgs = validateToolArguments(tool, preparedToolCall); if (config.beforeToolCall) { const beforeResult = await config.beforeToolCall( { assistantMessage, toolCall, args: validatedArgs, context: currentContext, }, signal, ); if (signal?.aborted) { return { kind: \"immediate\", result: createErrorToolResult(\"Operation aborted\"), isError: true, }; } if (beforeResult?.block) { const result = createErrorToolResult(beforeResult.reason || \"Tool execution was blocked\"); if (beforeResult.terminate === true) { result.terminate = true; } return { kind: \"immediate\", result, isError: true, }; } } if (signal?.aborted) { return { kind: \"immediate\", result: createErrorToolResult(\"Operation aborted\"), isError: true, }; } return { kind: \"prepared\", toolCall,",
-          "hintLine": 707,
+          "quote": "function prepareToolCallArguments(tool: AgentTool<any>, toolCall: AgentToolCall): AgentToolCall { if (!tool.prepareArguments) { return toolCall; } const preparedArguments = tool.prepareArguments(toolCall.arguments); if (preparedArguments === toolCall.arguments) { return toolCall; } return { ...toolCall, arguments: preparedArguments as Record<string, any>, };",
+          "hintLine": 694,
           "volatility": "high"
         }
       ]
@@ -2818,7 +2818,7 @@
       "id": "E157",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/agent/src/agent-loop.ts#L820-L940`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/src/agent-loop.ts",
@@ -2835,16 +2835,16 @@
     {
       "id": "E158",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
-      "claim": "证据：`../../packages/agent/src/agent-loop.ts#L586-L659`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`../../packages/agent/src/agent-loop.ts#L586-L660`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/src/agent-loop.ts",
           "locator": {
             "kind": "text",
-            "value": "break; } } return { messages, terminate: shouldTerminateToolBatch(finalizedCalls), }; } async function executeToolCallsP"
+            "value": "return { messages, terminate: shouldTerminateToolBatch(finalizedCalls), }; } async function executeToolCallsParallel( currentContext: AgentContext, as"
           },
-          "quote": "break; } } return { messages, terminate: shouldTerminateToolBatch(finalizedCalls), }; } async function executeToolCallsParallel( currentContext: AgentContext, assistantMessage: AssistantMessage, toolCalls: AgentToolCall[], config: AgentLoopConfig, signal: AbortSignal | undefined, emit: AgentEventSink, ): Promise<ExecutedToolCallBatch> { const finalizedCalls: FinalizedToolCallEntry[] = []; for (const toolCall of toolCalls) { await emit({ type: \"tool_execution_start\", toolCallId: toolCall.id, toolName: toolCall.name, args: toolCall.arguments, }); const preparation = await prepareToolCall(currentContext, assistantMessage, toolCall, config, signal); if (preparation.kind === \"immediate\") { const finalized = { toolCall, result: preparation.result, isError: preparation.isError, } satisfies FinalizedToolCallOutcome; await emitToolExecutionEnd(finalized, emit); finalizedCalls.push(finalized); if (signal?.aborted) { break; } continue; } finalizedCalls.push(async () => { if (signal?.aborted) { const finalized = { toolCall, result: createErrorToolResult(\"Operation aborted\"), isError: true, } satisfies FinalizedToolCallOutcome; await emitToolExecutionEnd(finalized, emit); return finalized; } const executed = await executePreparedToolCall(preparation, signal, emitToolExecutionUpdate(toolCall, emit)); const finalized = await finalizeExecutedToolCall( currentContext, assistantMessage, preparation, executed, config, signal, ); await emitToolExecutionEnd(finalized, emit); return finalized; }); if (signal?.aborted) { break; } } const orderedFinalizedCalls = await Promise.all( finalizedCalls.map((entry) => (typeof entry === \"function\" ? entry() : Promise.resolve(entry))), ); const messages: ToolResultMessage[] = [];",
+          "quote": "return { messages, terminate: shouldTerminateToolBatch(finalizedCalls), }; } async function executeToolCallsParallel( currentContext: AgentContext, assistantMessage: AssistantMessage, toolCalls: AgentToolCall[], config: AgentLoopConfig, signal: AbortSignal | undefined, emit: AgentEventSink, ): Promise<ExecutedToolCallBatch> { const finalizedCalls: FinalizedToolCallEntry[] = []; for (const toolCall of toolCalls) { await emit({ type: \"tool_execution_start\", toolCallId: toolCall.id, toolName: toolCall.name, args: toolCall.arguments, }); const preparation = await prepareToolCall(currentContext, assistantMessage, toolCall, config, signal); if (preparation.kind === \"immediate\") { const finalized = { toolCall, result: preparation.result, isError: preparation.isError, } satisfies FinalizedToolCallOutcome; await emitToolExecutionEnd(finalized, emit); finalizedCalls.push(finalized); continue; } finalizedCalls.push(async () => { if (signal?.aborted) { const finalized = { toolCall, result: createErrorToolResult(\"Operation aborted\"), isError: true, } satisfies FinalizedToolCallOutcome; await emitToolExecutionEnd(finalized, emit); return finalized; } const executed = await executePreparedToolCall(preparation, signal, emitToolExecutionUpdate(toolCall, emit)); const finalized = await finalizeExecutedToolCall( currentContext, assistantMessage, preparation, executed, config, signal, ); await emitToolExecutionEnd(finalized, emit); return finalized; }); } const orderedFinalizedCalls = await Promise.all( finalizedCalls.map((entry) => (typeof entry === \"function\" ? entry() : Promise.resolve(entry))), ); const messages: ToolResultMessage[] = []; for (const finalized of orderedFinalizedCalls) { const toolResultMessage = createToolResultMessage(finalized); await emitToolResultMessage(toolResultMessage, emit); messages.push(toolResultMessage); } return { messages, terminate: shouldTerminateToolBatch(orderedFinalizedCalls), }; }",
           "hintLine": 586,
           "volatility": "high"
         }
@@ -2854,7 +2854,7 @@
       "id": "E159",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/agent/test/agent-loop.test.ts#L627-L719`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/test/agent-loop.test.ts",
@@ -2872,7 +2872,7 @@
       "id": "E160",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/agent/test/agent-loop.test.ts#L826-L906`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/test/agent-loop.test.ts",
@@ -2890,7 +2890,7 @@
       "id": "E161",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/src/types.ts#L753-L785`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/src/types.ts",
@@ -2908,7 +2908,7 @@
       "id": "E162",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/test/faux-provider.test.ts#L457-L531`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/test/faux-provider.test.ts",
@@ -2926,7 +2926,7 @@
       "id": "E163",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/ai/test/faux-provider.test.ts#L533-L605`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/ai/test/faux-provider.test.ts",
@@ -2944,7 +2944,7 @@
       "id": "E164",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/agent/test/agent.test.ts#L487-L550`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/test/agent.test.ts",
@@ -2962,7 +2962,7 @@
       "id": "E165",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/agent/test/agent.test.ts#L376-L447`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/agent/test/agent.test.ts",
@@ -2979,16 +2979,16 @@
     {
       "id": "E166",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
-      "claim": "证据：`../../packages/chord/README.md#L3-L7`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`../../packages/chord/README.md#L3-L8`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/chord/README.md",
           "locator": {
             "kind": "text",
-            "value": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be"
+            "value": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and keep running while their plugins are"
           },
-          "quote": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and can be **hot reloaded** while they run. - An **object** is state plus code at an address. It is created on demand and lives while someone references it. - Everyone gets a **reference**, never the object. References work the same locally and across processes, and survive reloads. - Every object knows its **principal**: an owner and a guest get different objects, with different methods.",
+          "quote": "Chord builds applications out of **objects** that live in several processes (a server, workers, browser tabs) and keep running while their plugins are **reloaded**. - An **object type** is a contract: a name, params that select the instance, the host it lives on, its members (state and methods) and a version. Contracts are runtime values described with JSON Schema, written with the builders of `@earendil-works/pi-schema`. - A **facet** is a plugin's declarations for one host: the types it serves and its contributions to registries. A factory only declares; Chord activates. - Everyone gets a **reference**, never the object. A reference is live and hydrated once its `get` resolves, works the same locally and across links, and keeps its object alive. - **Documents** are named JSON values an object owns, written in transactions and persisted in Chord's store; **derives** compute values from watchables; **jobs** are owned work that outlives the call that started it.",
           "hintLine": 3,
           "volatility": "high"
         }
@@ -2997,17 +2997,17 @@
     {
       "id": "E167",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
-      "claim": "证据：`../../packages/chord/README.md#L47-L68`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`../../packages/chord/README.md#L44-L74`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/chord/README.md",
           "locator": {
             "kind": "text",
-            "value": "},"
+            "value": "## Quick start ```ts import { createHost, defineFacet, local, method, obj, str, constant } from \"@earendil-works/chord\"; import { BACKGROUND_CONTEXT }"
           },
-          "quote": "\t\t},\n\t},\n});\n\nconst host = createHost({ name: \"server\", self: { kind: \"server\" } });\n\nhost.serve(Counter, ({ name }, _principal, self) => {\n\tconst count = self.state(\"count\", num(), 0);\n\treturn {\n\t\tvariant: \"default\",\n\t\tcount,\n\t\tincrement: async ({ by }, ctx) => {\n\t\t\tcount.change(ctx, (n) => n + by);\n\t\t},\n\t};",
-          "hintLine": 47,
+          "quote": "## Quick start ```ts import { createHost, defineFacet, local, method, obj, str, constant } from \"@earendil-works/chord\"; import { BACKGROUND_CONTEXT } from \"@earendil-works/chord/context\"; const context = BACKGROUND_CONTEXT; // every call takes a context, used for cancellation // A contract: params select the instance (one object per language), members are state and methods. const Greeter = local(\"example.greeter\", { version: 1, params: { language: str() }, members: { language: str(), greet: method(obj({ name: str() }), str()) }, }); // A facet serves types with factories; a factory only declares and returns the implementation. const facet = defineFacet((host) => { host.serve(Greeter, ({ language }) => ({ language: constant(language), greet: async ({ name }) => (language === \"de\" ? `Hallo ${name}` : `Hello ${name}`), })); }); const host = createHost({ onError: (error) => console.error(error) }); await host.load([{ name: \"@example/greeter\", facet }], context); const german = await host.get(Greeter, { language: \"de\" }, context); // live: state has values, methods can be called console.log(german.language.value, await german.greet({ name: \"Mario\" }, context)); // de Hallo Mario german.release(); // the last reference released ends the object await host.close(context); ```",
+          "hintLine": 44,
           "volatility": "high"
         }
       ]
@@ -3015,17 +3015,17 @@
     {
       "id": "E168",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
-      "claim": "证据：`../../packages/chord/README.md#L70-L105`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`../../packages/chord/README.md#L78-L80`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/chord/README.md",
           "locator": {
             "kind": "text",
-            "value": "- [Specification](docs/spec.md)"
+            "value": "- [Design](docs/design.md): the target design, the one current statement of every rule; [decisions](docs/decisions.md): the decision log; [slices](doc"
           },
-          "quote": "- [Specification](docs/spec.md): compatibility, lifetime, and reload semantics, plus known limitations and implementation decisions.",
-          "hintLine": 70,
+          "quote": "- [Design](docs/design.md): the target design, the one current statement of every rule; [decisions](docs/decisions.md): the decision log; [slices](docs/slices.md): the build plan and its carry-over. - [Plugins and hosts](docs/guide-plugins-hosts/book.md): a tutorial building a notes app with plugins, HTTP and workers; [plugin authoring](docs/plugin-authoring.md): the guide for agents writing plugins. - [Examples](test/examples/): runnable references, one topic each. Run from `packages/chord`: `node --conditions=source --experimental-strip-types test/examples/01-objects.ts`.",
+          "hintLine": 78,
           "volatility": "high"
         }
       ]
@@ -3034,7 +3034,7 @@
       "id": "E169",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/chord/test/boundary.test.ts#L10-L33`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/chord/test/boundary.test.ts",
@@ -3052,7 +3052,7 @@
       "id": "E170",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/telemetry/README.md#L3-L13`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/telemetry/README.md",
@@ -3070,7 +3070,7 @@
       "id": "E171",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/telemetry/README.md#L118-L132`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/telemetry/README.md",
@@ -3088,7 +3088,7 @@
       "id": "E172",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/telemetry/src/testing/conformance.ts#L60-L84`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/telemetry/src/testing/conformance.ts",
@@ -3106,7 +3106,7 @@
       "id": "E173",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/telemetry/src/testing/conformance.ts#L184-L244`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/telemetry/src/testing/conformance.ts",
@@ -3124,7 +3124,7 @@
       "id": "E174",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/telemetry/src/testing/conformance.ts#L246-L313`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/telemetry/src/testing/conformance.ts",
@@ -3142,7 +3142,7 @@
       "id": "E175",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/telemetry/README.md#L385-L391`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/telemetry/README.md",
@@ -3160,7 +3160,7 @@
       "id": "E176",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/durable/README.md#L1-L7`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/durable/README.md",
@@ -3178,7 +3178,7 @@
       "id": "E177",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/durable/README.md#L69-L99`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/durable/README.md",
@@ -3195,17 +3195,17 @@
     {
       "id": "E178",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
-      "claim": "证据：`../../packages/durable/README.md#L147-L170`",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：`../../packages/durable/README.md#L145-L162`",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/durable/README.md",
           "locator": {
             "kind": "text",
-            "value": "version: 1, initial: () => ({ phase: \"wait\" }), phases: { // Resolves once the sleep is stored; the phase ends there. wa"
+            "value": "const Reminder = defineTask<{ text: string; at: number }, { phase: \"wait\" } | { phase: \"deliver\" }, null>({ name: \"app.reminder\", version: 1, initial:"
           },
-          "quote": "version: 1, initial: () => ({ phase: \"wait\" }), phases: { // Resolves once the sleep is stored; the phase ends there. wait: (task, runtime, context) => runtime.sleepUntil(task.input.at, { phase: \"deliver\" }, context), deliver: async (task, runtime, context) => { await notify(task.input.text); await runtime.commit(() => ({ status: \"terminal\", outcome: { status: \"completed\", result: null } }), context); }, }, abort: (_task, runtime, context) => runtime.commit(() => ({ status: \"terminal\", outcome: { status: \"aborted\" } }), context), }); ``` There is no sleep in the middle of a phase: a phase reruns from its top after a restart, so work after the wait goes in the next phase, and what it needs goes in the checkpoint. `{ status: \"sleeping\", until, checkpoint }` returned from `runtime.commit()` is the same sleep, committed together with other writes. Retry backoffs and deferred-response polls of the built-in tasks sleep the same way. The timers of the Session, the scheduler, and its tasks go through `setTimer` (default `setTimeout`), and their times through `now` (default `Date.now`); pass both to run a Harness on a fake clock. The Node.js environment, file watcher, and image worker keep their own timers. Sleep deadlines are stored on `now`, so every process that opens one storage must use the same clock. While scheduling runs, a timer resumes sleeping tasks when they are due and keeps a Node.js process alive meanwhile. A host whose process can be evicted, such as a Cloudflare Durable Object, wakes it itself. With `onWake`, the Harness arms no timer for sleeps; it tells the host what `harness.wake()` says whenever that changes: `active` while some task can run now or is running, and `at`, the earliest sleep. The host keeps its alarm armed and calls `resume()` when it fires: ```typescript export class Session extends DurableObject<Env> { #harness!: Harness;",
-          "hintLine": 147,
+          "quote": "const Reminder = defineTask<{ text: string; at: number }, { phase: \"wait\" } | { phase: \"deliver\" }, null>({ name: \"app.reminder\", version: 1, initial: () => ({ phase: \"wait\" }), phases: { // Resolves once the sleep is stored; the phase ends there. wait: (task, runtime, context) => runtime.sleepUntil(task.input.at, { phase: \"deliver\" }, context), deliver: async (task, runtime, context) => { await notify(task.input.text); await runtime.commit(() => ({ status: \"terminal\", outcome: { status: \"completed\", result: null } }), context); }, }, abort: (_task, runtime, context) => runtime.commit(() => ({ status: \"terminal\", outcome: { status: \"aborted\" } }), context), }); ``` There is no sleep in the middle of a phase: a phase reruns from its top after a restart, so work after the wait goes in the next phase, and what it needs goes in the checkpoint. `{ status: \"sleeping\", until, checkpoint }` returned from `runtime.commit()` is the same sleep, committed together with other writes; with `signals` it also wakes on a signal (see [Signals](#signals)), and `until` becomes optional. Retry backoffs and deferred-response polls of the built-in tasks sleep the same way.",
+          "hintLine": 145,
           "volatility": "high"
         }
       ]
@@ -3214,7 +3214,7 @@
       "id": "E179",
       "page": "12_pi_philosophy/structure_quality_evidence.md",
       "claim": "证据：`../../packages/durable/README.md#L535-L567`",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/durable/README.md",
@@ -3232,7 +3232,7 @@
       "id": "E180",
       "page": "12_pi_philosophy/review.md",
       "claim": "新贡献者的 issue/PR 默认自动关闭，维护者按节奏复审重开",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -3250,15 +3250,15 @@
       "id": "E181",
       "page": "12_pi_philosophy/review.md",
       "claim": "较大的设计变更走 RFC，公开的只是一部分",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
           "locator": {
             "kind": "text",
-            "value": "## Where can I learn about plans? Earendil uses RFCs to discuss larger changes. Not all of them are public, but quite a "
+            "value": "## Where can I learn about plans? Earendil uses RFCs to discuss larger changes. Not all of them are public, but quite a few are. They can be found at "
           },
-          "quote": "## Where can I learn about plans? Earendil uses RFCs to discuss larger changes. Not all of them are public, but quite a few are. They can be found at [rfc.earendil.com](https://rfc.earendil.com/keyword/pi/).",
+          "quote": "## Where can I learn about plans? Earendil uses RFCs to discuss larger changes. Not all of them are public, but quite a few are. They can be found at [rfc.earendil.com](https://rfc.earendil.com/keyword/pi).",
           "hintLine": 99,
           "volatility": "high"
         }
@@ -3268,7 +3268,7 @@
       "id": "E182",
       "page": "12_pi_philosophy/review.md",
       "claim": "根的 check 命令串起 biome、依赖、类型、入口图、install-lock 与 browser smoke",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "package.json",
@@ -3286,16 +3286,16 @@
       "id": "E183",
       "page": "12_pi_philosophy/review.md",
       "claim": "release 脚本在收尾时把 [Unreleased] 段落改名并输出提示",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/release.mjs",
           "locator": {
             "kind": "text",
-            "value": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Ch"
+            "value": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check the npm version and for un"
           },
-          "quote": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check for uncommitted changes console.log(\"Checking for uncommitted changes...\"); const status = run(\"git status --porcelain\", { silent: true }); if (status && status.trim()) { console.error(\"Error: Uncommitted changes detected. Commit or stash first.\"); console.error(status); process.exit(1); } console.log(\" Working directory clean\\n\"); // 2. Verify npm package registration before modifying the worktree. assertPackagesAreRegisteredWithNpm(); // Pin and verify the Nix model catalog before modifying versions, so the pin // lands in the release commit and a failure leaves the worktree clean. console.log(\"Pinning and building with the newest model catalog for Nix...\"); await pinAndBuildWithNewestModelCatalog(); console.log(); // 3. Bump or set version const version = bumpOrSetVersion(RELEASE_TARGET); console.log(` New version: ${version}\\n`); // 4. Update changelogs console.log(\"Updating CHANGELOG.md files...\"); updateChangelogsForRelease(version); console.log(); // 5. Regenerate release artifacts console.log(\"Regenerating release artifacts...\"); run(\"npm run generate:models\"); run(\"npm run check:model-data\");",
-          "hintLine": 251,
+          "quote": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check the npm version and for uncommitted changes // The release rewrites package-lock.json. npm 10 (bundled with Node 22) drops the `libc` // fields that tell npm which native packages are glibc and which are musl builds. console.log(\"Checking npm version...\"); const npmVersion = run(\"npm --version\", { silent: true }).trim(); if (Number(npmVersion.split(\".\")[0]) < 11) { console.error(`Error: the release needs npm 11 or newer to write package-lock.json; found npm ${npmVersion}.`);",
+          "hintLine": 250,
           "volatility": "high"
         }
       ]
@@ -3304,7 +3304,7 @@
       "id": "E184",
       "page": "12_pi_philosophy/review.md",
       "claim": "主 CI 的 build-check-test 在单个 Linux runner 上跑 checkout/build/check/test",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/ci.yml",
@@ -3322,7 +3322,7 @@
       "id": "E185",
       "page": "12_pi_philosophy/review.md",
       "claim": "issue 量超过维护者能实时负责的量，是自动关闭的政策理由",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -3340,7 +3340,7 @@
       "id": "E186",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：issue 分析 prompt",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".pi/prompts/is.md",
@@ -3358,7 +3358,7 @@
       "id": "E187",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：issue-analysis 工作流",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/issue-analysis.yml",
@@ -3376,7 +3376,7 @@
       "id": "E188",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：输出",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/issue-analysis.yml",
@@ -3394,7 +3394,7 @@
       "id": "E189",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：import-repro 扩展",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".pi/extensions/import-repro.ts",
@@ -3412,7 +3412,7 @@
       "id": "E190",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：入口图检查",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-entry-graphs.mjs",
@@ -3430,7 +3430,7 @@
       "id": "E191",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：当前预算",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-entry-graphs.mjs",
@@ -3448,7 +3448,7 @@
       "id": "E192",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：#6363 回归测试",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/test/suite/regressions/6363-agent-settled-event.test.ts",
@@ -3466,7 +3466,7 @@
       "id": "E193",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：agent_end handler 排入 follow-up",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/test/suite/regressions/6363-agent-settled-event.test.ts",
@@ -3484,7 +3484,7 @@
       "id": "E194",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：waitForIdle",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/test/suite/regressions/6363-agent-settled-event.test.ts",
@@ -3502,7 +3502,7 @@
       "id": "E195",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：faux harness",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/test/suite/harness.ts",
@@ -3520,7 +3520,7 @@
       "id": "E196",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：扩展案例",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/evals/evals/extensions.docs.eval.ts",
@@ -3538,7 +3538,7 @@
       "id": "E197",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：任务计划",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/evals/src/plan.ts",
@@ -3556,7 +3556,7 @@
       "id": "E198",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：pair resolution",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/evals/src/report.ts",
@@ -3574,7 +3574,7 @@
       "id": "E199",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：测试",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/evals/test/comparison.test.ts",
@@ -3592,7 +3592,7 @@
       "id": "E200",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：零分测试",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/evals/test/report.test.ts",
@@ -3610,16 +3610,16 @@
       "id": "E201",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：release 脚本",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/release.mjs",
           "locator": {
             "kind": "text",
-            "value": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Ch"
+            "value": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check the npm version and for un"
           },
-          "quote": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check for uncommitted changes console.log(\"Checking for uncommitted changes...\"); const status = run(\"git status --porcelain\", { silent: true }); if (status && status.trim()) { console.error(\"Error: Uncommitted changes detected. Commit or stash first.\"); console.error(status); process.exit(1); }",
-          "hintLine": 251,
+          "quote": "console.log(` Added [Unreleased] to ${changelog}`); } } // Main flow console.log(\"\\n=== Release Script ===\\n\"); // 1. Check the npm version and for uncommitted changes // The release rewrites package-lock.json. npm 10 (bundled with Node 22) drops the `libc` // fields that tell npm which native packages are glibc and which are musl builds. console.log(\"Checking npm version...\"); const npmVersion = run(\"npm --version\", { silent: true }).trim(); if (Number(npmVersion.split(\".\")[0]) < 11) { console.error(`Error: the release needs npm 11 or newer to write package-lock.json; found npm ${npmVersion}.`);",
+          "hintLine": 250,
           "volatility": "high"
         }
       ]
@@ -3628,7 +3628,7 @@
       "id": "E202",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：tag publish job",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": ".github/workflows/build-binaries.yml",
@@ -3646,7 +3646,7 @@
       "id": "E203",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：README",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "README.md",
@@ -3664,7 +3664,7 @@
       "id": "E204",
       "page": "12_pi_philosophy/review.md",
       "claim": "证据：publish helper",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/publish.mjs",
@@ -3682,7 +3682,7 @@
       "id": "E205",
       "page": "12_pi_philosophy/research.md",
       "claim": "证据：README:15–21",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "README.md",
@@ -3700,7 +3700,7 @@
       "id": "E206",
       "page": "12_pi_philosophy/research.md",
       "claim": "证据：CONTRIBUTING:7–11",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "CONTRIBUTING.md",
@@ -3718,7 +3718,7 @@
       "id": "E207",
       "page": "12_pi_philosophy/research.md",
       "claim": "证据：README:21",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "README.md",
@@ -3735,17 +3735,17 @@
     {
       "id": "E208",
       "page": "12_pi_philosophy/research.md",
-      "claim": "证据：AgentSession:1839–1876",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：AgentSession:1918–1943",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/agent-session.ts",
           "locator": {
             "kind": "text",
-            "value": "// Tools the branch ever added or removed. Removed tools stay inactive. const mentioned = new Set( systemMessages .flatM"
+            "value": "// Tools the branch ever added or removed. Removed tools stay inactive. const mentioned = new Set( systemMessages .flatMap((message) => [...(message.t"
           },
-          "quote": "// Tools the branch ever added or removed. Removed tools stay inactive. const mentioned = new Set( systemMessages .flatMap((message) => [...(message.toolsAdded ?? []), ...(message.toolsRemoved ?? [])]) .map((tool) => tool.name), ); // Extension tools the branch never mentioned were registered after it recorded its loadout, so // they are activated like newly registered tools. Built-in tools follow `defaultTools` instead. const newTools = [...this._toolRegistry.keys()].filter( (name) => !mentioned.has(name) && !this._baseToolDefinitions.has(name) && this._isActivatedOnRegistration(name), ); // The recorded loadout plus the new tools, with `--tools +name`/`-name` applied. const names = applyToolModifiers( [...getCurrentTools(systemMessages).map((tool) => tool.name), ...newTools], modifiers, ); // Recorded tools that are not registered yet, such as MCP tools of servers still connecting, are // activated when they register. Excluded tools never register, so they are not kept pending. this._pendingToolNames = new Set(names.filter((name) => this._isAllowedTool(name))); // Ignores names that are not registered. this._setActiveTools(names); } // ========================================================================= // Prompting // ========================================================================= /** * Start a run from a user or custom message. The session counts as busy from here on, so * messages sent while before_agent_start handlers run are queued into this run instead of * starting another, and an abort requested meanwhile aborts the run as soon as it exists. * @param onStarted Called once the run's messages are prepared, before the first request. */ private async _startRun(trigger: BeforeAgentStartTrigger, onStarted?: () => void): Promise<void> { this._isAgentRunActive = true; this._agentRunAbortRequested = false; let messages: AgentMessage[];",
-          "hintLine": 1839,
+          "quote": "// Tools the branch ever added or removed. Removed tools stay inactive. const mentioned = new Set( systemMessages .flatMap((message) => [...(message.toolsAdded ?? []), ...(message.toolsRemoved ?? [])]) .map((tool) => tool.name), ); // Extension tools the branch never mentioned were registered after it recorded its loadout, so // they are activated like newly registered tools. Built-in tools follow `defaultTools` instead. const newTools = [...this._toolRegistry.keys()].filter( (name) => !mentioned.has(name) && !this._baseToolDefinitions.has(name) && this._isActivatedOnRegistration(name), ); // The recorded loadout plus the new tools, with `--tools +name`/`-name` applied. const names = applyToolModifiers( [...getCurrentTools(systemMessages).map((tool) => tool.name), ...newTools], modifiers, ); // Recorded tools that are not registered yet, such as MCP tools of servers still connecting, are // activated when they register. Excluded tools never register, so they are not kept pending. this._pendingToolNames = new Set(names.filter((name) => this._isAllowedTool(name))); this._restoredToolNames = new Set( applyToolModifiers( getCurrentTools(systemMessages).map((tool) => tool.name), modifiers, ), );",
+          "hintLine": 1918,
           "volatility": "high"
         }
       ]
@@ -3753,17 +3753,17 @@
     {
       "id": "E209",
       "page": "12_pi_philosophy/research.md",
-      "claim": "证据：_prepareRetry:3747–3786",
-      "checkedAt": "v1.5.0",
+      "claim": "证据：reload 重绑定按 _extensionsBound 重发 session_start:3867–3872",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/src/core/agent-session.ts",
           "locator": {
             "kind": "text",
-            "value": "const hasBindings = this._extensionUIContext || this._extensionCommandContextActions || this._extensionShutdownHandler |"
+            "value": "if (this._extensionsBound) { await options?.beforeSessionStart?.(); await this._extensionRunner.emit({ type: \"session_start\", reason: \"reload\" }); thi"
           },
-          "quote": "const hasBindings = this._extensionUIContext || this._extensionCommandContextActions || this._extensionShutdownHandler || this._extensionErrorListener; if (hasBindings) { await options?.beforeSessionStart?.(); await this._extensionRunner.emit({ type: \"session_start\", reason: \"reload\" }); this._extensionRunner.reportUnhandledMcpServers(); await this.extendResourcesFromExtensions(\"reload\"); } } // ========================================================================= // Auto-Retry // ========================================================================= /** * Check if an error is retryable (overloaded, rate limit, server errors). * Context overflow errors are NOT retryable (handled by compaction instead). */ private _isRetryableError(message: AssistantMessage): boolean { // Context overflow is handled by compaction, not retry. if (isContextOverflow(message, (this._modelForMessage(message) ?? this.model)?.contextWindow ?? 0)) return false; return isRetryableAssistantError(message); } /** * Retry policy + callbacks shared by compaction and branch-summary summarization calls. * Uses the same `settings.retry` budget/backoff as agent-turn retries so a single transient * stream drop no longer fails the whole operation. `source` carries the context * the TUI needs to render the retry and recreate the underlying indicator. */ private _summarizationRetryCallbacks( source: { source: \"branchSummary\" } | { source: \"compaction\"; reason: \"manual\" | \"threshold\" | \"overflow\" }, ): RetryCallbacks { return { onRetryScheduled: (attempt, maxAttempts, delayMs, errorMessage) => { this._emit({",
-          "hintLine": 3747,
+          "quote": "if (this._extensionsBound) { await options?.beforeSessionStart?.(); await this._extensionRunner.emit({ type: \"session_start\", reason: \"reload\" }); this._extensionRunner.reportUnhandledMcpServers(); await this.extendResourcesFromExtensions(\"reload\"); }",
+          "hintLine": 3867,
           "volatility": "high"
         }
       ]
@@ -3772,7 +3772,7 @@
       "id": "E210",
       "page": "12_pi_philosophy/research.md",
       "claim": "证据：package.json:20–27",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "package.json",
@@ -3790,7 +3790,7 @@
       "id": "E211",
       "page": "12_pi_philosophy/research.md",
       "claim": "证据：tsconfig:56–57",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "tsconfig.json",
@@ -3808,7 +3808,7 @@
       "id": "E212",
       "page": "12_pi_philosophy/research.md",
       "claim": "证据：runtime-deps 负例测试:27–34",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "scripts/check-runtime-deps.test.mjs",
@@ -3826,7 +3826,7 @@
       "id": "E213",
       "page": "12_pi_philosophy/research.md",
       "claim": "证据：settings:44",
-      "checkedAt": "v1.5.0",
+      "checkedAt": "v1.6.1",
       "sources": [
         {
           "path": "packages/coding-agent/docs/settings.md",

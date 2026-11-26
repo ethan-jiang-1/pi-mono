@@ -52,9 +52,9 @@ assistant      ← 总结文本，stopReason: "stop"
 |---|---|---|
 | 形态 | append-only JSONL 树 + 投影函数 | records（conversation/entry/task/submission）+ documents + 单调 seq |
 | 状态 | v3，生产路径 | 独立实验内核（chord replicated state） |
-| "replay" 语义 | 轨迹重放 = 上下文求值 | task checkpoint 重放 = 崩溃恢复（`replay: "safe" | "unsafe"` 是**工具**恢复语义） |
+| "replay" 语义 | 轨迹重放 = 上下文求值 | task checkpoint 重放 = 崩溃恢复（`replay` 取 `"safe"` 或 `"unsafe"`，是**工具**恢复语义） |
 
-另外两个同词不同义的地方也顺带钉住：`cache-warmer` 的 `isReplayable`（[cache-warmer.ts（E024）](../_evidence/render.md#e024)）指"用单 token 上限重放请求以暖缓存"；`packages/evals` 的 transcript 重放指"把轨迹作为 prompt 喂真 provider 做评测"（[test-strategy/07](../test-strategy/07-evals-separation.md)）。本专题的"回放"专指轨迹 → 上下文/脚本的重放。
+另外两个同词不同义的地方也顺带钉住：cache warming 的 `isCacheWarmingReplayable`（v1.5.1 起是 pi-ai 共享助手 `packages/ai/src/cache-warming.ts`，coding-agent 的 cache-warmer 消费它；台账 E024）指"用单 token 上限重放请求以暖缓存"；`packages/evals` 的 transcript 重放指"把轨迹作为 prompt 喂真 provider 做评测"（[test-strategy/07](../test-strategy/07-evals-separation.md)）。本专题的"回放"专指轨迹 → 上下文/脚本的重放。
 
 ## 轨迹资产的官方通道
 

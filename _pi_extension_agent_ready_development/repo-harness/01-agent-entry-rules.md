@@ -13,12 +13,16 @@ pi-mono 对没来过的 coding agent 的全部入口合同由两个文件承担�
 > After code changes (not docs): `npm run check` (full output, no tail). Fix all errors, warnings, and infos before committing. Does not run tests.
 >
 > — AGENTS.md（[E003](../_evidence/render.md#e003)）
-
-> Run `npm run build` whenever something needs built output (`dist/`): tests or benchmarks that import built packages, Durable's workerd suite. Never use it to type check or lint: that is `npm run check`, the preferred check.
 >
-> — AGENTS.md（[E004](../_evidence/render.md#e004)）
+> Run `npm run build` whenever something needs built output (`dist/`): tests or benchmarks that import built packages, Durable's workerd suite. The full suites of Chord and Durable need it: Chord's tests that start Node processes or bundle with esbuild load workspace packages from `dist/` (the rest run from source by its vitest config), and Durable imports pi-ai's `utils/*`, which have no source export. Never use it to type check or lint: that is `npm run check`, the preferred check.
+>
+> — AGENTS.md（[E004](../_evidence/render.md#e004)，v1.5.1 起补 Chord/Durable 完整套件需先 build 的说明）
+>
+> `apps/p2` is outside the root check and the root tests. After p2 changes also run `cd apps/p2 && npm run check`; p2's suite is `cd apps/p2 && npm test` (TUI tests need Node 26, browser tests need `CHROMIUM_BIN`).
+>
+> — AGENTS.md（v1.5.1 新增；apps/p2 在根 check/测试之外，自带入口）
 
-要点：`check` 是 lint/格式/类型检查且**不跑测试**；全量 vitest 套件含 e2e（存在 endpoint/auth 环境变量时激活），非 e2e 测试用根目录 `./test.sh`，或从包根跑单个测试文件（[E005](../_evidence/render.md#e005)）。测试本身的边界：
+要点：`check` 是 lint/格式/类型检查且**不跑测试**；全量 vitest 套件含 e2e（存在 endpoint/auth 环境变量时激活），非 e2e 测试用根目录 `./test.sh`（明确只跑 `packages/*`），或从包根跑单个测试文件（[E005](../_evidence/render.md#e005)）。测试本身的边界：
 
 > For `packages/coding-agent/test/suite/`, use `test/suite/harness.ts` + the faux provider. No real provider APIs, keys, or paid tokens.
 >

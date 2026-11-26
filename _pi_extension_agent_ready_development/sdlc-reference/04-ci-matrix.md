@@ -21,12 +21,12 @@ pi-mono 的质量检查不是单一「全仓检查」按钮，而是按事件与
 
   > Runs pi's MCP client from source against the pinned official conformance suite and fails on regressions against packages/coding-agent/test/mcp-conformance/baseline.json.
 
-  
+
   即协议兼容是普通 PR CI 的独立质量边界，不被「npm test 已覆盖」概括。
 
 [E035](../_evidence/render.md#e035)
 
-根 `npm test` 的构成：先 `node --test scripts/*.test.mjs scripts/*.test.ts`（脚本自身的单测），再 `npm run test --workspaces --if-present`。因此每个 workspace 包自己的 `test` 脚本都随主 CI 执行——包括 `packages/evals` 的基础单测（它的 `test` 是 `vitest run --config vitest.test.config.ts`，，与需要真实模型的 `eval`/`eval:host`/`eval:docs` 脚本是两回事，）。
+根 `npm test` 的构成：先 `node --test scripts/*.test.mjs scripts/*.test.ts`（脚本自身的单测），再 `npm run test --workspace packages --if-present`（v1.6.1 现文；旧写法 `--workspaces`）。因此每个 workspace 包自己的 `test` 脚本都随主 CI 执行——包括 `packages/evals` 的基础单测（它的 `test` 是 `vitest run --config vitest.test.config.ts`，，与需要真实模型的 `eval`/`eval:host`/`eval:docs` 脚本是两回事，）。
 
 [E036](../_evidence/render.md#e036)
 

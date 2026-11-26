@@ -130,4 +130,11 @@ Pi 也会自动管理状态：会话持久化、上下文压缩、请求恢复�
 - **依赖规则扩展到内部包**：`AGENTS.md:45` 从 "Direct external deps" 改为 "Direct **registry** deps, **including internal workspace deps**"；`scripts/check-pinned-deps.mjs` 删除了内部包豁免，所有 registry 依赖必须是精确版本（实测仓库内已无 `^`）。
 - **发布前多了一道数据兼容门禁**：模型目录会直接服务已发布的 pi，发布前用 `check-model-catalog-compat.mjs` 对最新 release 的 pi-ai 做类型校验；不兼容时先升 `MINIMUM_PI_VERSION`（当前 1.2.1）。
 - **release 必须先 pin 最新模型目录再构建**（`scripts/release.mjs:91-129`），否则发布脚本失败——把"数据也是发布物"写进了流程。
-- **entry-graph 成本合同上调**：`packages/ai` 的 `./models` 15→20，`packages/durable` 根 66→73，并新增 `allow` 例外（`scripts/check-entry-graphs.mjs`）。
+- **entry-graph 成本合同上调**：`packages/ai` 的 `./models` 15→20，`packages/durable` 根 66→73，并新增 `
+
+## sync-0012–0015 增量（v1.5.1→v1.6.1，基线 v1.6.1）
+
+- **AGENTS.md 四轮新增四条规则**：禁运行时检查类型已保证的值（v1.5.1）→ 修法先看 sibling 实现（v1.6.0）→ tagged union 禁 `in`（v1.6.1）→ Reviews 节"评审报告等齐再汇总"（v1.6.1）。前三条是同一条主线的收紧（"运行时检查必须有 decided 边界"），且 v1.6.1 的规则在**同 release** 被代码执行（durable/chord 12 条 Breaking 全按 tagged union 改形）——"规则粒度 = 执行者精确度"的又一实例，且规则与实现同节奏。
+- **Chord v2 Code Style 绑定范围扩到全包**（v1.5.1）：`src/next/` → `src/`；规则文本不变，路径随 v2 转正搬家（`docs/next`→`docs`、`test/next/examples`→`test/examples`）。
+- **AGENTS.md 开始为 apps 层立法**：Writing p2 plugin code / Building p2's web UI（指向 `.pi/skills/p2-ui.md`）/ Working on p3 三节（v1.5.1–v1.6.0）——规则全集的边界从 packages 扩到 apps；新规则面出现时文档与规则同步立法。
+- **治理面变化**：根 `check` 链 8→9 步；v1.6.0 新增链外 `check:released-changelogs`（发布后 changelog 校验——继"数据也是发布物"之后，changelog 也成了发布物门禁）；`issue-gate.yml` 重写、关单标签清理拆出 `remove-labels-on-close.yml`；根 README 首行新增"新贡献者的 issue/PR 默认自动关闭、维护者每日复核"——贡献门收紧；`undici` 升 8.12.4（六个安全公告，#12200）。`scripts/issues` 本机批量 triage 工具删除（v1.5.1）。allow` 例外（`scripts/check-entry-graphs.mjs`）。
